@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The Current</title>
+<meta name="description" content="Rise through a tube of the second-hand archive's 109 films. Your tentacles are film strips; brush the walls to play them, linger to catch a frame. Your bell plays what you caught.">
+<style>
+:root{--ink:#f2e6cf;--gold:#f6c47a;--red:#c8361e;--dim:rgba(214,190,150,.8)}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:#050302;color:var(--ink);overflow:hidden;touch-action:none;overscroll-behavior:none;font-family:system-ui,"Helvetica Neue",Arial,sans-serif;-webkit-user-select:none;user-select:none}
+#gl{position:fixed;inset:0;width:100%;height:100%;display:block}
+.ui{position:fixed;pointer-events:none;transition:opacity .6s}
+#state{top:max(10px,env(safe-area-inset-top));right:14px;text-align:right;font:italic 14px Georgia,serif;color:var(--dim);text-shadow:0 0 6px #000;opacity:.0}
+#film{left:0;right:0;bottom:max(14px,env(safe-area-inset-bottom));text-align:center;font:italic clamp(15px,2vw,20px) Georgia,serif;text-shadow:0 0 8px #000,0 0 2px #000;opacity:0}
+#edit{top:max(10px,env(safe-area-inset-top));left:14px;pointer-events:auto;opacity:0}
+#edit button{font:600 13px system-ui;letter-spacing:.05em;color:var(--ink);background:rgba(10,7,4,.6);border:1px solid rgba(246,196,122,.5);border-radius:999px;padding:9px 14px;min-height:40px;margin-right:6px;cursor:pointer}
+#title{inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 8vw;background:radial-gradient(ellipse at 70% 50%,rgba(5,3,2,0),rgba(5,3,2,.85) 70%);pointer-events:auto}
+#title h1{margin:0;font-weight:900;letter-spacing:.22em;font-size:clamp(26px,5vw,54px);line-height:1}#title h1 i{display:block;font-family:Georgia,serif;letter-spacing:0;color:var(--gold);font-size:1.9em}
+#title p{margin:16px 0 0;max-width:520px;font-size:clamp(15px,1.9vw,19px);line-height:1.5;color:#ecd8b4}
+#title button{align-self:flex-start;margin-top:20px;font:600 15px system-ui;letter-spacing:.06em;color:#1a1208;background:var(--gold);border:0;border-radius:999px;padding:13px 24px;min-height:48px;cursor:pointer}
+#title small{margin-top:14px;max-width:520px;color:var(--dim);font:italic 13px Georgia,serif}#title a{color:var(--gold)}
+#reel{position:fixed;inset:0;display:none;background:#000}#reel canvas{width:100%;height:100%;display:block}
+#dbg{left:10px;bottom:10px;font:12px ui-monospace,monospace;color:#9ccfa4;white-space:pre;display:none;text-shadow:0 0 4px #000}
+@media (max-height:520px){#title h1{font-size:22px}#title p{font-size:14px;margin-top:10px}#title small{display:none}}
+</style>
+<script type="importmap">{"imports":{"three":"../paeleo/scion/videotext/vendor/three.module.min.js","three/addons/":"../paeleo/scion/videotext/vendor/addons/"}}</script>
+</head>
+<body>
+<canvas id="gl" aria-label="A jellyfish made of film rising through a tube lined with archive film frames"></canvas>
+<div class="ui" id="state"></div>
+<div class="ui" id="film"></div>
+<div class="ui" id="edit"><button id="play">Play your edit</button><button id="save">Save edit</button></div>
+<div class="ui" id="dbg"></div>
+<div class="ui" id="title">
+  <h1>THE<i>current</i></h1>
+  <p>Rise through the second-hand archive: a tube of 109 films, each ring a moment. Hold where you want to go and tap to pulse. Brush the walls and they play. Linger, and a frame joins one of your tentacles. Each tentacle is a film strip, and each new film grows a new one.</p>
+  <button id="go">Rise</button>
+  <small>Stop pulsing and you sink, back through time. The red ink burns what it touches; two fast pulses shake it off. <a href="NOTES_v2.md">How it works</a> · <a href="v1.html">first version</a> · <a href="../">Contaminant Jelly</a></small>
+</div>
+<div id="reel"><canvas id="rc"></canvas></div>
+<script type="module">
+import * as THREE from 'three';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+const $ = id => document.getElementById(id), Q = new URLSearchParams(location.search), COARSE = matchMedia('(pointer: coarse)').matches, DEBUG = Q.has('debug');
+const SM = Q.get('sm') || 'https://hartswf0.github.io/secondhand-motion/';
+let FILMS = await (await fetch('films109.json')).json();
+if (Q.get('films')) { const keep = Q.get('films').split(','); FILMS = FILMS.filter(f => keep.includes(f.slug)); }
+const frameURL = (f, i) => `${SM}${f.dir}/f${String(i % f.n).padStart(3, '0')}.jpg`;
+// ------------------------------------------------------------------ images: one shared cache, loaded only when a ring or a bell needs them
+const IMG = new Map();
+function img(url) { let e = IMG.get(url); if (e) return e; const im = new Image(); im.crossOrigin = 'anonymous'; e = {im, ok: false, cbs: []};
+  im.onload = () => { e.ok = true; e.cbs.forEach(f => f(im)); e.cbs = []; }; im.onerror = () => { e.bad = true; }; im.src = url; IMG.set(url, e);
+  if (IMG.size > 900) { const k = IMG.keys().next().value; IMG.delete(k); } return e; }
+function withImg(url, fn) { const e = img(url); if (e.ok) fn(e.im); else if (!e.bad) e.cbs.push(fn); }
+// ------------------------------------------------------------------ renderer
+const renderer = new THREE.WebGLRenderer({canvas: $('gl'), antialias: true, powerPreference: 'high-performance'});
+renderer.setPixelRatio(Math.min(COARSE ? 1.25 : 1.75, devicePixelRatio || 1)); renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1;
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x050302); scene.fog = new THREE.FogExp2(0x070403, .045);
+const camera = new THREE.PerspectiveCamera(60, 1, .05, 120);
+const composer = new EffectComposer(renderer); composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), .55, .45, .62); composer.addPass(bloom); composer.addPass(new OutputPass());
+function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); composer.setSize(w, h); bloom.setSize(w * .6, h * .6); camera.aspect = w / h; camera.updateProjectionMatrix(); const rc = $('rc'); rc.width = w; rc.height = h; }
+addEventListener('resize', resize); resize();
+// ------------------------------------------------------------------ the tube: a vertical time worm. Ring k sits at height k*RS; its panels hold frame (k + j) of their films,
+// so rising runs the archive forward and sinking runs it back, like scrubbing through a tomography of films
+const R = 7, RS = 2.3, PER = 16, NR = 17, PW = 2.55, PH = 1.8;
+const wall = new THREE.Mesh(new THREE.CylinderGeometry(R + .08, R + .08, 80, 64, 1, true), new THREE.MeshBasicMaterial({color: 0x0b0705, side: THREE.BackSide}));
+scene.add(wall);
+const ATW = 2048, SW = 128, SH = 96, COLS = 16;   // the frames of the visible rings share one atlas texture
+const atlasC = document.createElement('canvas'); atlasC.width = ATW; atlasC.height = ATW; const ag = atlasC.getContext('2d'); ag.fillStyle = '#100a06'; ag.fillRect(0, 0, ATW, ATW);
+const atlas = new THREE.CanvasTexture(atlasC); atlas.colorSpace = THREE.SRGBColorSpace; atlas.generateMipmaps = false; atlas.minFilter = THREE.LinearFilter;
+const slotC = document.createElement('canvas'); slotC.width = SW; slotC.height = SH; const sg = slotC.getContext('2d'); const slotTex = new THREE.CanvasTexture(slotC); slotTex.colorSpace = THREE.SRGBColorSpace;
+const _pos2 = new THREE.Vector2();
+function putSlot(slot, im) {   // draw one frame into its slot: a small upload, not the whole atlas
+  sg.drawImage(im, 0, 0, SW, SH); const c = slot % COLS, r = (slot / COLS) | 0;
+  _pos2.set(c * SW, ATW - (r + 1) * SH); slotTex.needsUpdate = true; renderer.copyTextureToTexture(_pos2, slotTex, atlas);
+}
+const NP = NR * PER, panelGeo = new THREE.PlaneGeometry(PW, PH);
+const aSlot = new THREE.InstancedBufferAttribute(new Float32Array(NP), 1), aGlow = new THREE.InstancedBufferAttribute(new Float32Array(NP), 1);
+panelGeo.setAttribute('aSlot', aSlot); panelGeo.setAttribute('aGlow', aGlow);
+const panelMat = new THREE.ShaderMaterial({fog: true, uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, {uAtlas: {value: atlas}}]),
+  vertexShader: `attribute float aSlot, aGlow; varying vec2 vUv; varying float vGlow; #include <fog_pars_vertex>
+    void main(){ float c = mod(aSlot, ${COLS}.), r = floor(aSlot / ${COLS}.); vUv = vec2((c + uv.x) * ${SW}. / ${ATW}., 1. - (r + 1. - uv.y) * ${SH}. / ${ATW}.); vGlow = aGlow;
+      vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4(position, 1.); gl_Position = projectionMatrix * mvPosition; #include <fog_vertex> }`.replace(/#include (<[^>]+>)/g, '\n#include $1\n'),
+  fragmentShader: `uniform sampler2D uAtlas; varying vec2 vUv; varying float vGlow; #include <fog_pars_fragment>
+    void main(){ vec3 c = texture2D(uAtlas, vUv).rgb; float l = dot(c, vec3(.3, .55, .15)); vec3 sep = vec3(1., .84, .6) * pow(l, 1.15);
+      vec3 col = sep * (.2 + .95 * vGlow) + vec3(1., .7, .4) * vGlow * .1; gl_FragColor = vec4(col, 1.); #include <fog_fragment> }`.replace(/#include (<[^>]+>)/g, '\n#include $1\n')});
+panelMat.uniforms.uAtlas.value = atlas;   // merge() clones textures; the atlas must be the one we copy into
+const panels = new THREE.InstancedMesh(panelGeo, panelMat, NP); panels.frustumCulled = false; scene.add(panels);
+const ringOf = new Int32Array(NR).fill(-9999), P = Array.from({length: NP}, () => ({film: 0, frame: 0, play: 0, glow: 0, next: 0, dwell: 0, cool: 0, shown: -1}));
+const hash = (a, b) => ((a * 73856093) ^ (b * 19349663)) >>> 0;
+const _m = new THREE.Matrix4(), _o = new THREE.Object3D();
+function layRing(m, k) {
+  ringOf[m] = k; const y = k * RS, tw = k * .17;   // each ring turns a little: the tube is a helix of moments
+  for (let j = 0; j < PER; j++) { const s = m * PER + j, th = j / PER * Math.PI * 2 + tw, p = P[s];
+    _o.position.set(Math.cos(th) * R, y, Math.sin(th) * R); _o.lookAt(0, y, 0); _o.updateMatrix(); panels.setMatrixAt(s, _o.matrix);
+    p.film = hash(k + 1000, j) % FILMS.length; p.frame = (k * 2 + j) % FILMS[p.film].n; p.play = 0; p.glow = 0; p.shown = -1; p.k = k; p.j = j; p.th = th; p.y = y; aSlot.setX(s, s); aGlow.setX(s, 0);
+    show(s);
+  }
+  panels.instanceMatrix.needsUpdate = true; aSlot.needsUpdate = true;
+}
+function show(s) { const p = P[s], f = FILMS[p.film], want = p.frame; if (p.shown === want) return; const url = frameURL(f, want), k = p.k;
+  withImg(url, im => { if (p.k !== k || p.frame !== want) return; putSlot(s, im); p.shown = want; }); }
+function updateRings(y) { const k0 = Math.round(y / RS); for (let k = k0 - 8; k <= k0 + 8; k++) { const m = ((k % NR) + NR) % NR; if (ringOf[m] !== k) layRing(m, k); } }
+// ------------------------------------------------------------------ currents: welling up in the middle, slack at the wall, turning slowly
+function flow(x, y, z, out) { const r = Math.hypot(x, z) / R, up = .42 * (1 - r * r) - .05, sw = .18; out.set(-z * sw / R * 2, up, x * sw / R * 2); out.x += .12 * Math.sin(y * .6 + T * .5); out.z += .12 * Math.cos(y * .5 - T * .4); return out; }
+let T = 0;
+const streakN = 260, streakG = new THREE.BufferGeometry(), streakP = new Float32Array(streakN * 3);
+for (let i = 0; i < streakN; i++) { const a = Math.random() * 6.28, r = Math.sqrt(Math.random()) * R * .9; streakP.set([Math.cos(a) * r, Math.random() * 30 - 15, Math.sin(a) * r], i * 3); }
+streakG.setAttribute('position', new THREE.BufferAttribute(streakP, 3));
+const streaks = new THREE.Points(streakG, new THREE.PointsMaterial({size: .05, color: 0xffe2b8, transparent: true, opacity: .35, depthWrite: false, blending: THREE.AdditiveBlending})); scene.add(streaks);
+// ------------------------------------------------------------------ the jellyfish: one authoritative bell; strands that obey it
+const J = {p: new THREE.Vector3(0, 0, 0), v: new THREE.Vector3(), heading: new THREE.Vector3(0, 1, 0), q: new THREE.Quaternion(), ph: 0, lastTap: -9, rhythm: 0, ink: 0, glow: 0};
+const BR = 1.15, BH = .9, pulseC = ph => { ph = ((ph % 1) + 1) % 1; return ph < .28 ? Math.sin(ph / .28 * Math.PI / 2) : 1 - (t => t * t * (3 - 2 * t))((ph - .28) / .72); };
+const contractGLSL = `float c(float ph){ ph = fract(ph); return ph < .28 ? sin(ph / .28 * 1.5708) : 1. - smoothstep(0., 1., (ph - .28) / .72); }
+  vec3 contract(vec3 p, float t, float pulse){ float k = c(pulse - t * .18) * pow(t, 1.4); p.xz *= 1. - .3 * k; p.y += .2 * k * (1. - t) + .07 * k; return p; }`;
+// the bell is particles, and the particles are the film you caught last, playing (after the Afterlight splats)
+const BN = 3400, bellG = new THREE.BufferGeometry(), bp = new Float32Array(BN * 3), buv = new Float32Array(BN * 2), bt = new Float32Array(BN), bs = new Float32Array(BN);
+for (let i = 0; i < BN; i++) { const t = Math.sqrt(Math.random()), a = t * Math.PI / 2 * 1.04, ph = Math.random() * Math.PI * 2, rr = BR * Math.sin(a) * (1 + .06 * Math.sin(t * Math.PI)), y = BH * Math.cos(a), depth = Math.random() < .3 ? .82 + .18 * Math.random() : 1;
+  bp.set([Math.cos(ph) * rr * depth, y * depth, Math.sin(ph) * rr * depth], i * 3); buv.set([.5 + Math.cos(ph) * rr / (BR * 2.1), .5 + Math.sin(ph) * rr / (BR * 2.1)], i * 2); bt[i] = t; bs[i] = Math.random(); }
+bellG.setAttribute('position', new THREE.BufferAttribute(bp, 3)); bellG.setAttribute('aUv', new THREE.BufferAttribute(buv, 2)); bellG.setAttribute('aT', new THREE.BufferAttribute(bt, 1)); bellG.setAttribute('aS', new THREE.BufferAttribute(bs, 1));
+const bellC = document.createElement('canvas'); bellC.width = 160; bellC.height = 120; const bg2 = bellC.getContext('2d'); bg2.fillStyle = '#c89a60'; bg2.fillRect(0, 0, 160, 120);
+const bellTex = new THREE.CanvasTexture(bellC); bellTex.colorSpace = THREE.SRGBColorSpace;
+const bellPts = new THREE.Points(bellG, new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+  uniforms: {uPulse: {value: 0}, uImg: {value: bellTex}, uHas: {value: 0}, uInk: {value: 0}, uGlow: {value: 0}, uScale: {value: 1}, uTime: {value: 0}},
+  vertexShader: `uniform float uPulse, uScale, uTime; attribute vec2 aUv; attribute float aT, aS; varying vec2 vUv; varying float vT, vS; ${contractGLSL}
+    void main(){ vec3 p = contract(position, aT, uPulse); p += .015 * vec3(sin(uTime * 2. + aS * 40.), cos(uTime * 1.7 + aS * 30.), sin(uTime * 1.3 + aS * 20.));
+      vUv = aUv; vT = aT; vS = aS; vec4 mv = modelViewMatrix * vec4(p, 1.); gl_PointSize = (2.2 + 3. * aS) * uScale / -mv.z; gl_Position = projectionMatrix * mv; }`,
+  fragmentShader: `uniform sampler2D uImg; uniform float uHas, uInk, uGlow; varying vec2 vUv; varying float vT, vS;
+    void main(){ vec2 q = gl_PointCoord - .5; float g = exp(-dot(q, q) * 14.); vec3 im = texture2D(uImg, vUv).rgb; float l = dot(im, vec3(.3, .55, .15));
+      vec3 film = vec3(1., .82, .58) * (.15 + 1.1 * l), warm = vec3(1., .72, .45) * (.35 + .4 * vT);
+      vec3 col = mix(warm, film, uHas) * (.55 + .7 * pow(vT, 4.)) * (1. + uGlow); col = mix(col, vec3(.7, .08, .04), uInk * .7);
+      gl_FragColor = vec4(col * g * .27, 1.); }`}));
+bellPts.frustumCulled = false;
+const shell = new THREE.Mesh(new THREE.LatheGeometry(Array.from({length: 33}, (_, i) => { const t = i / 32, a = t * Math.PI / 2 * 1.04; return new THREE.Vector2(Math.max(.001, BR * Math.sin(a) * (1 + .06 * Math.sin(t * Math.PI))), BH * Math.cos(a)); }), 72),
+  new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, uniforms: {uPulse: {value: 0}, uInk: {value: 0}},
+    vertexShader: `uniform float uPulse; varying vec3 vN, vV; varying float vT; ${contractGLSL}
+      void main(){ float t = clamp(1. - position.y / ${BH.toFixed(2)}, 0., 1.); vT = t; vec3 p = contract(position, t, uPulse); vN = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(p, 1.); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }`,
+    fragmentShader: `uniform float uInk; varying vec3 vN, vV; varying float vT; void main(){ float fr = pow(1. - abs(dot(normalize(vN), vV)), 2.6); vec3 c = vec3(1., .8, .58) * fr * (.35 + .5 * pow(vT, 5.)); c = mix(c, vec3(.6, .06, .03) * fr, uInk * .7); gl_FragColor = vec4(c, 1.); }`}));
+const bell = new THREE.Group(); bell.add(bellPts, shell); scene.add(bell);
+const lamp = new THREE.PointLight(0xffc07a, 3, 9, 1.6); bell.add(lamp);
+function rimPoint(a, out) { const k = pulseC(J.ph - .18), r = BR * (1 - .3 * k); return out.set(Math.cos(a) * r, .03 * k - .02, Math.sin(a) * r); }
+// ------------------------------------------------------------------ strands: rotation-free Verlet chains, Gauss-Seidel projection, the tube's SDF
+const MAXARMS = 10, AN = 18, FR = 10, FN = 7, NN = MAXARMS * AN + FR * FN;
+const X = new Float32Array(NN * 3), XP = new Float32Array(NN * 3);
+const arms = [], fringe = [];
+for (let i = 0; i < MAXARMS; i++) arms.push({start: i * AN, n: AN, L: .13, a: 0, on: false, film: -1, frames: [], burned: [], strip: null});
+for (let i = 0; i < FR; i++) fringe.push({start: MAXARMS * AN + i * FN, n: FN, L: .16, a: i / FR * Math.PI * 2, on: true, fringe: true});
+const chains = () => arms.filter(a => a.on).concat(fringe);
+const _r = new THREE.Vector3(), _f = new THREE.Vector3(), _p = new THREE.Vector3();
+function rootOf(ch, out) { if (ch.fringe) return rimPoint(ch.a, out).applyQuaternion(J.q).add(J.p); return out.set(Math.cos(ch.a) * .62, -.04, Math.sin(ch.a) * .62).applyQuaternion(J.q).add(J.p); }
+function seat(ch) { rootOf(ch, _r); const d = J.heading.clone().negate(); for (let j = 0; j < ch.n; j++) { const i = (ch.start + j) * 3, q = _r.clone().addScaledVector(d, j * ch.L); X[i] = XP[i] = q.x; X[i + 1] = XP[i + 1] = q.y; X[i + 2] = XP[i + 2] = q.z; } }
+const stat = {resid: 0, frames: [], checks: 0};
+function stepStrands(dt) {
+  const down = J.heading.clone().negate(), all = chains();
+  for (const ch of all) for (let j = 1; j < ch.n; j++) {
+    const i = (ch.start + j) * 3; flow(X[i], X[i + 1], X[i + 2], _f);
+    const vx = (X[i] - XP[i]) / dt, vy = (X[i + 1] - XP[i + 1]) / dt, vz = (X[i + 2] - XP[i + 2]) / dt, kd = ch.fringe ? 1.3 : 1.1, sink = ch.fringe ? 1.1 : .9;
+    let ax = kd * (_f.x - vx) + down.x * sink, ay = kd * (_f.y - vy) + down.y * sink - .25, az = kd * (_f.z - vz) + down.z * sink;
+    if (!ch.fringe) { const ox = X[i] - J.p.x, oy = X[i + 1] - J.p.y, oz = X[i + 2] - J.p.z, al = ox * J.heading.x + oy * J.heading.y + oz * J.heading.z, sx = ox - J.heading.x * al, sy = oy - J.heading.y * al, sz = oz - J.heading.z * al, sl = Math.hypot(sx, sy, sz) || 1; ax += sx / sl * .9; ay += sy / sl * .9; az += sz / sl * .9; }
+    const nx = X[i] + (X[i] - XP[i]) * .97 + ax * dt * dt, ny = X[i + 1] + (X[i + 1] - XP[i + 1]) * .97 + ay * dt * dt, nz = X[i + 2] + (X[i + 2] - XP[i + 2]) * .97 + az * dt * dt;
+    XP[i] = X[i]; XP[i + 1] = X[i + 1]; XP[i + 2] = X[i + 2]; X[i] = nx; X[i + 1] = ny; X[i + 2] = nz;
+  }
+  for (const ch of all) { rootOf(ch, _r); const i = ch.start * 3; X[i] = XP[i] = _r.x; X[i + 1] = XP[i + 1] = _r.y; X[i + 2] = XP[i + 2] = _r.z; }
+  let resid = 0;
+  for (let it = 0; it < 14; it++) for (const ch of all) { const fwd = it % 2 === 0, n = ch.n;
+    for (let jj = 0; jj < n - 1; jj++) { const j = fwd ? jj : n - 2 - jj, a = (ch.start + j) * 3, b = a + 3, dx = X[b] - X[a], dy = X[b + 1] - X[a + 1], dz = X[b + 2] - X[a + 2], d = Math.hypot(dx, dy, dz) || 1e-6, e = (d - ch.L) / d;
+      if (it === 13) resid = Math.max(resid, Math.abs(d - ch.L) / ch.L); const wa = j === 0 ? 0 : .5, wb = j === 0 ? 1 : .5;
+      X[a] += dx * e * wa; X[a + 1] += dy * e * wa; X[a + 2] += dz * e * wa; X[b] -= dx * e * wb; X[b + 1] -= dy * e * wb; X[b + 2] -= dz * e * wb; }
+    if (!ch.fringe) for (let j = 0; j < n - 2; j++) { const a = (ch.start + j) * 3, b = a + 6, dx = X[b] - X[a], dy = X[b + 1] - X[a + 1], dz = X[b + 2] - X[a + 2], d = Math.hypot(dx, dy, dz) || 1e-6, mn = ch.L * 1.85;
+      if (d < mn) { const e = (d - mn) / d * .3, wa = j === 0 ? 0 : .5; X[a] += dx * e * wa; X[a + 1] += dy * e * wa; X[a + 2] += dz * e * wa; X[b] -= dx * e * .5; X[b + 1] -= dy * e * .5; X[b + 2] -= dz * e * .5; } } }
+  for (const ch of all) for (let j = 1; j < ch.n; j++) { const i = (ch.start + j) * 3, r = Math.hypot(X[i], X[i + 2]), lim = R - .12;   // SDF of the tube: phi = R - r
+    if (r > lim) { const k = lim / r; X[i] *= k; X[i + 2] *= k; }
+    _p.set(X[i], X[i + 1], X[i + 2]).sub(J.p); const up = _p.dot(J.heading), side = _p.addScaledVector(J.heading, -up), rs = side.length();
+    if (up > -.05 && up < .55 && rs < BR * .66) { side.multiplyScalar((BR * .66 - rs) / (rs || 1)); X[i] += side.x; X[i + 1] += side.y; X[i + 2] += side.z; } }
+  stat.resid = resid;
+}
+// ------------------------------------------------------------------ the arms are film strips: ribbons on transported frames, textured with the frames you caught
+const STRIP_W = .5, stripC = () => { const c = document.createElement('canvas'); c.width = 64; c.height = 1024; return c; };
+function drawStrip(a) {
+  const c = a.canvas, g = c.getContext('2d'), n = Math.max(1, a.frames.length), fh = Math.min(64, Math.floor(1024 / Math.max(6, n)));
+  g.clearRect(0, 0, 64, 1024); g.fillStyle = a.film < 0 ? 'rgba(120,70,30,.55)' : 'rgba(18,11,6,.92)'; g.fillRect(0, 0, 64, 1024);
+  a.frames.forEach((fi, i) => { const y = i * fh, e = img(frameURL(FILMS[a.film], fi)); if (e.ok) { g.filter = a.burned[i] ? 'sepia(1) brightness(.35) contrast(2)' : 'sepia(.85)'; g.drawImage(e.im, 12, y + 2, 40, fh - 4); g.filter = 'none'; }
+    else { g.fillStyle = 'rgba(200,160,110,.3)'; g.fillRect(12, y + 2, 40, fh - 4); withImg(frameURL(FILMS[a.film], fi), () => drawStrip(a)); }
+    if (a.burned[i]) { const gr = g.createRadialGradient(32, y + fh / 2, 2, 32, y + fh / 2, fh * .6); gr.addColorStop(0, 'rgba(0,0,0,1)'); gr.addColorStop(.7, 'rgba(255,110,40,.9)'); gr.addColorStop(1, 'rgba(255,110,40,0)'); g.fillStyle = gr; g.fillRect(12, y, 40, fh); } });
+  for (let y = 4; y < 1024; y += 12) { g.clearRect(3, y, 6, 6); g.clearRect(55, y, 6, 6); }   // sprocket holes, open to the water
+  a.tex.needsUpdate = true; a.used = Math.min(1, (n * fh) / 1024);
+}
+const stripMat = tex => new THREE.ShaderMaterial({transparent: true, depthWrite: false, side: THREE.DoubleSide, uniforms: {uMap: {value: tex}, uUsed: {value: 1}, uInk: {value: 0}, uLeader: {value: 0}},
+  vertexShader: `varying vec2 vUv; varying vec3 vN, vV; void main(){ vUv = uv; vN = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(position, 1.); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }`,
+  fragmentShader: `uniform sampler2D uMap; uniform float uUsed, uInk, uLeader; varying vec2 vUv; varying vec3 vN, vV;
+    void main(){ vec4 t = texture2D(uMap, vec2(vUv.x, 1. - vUv.y * uUsed)); float fr = .6 + .4 * abs(dot(normalize(vN), vV)); vec3 c = t.rgb * (1.6 + .6 * uLeader) * fr;
+      c = mix(c, vec3(.5, .05, .03), uInk * .5); float a = t.a * (.9 - .5 * vUv.y * uLeader); if (a < .03) discard; gl_FragColor = vec4(c, a); }`});
+function makeStrip(a) {
+  a.canvas = stripC(); a.tex = new THREE.CanvasTexture(a.canvas); a.tex.colorSpace = THREE.SRGBColorSpace;
+  const g = new THREE.BufferGeometry(), nv = a.n * 2; g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(nv * 3), 3).setUsage(THREE.DynamicDrawUsage));
+  g.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(nv * 3), 3).setUsage(THREE.DynamicDrawUsage)); const uv = new Float32Array(nv * 2), idx = [];
+  for (let j = 0; j < a.n; j++) { uv.set([0, j / (a.n - 1), 1, j / (a.n - 1)], j * 4); if (j < a.n - 1) idx.push(j * 2, j * 2 + 1, j * 2 + 2, j * 2 + 1, j * 2 + 3, j * 2 + 2); }
+  g.setAttribute('uv', new THREE.BufferAttribute(uv, 2)); g.setIndex(idx);
+  a.mesh = new THREE.Mesh(g, stripMat(a.tex)); a.mesh.frustumCulled = false; scene.add(a.mesh); drawStrip(a);
+}
+const _t = new THREE.Vector3(), _n = new THREE.Vector3(), _b = new THREE.Vector3();
+function skinStrip(a) {
+  const P = a.mesh.geometry.attributes.position.array, N = a.mesh.geometry.attributes.normal.array;
+  for (let j = 0; j < a.n; j++) { const i = (a.start + j) * 3, i2 = (a.start + Math.min(a.n - 1, j + 1)) * 3, i0 = (a.start + Math.max(0, j - 1)) * 3;
+    _t.set(X[i2] - X[i0], X[i2 + 1] - X[i0 + 1], X[i2 + 2] - X[i0 + 2]).normalize();
+    if (j === 0) { _n.set(Math.cos(a.a), 0, Math.sin(a.a)).applyQuaternion(J.q); } _n.addScaledVector(_t, -_n.dot(_t)).normalize();   // parallel transport of the ribbon's face
+    _b.crossVectors(_t, _n); const w = STRIP_W * (1 - .25 * j / a.n) * .5, tw = Math.sin(j * .35 + T * 1.3) * .5;   // a slow twist, as film curls
+    const sx = _b.x * Math.cos(tw) + _n.x * Math.sin(tw), sy = _b.y * Math.cos(tw) + _n.y * Math.sin(tw), sz = _b.z * Math.cos(tw) + _n.z * Math.sin(tw);
+    P.set([X[i] - sx * w, X[i + 1] - sy * w, X[i + 2] - sz * w, X[i] + sx * w, X[i + 1] + sy * w, X[i + 2] + sz * w], j * 6);
+    const nx = _n.x * Math.cos(tw) - _b.x * Math.sin(tw), ny = _n.y * Math.cos(tw) - _b.y * Math.sin(tw), nz = _n.z * Math.cos(tw) - _b.z * Math.sin(tw); N.set([nx, ny, nz, nx, ny, nz], j * 6); }
+  a.mesh.geometry.attributes.position.needsUpdate = true; a.mesh.geometry.attributes.normal.needsUpdate = true;
+  a.mesh.material.uniforms.uUsed.value = a.used || 1; a.mesh.material.uniforms.uInk.value = J.ink; a.mesh.material.uniforms.uLeader.value = a.film < 0 ? 1 : 0;
+}
+// the fine fringe: a few thin threads at the margin, shaded tubes (a body, not hair)
+const fringeG = new THREE.BufferGeometry(), FRAD = 4, fv = FR * FN * FRAD; fringeG.setAttribute('position', new THREE.BufferAttribute(new Float32Array(fv * 3), 3).setUsage(THREE.DynamicDrawUsage));
+{ const idx = []; for (let c = 0; c < FR; c++) for (let j = 0; j < FN - 1; j++) for (let k = 0; k < FRAD; k++) { const a = (c * FN + j) * FRAD + k, b = (c * FN + j) * FRAD + (k + 1) % FRAD; idx.push(a, a + FRAD, b, b, a + FRAD, b + FRAD); } fringeG.setIndex(idx); }
+const fringeMesh = new THREE.Mesh(fringeG, new THREE.MeshBasicMaterial({color: 0xffc89a, transparent: true, opacity: .22, blending: THREE.AdditiveBlending, depthWrite: false})); fringeMesh.frustumCulled = false; scene.add(fringeMesh);
+function skinFringe() { const Pp = fringeG.attributes.position.array; let o = 0;
+  for (const ch of fringe) { _n.set(0, 0, 0); for (let j = 0; j < ch.n; j++) { const i = (ch.start + j) * 3, i2 = (ch.start + Math.min(ch.n - 1, j + 1)) * 3, i0 = (ch.start + Math.max(0, j - 1)) * 3;
+    _t.set(X[i2] - X[i0], X[i2 + 1] - X[i0 + 1], X[i2 + 2] - X[i0 + 2]).normalize(); if (j === 0) _n.set(Math.cos(ch.a), 0, Math.sin(ch.a)); _n.addScaledVector(_t, -_n.dot(_t)).normalize(); _b.crossVectors(_t, _n);
+    const r = .016 * (1 - .7 * j / ch.n); for (let k = 0; k < FRAD; k++) { const th = k / FRAD * 6.283, cx = Math.cos(th) * r, sx = Math.sin(th) * r; Pp[o++] = X[i] + _n.x * cx + _b.x * sx; Pp[o++] = X[i + 1] + _n.y * cx + _b.y * sx; Pp[o++] = X[i + 2] + _n.z * cx + _b.z * sx; } } }
+  fringeG.attributes.position.needsUpdate = true; }
+function addArm(film) {   // a new film grows a new strip: it unrolls from the bell
+  const a = arms.find(a => !a.on); if (!a) return null; a.on = true; a.film = film; a.frames = []; a.burned = []; a.L = .1;
+  const on = arms.filter(x => x.on); on.forEach((x, i) => x.a = i / on.length * Math.PI * 2 + .3); seat(a); if (!a.mesh) makeStrip(a); else { a.mesh.visible = true; drawStrip(a); } return a;
+}
+// ------------------------------------------------------------------ brushing and catching: strand nodes near the wall find their panel directly (the tube is its own grid)
+const panelAt = (x, y, z) => { const k = Math.round(y / RS), m = ((k % NR) + NR) % NR; if (ringOf[m] !== k || Math.abs(y - k * RS) > PH * .55) return -1;
+  let th = Math.atan2(z, x) - k * .17; th = ((th % 6.2832) + 6.2832) % 6.2832; const j = Math.round(th / 6.2832 * PER) % PER, dth = Math.abs(th - j / PER * 6.2832); if (Math.min(dth, 6.2832 - dth) * R > PW * .5) return -1; return m * PER + j; };
+const caught = [], seen = new Set(); let catchCool = 0;
+function brushPass(dt) {
+  let checks = 0; const now = T;
+  for (const ch of chains()) { for (let j = ch.fringe ? 3 : 2; j < ch.n; j += ch.fringe ? 3 : 2) { const i = (ch.start + j) * 3; if (Math.hypot(X[i], X[i + 2]) < R - .7) continue; checks++;
+    const s = panelAt(X[i], X[i + 1], X[i + 2]); if (s < 0) continue; const p = P[s];
+    if (p.play < now) { buzz(5); brushSound(); }
+    p.play = now + 2.2; p.dwell += dt * (ch.fringe ? 1.2 : 3);   // an arm lingering on a frame takes it
+    if (p.dwell > .6 && p.cool < now && now > catchCool) catchFrame(s, ch); } }
+  stat.checks = checks;
+  let playing = 0;
+  for (let s = 0; s < NP; s++) { const p = P[s], on = p.play > now; p.dwell = Math.max(0, p.dwell - dt * .8); const g = on ? 1 : Math.max(0, p.glow - dt * .7);
+    if (g !== p.glow) { p.glow = g; aGlow.setX(s, g); }
+    if (on) { playing++; if (now > p.next) { const f = FILMS[p.film]; p.frame = (p.frame + 1) % f.n; p.next = now + 1 / Math.min(10, f.fps || 8); show(s); } } }
+  aGlow.needsUpdate = true; return playing;
+}
+function catchFrame(s, ch) {
+  const p = P[s], f = FILMS[p.film]; p.cool = T + 9; p.dwell = 0; catchCool = T + 1.1;
+  let a = arms.find(x => x.on && x.film === p.film);
+  if (!a) { a = arms.find(x => x.on && x.film < 0) || null; if (a) { a.film = p.film; a.frames = []; a.burned = []; } else a = addArm(p.film); if (!a) a = ch.film >= 0 ? ch : arms.find(x => x.on); }
+  if (!a || a.film !== p.film) return;
+  a.frames.push(p.frame); a.burned.push(false); a.L = Math.min(.36, .13 + .024 * a.frames.length); drawStrip(a);   // the timeline grows as it fills
+  caught.push({film: p.film, frame: p.frame, t: T, y: J.p.y}); seen.add(p.film); bellFilm = {film: p.film, from: p.frame, t0: T};
+  J.glow = 1; sfx('sfx_catch', .8); buzz([14, 30, 22]); tone(392 * Math.pow(2, (p.film % 12) / 12), 1, .06);
+  say(`${f.title}${f.src ? ' · ' + f.src : ''} · frame ${p.frame + 1}`);
+  if (caught.length === 4) $('edit').style.opacity = 1;
+}
+// ------------------------------------------------------------------ the bell plays the film you caught last
+let bellFilm = null, bellNext = 0;
+function stepBellFilm() {
+  if (!bellFilm || T < bellNext) return; const f = FILMS[bellFilm.film], i = bellFilm.from + Math.floor((T - bellFilm.t0) * Math.min(10, f.fps || 8)); bellNext = T + .1;
+  withImg(frameURL(f, i), im => { bg2.drawImage(im, 0, 0, 160, 120); bellTex.needsUpdate = true; bellPts.material.uniforms.uHas.value = 1; });
+  withImg(frameURL(f, i + 1), () => {});
+}
+// ------------------------------------------------------------------ the censor's ink: it falls through the current, clings, burns the newest frame on a strip
+const inkGeo = new THREE.IcosahedronGeometry(.32, 2), inkMat = new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: {uTime: {value: 0}},
+  vertexShader: `uniform float uTime; varying vec3 vN, vV; void main(){ vec3 p = position * (1. + .3 * sin(position.x * 9. + uTime * 3.) * sin(position.y * 7. - uTime * 2.)); vN = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(p, 1.); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }`,
+  fragmentShader: `varying vec3 vN, vV; void main(){ float fr = pow(1. - abs(dot(normalize(vN), vV)), 2.); gl_FragColor = vec4(vec3(1., .14, .05) * (.08 + 1.1 * fr), 1.); }`});
+const inks = []; let inkY = 10;
+function stepInk(dt) {
+  while (inkY < J.p.y + 22) { inkY += 10 + Math.random() * 10; const a = Math.random() * 6.28, r = Math.sqrt(Math.random()) * R * .75, m = new THREE.Mesh(inkGeo, inkMat); m.position.set(Math.cos(a) * r, inkY, Math.sin(a) * r); scene.add(m); inks.push({m, on: -1, arm: null}); }
+  for (let n = inks.length - 1; n >= 0; n--) { const k = inks[n], p = k.m.position;
+    if (k.on >= 0) { const i = k.on * 3; p.set(X[i], X[i + 1], X[i + 2]); continue; }
+    flow(p.x, p.y, p.z, _f); p.addScaledVector(_f, dt * .3); p.y -= .55 * dt; k.m.rotation.y += dt;
+    if (p.y < J.p.y - 14) { scene.remove(k.m); inks.splice(n, 1); continue; }
+    if (p.distanceTo(J.p) < 1.1) { stick(k, null, 0); continue; }
+    for (const a of arms) { if (!a.on) continue; for (let j = 3; j < a.n; j += 3) { const i = (a.start + j) * 3; if (Math.hypot(p.x - X[i], p.y - X[i + 1], p.z - X[i + 2]) < .5) { stick(k, a, a.start + j); break; } } if (k.on >= 0) break; }
+  }
+  const held = inks.filter(k => k.on >= 0).length; J.inkHeld = held > 0; J.ink = THREE.MathUtils.clamp(J.ink + (held ? .06 * held : -.03) * dt, 0, 1);
+}
+function stick(k, a, node) { k.on = node; k.arm = a; buzz([30, 40, 60]); tone(98, .5, .12);
+  if (a && a.frames.length) { const i = a.frames.length - 1; if (!a.burned[i]) { a.burned[i] = true; drawStrip(a); say('the censor burns a frame'); } }
+  else say('ink on you: pulse twice, fast'); }
+function shake() { let n = 0; for (const k of inks) if (k.on >= 0) { k.on = -1; k.m.position.addScaledVector(J.heading, -1.6); n++; } if (n) { tone(330, .3, .06); say('shaken off'); } }
+// ------------------------------------------------------------------ sound and touch
+let ac = null; const SND = {};
+function snd(n, v, loop) { if (!SND[n]) { const a = new Audio(`../paeleo/scion/videotext/memory-maker/fal/${n}.mp3`); a.loop = !!loop; SND[n] = a; } SND[n].volume = v; return SND[n]; }
+function sfx(n, v) { try { const a = snd(n, v).cloneNode(); a.volume = v; a.play().catch(() => {}); } catch (e) {} }
+function tone(f, d, g) { if (!ac) return; const t = ac.currentTime, o = ac.createOscillator(), v = ac.createGain(); o.type = 'triangle'; o.frequency.setValueAtTime(f, t); v.gain.setValueAtTime(0, t); v.gain.linearRampToValueAtTime(g, t + .01); v.gain.exponentialRampToValueAtTime(.0001, t + d); o.connect(v).connect(ac.destination); o.start(t); o.stop(t + d + .05); }
+function thump(q) { if (!ac) return; const t = ac.currentTime, o = ac.createOscillator(), v = ac.createGain(); o.frequency.setValueAtTime(120 + 60 * q, t); o.frequency.exponentialRampToValueAtTime(46, t + .25); v.gain.setValueAtTime(0, t); v.gain.linearRampToValueAtTime(.2, t + .012); v.gain.exponentialRampToValueAtTime(.0001, t + .35); o.connect(v).connect(ac.destination); o.start(t); o.stop(t + .4); }
+let lastBrush = 0; function brushSound() { if (!ac || T - lastBrush < .08) return; lastBrush = T; const t = ac.currentTime, b = ac.createBuffer(1, ac.sampleRate * .06 | 0, ac.sampleRate), x = b.getChannelData(0); for (let i = 0; i < x.length; i++) x[i] = (Math.random() * 2 - 1) * (1 - i / x.length);
+  const s = ac.createBufferSource(), f = ac.createBiquadFilter(), v = ac.createGain(); f.type = 'bandpass'; f.frequency.value = 2400 + Math.random() * 1500; f.Q.value = 2; v.gain.value = .05; s.buffer = b; s.connect(f).connect(v).connect(ac.destination); s.start(t); }   // a film edge flicking past
+const buzz = p => { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} };
+// ------------------------------------------------------------------ the only words: what just changed, and they leave
+let sayT = -9; function say(t) { $('film').textContent = t; $('film').style.opacity = 1; sayT = T; }
+// ------------------------------------------------------------------ control: hold where you want to go; tap to pulse; let go and you sink
+const ptr = {down: false, x: 0, y: 0}, keys = new Set(), G = {state: 'title'};
+function pulse() { const now = performance.now() / 1000, gap = now - J.lastTap; if (gap < .2) return; if (gap < .45 && J.inkHeld) shake();
+  J.rhythm = gap > .5 && gap < 1.1 ? Math.min(1, J.rhythm + .25) : Math.max(0, J.rhythm - .3); J.lastTap = now; J.ph = Math.floor(J.ph) + .001;
+  J.v.addScaledVector(J.heading, 1.05 + .9 * J.rhythm); thump(J.rhythm); buzz(Math.round(9 + 12 * J.rhythm)); }
+const ray = new THREE.Raycaster(), _nd = new THREE.Vector2();
+function target() {   // the held point, on the tube wall: the jellyfish swims toward the frame you touch
+  _nd.set(ptr.x / innerWidth * 2 - 1, -(ptr.y / innerHeight * 2 - 1)); ray.setFromCamera(_nd, camera); const o = ray.ray.origin, d = ray.ray.direction;
+  const a = d.x * d.x + d.z * d.z, b = 2 * (o.x * d.x + o.z * d.z), c = o.x * o.x + o.z * o.z - R * R, t = (-b + Math.sqrt(Math.max(0, b * b - 4 * a * c))) / (2 * a || 1);
+  return o.clone().addScaledVector(d, Math.min(30, t)); }
+function stepJelly(dt) {
+  flow(J.p.x, J.p.y, J.p.z, _f); let want = new THREE.Vector3(0, 1, 0);
+  if (ptr.down && G.state === 'play') { const d = target().sub(J.p), L = d.length(); if (L > .4) { want.copy(d).normalize(); J.v.addScaledVector(want, Math.min(2.2, L * .5) * dt * 1.4); } }
+  const kx = (keys.has('arrowright') || keys.has('d')) - (keys.has('arrowleft') || keys.has('a')), ky = (keys.has('arrowup') || keys.has('w')) - (keys.has('arrowdown') || keys.has('s'));
+  if (kx || ky) { const right = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0), fwd = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 2).negate().setY(0).normalize();
+    want.copy(right).multiplyScalar(kx).addScaledVector(fwd, ky).add(new THREE.Vector3(0, .6, 0)).normalize(); J.v.addScaledVector(want, 1.6 * dt); }
+  J.v.y -= .55 * dt;   // a little heavier than water: rest, and you sink back through the films
+  J.v.lerp(_f, 1 - Math.pow(.6, dt)); J.p.addScaledVector(J.v, dt);
+  const r = Math.hypot(J.p.x, J.p.z), lim = R - .85; if (r > lim) { J.p.x *= lim / r; J.p.z *= lim / r; const n = new THREE.Vector3(J.p.x, 0, J.p.z).normalize(); J.v.addScaledVector(n, -Math.max(0, J.v.dot(n))); }
+  J.p.y = Math.max(-2, J.p.y);
+  J.heading.lerp(want.add(new THREE.Vector3(0, .5, 0)).normalize(), 1 - Math.pow(.1, dt)).normalize(); J.q.slerp(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), J.heading), 1 - Math.pow(.05, dt));
+  J.ph += dt * (performance.now() / 1000 - J.lastTap < 1.3 ? 1.25 : .5); J.glow = Math.max(0, J.glow - dt * 1.4);
+}
+// ------------------------------------------------------------------ camera: on the far side of the axis, level with the bell, so the wall behind it fills the frame
+let camA = 0;
+function stepCamera(dt) { const r = Math.hypot(J.p.x, J.p.z); if (r > .6) { let a = Math.atan2(J.p.z, J.p.x), d = a - camA; d = Math.atan2(Math.sin(d), Math.cos(d)); camA += d * (1 - Math.pow(.15, dt)); }
+  const rj = Math.max(.6, Math.hypot(J.p.x, J.p.z)), rc = rj - 3.4, cp = new THREE.Vector3(Math.cos(camA) * rc, J.p.y + .45, Math.sin(camA) * rc); camera.position.lerp(cp, 1 - Math.pow(.02, dt)); camera.lookAt(J.p.x, J.p.y - .45, J.p.z);
+  wall.position.y = J.p.y; streaks.position.y = Math.floor(J.p.y / 30) * 30; }
+// ------------------------------------------------------------------ your edit: every frame caught, in the order you caught it, each strip its own track
+function playEdit() {
+  if (!caught.length) return; G.state = 'reel'; $('reel').style.display = 'block'; const c = $('rc'), g = c.getContext('2d'); let i = 0, t0 = performance.now(), lastI = -1;
+  const step = () => { if (G.state !== 'reel') return; i = Math.floor((performance.now() - t0) / 420); if (i >= caught.length) { G.state = 'play'; $('reel').style.display = 'none'; return; }
+    const e = caught[i], f = FILMS[e.film], im = img(frameURL(f, e.frame)); g.fillStyle = '#000'; g.fillRect(0, 0, c.width, c.height);
+    if (i !== lastI) { lastI = i; tone(392 * Math.pow(2, (e.film % 12) / 12), .5, .05); }
+    if (im.ok) { const s = Math.max(c.width / im.im.naturalWidth, c.height / im.im.naturalHeight); g.filter = 'sepia(.7)'; g.drawImage(im.im, (c.width - im.im.naturalWidth * s) / 2, (c.height - im.im.naturalHeight * s) / 2, im.im.naturalWidth * s, im.im.naturalHeight * s); g.filter = 'none'; }
+    g.fillStyle = 'rgba(242,230,207,.85)'; g.font = `italic ${Math.round(c.height * .03)}px Georgia`; g.fillText(`${i + 1} / ${caught.length} · ${f.title}`, c.width * .03, c.height * .95);
+    requestAnimationFrame(step); };
+  step();
+}
+function saveEdit() { const edl = {title: 'The Current: an edit', made: new Date().toISOString(), events: caught.map((e, i) => ({n: i + 1, film: FILMS[e.film].slug, title: FILMS[e.film].title, source: FILMS[e.film].src, frame: e.frame, url: frameURL(FILMS[e.film], e.frame), at_height_m: +e.y.toFixed(1)}))};
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(edl, null, 1)], {type: 'application/json'})); a.download = 'the-current-edit.json'; a.click(); }
+// ------------------------------------------------------------------ the loop
+let last = performance.now(), acc = 0; const DT = 1 / 120;
+function frame(now) {
+  requestAnimationFrame(frame); const real = Math.min(.05, (now - last) / 1000); last = now; if (G.state === 'reel') return; acc += real; const t0 = performance.now();
+  let n = 0; while (acc >= DT && n < 12) { T += DT; if (G.state === 'play') stepJelly(DT); else { J.p.y += Math.sin(T * .7) * .002; J.ph += DT * .55; } stepStrands(DT); stepInk(DT); acc -= DT; n++; } if (n === 12) acc = 0;
+  updateRings(J.p.y); const playing = brushPass(real); stepBellFilm();
+  for (const a of arms) if (a.on) skinStrip(a); skinFringe();
+  bell.position.copy(J.p); bell.quaternion.copy(J.q); const u = bellPts.material.uniforms; u.uPulse.value = J.ph; u.uTime.value = T; u.uInk.value = J.ink; u.uGlow.value = J.glow; u.uScale.value = innerHeight * renderer.getPixelRatio() / 1.15 * .01;
+  shell.material.uniforms.uPulse.value = J.ph; shell.material.uniforms.uInk.value = J.ink; inkMat.uniforms.uTime.value = T;
+  lamp.intensity = 2 + 2.5 * pulseC(J.ph) + J.glow * 6; fringeMesh.material.color.setRGB(1, .78 - .5 * J.ink, .6 - .4 * J.ink);
+  stepCamera(real);
+  if (SND.sfx_projector_loop) SND.sfx_projector_loop.volume = Math.min(.5, playing * .05);
+  if (T - sayT > 2.2) $('film').style.opacity = 0;
+  if (G.state === 'play') { const st = $('state'); st.textContent = `${Math.max(0, J.p.y).toFixed(0)} m · ${caught.length} frames · ${seen.size} films${J.ink > .05 ? ' · ink ' + Math.round(J.ink * 100) + '%' : ''}`; st.style.opacity = J.ink > .05 || T - (G.lastChange || 0) < 3 ? .9 : .35;
+    if (J.ink >= 1) { J.ink = .4; for (const k of inks) if (k.on >= 0) { k.on = -1; } J.p.y = Math.max(0, J.p.y - 8); say('the ink took you down eight metres'); } }
+  composer.render();
+  const ft = performance.now() - t0; stat.frames.push(ft); if (stat.frames.length > 240) stat.frames.shift();
+  if (DEBUG) { const s = stat.frames.slice().sort((a, b) => a - b), q = x => s[Math.floor(x * (s.length - 1))].toFixed(1); $('dbg').textContent = `strands ${chains().length} · nodes ${NN} · stretch ${(stat.resid * 100).toFixed(2)}%\nwall checks ${stat.checks} · playing ${playing} · images ${IMG.size}\nframe ms p50 ${q(.5)} p95 ${q(.95)} p99 ${q(.99)}`; }
+}
+// ------------------------------------------------------------------ start
+function begin() { if (!ac) { const A = window.AudioContext || window.webkitAudioContext; if (A) ac = new A(); } if (ac && ac.state === 'suspended') ac.resume();
+  for (const [n, v] of [['music_ocean', .32], ['sfx_ocean_bed', .22]]) snd(n, v, true).play().catch(() => {}); snd('sfx_projector_loop', 0, true).play().catch(() => {});
+  $('title').style.display = 'none'; G.state = 'play'; say(COARSE ? 'hold where you want to go · tap to pulse' : 'hold where you want to go (or arrows) · click or space to pulse'); }
+const cv = $('gl');
+cv.addEventListener('pointerdown', e => { ptr.down = true; ptr.x = e.clientX; ptr.y = e.clientY; if (G.state === 'play') pulse(); try { cv.setPointerCapture(e.pointerId); } catch (x) {} });
+cv.addEventListener('pointermove', e => { ptr.x = e.clientX; ptr.y = e.clientY; });
+addEventListener('pointerup', () => { ptr.down = false; });
+addEventListener('keydown', e => { const k = e.key.toLowerCase(); if (k === ' ') { e.preventDefault(); if (G.state === 'play') pulse(); else if (G.state === 'reel') { G.state = 'play'; $('reel').style.display = 'none'; } } if (k.startsWith('arrow')) e.preventDefault(); keys.add(k); });
+addEventListener('keyup', e => keys.delete(e.key.toLowerCase()));
+$('reel').addEventListener('pointerdown', () => { G.state = 'play'; $('reel').style.display = 'none'; });
+$('go').onclick = begin; $('play').onclick = playEdit; $('save').onclick = saveEdit; if (DEBUG) $('dbg').style.display = 'block';
+addArm(-1); addArm(-1);   // two lengths of clear leader, waiting for film
+J.q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), J.heading); for (const ch of chains()) seat(ch); updateRings(0); camera.position.set(-2.8, .45, 0);
+requestAnimationFrame(frame);
+window.__cur = () => ({state: G.state, y: J.p.y, caught: caught.length, films: seen.size, arms: arms.filter(a => a.on).length, ink: J.ink, resid: stat.resid, checks: stat.checks, images: IMG.size,
+  p95: (() => { const s = stat.frames.slice().sort((a, b) => a - b); return s[Math.floor(.95 * (s.length - 1))]; })(),
+  wall: (() => { const a = camA + Math.PI * 0, p = new THREE.Vector3(Math.cos(camA) * R * .97, J.p.y + .3, Math.sin(camA) * R * .97).project(camera); return [(p.x + 1) / 2 * innerWidth, (1 - p.y) / 2 * innerHeight]; })()});
+</script>
+</body>
+</html>
