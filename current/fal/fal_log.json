@@ -1,0 +1,17 @@
+[
+ {
+  "endpoint": "minimax/h3-max/text-to-video",
+  "name": "design_v2",
+  "seconds": 15.6,
+  "arguments": {
+   "duration": 10,
+   "resolution": "1080P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "prompt": "Dark 3D game, vertical camera rising up inside a tall cylindrical tunnel whose walls are lined with thousands of small glowing black-and-white archive film frames in rings, like a tomography scan of old films. A translucent jellyfish whose bell is made of glowing particles showing a moving sepia film image, and whose long tentacles are curling strips of 35mm film stock with sprocket holes, swims upward with slow pulses; when a tentacle brushes the wall, the frames there light up and start to play. Soft upward currents of light, a few drifting red ink clouds. Chase camera below and behind the jellyfish, smooth.",
+  "files": [
+   "fal/design_v2.mp4"
+  ]
+ }
+]
