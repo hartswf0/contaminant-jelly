@@ -28,5 +28,20 @@
   "files": [
    "fal/design_v4.mp4"
   ]
+ },
+ {
+  "endpoint": "minimax/h3-max/text-to-video",
+  "name": "design_v5",
+  "seconds": 17.9,
+  "arguments": {
+   "duration": 10,
+   "resolution": "1080P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "prompt": "LAW: one small golden jellyfish of light, its bell a dome of shimmering particles, its eight tentacles chains of glowing beads, swims away from the camera through a vast dark underwater tunnel; the camera follows low and behind it the whole time, then pulls back wide to reveal more of the tunnel around it. Moving pictures exist only as soft glowing clouds of points with no edges, never as rectangles or screens: large drifting smoke-clouds showing old black-and-white film footage, a horse running, a face, a hand, playing inside the haze. The tunnel forks around a dark rock pillar into two passages. FLOW: a deep-sea anglerfish, a huge black shape made of sparse dim particles, hangs in the right passage with a glowing lure that also shows a tiny film; a school of silver fish made of flecks scatters as the jellyfish passes; a long ribbon eel whose body is a chain of small film-clouds glides alongside; streams of marine snow flow in a spiralling current; a second, cyan jellyfish of light swims in the distance. Dark teal fog, only the films and creatures give light, red grain clouds of corruption drift near the walls. Slow, fluid, haunting.",
+  "files": [
+   "fal/design_v5_720.mp4"
+  ]
  }
 ]

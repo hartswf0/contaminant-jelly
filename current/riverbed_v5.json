@@ -1,0 +1,110 @@
+{
+  "engine": {"name": "PRIME ENGINE", "version": "8.0", "mode": "GOLDEN_RIVERBED"},
+  "source_profile": {
+    "source_type": "hybrid",
+    "source_title": "The Current (fifth version)",
+    "core_idea": "A jellyfish of light dives a drowned tunnel to the Source, drinking films that exist only as clouds of light and carrying them in tentacles that become time worms, among eels, fish and anglerfish, alone or with others.",
+    "generative_goal": "Regenerate the game's world as design video and as play without losing what makes it itself: organic film, forward descent, fluid life, a clear end.",
+    "recommended_form": "patch_chain"
+  },
+  "riverbed": {
+    "core_identity": "A small golden jellyfish of light swims forward down one dark tunnel toward an end; moving pictures exist only as edgeless clouds of light that it drinks and carries.",
+    "hinge_conditions": [
+      "Films are never rectangles, screens or frames: only gaussian clouds, bead-chains (time worms) or a bloom.",
+      "The jellyfish always moves forward along the tunnel; the player chooses where in the cross-section, not the direction of travel.",
+      "The world is darker than its films; films and creatures are the only light.",
+      "Drinking a film moves it from the world into a tentacle, which then carries it as a worm.",
+      "The dive ends at the Source, where what you carry blooms one film at a time."
+    ],
+    "identity_constraints": [
+      "The creature is an original golden bell of particles with eight bead tentacles, not a likeness of any film's machine or character.",
+      "The anglerfish, eels and fish are made of the same particle matter as everything else.",
+      "Corruption is red static grain, never a recognisable picture."
+    ],
+    "governing_rules": [
+      "Water flows down the tunnel; two spiral currents flow faster and carry whatever enters them.",
+      "Tentacles are dragged by the water, so they trail, stream in currents and curl in eddies.",
+      "Thrust comes from the bell's contraction: the stroke is the pulse.",
+      "Three chambers fork around a pillar: the right side is richer in films and an anglerfish waits there; the left side is poorer and more corrupted.",
+      "The anglerfish's lure is a film; touching it is being bitten; a bite costs two carried films.",
+      "Touching red corruption costs one carried film.",
+      "An eel's body is one film flowing from head to tail; drinking from its tail takes a clip and makes it dart.",
+      "In a shared room the seed is shared, so every diver meets the same films; a film one diver drinks is gone for all."
+    ],
+    "continuity_anchors": [
+      "the golden bell",
+      "the eight tentacles and how many carry films",
+      "the depth count toward the Source",
+      "the dark teal fog"
+    ],
+    "invariants": [
+      "No moving image is ever drawn with a border.",
+      "The camera is always behind or beside the jellyfish, within the tunnel, never through a wall or the pillar.",
+      "Nothing smears across the lens: everything fades in the last metres before the camera."
+    ],
+    "mistake_conditions": [
+      "A film shown as a quad, card, screen or wall poster.",
+      "Bright walls or bright fog that make films read as stickers on a lit set.",
+      "A predator that is a copy of a known creature design rather than an original anglerfish of particles.",
+      "A dive without an end, or an end with no account of what was carried."
+    ]
+  },
+  "flow": {
+    "mutable_variables": ["which films appear and where", "cloud size and softness", "how many fish, eels and corrupted clouds", "which song plays", "the music filter depth"],
+    "atmospheric_range": ["teal-black fog from #0a1110 to #364845", "marine snow from sparse to streaming", "plankton specks on the walls"],
+    "surface_detail_range": ["smoke grain at the cloud edges", "photophores on the angler", "a green cast in eel films", "a warm cast in drunk films"],
+    "transformation_range": ["a cloud pouring into the bell", "a tentacle filling bead by bead", "a carried film blooming large in the dark", "the tunnel widening into a chamber and a hall"],
+    "camera_variation_range": ["chase distance from 2.8 to 24 m by pinch or scroll", "a yaw of up to a quarter turn to peek at the creature's side", "a slow orbit at the Source"],
+    "permitted_drift": ["film density per metre", "the creature's hue under hurt, glow and carrying", "the music zone"],
+    "forbidden_drift": ["any rectangular image", "a light background", "reverse travel", "a hostile UI that covers the films"]
+  },
+  "diegesis": {
+    "premise": "The drowned tunnels of old video, where films have become drifting light, lead down to a Source.",
+    "world_rules": ["water and its currents flow toward the Source", "films are matter that can be drunk, carried, lost and let go", "the dark is alive"],
+    "core_entities": ["the golden jellyfish (you)", "cyan jellyfish (other divers)", "film clouds", "film reefs on the walls", "film eels", "fish schools", "anglerfish", "red corruption"],
+    "core_locations": ["the winding tunnel", "the three forked chambers", "the Source hall"],
+    "dominant_relations": ["you take films from the world", "predators take films from you", "currents give speed", "other divers share and compete for the same films"]
+  },
+  "sequence_architecture": {
+    "macro_units": [
+      {"unit_id": "U1", "function": "learning to swim and drink", "riverbed_role": "establish organic film and forward motion", "flow_behavior": "sparse films, first eel, first school", "beats": [
+        {"beat_id": "U1.B1", "shift": "entry", "transition_channel": "drift", "prompt_burden": "show a film cloud is something to swim into", "patches": [
+          {"patch_id": "P1", "start_time": null, "end_time": null, "local_event": "the bell meets its first cloud and pours it into a tentacle", "camera_environment": "chase, 6 m behind, dark tunnel", "what_must_hold": ["edgeless cloud", "golden bell"], "what_may_vary": ["film", "cloud size"], "local_seed": "first drink: a giraffe walking in smoke pours into the bell"}]}]},
+      {"unit_id": "U2", "function": "the forks", "riverbed_role": "risk and reward around a pillar", "flow_behavior": "rich right side with an anglerfish; corrupted left side", "beats": [
+        {"beat_id": "U2.B1", "shift": "reveal", "transition_channel": "threshold crossing", "prompt_burden": "the lure looks like a film", "patches": [
+          {"patch_id": "P2", "start_time": null, "end_time": null, "local_event": "the angler wakes, hunts and lunges", "camera_environment": "pulled back to see the dark bulk against the films", "what_must_hold": ["the angler is particles", "the bite costs films"], "what_may_vary": ["lure film", "lunge angle"], "local_seed": "a small bright film dangles in front of a black wall of teeth"}]}]},
+      {"unit_id": "U3", "function": "the deep", "riverbed_role": "darker water, deeper music", "flow_behavior": "currents, eels, rare anglers", "beats": [
+        {"beat_id": "U3.B1", "shift": "acceleration", "transition_channel": "zoom-through", "prompt_burden": "riding a current", "patches": [
+          {"patch_id": "P3", "start_time": null, "end_time": null, "local_event": "the bell enters a spiral current with an eel", "camera_environment": "chase with FOV push", "what_must_hold": ["streaming snow", "trailing tentacles"], "what_may_vary": ["eel film"], "local_seed": "an eel of flowing film and the jellyfish ride a streaming spiral"}]}]},
+      {"unit_id": "U4", "function": "the Source", "riverbed_role": "the end, and the account", "flow_behavior": "the hall opens; carried films bloom one by one", "beats": [
+        {"beat_id": "U4.B1", "shift": "release", "transition_channel": "dissolve", "prompt_burden": "letting go", "patches": [
+          {"patch_id": "P4", "start_time": null, "end_time": null, "local_event": "each carried film blooms large, then the dive is told", "camera_environment": "slow orbit, pulled back", "what_must_hold": ["one film at a time", "the end card lists them"], "what_may_vary": ["the films"], "local_seed": "a vast dark hall where a bicycle wheel blooms in smoke"}]}]}
+    ]
+  },
+  "prompt_architecture": {
+    "master_prompt_strategy": "State the identity once as LAW, then let creatures, films and weather move as FLOW.",
+    "continuity_law": "One golden particle jellyfish, always swimming away from the camera down one dark tunnel; films only as edgeless clouds of light.",
+    "style_law": "Dark teal fog; light comes only from films and creatures; particles, smoke and grain, never surfaces or screens.",
+    "transition_law": "Every change is a passage through water: drift, pour, bloom, widen; never a cut to a frame.",
+    "negative_constraints": ["no rectangles, screens, picture frames or film strips", "no bright set lighting", "no copied creature designs", "no text overlays"],
+    "master_prompt": "LAW: one small golden jellyfish of light, its bell a dome of shimmering particles, its eight tentacles chains of glowing beads, swims away from the camera through a vast dark underwater tunnel; the camera follows low and behind it the whole time, then pulls back wide to reveal more of the tunnel around it. Moving pictures exist only as soft glowing clouds of points with no edges, never as rectangles or screens: large drifting smoke-clouds showing old black-and-white film footage, a horse running, a face, a hand, playing inside the haze. The tunnel forks around a dark rock pillar into two passages. FLOW: a deep-sea anglerfish, a huge black shape made of sparse dim particles, hangs in the right passage with a glowing lure that also shows a tiny film; a school of silver fish made of flecks scatters as the jellyfish passes; a long ribbon eel whose body is a chain of small film-clouds glides alongside; streams of marine snow flow in a spiralling current; a second, cyan jellyfish of light swims in the distance. Dark teal fog, only the films and creatures give light, red grain clouds of corruption drift near the walls. Slow, fluid, haunting.",
+    "segment_prompts": [
+      {"segment_id": "S1", "purpose": "drinking", "prompt": "The golden particle jellyfish swims into a drifting smoke-cloud of old film; the cloud pours into its bell and one tentacle lights up bead by bead with the same moving picture. Dark tunnel, chase camera."},
+      {"segment_id": "S2", "purpose": "the angler", "prompt": "In a dark forked chamber a huge anglerfish made of sparse dark particles dangles a lure that is a tiny glowing film; it opens a jaw of pale uneven fangs and lunges at the small golden jellyfish, which dashes away."}
+    ],
+    "bridge_prompts": [
+      {"bridge_id": "BR1", "from": "tunnel", "to": "chamber", "function": "threshold", "prompt": "The tunnel widens around a dark pillar; currents of marine snow split to either side."},
+      {"bridge_id": "BR2", "from": "deep", "to": "Source", "function": "release", "prompt": "The walls fall away into a vast dark hall; the jellyfish slows, and the films it carries bloom one after another as large clouds of light."}
+    ],
+    "constraint_prompts": [
+      {"constraint_id": "C1", "purpose": "never a frame", "prompt": "Every moving image is a cloud of light that fades to nothing at its edge; there are no screens, cards or borders anywhere."}
+    ]
+  },
+  "generation_notes": {
+    "model_behavior_priority": ["keep the films edgeless", "keep the jellyfish small, golden and ahead of the camera", "keep the dark"],
+    "stability_targets": ["bell shape", "tentacle count", "palette"],
+    "controlled_variability_targets": ["films", "creatures", "currents", "camera distance"],
+    "failure_risks": ["video models round films into vignetted rectangles (design_v5 shows round soft vignettes, which are acceptable)", "the angler drifts toward a stock creature design", "fog brightens into a lit set"]
+  },
+  "conform": {"edl_requested": false, "otio_requested": false, "edl": null, "otio": null}
+}

@@ -1,0 +1,528 @@
+{
+ "base": "https://hartswf0.github.io/moto/",
+ "note": "VOLHOLLA songs chosen by the user, streamed from the moto site; the notes are the user's own words.",
+ "zones": {
+  "drift": [
+   "siltwire-02",
+   "siltwire-06",
+   "siltwire-10",
+   "daehoned-05",
+   "daehoned-10",
+   "nightbus-17",
+   "nightbus-03",
+   "nightbus-06",
+   "event-03",
+   "blackwater-01",
+   "blackwater-02",
+   "blackwater-03",
+   "blackwater-04",
+   "blackwater-05",
+   "blackwater-06",
+   "blackwater-07",
+   "blackwater-08",
+   "blackwater-09",
+   "blackwater-10",
+   "blackwater-11",
+   "blackwater-12",
+   "blackwater-13",
+   "blackwater-14",
+   "blackwater-15",
+   "blackwater-16",
+   "blackwater-17",
+   "blackwater-18",
+   "blackwater-19",
+   "blackwater-20",
+   "blackwater-21",
+   "blackwater-22"
+  ],
+  "chamber": [
+   "siltwire-15",
+   "twobuttons-13",
+   "nightbus-14",
+   "daehoned-19",
+   "firstwintera-13"
+  ],
+  "deep": [
+   "event-04",
+   "firstwintera-18",
+   "firstwintera-13",
+   "nightbus-14",
+   "siltwire-15",
+   "twobuttons-13"
+  ],
+  "hunt": [
+   "twobuttons-14"
+  ],
+  "end": [
+   "twobuttons-06"
+  ],
+  "surface": [
+   "nightbus-13",
+   "daehoned-15",
+   "daehoned-02",
+   "daehoned-18",
+   "daehoned-23",
+   "nightbus-08",
+   "neonbutterfly-02",
+   "neonbutterfly-18",
+   "lastweekaugust-01",
+   "lastweekaugust-02",
+   "lastweekaugust-03",
+   "lastweekaugust-04",
+   "lastweekaugust-05",
+   "lastweekaugust-06",
+   "lastweekaugust-07",
+   "lastweekaugust-08"
+  ]
+ },
+ "tracks": [
+  {
+   "id": "nightbus-03",
+   "title": "Command Decent",
+   "album": "NIGHT BUS",
+   "mood": "probably good",
+   "src": "NEON PUDDLES/night bus/Neon Puddles (Night Bus Edit) - Command Decent - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "nightbus-06",
+   "title": "Phosphor Waveform Log",
+   "album": "NIGHT BUS",
+   "mood": "pretty good",
+   "src": "NEON PUDDLES/night bus/Neon Puddles (Night Bus Edit) - Phosphor Waveform Log - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "nightbus-08",
+   "title": "Saltwater Static (The Last Shanty)",
+   "album": "NIGHT BUS",
+   "mood": "nostalgic engine",
+   "src": "NEON PUDDLES/night bus/Neon Puddles (Night Bus Edit) - Saltwater Static (The Last Shanty) - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "nightbus-13",
+   "title": "The Fragile Iron Ghost",
+   "album": "NIGHT BUS",
+   "mood": "bright and poppy",
+   "src": "NEON PUDDLES/night bus/Neon Puddles (Night Bus Edit) - The Fragile Iron Ghost - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "nightbus-14",
+   "title": "The Long Descent (Memory Rot)",
+   "album": "NIGHT BUS",
+   "mood": "elegant classic",
+   "src": "NEON PUDDLES/night bus/Neon Puddles (Night Bus Edit) - The Long Descent (Memory Rot) - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "nightbus-17",
+   "title": "The Wet Console",
+   "album": "NIGHT BUS",
+   "mood": "good sound texture",
+   "src": "NEON PUDDLES/night bus/Neon Puddles (Night Bus Edit) - The Wet Console - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "neonbutterfly-02",
+   "title": "Catastrophic Elegance   Math Dance",
+   "album": "NEON BUTTERFLY DREAMS",
+   "mood": "nostalgic, with lyrics",
+   "src": "SOUTHERN NOISE CATHARSIS/Southern Noise Catharsis - Catastrophic Elegance _ Math Dance - Treblo.ogg",
+   "mp3": "MEDIA_DERIVATIVES/audio/SOUTHERN NOISE CATHARSIS/Southern Noise Catharsis - Catastrophic Elegance _ Math Dance - Treblo--stream.mp3"
+  },
+  {
+   "id": "neonbutterfly-18",
+   "title": "Wings Outside the Seam",
+   "album": "NEON BUTTERFLY DREAMS",
+   "mood": "ethereal, with lyrics",
+   "src": "SOUTHERN NOISE CATHARSIS/Southern Noise Catharsis - Wings Outside the Seam - Treblo.ogg",
+   "mp3": "MEDIA_DERIVATIVES/audio/SOUTHERN NOISE CATHARSIS/Southern Noise Catharsis - Wings Outside the Seam - Treblo--stream.mp3"
+  },
+  {
+   "id": "siltwire-02",
+   "title": "Gospel Under Water",
+   "album": "SILT, WIRE & MOUNTAIN CURRENT",
+   "mood": "beautiful surreal underwater",
+   "src": "SILT, WIRE, AND MOUNTAIN CURRENT/m0 Silt, Wire & Mountain Current - Gospel Under Water - Treblo.ogg",
+   "mp3": null
+  },
+  {
+   "id": "siltwire-06",
+   "title": "Lost & Found (Under the Courthouse Eddy)",
+   "album": "SILT, WIRE & MOUNTAIN CURRENT",
+   "mood": "beautiful guitar underwater echo",
+   "src": "SILT, WIRE, AND MOUNTAIN CURRENT/Silt, Wire & Mountain Current - Lost & Found (Under the Courthouse Eddy) m2 - Treblo.ogg",
+   "mp3": null
+  },
+  {
+   "id": "siltwire-10",
+   "title": "Stay in the Current",
+   "album": "SILT, WIRE & MOUNTAIN CURRENT",
+   "mood": "stay in the current",
+   "src": "SILT, WIRE, AND MOUNTAIN CURRENT/Silt, Wire & Mountain Current - Stay in the Current - m5 - Treblo.ogg",
+   "mp3": null
+  },
+  {
+   "id": "siltwire-15",
+   "title": "Silt Bench",
+   "album": "SILT, WIRE & MOUNTAIN CURRENT",
+   "mood": "silt ocean",
+   "src": "SILT, WIRE, AND MOUNTAIN CURRENT/Silt, Wire & Mountain Current - E2-4 Silt Bench - Treblo.ogg",
+   "mp3": null
+  },
+  {
+   "id": "twobuttons-06",
+   "title": "Go Home and Be Free",
+   "album": "THE LITURGY OF THE TWO BUTTONS",
+   "mood": "best old time",
+   "src": "THE LITURGY OF THE TWO BUTTONS/The Liturgy of the Two Buttons - Go Home and Be Free - Treblo.ogg",
+   "mp3": null
+  },
+  {
+   "id": "twobuttons-13",
+   "title": "Ritual of the Ash and Silt (1)",
+   "album": "THE LITURGY OF THE TWO BUTTONS",
+   "mood": "good texture",
+   "src": "THE LITURGY OF THE TWO BUTTONS/The Liturgy of the Two Buttons - Ritual of the Ash and Silt - Treblo (1).ogg",
+   "mp3": null
+  },
+  {
+   "id": "twobuttons-14",
+   "title": "Ritual of the Ash and Silt (2)",
+   "album": "THE LITURGY OF THE TWO BUTTONS",
+   "mood": "ritual of war",
+   "src": "THE LITURGY OF THE TWO BUTTONS/The Liturgy of the Two Buttons - Ritual of the Ash and Silt - Treblo (2).ogg",
+   "mp3": null
+  },
+  {
+   "id": "daehoned-02",
+   "title": "Cedar Tank Splash",
+   "album": "D-A-E \u00b7 HONED FOR FILM",
+   "mood": "good vibe",
+   "src": "DAE STILL OPEN/D-A-E (Still Open) - Cedar Tank Splash - Treblo.ogg",
+   "mp3": null
+  },
+  {
+   "id": "daehoned-05",
+   "title": "Chicha Surf & Boreal Glitch Workshop",
+   "album": "D-A-E \u00b7 HONED FOR FILM",
+   "mood": "dream underwater",
+   "src": "DAE STILL OPEN/D-A-E (Still Open) - Chicha Surf & Boreal Glitch Workshop - Treblo.ogg",
+   "mp3": null
+  },
+  {
+   "id": "daehoned-10",
+   "title": "Preparation & Drift",
+   "album": "D-A-E \u00b7 HONED FOR FILM",
+   "mood": "preparing for drift",
+   "src": "DAE STILL OPEN/D-A-E (Still Open) - Preparation & Drift - Treblo.ogg",
+   "mp3": null
+  },
+  {
+   "id": "daehoned-15",
+   "title": "Salvaged Room, Traveling Light",
+   "album": "D-A-E \u00b7 HONED FOR FILM",
+   "mood": "traveling light, bright",
+   "src": "DAE STILL OPEN/D-A-E (Still Open) - Salvaged Room, Traveling Light - Treblo.ogg",
+   "mp3": null
+  },
+  {
+   "id": "daehoned-18",
+   "title": "Salvaged Timber",
+   "album": "D-A-E \u00b7 HONED FOR FILM",
+   "mood": "funk fish",
+   "src": "DAE STILL OPEN/D-A-E (Still Open) - Salvaged Timber - Treblo.ogg",
+   "mp3": null
+  },
+  {
+   "id": "daehoned-19",
+   "title": "Slide Carousel at Blue Hour",
+   "album": "D-A-E \u00b7 HONED FOR FILM",
+   "mood": "go around",
+   "src": "DAE STILL OPEN/D-A-E (Still Open) - Slide Carousel at Blue Hour - Treblo.ogg",
+   "mp3": null
+  },
+  {
+   "id": "daehoned-23",
+   "title": "The Geezer's Stride",
+   "album": "D-A-E \u00b7 HONED FOR FILM",
+   "mood": "old time",
+   "src": "DAE STILL OPEN/D-A-E (Still Open) - The Geezer's Stride - Treblo.ogg",
+   "mp3": null
+  },
+  {
+   "id": "event-03",
+   "title": "Steel & Static \u2014 The 2 AM Express",
+   "album": "EVENT HORIZON DISCOVERY",
+   "mood": "underwater flux",
+   "src": "EVENT HORIZON DISCOVERY/Event Horizon Discovery - Steel & Static \u2014 The 2 AM Express - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "event-04",
+   "title": "Stratospheric Void Crossing",
+   "album": "EVENT HORIZON DISCOVERY",
+   "mood": "deep dark void",
+   "src": "EVENT HORIZON DISCOVERY/Event Horizon Discovery - Stratospheric Void Crossing - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "firstwintera-13",
+   "title": "Tizita",
+   "album": "SOMEONE WROTE MY FIRST WINTER \u00b7 A SIDE",
+   "mood": "beautiful haunting",
+   "src": "Someone Wrote My First Winter (A Side)/Someone Wrote My First Winter - Tizita - Treblo.ogg",
+   "mp3": null
+  },
+  {
+   "id": "firstwintera-18",
+   "title": "Heart Is Stone",
+   "album": "SOMEONE WROTE MY FIRST WINTER \u00b7 A SIDE",
+   "mood": "good and deep",
+   "src": "Someone Wrote My First Winter (A Side)/Someone Wrote My First Winter - Heart Is Stone - Treblo.ogg",
+   "mp3": null
+  },
+  {
+   "id": "blackwater-01",
+   "title": "A Chinese Good Man (Main Theme)",
+   "album": "BLACK WATER RUN",
+   "mood": "dream loop instrumental",
+   "src": "BLACK WATER RUN/Black Water Run - A Chinese Good Man (Main Theme) - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "blackwater-02",
+   "title": "Amphibian Escape & Concrete Smoke",
+   "album": "BLACK WATER RUN",
+   "mood": "dream loop instrumental",
+   "src": "BLACK WATER RUN/Black Water Run - Amphibian Escape & Concrete Smoke - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "blackwater-03",
+   "title": "Amphibian Noir (The Hard Cut)",
+   "album": "BLACK WATER RUN",
+   "mood": "dream loop instrumental",
+   "src": "BLACK WATER RUN/Black Water Run - Amphibian Noir (The Hard Cut) - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "blackwater-04",
+   "title": "Baja Jade Night",
+   "album": "BLACK WATER RUN",
+   "mood": "dream loop instrumental",
+   "src": "BLACK WATER RUN/Black Water Run - Baja Jade Night - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "blackwater-05",
+   "title": "Concrete Alley Soul",
+   "album": "BLACK WATER RUN",
+   "mood": "dream loop instrumental",
+   "src": "BLACK WATER RUN/Black Water Run - Concrete Alley Soul - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "blackwater-06",
+   "title": "Concrete Exhale (Searchlight Halation)",
+   "album": "BLACK WATER RUN",
+   "mood": "dream loop instrumental",
+   "src": "BLACK WATER RUN/Black Water Run - Concrete Exhale (Searchlight Halation) - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "blackwater-07",
+   "title": "Concrete Exhale",
+   "album": "BLACK WATER RUN",
+   "mood": "dream loop instrumental",
+   "src": "BLACK WATER RUN/Black Water Run - Concrete Exhale - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "blackwater-08",
+   "title": "Deep Sea Monarchy",
+   "album": "BLACK WATER RUN",
+   "mood": "dream loop instrumental",
+   "src": "BLACK WATER RUN/Black Water Run - Deep Sea Monarchy - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "blackwater-09",
+   "title": "Ghost City Dynasty",
+   "album": "BLACK WATER RUN",
+   "mood": "dream loop instrumental",
+   "src": "BLACK WATER RUN/Black Water Run - Ghost City Dynasty - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "blackwater-10",
+   "title": "Gray Alley Slow Drag",
+   "album": "BLACK WATER RUN",
+   "mood": "dream loop instrumental",
+   "src": "BLACK WATER RUN/Black Water Run - Gray Alley Slow Drag - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "blackwater-11",
+   "title": "Midnight Evasion",
+   "album": "BLACK WATER RUN",
+   "mood": "dream loop instrumental",
+   "src": "BLACK WATER RUN/Black Water Run - Midnight Evasion - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "blackwater-12",
+   "title": "Night Wake (Spotlight Halation)",
+   "album": "BLACK WATER RUN",
+   "mood": "dream loop instrumental",
+   "src": "BLACK WATER RUN/Black Water Run - Night Wake (Spotlight Halation) - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "blackwater-13",
+   "title": "Nylon and Jade",
+   "album": "BLACK WATER RUN",
+   "mood": "dream loop instrumental",
+   "src": "BLACK WATER RUN/Black Water Run - Nylon and Jade - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "blackwater-14",
+   "title": "Ocean Palace Static",
+   "album": "BLACK WATER RUN",
+   "mood": "dream loop instrumental",
+   "src": "BLACK WATER RUN/Black Water Run - Ocean Palace Static - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "blackwater-15",
+   "title": "Red Lanterns over the Malecon",
+   "album": "BLACK WATER RUN",
+   "mood": "dream loop instrumental",
+   "src": "BLACK WATER RUN/Black Water Run - Red Lanterns over the Malecon - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "blackwater-16",
+   "title": "Static Smoke Phase",
+   "album": "BLACK WATER RUN",
+   "mood": "dream loop instrumental",
+   "src": "BLACK WATER RUN/Black Water Run - Static Smoke Phase - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "blackwater-17",
+   "title": "Tectonic Wake, Static Smoke",
+   "album": "BLACK WATER RUN",
+   "mood": "dream loop instrumental",
+   "src": "BLACK WATER RUN/Black Water Run - Tectonic Wake, Static Smoke - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "blackwater-18",
+   "title": "The Good Man's Jasmine Draught",
+   "album": "BLACK WATER RUN",
+   "mood": "dream loop instrumental",
+   "src": "BLACK WATER RUN/Black Water Run - The Good Man's Jasmine Draught - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "blackwater-19",
+   "title": "The Sea To The Alleyway",
+   "album": "BLACK WATER RUN",
+   "mood": "dream loop instrumental",
+   "src": "BLACK WATER RUN/Black Water Run - The Sea To The Alleyway - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "blackwater-20",
+   "title": "The Shadow of the Alley",
+   "album": "BLACK WATER RUN",
+   "mood": "dream loop instrumental",
+   "src": "BLACK WATER RUN/Black Water Run - The Shadow of the Alley - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "blackwater-21",
+   "title": "The Soulful Good Man (Philly Fusion)",
+   "album": "BLACK WATER RUN",
+   "mood": "dream loop instrumental",
+   "src": "BLACK WATER RUN/Black Water Run - The Soulful Good Man (Philly Fusion) - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "blackwater-22",
+   "title": "Vinilo de Sangre y Sal",
+   "album": "BLACK WATER RUN",
+   "mood": "dream loop instrumental",
+   "src": "BLACK WATER RUN/Black Water Run - Vinilo de Sangre y Sal - Sonauto.ogg",
+   "mp3": null
+  },
+  {
+   "id": "lastweekaugust-01",
+   "title": "Clean the Words",
+   "album": "LAST WEEK OF AUGUST",
+   "mood": "surfy, with lyrics",
+   "src": "THE LAST WEEK OF AUGUST/Last Week of August - Clean the Words - Treblo.ogg",
+   "mp3": "MEDIA_DERIVATIVES/audio/THE LAST WEEK OF AUGUST/Last Week of August - Clean the Words - Treblo--stream.mp3"
+  },
+  {
+   "id": "lastweekaugust-02",
+   "title": "Flinch at the Machine",
+   "album": "LAST WEEK OF AUGUST",
+   "mood": "surfy, with lyrics",
+   "src": "THE LAST WEEK OF AUGUST/Last Week of August - Flinch at the Machine - Treblo.ogg",
+   "mp3": "MEDIA_DERIVATIVES/audio/THE LAST WEEK OF AUGUST/Last Week of August - Flinch at the Machine - Treblo--stream.mp3"
+  },
+  {
+   "id": "lastweekaugust-03",
+   "title": "Human in the Loop",
+   "album": "LAST WEEK OF AUGUST",
+   "mood": "surfy, with lyrics",
+   "src": "THE LAST WEEK OF AUGUST/Last Week of August - Human in the Loop - Treblo.ogg",
+   "mp3": "MEDIA_DERIVATIVES/audio/THE LAST WEEK OF AUGUST/Last Week of August - Human in the Loop - Treblo--stream.mp3"
+  },
+  {
+   "id": "lastweekaugust-04",
+   "title": "Leave the Breath In",
+   "album": "LAST WEEK OF AUGUST",
+   "mood": "surfy, with lyrics",
+   "src": "THE LAST WEEK OF AUGUST/Last Week of August - Leave the Breath In - Treblo.ogg",
+   "mp3": "MEDIA_DERIVATIVES/audio/THE LAST WEEK OF AUGUST/Last Week of August - Leave the Breath In - Treblo--stream.mp3"
+  },
+  {
+   "id": "lastweekaugust-05",
+   "title": "Render Beach",
+   "album": "LAST WEEK OF AUGUST",
+   "mood": "surfy, with lyrics",
+   "src": "THE LAST WEEK OF AUGUST/Last Week of August - Render Beach - Treblo.ogg",
+   "mp3": "MEDIA_DERIVATIVES/audio/THE LAST WEEK OF AUGUST/Last Week of August - Render Beach - Treblo--stream.mp3"
+  },
+  {
+   "id": "lastweekaugust-06",
+   "title": "Reverb on the Dashboard",
+   "album": "LAST WEEK OF AUGUST",
+   "mood": "surfy, with lyrics",
+   "src": "THE LAST WEEK OF AUGUST/Last Week of August - Reverb on the Dashboard - Treblo.ogg",
+   "mp3": "MEDIA_DERIVATIVES/audio/THE LAST WEEK OF AUGUST/Last Week of August - Reverb on the Dashboard - Treblo--stream.mp3"
+  },
+  {
+   "id": "lastweekaugust-07",
+   "title": "Static and Surf",
+   "album": "LAST WEEK OF AUGUST",
+   "mood": "surfy, with lyrics",
+   "src": "THE LAST WEEK OF AUGUST/Last Week of August - Static and Surf - Treblo.ogg",
+   "mp3": "MEDIA_DERIVATIVES/audio/THE LAST WEEK OF AUGUST/Last Week of August - Static and Surf - Treblo--stream.mp3"
+  },
+  {
+   "id": "lastweekaugust-08",
+   "title": "Sterile Tongues",
+   "album": "LAST WEEK OF AUGUST",
+   "mood": "surfy, with lyrics",
+   "src": "THE LAST WEEK OF AUGUST/Last Week of August - Sterile Tongues - Treblo.ogg",
+   "mp3": "MEDIA_DERIVATIVES/audio/THE LAST WEEK OF AUGUST/Last Week of August - Sterile Tongues - Treblo--stream.mp3"
+  }
+ ]
+}

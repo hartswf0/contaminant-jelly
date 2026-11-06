@@ -4,39 +4,55 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>The Current</title>
-<meta name="description" content="A golden jellyfish of light swims a fog-choked tunnel where old films drift as clouds of light. It drinks them into its tentacles, which become time worms; you watch them bloom in the dark.">
+<meta name="description" content="A jellyfish of light dives a drowned tunnel to the Source. Films drift as clouds of light and grow on the walls; eels carry them, anglerfish lure with them. Drink them into your tentacles and carry them down, alone or together.">
 <style>
-:root{--ink:#eef2ee;--gold:#ffc46a;--dim:rgba(200,214,206,.7)}
-*{box-sizing:border-box}html,body{margin:0;height:100%;background:#0c1312;color:var(--ink);overflow:hidden;touch-action:none;overscroll-behavior:none;font-family:system-ui,"Helvetica Neue",Arial,sans-serif;-webkit-user-select:none;user-select:none}
+:root{--ink:#eef2ee;--gold:#ffc46a;--dim:rgba(200,214,206,.7);--cyan:#7fe6ff}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:#0a1110;color:var(--ink);overflow:hidden;touch-action:none;overscroll-behavior:none;font-family:system-ui,"Helvetica Neue",Arial,sans-serif;-webkit-user-select:none;user-select:none}
 #gl{position:fixed;inset:0;width:100%;height:100%;display:block}
 .ui{position:fixed;pointer-events:none;transition:opacity .7s}
-#state{top:max(10px,env(safe-area-inset-top));right:14px;font:italic 14px Georgia,serif;color:var(--dim);text-shadow:0 0 6px #000;opacity:.4}
-#say{left:0;right:0;bottom:max(16px,env(safe-area-inset-bottom));text-align:center;font:italic clamp(15px,2vw,20px) Georgia,serif;text-shadow:0 0 8px #000,0 0 2px #000;opacity:0}
+#state{top:max(10px,env(safe-area-inset-top));right:14px;font:italic 14px Georgia,serif;color:var(--dim);text-shadow:0 0 6px #000;opacity:.45;text-align:right}
+#song{left:14px;bottom:max(10px,env(safe-area-inset-bottom));font:italic 12px Georgia,serif;color:var(--dim);opacity:0;pointer-events:auto;cursor:pointer;max-width:46vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#say{left:0;right:0;bottom:max(34px,calc(env(safe-area-inset-bottom) + 24px));text-align:center;font:italic clamp(15px,2vw,20px) Georgia,serif;text-shadow:0 0 8px #000,0 0 2px #000;opacity:0;padding:0 40px}
 #act{top:max(10px,env(safe-area-inset-top));left:14px;pointer-events:auto;opacity:0}
-#act button{font:600 13px system-ui;letter-spacing:.05em;color:var(--ink);background:rgba(6,10,10,.55);border:1px solid rgba(255,196,106,.45);border-radius:999px;padding:9px 14px;min-height:40px;margin-right:6px;cursor:pointer}
-#title{inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 8vw;background:radial-gradient(ellipse at 65% 55%,rgba(12,19,18,0),rgba(6,10,10,.86) 72%);pointer-events:auto}
-#title h1{margin:0;font-weight:900;letter-spacing:.22em;font-size:clamp(26px,5vw,54px);line-height:1}#title h1 i{display:block;font-family:Georgia,serif;letter-spacing:0;color:var(--gold);font-size:1.9em}
-#title p{margin:16px 0 0;max-width:520px;font-size:clamp(15px,1.9vw,19px);line-height:1.5;color:#dfe6e0}
-#title button{align-self:flex-start;margin-top:20px;font:600 15px system-ui;letter-spacing:.06em;color:#1a1208;background:var(--gold);border:0;border-radius:999px;padding:13px 24px;min-height:48px;cursor:pointer}
-#title small{margin-top:14px;max-width:520px;color:var(--dim);font:italic 13px Georgia,serif}#title a{color:var(--gold)}
-#dbg{left:10px;bottom:10px;font:12px ui-monospace,monospace;color:#9ccfa4;white-space:pre;display:none;text-shadow:0 0 4px #000}
+#act button,#end button.ghost{font:600 13px system-ui;letter-spacing:.05em;color:var(--ink);background:rgba(6,10,10,.55);border:1px solid rgba(255,196,106,.45);border-radius:999px;padding:9px 14px;min-height:40px;margin-right:6px;cursor:pointer}
+#map{right:6px;top:50%;transform:translateY(-50%);width:26px;height:156px;opacity:.6}
+#title,#end{inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 8vw;background:radial-gradient(ellipse at 65% 55%,rgba(10,17,16,0),rgba(5,9,9,.88) 72%);pointer-events:auto}
+#end{display:none;background:radial-gradient(ellipse at 50% 50%,rgba(10,17,16,.3),rgba(5,9,9,.93) 70%)}
+h1{margin:0;font-weight:900;letter-spacing:.22em;font-size:clamp(26px,5vw,54px);line-height:1}h1 i{display:block;font-family:Georgia,serif;letter-spacing:0;color:var(--gold);font-size:1.9em}
+#title p,#end p{margin:16px 0 0;max-width:540px;font-size:clamp(15px,1.9vw,19px);line-height:1.5;color:#dfe6e0}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.row button{font:600 15px system-ui;letter-spacing:.06em;color:#1a1208;background:var(--gold);border:0;border-radius:999px;padding:13px 24px;min-height:48px;cursor:pointer}
+.row button.ghost{background:rgba(6,10,10,.55);color:var(--ink);border:1px solid rgba(127,230,255,.5)}
+#title small,#end small{margin-top:14px;max-width:540px;color:var(--dim);font:italic 13px Georgia,serif;line-height:1.5}#title a,#end a{color:var(--gold)}
+#room{color:var(--cyan)!important}
+#end ol{margin:12px 0 0;padding-left:20px;max-width:560px;max-height:30vh;overflow:auto;font:italic 14px/1.5 Georgia,serif;color:#dfe6e0}
+#dbg{left:10px;bottom:30px;font:12px ui-monospace,monospace;color:#9ccfa4;white-space:pre;display:none;text-shadow:0 0 4px #000}
 #flash{inset:0;background:radial-gradient(ellipse,rgba(255,40,20,0),rgba(255,40,20,.4));opacity:0;transition:opacity .25s}
-@media (max-height:520px){#title h1{font-size:22px}#title p{font-size:14px;margin-top:10px}#title small{display:none}}
+@media (max-height:560px){h1{font-size:22px}#title p,#end p{font-size:14px;margin-top:10px}#title small{display:none}#map{height:110px}}
 </style>
 <script type="importmap">{"imports":{"three":"../paeleo/scion/videotext/vendor/three.module.min.js","three/addons/":"../paeleo/scion/videotext/vendor/addons/"}}</script>
 </head>
 <body>
-<canvas id="gl" aria-label="A golden jellyfish of light in a foggy tunnel where old films drift as glowing clouds"></canvas>
+<canvas id="gl" aria-label="A jellyfish of light in a dark tunnel where old films drift as glowing clouds"></canvas>
 <div class="ui" id="flash"></div>
 <div class="ui" id="state"></div>
+<canvas class="ui" id="map" width="52" height="312" aria-label="map of the tunnel ahead"></canvas>
 <div class="ui" id="say"></div>
+<div class="ui" id="song" title="tap for the next song · M changes the station"></div>
 <div class="ui" id="act"><button id="watch">Watch</button><button id="save">Save reel</button></div>
 <div class="ui" id="dbg"></div>
 <div class="ui" id="title">
   <h1>THE<i>current</i></h1>
-  <p>In the drowned tunnels of old video, films drift as clouds of light. You are a jellyfish of light. Point where you want to swim; tap to dash. Swim into a cloud and it pours into you: your tentacles become time worms, carrying its moving pictures.</p>
-  <button id="go">Dive</button>
-  <small>Red clouds are corrupted; they drain a worm. Press Watch to let what you carry bloom in the dark. The films come from the second-hand archive's 109. <a href="NOTES.md">How it works</a> · <a href="v3.html">v3</a> · <a href="../">Contaminant Jelly</a></small>
+  <p>A jellyfish of light dives the drowned tunnels of old video, down to the Source. Films drift as clouds and grow on the walls. Point where you want to swim; tap to dash; ride the currents. Swim into a cloud and it pours into you; your tentacles become time worms that carry it down.</p>
+  <div class="row"><button id="go">Dive</button><button id="together" class="ghost">Swim together</button></div>
+  <small id="how">Eels carry films in their bodies: drink from the tail. Anglerfish dangle a film as bait. Red clouds are corrupted. Where the tunnel forks, the right is richer and something waits there. Pinch or scroll to pull back; two fingers or right-drag to peek around. <a href="NOTES.md">How it works</a> · <a href="v4.html">v4</a> · <a href="../">Contaminant Jelly</a></small>
+</div>
+<div class="ui" id="end">
+  <h1>THE<i>source</i></h1>
+  <p id="endp"></p>
+  <ol id="endl"></ol>
+  <div class="row"><button id="again">Dive again</button><button id="endsave" class="ghost">Save reel</button><button id="share" class="ghost">Share the dive</button></div>
+  <small id="ends"></small>
 </div>
 <script type="module">
 import * as THREE from 'three';
@@ -48,51 +64,74 @@ const $ = id => document.getElementById(id), Q = new URLSearchParams(location.se
 const SM = Q.get('sm') || 'https://hartswf0.github.io/secondhand-motion/';
 let FILMS = await (await fetch('films109.json')).json();
 if (Q.get('films')) { const keep = Q.get('films').split(','); FILMS = FILMS.filter(f => keep.includes(f.slug)); }
+const MUSIC = await (await fetch('music.json')).json().catch(() => null);
 const frameURL = (f, i) => `${SM}${f.dir}/f${String(((i % f.n) + f.n) % f.n).padStart(3, '0')}.jpg`;
 const IMG = new Map();
 function img(url) { let e = IMG.get(url); if (e) return e; const im = new Image(); im.crossOrigin = 'anonymous'; e = {im, ok: false, cbs: []};
   im.onload = () => { e.ok = true; e.cbs.forEach(f => f(im)); e.cbs = []; }; im.onerror = () => { e.bad = true; }; im.src = url; IMG.set(url, e); if (IMG.size > 900) IMG.delete(IMG.keys().next().value); return e; }
 function withImg(url, fn) { const e = img(url); if (e.ok) fn(e.im); else if (!e.bad) e.cbs.push(fn); }
-// ------------------------------------------------------------------ renderer: a teal dark that swallows, light that bleeds through it
+// ------------------------------------------------------------------ a shared dive: the room seeds the world, so friends meet the same films in the same places
+const ROOM = (Q.get('room') || '').replace(/[^a-z0-9]/gi, '').slice(0, 12).toLowerCase();
+const SEED = ROOM ? [...ROOM].reduce((h, c) => Math.imul(h ^ c.charCodeAt(0), 2654435761) >>> 0, 2166136261) : (Math.random() * 4294967296) >>> 0;
+const rnd = (i, k = 0) => { let t = (SEED ^ Math.imul(i + 1, 0x9E3779B1) ^ Math.imul(k + 7, 0x85EBCA77)) >>> 0; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+// ------------------------------------------------------------------ renderer: a dark that swallows; only films and creatures give light
 const renderer = new THREE.WebGLRenderer({canvas: $('gl'), antialias: false, powerPreference: 'high-performance'});
 renderer.setPixelRatio(Math.min(COARSE ? 1.25 : 1.6, devicePixelRatio || 1)); renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = .95;
-const FOG = new THREE.Color(0x0c1514), scene = new THREE.Scene(); scene.background = FOG.clone(); scene.fog = new THREE.FogExp2(FOG, .06);
-const camera = new THREE.PerspectiveCamera(60, 1, .05, 120);
+const FOG = new THREE.Color(0x0c1514), scene = new THREE.Scene(); scene.background = FOG.clone(); scene.fog = new THREE.FogExp2(FOG, .05);
+const camera = new THREE.PerspectiveCamera(60, 1, .05, 160);
 const composer = new EffectComposer(renderer); composer.addPass(new RenderPass(scene, camera));
 const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), .75, .6, .72); composer.addPass(bloom); composer.addPass(new OutputPass());
 function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); composer.setSize(w, h); bloom.setSize(w * .5, h * .5); camera.aspect = w / h; camera.updateProjectionMatrix(); }
 addEventListener('resize', resize); resize();
-// ------------------------------------------------------------------ the tunnel: you never see its walls, only its fog and the faint seams of the old pipe
-const R = 6, path = s => new THREE.Vector3(6 * Math.sin(s * .03) + 2.5 * Math.sin(s * .011 + 1), 3.5 * Math.sin(s * .023 + .5) + 1.5 * Math.sin(s * .057), -s);
+// ------------------------------------------------------------------ the tunnel: it winds, forks around pillars in three chambers, and opens at the end into the Source
+const sm = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+const R0 = 6, END = 605, LEN = 700, CHS = [[90, 165], [250, 330], [420, 500]];
+const chamberW = s => { for (const [a, b] of CHS) if (s > a - 1 && s < b + 1) return sm(a, a + 18, s) * (1 - sm(b - 18, b, s)); return 0; };
+const pillarR = s => { for (const [a, b] of CHS) if (s > a + 10 && s < b - 10) return 2.6 * sm(a + 12, a + 26, s) * (1 - sm(b - 26, b - 12, s)); return 0; };
+const Rad = s => R0 + 5.5 * chamberW(s) + 14 * sm(575, 615, s);
+const path = s => new THREE.Vector3(6 * Math.sin(s * .03) + 2.5 * Math.sin(s * .011 + 1), 3.5 * Math.sin(s * .023 + .5) + 1.5 * Math.sin(s * .057), -s);
 const tangent = s => path(s + .4).sub(path(s - .4)).normalize();
 function frameAt(s) { const T = tangent(s), N = new THREE.Vector3(0, 1, 0).addScaledVector(T, -T.y).normalize(), B = new THREE.Vector3().crossVectors(T, N); return {T, N, B, C: path(s)}; }
-const LEN = 3000; class PC extends THREE.Curve { getPoint(u, o = new THREE.Vector3()) { return o.copy(path(u * LEN)); } }
-const pipeMat = new THREE.ShaderMaterial({side: THREE.BackSide, fog: true, uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog]),
+const cross = (s, x, y, out = new THREE.Vector3()) => { const f = frameAt(s); return out.copy(f.C).addScaledVector(f.N, y).addScaledVector(f.B, x); };
+// two currents spiral down the tunnel: ride one and it carries you
+const lane = (s, k) => { const a = s * .045 + k * Math.PI + .6, r = Rad(s) * .56; return [Math.cos(a) * r, Math.sin(a) * r * .85]; };
+const laneBoost = (s, x, y) => { let b = 0; for (let k = 0; k < 2; k++) { const [lx, ly] = lane(s, k), d = Math.hypot(x - lx, y - ly); b = Math.max(b, 1 - d / 1.9); } return Math.max(0, b); };
+function tubeGeo(s0, s1, radius, segA, step, inward) {
+  const rings = Math.ceil((s1 - s0) / step) + 1, pos = new Float32Array(rings * (segA + 1) * 3), uv = new Float32Array(rings * (segA + 1) * 2), idx = [];
+  for (let i = 0; i < rings; i++) { const s = Math.min(s1, s0 + i * step), f = frameAt(s), r = radius(s);
+    for (let j = 0; j <= segA; j++) { const a = j / segA * Math.PI * 2, k = i * (segA + 1) + j; pos.set([f.C.x + (f.N.x * Math.sin(a) + f.B.x * Math.cos(a)) * r, f.C.y + (f.N.y * Math.sin(a) + f.B.y * Math.cos(a)) * r, f.C.z + (f.N.z * Math.sin(a) + f.B.z * Math.cos(a)) * r], k * 3); uv.set([s / LEN, j / segA], k * 2); } }
+  for (let i = 0; i < rings - 1; i++) for (let j = 0; j < segA; j++) { const a = i * (segA + 1) + j, b = a + segA + 1; inward ? idx.push(a, b, a + 1, b, b + 1, a + 1) : idx.push(a, a + 1, b, b, a + 1, b + 1); }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.BufferAttribute(uv, 2)); g.setIndex(idx); return g;
+}
+const wallMat = new THREE.ShaderMaterial({side: THREE.DoubleSide, fog: true, uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, {uTime: {value: 0}}]),
   vertexShader: `varying vec2 vUv; #include <fog_pars_vertex>
     void main(){ vUv = uv; vec4 mvPosition = modelViewMatrix * vec4(position, 1.); gl_Position = projectionMatrix * mvPosition; #include <fog_vertex> }`,
-  fragmentShader: `varying vec2 vUv; #include <fog_pars_fragment>
-    void main(){ float s = vUv.x * ${LEN}.; float seam = smoothstep(.05, 0., abs(fract(s / 4.) - .5) - .45); vec3 c = vec3(.0035, .0065, .006) + vec3(.004, .007, .0065) * seam; gl_FragColor = vec4(c, 1.); #include <fog_fragment> }`});
-for (const k of ['vertexShader', 'fragmentShader']) pipeMat[k] = pipeMat[k].replace(/#include (<[^>]+>)/g, '\n#include $1\n');
-scene.add(new THREE.Mesh(new THREE.TubeGeometry(new PC(), 2000, R + .3, 24, false), pipeMat));
+  fragmentShader: `uniform float uTime; varying vec2 vUv; #include <fog_pars_fragment>
+    float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+    void main(){ float s = vUv.x * ${LEN}.; float seam = smoothstep(.05, 0., abs(fract(s / 4.) - .5) - .45);
+      vec2 g = vec2(s * 3., vUv.y * 90.), cell = floor(g), fc = fract(g) - .5 - (vec2(h(cell + 7.), h(cell + 9.)) - .5) * .5; float pl = step(.985, h(cell)) * smoothstep(.12, 0., length(fc * vec2(1., 1.3))) * (.5 + .5 * sin(uTime * 1.7 + h(cell + 3.) * 30.));   // plankton on the walls
+      vec3 c = vec3(.0035, .0065, .006) + vec3(.004, .007, .0065) * seam + vec3(.02, .09, .1) * pl; gl_FragColor = vec4(c, 1.); #include <fog_fragment> }`});
+for (const k of ['vertexShader', 'fragmentShader']) wallMat[k] = wallMat[k].replace(/#include (<[^>]+>)/g, '\n#include $1\n');
+scene.add(new THREE.Mesh(tubeGeo(-20, LEN, s => Rad(s) + .3, 32, 1, true), wallMat));
+for (const [a, b] of CHS) scene.add(new THREE.Mesh(tubeGeo(a + 10, b - 10, s => Math.max(.01, pillarR(s)), 18, .7, false), wallMat));
 // ------------------------------------------------------------------ frames live in an atlas the clouds sample; a clip owns a block of 8 consecutive frames
-const ATW = 2048, SW = 128, SH = 96, COLS = 16, BLOCK = 8, NBLOCK = 40;
+const ATW = 2048, SW = 128, SH = 96, COLS = 16, BLOCK = 8, NBLOCK = 42;
 const atlasC = document.createElement('canvas'); atlasC.width = atlasC.height = ATW; const ag = atlasC.getContext('2d'); ag.fillStyle = '#000'; ag.fillRect(0, 0, ATW, ATW);
 const atlas = new THREE.CanvasTexture(atlasC); atlas.colorSpace = THREE.SRGBColorSpace; atlas.generateMipmaps = false; atlas.minFilter = THREE.LinearFilter;
 const slotC = document.createElement('canvas'); slotC.width = SW; slotC.height = SH; const sg = slotC.getContext('2d'), slotTex = new THREE.CanvasTexture(slotC); slotTex.colorSpace = THREE.SRGBColorSpace;
 const _v2 = new THREE.Vector2();
 function putSlot(slot, im) { sg.drawImage(im, 0, 0, SW, SH); const c = slot % COLS, r = (slot / COLS) | 0; _v2.set(c * SW, ATW - (r + 1) * SH); slotTex.needsUpdate = true; renderer.copyTextureToTexture(_v2, slotTex, atlas); }
-const freeBlocks = Array.from({length: NBLOCK - 1}, (_, i) => i + 1), VIEWBLOCK = 0;   // block 0 is the viewer's
+const VIEWBLOCK = 0, LUREBLOCK = 1, freeBlocks = Array.from({length: NBLOCK - 2}, (_, i) => i + 2);
 const blockTag = new Int32Array(NBLOCK).fill(-1); let tagN = 0;
 function loadClip(block, film, from) { const tag = ++tagN; blockTag[block] = tag; for (let i = 0; i < BLOCK; i++) withImg(frameURL(FILMS[film], from + i), im => { if (blockTag[block] === tag) putSlot(block * BLOCK + i, im); }); }
-const takeBlock = () => freeBlocks.length ? freeBlocks.shift() : -1, giveBlock = b => { if (b > 0) { blockTag[b] = -1; freeBlocks.push(b); } };
-// ------------------------------------------------------------------ the splat engine: every moving image is a cloud of gaussian points, never a rectangle.
-// Each cloud is one row of a float parameter texture; every point reads its row, samples its frame from the atlas in the vertex shader,
-// is lifted into depth by its own light, breathes at its edges, and fades as a gaussian, so a film has no border, only a falloff.
+const takeBlock = () => freeBlocks.length ? freeBlocks.shift() : -1, giveBlock = b => { if (b > 1) { blockTag[b] = -1; freeBlocks.push(b); } };
+// ------------------------------------------------------------------ the splat engine: every moving image is a cloud of gaussian points, never a rectangle (see SCION_NEVER_A_FRAME.md)
 const MAXC = 256, PT = new Float32Array(MAXC * 5 * 4), params = new THREE.DataTexture(PT, 5, MAXC, THREE.RGBAFormat, THREE.FloatType); params.needsUpdate = true;
-const row = (r, k, a, b, c, d) => PT.set([a, b, c, d], (r * 5 + k) * 4);   // t4 = softness, so a cloud can be grain or picture
+const row = (r, k, a, b, c, d) => PT.set([a, b, c, d], (r * 5 + k) * 4);
+const hide = r => row(r, 1, -1, 1, 0, 0);
 const uCam = {uR: {value: new THREE.Vector3()}, uU: {value: new THREE.Vector3()}, uF: {value: new THREE.Vector3()}};
 const splatMat = new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-  uniforms: {uP: {value: params}, uAtlas: {value: atlas}, uTime: {value: 0}, uScale: {value: 1}, uFog: {value: .06}, ...uCam},
+  uniforms: {uP: {value: params}, uAtlas: {value: atlas}, uTime: {value: 0}, uScale: {value: 1}, uFog: {value: .05}, ...uCam},
   vertexShader: `uniform sampler2D uP, uAtlas; uniform vec3 uR, uU, uF; uniform float uTime, uScale, uFog; attribute float aCloud; attribute vec4 aUV; varying vec3 vC; varying float vA;
     vec4 P(int k){ return texelFetch(uP, ivec2(k, int(aCloud + .5)), 0); }
     float hs(float n){ return fract(sin(n) * 43758.5453); }
@@ -102,17 +141,18 @@ const splatMat = new THREE.ShaderMaterial({transparent: true, depthWrite: false,
       float r2 = dot(aUV.xy, aUV.xy), seed = aUV.z;
       vec3 im = vec3(0.); float l = 0.;
       if (b.x >= 0.) { float fr = mod(floor(b.z + c.x * (aUV.y * .5 + .5)), ${BLOCK}.), slot = b.x * ${BLOCK}. + fr, col = mod(slot, ${COLS}.), rw = floor(slot / ${COLS}.);
-        vec2 iu = vec2(aUV.x * .5 + .5, aUV.y * .5 + .5); im = texture2D(uAtlas, vec2((col + iu.x) * ${SW}. / ${ATW}., 1. - (rw + 1. - iu.y) * ${SH}. / ${ATW}.)).rgb; l = dot(im, vec3(.3, .55, .15)); }
+        vec2 iu = clamp(vec2(aUV.x * .5 + .5, aUV.y * .5 + .5), .01, .99); im = texture2D(uAtlas, vec2((col + iu.x) * ${SW}. / ${ATW}., 1. - (rw + 1. - iu.y) * ${SH}. / ${ATW}.)).rgb; l = dot(im, vec3(.3, .55, .15)); }
       float dz = (l - .5) * c.y * a.w, dist = max(.5, length(a.xyz - cameraPosition));
-      vec3 off = (uR * aUV.x * b.y + uU * aUV.y) * a.w * (dist - dz) / dist + uF * dz;   // the frame's own light lifts it into depth; seen from where it was shot, it still reads true
+      vec3 off = (uR * aUV.x * b.y + uU * aUV.y) * a.w * (dist - dz) / dist + uF * dz;   // lifted into depth by its own light, yet true from the camera
       off += a.w * (.006 + .11 * r2 * r2) * vec3(sin(uTime * 1.3 + seed * 41.), cos(uTime * 1.05 + seed * 31.), sin(uTime * .9 + seed * 17.));   // the edges breathe like smoke
       float bad = c.z; if (bad > .5) { float t = floor(uTime * 22.); off += a.w * .1 * vec3(hs(seed + t) - .5, hs(seed * 3. + t) - .5, hs(seed * 7. + t) - .5); }
       vec3 p = a.xyz + off;
-      if (c.w > 0.) { float q = clamp(c.w * 1.7 - seed * .7, 0., 1.); q = q * q * (3. - 2. * q); vec3 sw = (uR * sin(seed * 23. + c.w * 9.) + uU * cos(seed * 17. + c.w * 7.)) * 1.2 * q * (1. - q) * a.w; p = mix(p, d.xyz + (uR * (hs(seed * 5.) - .5) + uU * (hs(seed * 11.) - .5) + uF * (hs(seed * 13.) - .5)) * 1.3, q) + sw; }   // pouring into the creature
+      if (c.w > 0.) { float q = clamp(c.w * 1.7 - seed * .7, 0., 1.); q = q * q * (3. - 2. * q); vec3 sw = (uR * sin(seed * 23. + c.w * 9.) + uU * cos(seed * 17. + c.w * 7.)) * 1.2 * q * (1. - q) * a.w; p = mix(p, d.xyz + (uR * (hs(seed * 5.) - .5) + uU * (hs(seed * 11.) - .5) + uF * (hs(seed * 13.) - .5)) * 1.3, q) + sw; }   // pouring into a creature
       float lf = .06 + .94 * smoothstep(.06, .82, l); vec3 tc = mix(vec3(lf), im + .1, .55), cold = tc * vec3(.88, .97, 1.) * 1.5, warm = tc * vec3(1., .88, .7) * 1.4, gold = vec3(1., .66, .28) * .45;
       vec3 g = b.x >= 0. ? mix(cold, warm, d.w) : gold;
+      if (e.z > 0.) g = mix(g, g * vec3(.55, 1.05, .9), e.z);   // eels carry their films with a green cast
       if (bad > .5) g = vec3(1., .16, .06) * (.2 + .9 * hs(seed * 9. + floor(uTime * 16.)));
-      vec4 mv = viewMatrix * vec4(p, 1.), wp = vec4(p, 1.);
+      vec4 mv = viewMatrix * vec4(p, 1.);
       float fog = exp(-pow(uFog * .8 * -mv.z, 2.)) * smoothstep(.9, 2.6, -mv.z);   // nothing smears across the lens
       vC = g; vA = b.w / (sf * sf) * exp(-r2 * (e.y > 0. ? e.y : 2.4)) * fog * (c.w > 0. ? 1. - c.w : 1.);
       gl_PointSize = max(1.5, (.55 + 1.1 * fract(seed * 7.)) * sf * aUV.w * a.w * uScale / -mv.z); gl_Position = projectionMatrix * mv; }`,
@@ -124,39 +164,59 @@ function cloudPoints(firstRow, nRows, pts, spread) {
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3)); g.setAttribute('aCloud', new THREE.BufferAttribute(aC, 1)); g.setAttribute('aUV', new THREE.BufferAttribute(aU, 4));
   const p = new THREE.Points(g, splatMat); p.frustumCulled = false; scene.add(p); return p;
 }
-// rows: 0..15 drifting clouds, 16..143 time-worm beads (8 worms × 16), 150 the viewer
-const ND = 16, DROW = 0, WROW = 16, VROW = 150;
-cloudPoints(DROW, ND, 2400, 1.15); cloudPoints(WROW, 128, 90, 1); cloudPoints(VROW, 1, 48000, 1.1);
-// ------------------------------------------------------------------ the creature: a golden jellyfish of light (bell of splats, crown forward)
-const C = {s: 6, x: 0, y: 0, vx: 0, vy: 0, speed: 5, dash: 0, ph: 0, q: new THREE.Quaternion(), heading: new THREE.Vector3(0, 0, -1), p: new THREE.Vector3(), hurt: 0, glow: 0};
+// rows: drifting clouds, film reefs on the walls, the angler's lure, the viewer, time worms, eels
+const ND = 12, NR = 6, TN = 8, TS = 16, NE = 2, ES = 18;
+const DROW = 0, RROW = DROW + ND, LROW = RROW + NR, VROW = LROW + 1, WROW = VROW + 1, EROW = WROW + TN * TS;
+cloudPoints(DROW, ND, 2600, 1.15); cloudPoints(RROW, NR, 5200, 1.12); cloudPoints(LROW, 1, 500, 1); cloudPoints(VROW, 1, 48000, 1.1); cloudPoints(WROW, TN * TS, 90, 1); cloudPoints(EROW, NE * ES, 150, 1);
+for (let r = 0; r < MAXC; r++) hide(r);
+// ------------------------------------------------------------------ fog-water: marine snow that flows with the water, fast in the currents
+const NSNOW = 2600, snow = Array.from({length: NSNOW}, (_, i) => ({s: Math.random() * 90 - 10, a: Math.random() * 6.283, r: Math.sqrt(Math.random()), lane: i % 5 < 2 ? i % 2 : -1, j: Math.random()}));
+const snowPos = new Float32Array(NSNOW * 3), snowA = new Float32Array(NSNOW);
+const snowG = new THREE.BufferGeometry(); snowG.setAttribute('position', new THREE.BufferAttribute(snowPos, 3)); snowG.setAttribute('aL', new THREE.BufferAttribute(snowA, 1));
+const snowMat = new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: {uScale: {value: 1}, uFog: {value: .05}},
+  vertexShader: `uniform float uScale, uFog; attribute float aL; varying float vA; void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.); float z = -mv.z;
+    vA = exp(-pow(uFog * z, 2.)) * smoothstep(1.2, 3., z) * (.25 + .6 * aL); gl_PointSize = max(1., (.035 + .03 * aL) * uScale / z); gl_Position = projectionMatrix * mv; }`,
+  fragmentShader: `varying float vA; void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; gl_FragColor = vec4(vec3(.55, .8, .78) * vA * (1. - 4. * r2), 1.); }`});
+const snowPts = new THREE.Points(snowG, snowMat); snowPts.frustumCulled = false; scene.add(snowPts);
+function stepSnow(dt) {
+  for (let i = 0; i < NSNOW; i++) { const p = snow[i];
+    if (p.lane >= 0) { p.s += dt * (6.5 + 2 * p.j); } else { p.s += dt * (.7 + .5 * p.j); p.a += dt * .05 * (p.j - .5); }
+    if (p.s < C.s - 12) p.s += 92; else if (p.s > C.s + 80) p.s -= 92;
+    let x, y; if (p.lane >= 0) { const [lx, ly] = lane(p.s, p.lane); x = lx + Math.cos(p.a + p.s) * .9 * p.r; y = ly + Math.sin(p.a + p.s * 1.3) * .9 * p.r; }
+    else { const R = Rad(p.s) - .4; x = Math.cos(p.a) * R * p.r; y = Math.sin(p.a) * R * p.r; }
+    cross(p.s, x, y, _p); snowPos[i * 3] = _p.x; snowPos[i * 3 + 1] = _p.y; snowPos[i * 3 + 2] = _p.z; snowA[i] = p.lane >= 0 ? 1 : 0; }
+  snowG.attributes.position.needsUpdate = true; snowG.attributes.aL.needsUpdate = true;
+}
+// ------------------------------------------------------------------ the creature: a golden jellyfish of light that swims by pulsing
+const C = {s: 6, x: 0, y: 0, vx: 0, vy: 0, speed: 4, dash: 0, ph: 0, q: new THREE.Quaternion(), heading: new THREE.Vector3(0, 0, -1), p: new THREE.Vector3(), hurt: 0, glow: 0, boost: 0, lastPh: 0};
 const BN = 4200, bg = new THREE.BufferGeometry(), bp = new Float32Array(BN * 3), bt = new Float32Array(BN), bs = new Float32Array(BN);
 for (let i = 0; i < BN; i++) { const t = Math.sqrt(Math.random()), a = t * Math.PI / 2 * 1.05, ph = Math.random() * 6.283, rr = .9 * Math.sin(a) * (1 + .06 * Math.sin(t * Math.PI)), y = .72 * Math.cos(a), inner = Math.random() < .25 ? .55 + .35 * Math.random() : 1;
   bp.set([Math.cos(ph) * rr * inner, y * inner, Math.sin(ph) * rr * inner], i * 3); bt[i] = t; bs[i] = Math.random(); }
 bg.setAttribute('position', new THREE.BufferAttribute(bp, 3)); bg.setAttribute('aT', new THREE.BufferAttribute(bt, 1)); bg.setAttribute('aS', new THREE.BufferAttribute(bs, 1));
-const bell = new THREE.Points(bg, new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: {uPulse: {value: 0}, uTime: {value: 0}, uScale: {value: 1}, uGlow: {value: 0}, uHurt: {value: 0}, uWhite: {value: 0}, uFade: {value: 1}},
-  vertexShader: `uniform float uPulse, uTime, uScale; attribute float aT, aS; varying float vT, vS;
+const bellMat = (cA, cB) => new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: {uPulse: {value: 0}, uTime: {value: 0}, uScale: {value: 1}, uGlow: {value: 0}, uHurt: {value: 0}, uWhite: {value: 0}, uFade: {value: 1}, uA: {value: new THREE.Color(cA)}, uB: {value: new THREE.Color(cB)}},
+  vertexShader: `uniform float uPulse, uTime, uScale; attribute float aT, aS; varying float vT, vS, vF;
     float c(float ph){ ph = fract(ph); return ph < .28 ? sin(ph / .28 * 1.5708) : 1. - smoothstep(0., 1., (ph - .28) / .72); }
     void main(){ vec3 p = position; float k = c(uPulse - aT * .18) * pow(aT, 1.4); p.xz *= 1. - .3 * k; p.y += .18 * k * (1. - aT) + .06 * k; p.y += .02 * sin(atan(p.z, p.x) * 8. + uTime * 2.) * aT;
       p += .012 * vec3(sin(uTime * 2. + aS * 40.), cos(uTime * 1.7 + aS * 30.), sin(uTime * 1.3 + aS * 20.)); vT = aT; vS = aS;
-      vec4 mv = modelViewMatrix * vec4(p, 1.); gl_PointSize = (1.4 + 2.4 * aS) * uScale / -mv.z; gl_Position = projectionMatrix * mv; }`,
-  fragmentShader: `uniform float uGlow, uHurt, uWhite, uFade; varying float vT, vS; void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; float g = (exp(-r2 * 14.) - .0302) / .9698;
-    vec3 col = mix(vec3(1., .62, .22), vec3(1., .86, .5), pow(vT, 3.)) * (.55 + .8 * pow(vT, 5.)) * (1. + uGlow * 1.2); col = mix(col, vec3(1., .96, .9), uWhite * .35); col = mix(col, vec3(1., .12, .05), uHurt * .6); gl_FragColor = vec4(col * g * .2 * uFade, 1.); }`}));
-bell.frustumCulled = false; const creature = new THREE.Group(); creature.add(bell); creature.scale.setScalar(1.5); scene.add(creature);
-const lamp = new THREE.PointLight(0xffa850, 3, 10, 1.5); creature.add(lamp);
-// ------------------------------------------------------------------ tentacles: Verlet chains that become time worms when they carry a film
-const TN = 8, TS = 16, NN = TN * TS, X = new Float32Array(NN * 3), XP = new Float32Array(NN * 3);
+      vec4 mv = modelViewMatrix * vec4(p, 1.); vF = exp(-pow(.04 * -mv.z, 2.)); gl_PointSize = (1.4 + 2.4 * aS) * uScale / -mv.z; gl_Position = projectionMatrix * mv; }`,
+  fragmentShader: `uniform float uGlow, uHurt, uWhite, uFade; uniform vec3 uA, uB; varying float vT, vS, vF; void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; float g = (exp(-r2 * 14.) - .0302) / .9698;
+    vec3 col = mix(uA, uB, pow(vT, 3.)) * (.55 + .8 * pow(vT, 5.)) * (1. + uGlow * 1.2); col = mix(col, vec3(1., .96, .9), uWhite * .35); col = mix(col, vec3(1., .12, .05), uHurt * .6); gl_FragColor = vec4(col * g * .2 * uFade * vF, 1.); }`});
+const bell = new THREE.Points(bg, bellMat(0xff9e38, 0xffdb80)); bell.frustumCulled = false; const creature = new THREE.Group(); creature.add(bell); creature.scale.setScalar(1.5); scene.add(creature);
+// ------------------------------------------------------------------ tentacles: Verlet chains dragged by the water; they become time worms when they carry a film
+const NN = TN * TS, X = new Float32Array(NN * 3), XP = new Float32Array(NN * 3);
 const tent = Array.from({length: TN}, (_, i) => ({start: i * TS, n: TS, L: .22, a: i / TN * Math.PI * 2, clip: null}));
-const _r = new THREE.Vector3(), _p = new THREE.Vector3();
+const _r = new THREE.Vector3(), _p = new THREE.Vector3(), _q = new THREE.Vector3();
 const rootOf = (t, out) => out.set(Math.cos(t.a) * .75, -.05, Math.sin(t.a) * .75).applyQuaternion(C.q).multiplyScalar(1.5).add(C.p);
 function seat() { for (const t of tent) { rootOf(t, _r); for (let j = 0; j < t.n; j++) { const i = (t.start + j) * 3; X[i] = XP[i] = _r.x - C.heading.x * j * t.L; X[i + 1] = XP[i + 1] = _r.y - C.heading.y * j * t.L; X[i + 2] = XP[i + 2] = _r.z - C.heading.z * j * t.L; } } }
 const stat = {resid: 0, frames: []};
 let T = 0;
 function stepTent(dt) {
-  const {N, B} = frameAt(C.s);
+  const {T: Tt, N, B} = frameAt(C.s), wv = .8 + 5 * C.boost;   // the water's own speed down the tunnel
   for (const t of tent) for (let j = 1; j < t.n; j++) { const i = (t.start + j) * 3, vx = (X[i] - XP[i]) / dt, vy = (X[i + 1] - XP[i + 1]) / dt, vz = (X[i + 2] - XP[i + 2]) / dt, w = Math.sin(T * 2.6 - j * .42 + t.a * 2) * 1.3 * (j / t.n);
     const sx = N.x * Math.cos(t.a) + B.x * Math.sin(t.a), sy = N.y * Math.cos(t.a) + B.y * Math.sin(t.a), sz = N.z * Math.cos(t.a) + B.z * Math.sin(t.a);
-    const ax = -1.5 * vx + sx * w, ay = -1.5 * vy + sy * w - .2, az = -1.5 * vz + sz * w;
-    const nx = X[i] + (X[i] - XP[i]) * .96 + ax * dt * dt, ny = X[i + 1] + (X[i + 1] - XP[i + 1]) * .96 + ay * dt * dt, nz = X[i + 2] + (X[i + 2] - XP[i + 2]) * .96 + az * dt * dt;
+    const ed = Math.sin(T * .7 + X[i + 2] * .3 + j * .2) * .6, wx = Tt.x * wv + B.x * ed, wy = Tt.y * wv + N.y * ed * .6, wz = Tt.z * wv + B.z * ed;   // eddies
+    const ax = -2.2 * (vx - wx) + sx * w, ay = -2.2 * (vy - wy) + sy * w - .15, az = -2.2 * (vz - wz) + sz * w;
+    const nx = X[i] + (X[i] - XP[i]) * .97 + ax * dt * dt, ny = X[i + 1] + (X[i + 1] - XP[i + 1]) * .97 + ay * dt * dt, nz = X[i + 2] + (X[i + 2] - XP[i + 2]) * .97 + az * dt * dt;
     XP[i] = X[i]; XP[i + 1] = X[i + 1]; XP[i + 2] = X[i + 2]; X[i] = nx; X[i + 1] = ny; X[i + 2] = nz; }
   for (const t of tent) { rootOf(t, _r); const i = t.start * 3; X[i] = XP[i] = _r.x; X[i + 1] = XP[i + 1] = _r.y; X[i + 2] = XP[i + 2] = _r.z; }
   let resid = 0;
@@ -164,135 +224,397 @@ function stepTent(dt) {
     for (let jj = 0; jj < t.n - 1; jj++) { const j = fwd ? jj : t.n - 2 - jj, a = (t.start + j) * 3, b = a + 3, dx = X[b] - X[a], dy = X[b + 1] - X[a + 1], dz = X[b + 2] - X[a + 2], d = Math.hypot(dx, dy, dz) || 1e-6, e = (d - t.L) / d;
       if (it === 11) resid = Math.max(resid, Math.abs(d - t.L) / t.L); const wa = j === 0 ? 0 : .5, wb = j === 0 ? 1 : .5;
       X[a] += dx * e * wa; X[a + 1] += dy * e * wa; X[a + 2] += dz * e * wa; X[b] -= dx * e * wb; X[b + 1] -= dy * e * wb; X[b + 2] -= dz * e * wb; } }
-  for (const t of tent) for (let j = 1; j < t.n; j++) { const i = (t.start + j) * 3; _p.set(X[i], X[i + 1], X[i + 2]); let s = C.s - j * t.L; s += tangent(s).dot(_p.clone().sub(path(s)));
-    const Cc = path(s), d = _p.distanceTo(Cc), lim = R - .3; if (d > lim) { _p.sub(Cc).multiplyScalar(lim / d).add(Cc); X[i] = _p.x; X[i + 1] = _p.y; X[i + 2] = _p.z; } }   // the tunnel's SDF
+  for (const t of tent) for (let j = 1; j < t.n; j++) { const i = (t.start + j) * 3; _p.set(X[i], X[i + 1], X[i + 2]); let s = C.s - j * t.L; s += tangent(s).dot(_q.copy(_p).sub(path(s)));
+    const Cc = path(s), d = _p.distanceTo(Cc), lim = Rad(s) - .3, pr = pillarR(s) + .25;   // the tunnel's SDF, and the pillar's
+    if (d > lim) _p.sub(Cc).multiplyScalar(lim / d).add(Cc); else if (pr > .3 && d < pr) _p.sub(Cc).multiplyScalar(pr / Math.max(d, .01)).add(Cc); else continue;
+    X[i] = _p.x; X[i + 1] = _p.y; X[i + 2] = _p.z; }
   stat.resid = resid;
 }
-// ------------------------------------------------------------------ drifting films: clouds that come out of the fog, sometimes in pairs; some are corrupted
+// ------------------------------------------------------------------ drifting films: clouds that flow with the water; in the forks, the right side is richer
 const D = Array.from({length: ND}, () => ({live: false, block: -1}));
-let spawnS = 16;
+let spawnS = 16, spawnI = 0;
 function spawn(s) {
-  while (spawnS < s + 55) { spawnS += 6 + Math.random() * 7; const pair = Math.random() < .35, n = pair ? 2 : 1, a0 = Math.random() * 6.283;
-    for (let k = 0; k < n; k++) { const i = D.findIndex(d => !d.live); if (i < 0) return; const bad = Math.random() < Math.min(.4, .18 + s / 2600);
-      const block = bad ? -1 : takeBlock(); if (!bad && block < 0) return;
-      const film = (Math.random() * FILMS.length) | 0, from = (Math.random() * 40) | 0, a = a0 + k * 1.3, r = (pair ? 2.2 : Math.sqrt(Math.random()) * 2.4);
-      Object.assign(D[i], {live: true, bad, block, film, from, s: spawnS + k * .6, x: Math.cos(a) * r, y: Math.sin(a) * r * .8, size: bad ? 1.1 + Math.random() * .6 : 1.7 + Math.random() * 1.1, pour: 0, born: T, ph: Math.random() * 6, pos: new THREE.Vector3()});
+  while (spawnS < s + 60) { const i0 = spawnI++; spawnS += 5 + rnd(i0, 1) * 7; const ch = inChamber(spawnS), side = rnd(i0, 2) < .5 ? -1 : 1;
+    const pair = rnd(i0, 3) < (ch >= 0 && side > 0 ? .75 : .35), n = pair ? 2 : 1, a0 = rnd(i0, 4) * 6.283;
+    const pbad = ch >= 0 ? (side > 0 ? .05 : .45) : Math.min(.38, .16 + spawnS / 2000);
+    for (let k = 0; k < n; k++) { const key = i0 * 2 + k; if (TAKEN.has(key)) continue; const i = D.findIndex(d => !d.live); if (i < 0) return;
+      const bad = rnd(key, 5) < pbad, block = bad ? -1 : takeBlock(); if (!bad && block < 0) return;
+      const film = (rnd(key, 6) * FILMS.length) | 0, from = (rnd(key, 7) * 40) | 0; let x, y;
+      if (ch >= 0) { const R = Rad(spawnS); x = side * (pillarR(spawnS) + 1.6 + rnd(key, 8) * (R - pillarR(spawnS) - 3.6)); y = (rnd(key, 9) - .5) * R * .9; }
+      else { const a = a0 + k * 1.3, r = pair ? 2.2 : Math.sqrt(rnd(key, 8)) * 2.6; x = Math.cos(a) * r; y = Math.sin(a) * r * .8; }
+      Object.assign(D[i], {live: true, key, bad, block, film, from, s: spawnS + k * .6, x, y, size: bad ? 1.1 + rnd(key, 10) * .6 : 2 + rnd(key, 10) * 1.3, pour: 0, born: T, ph: rnd(key, 11) * 6, pos: new THREE.Vector3(), to: null});
       if (!bad) loadClip(block, film, from); } }
 }
-// ------------------------------------------------------------------ control: on rails. Where you point is where the creature swims in the tunnel; a tap is a dash
-const ptr = {down: false, x: innerWidth / 2, y: innerHeight / 2, active: false}, keys = new Set(), G = {state: 'title'};
+const inChamber = s => CHS.findIndex(([a, b]) => s > a + 14 && s < b - 14);
+// film reefs: big soft clouds rooted on the walls and pillars, playing as you pass
+const RF = Array.from({length: NR}, () => ({i: -1, block: -1})); let reefN = 0;
+function placeReef(r) { const i = reefN++, s = 26 + i * 19 + rnd(i, 21) * 8, a = rnd(i, 22) * 6.283, onP = pillarR(s) > 1.5 && rnd(i, 23) < .55;
+  const rad = onP ? pillarR(s) + 1.9 : Rad(s) - 2.6; if (r.block < 0) r.block = takeBlock(); const film = (rnd(i, 24) * FILMS.length) | 0, from = (rnd(i, 25) * 40) | 0;
+  Object.assign(r, {i, s, x: Math.cos(a) * rad, y: Math.sin(a) * rad * .9, film, from, size: 2.8 + rnd(i, 26) * 1.4, born: T, pos: new THREE.Vector3()}); if (r.block >= 0) loadClip(r.block, film, from); }
+// ------------------------------------------------------------------ eels: long fish whose bodies are chains of film; they ride the currents, and you can drink from their tails
+const E = Array.from({length: NE}, (_, k) => ({k, s: 40 + k * 55, speed: 3.6, block: -1, film: 0, from: 0, cool: 0, dart: 0, n: k}));
+function placeEel(e, s) { e.n += NE; e.s = s; e.speed = 3.2 + rnd(e.n, 31) * 1.2; e.film = (rnd(e.n, 32) * FILMS.length) | 0; e.from = (rnd(e.n, 33) * 40) | 0; e.cool = 0; e.dart = 0;
+  if (e.block < 0) e.block = takeBlock(); if (e.block >= 0) loadClip(e.block, e.film, e.from); }
+const eelBead = (e, j, out) => { const sj = e.s - j * .55, [lx, ly] = lane(sj, e.k), w = .5 * Math.sin(sj * 1.4 - T * 4.5) * (.3 + .7 * j / ES); return cross(sj, lx + w, ly + w * .4, out); };
+// ------------------------------------------------------------------ the anglerfish: a dark shape that hangs in the forks and the deep and dangles a film as bait
+const ANG = [130, 205, 292, 362, 462, 548].map((s, i) => ({s, side: CHS.some(([a, b]) => s > a && s < b) ? 1 : (rnd(i, 41) < .5 ? -1 : 1), i}));
+const A = {cur: null, state: 'lurk', t: 0, open: 0, pos: new THREE.Vector3(), vel: new THREE.Vector3(), dir: new THREE.Vector3(0, 0, 1), home: new THREE.Vector3(), film: 0, ate: 0};
+const aBody = [], aGlow = [];
+{ const pt = (arr, x, y, z, part) => arr.push(x, y, z, part);
+  for (let i = 0; i < 2600; i++) { const u = Math.random(), z = 1.2 - u * 5.4, prof = u < .32 ? Math.sqrt(Math.max(0, 1 - Math.pow((.32 - u) / .34, 2))) : Math.pow(1 - (u - .32) / .68, 1.3), r = 1.6 * prof * (1 + .05 * (Math.random() - .5)), a = Math.random() * 6.283;
+    const x = Math.cos(a) * r, y = Math.sin(a) * r * .85; pt(aBody, x, y, z, z > .45 && y < -.15 ? 1 : 0); if (Math.random() < .03) pt(aGlow, x * 1.01, y * 1.01, z, z > .45 && y < -.15 ? 1 : 4); else if (Math.random() < .22) pt(aGlow, x * 1.02, y * 1.02, z, z > .45 && y < -.15 ? 7 : 8); }
+  for (let i = 0; i < 360; i++) { const t = Math.random(), z = -4.2 - t * 1.2, s = (Math.random() - .5) * 2.6 * t; pt(aBody, s * .15, s, z, 0); }   // tail fan
+  for (const sd of [-1, 1]) for (let i = 0; i < 160; i++) { const t = Math.random(), a = Math.random() * 1.2; pt(aBody, sd * (1.2 + t * 1.3 * Math.cos(a)), -.4 - t * Math.sin(a), -.6 - t * .5, 0); }   // fins
+  for (const [n, lower] of [[17, 0], [13, 1]]) for (let i = 0; i < n; i++) { const t = ((i + .5) / n - .5) * 2.2 + (Math.random() - .5) * .12, lx = Math.sin(t) * (1.22 - lower * .1), lz = .55 + Math.cos(t) * (.78 - lower * .08), len = (.18 + .4 * Math.random() * Math.cos(t * .7)) * (lower ? .8 : 1), lean = (Math.random() - .5) * .25;
+    for (let k = 0; k < 6; k++) { const u = k / 5, w = (1 - u) * .05; for (const sd of k < 5 ? [-1, 1] : [0]) pt(aGlow, lx * (1 - .12 * u) + sd * w, lower ? -.55 + u * len : -.05 - u * len, lz - .1 * u + lean * u * u, lower ? 3 : 2); } }   // fangs: curved, uneven, inward; the lower ones ride the jaw
+  for (let i = 0; i <= 40; i++) { const t = i / 40, x = 0, y = (1 - t) * (1 - t) * 1.4 + 2 * (1 - t) * t * 2.8 + t * t * 1.7, z = (1 - t) * (1 - t) * .3 + 2 * (1 - t) * t * 1.7 + t * t * 3.1; pt(aGlow, x, y, z, 5); }   // the stalk
+  for (const sd of [-1, 1]) for (let i = 0; i < 12; i++) pt(aGlow, sd * .9 + (Math.random() - .5) * .08, .45 + (Math.random() - .5) * .08, .75, 6); }
+const angMat = glow => new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: glow ? THREE.AdditiveBlending : THREE.NormalBlending, uniforms: {uOpen: {value: 0}, uScale: {value: 1}, uTime: {value: 0}, uHunt: {value: 0}},
+  vertexShader: `uniform float uOpen, uScale, uTime, uHunt; attribute float aPart; varying float vP, vA;
+    void main(){ vec3 p = position; vP = aPart;
+      if (aPart == 1. || aPart == 3. || aPart == 7.) { float an = -uOpen * .75; vec3 q = p - vec3(0., -.2, .5); p = vec3(q.x, q.y * cos(an) - q.z * sin(an), q.y * sin(an) + q.z * cos(an)) + vec3(0., -.2, .5); }   // the jaw drops
+      p.x += sin(uTime * 2. + p.z * .8) * .08 * (1.2 - p.z) * .3;
+      vec4 mv = modelViewMatrix * vec4(p, 1.); float z = -mv.z; vA = exp(-pow(.045 * z, 2.)) * smoothstep(1.5, 5., z);
+      gl_PointSize = clamp((aPart > 6.5 ? .12 : aPart > 1.5 ? .07 : .16) * uScale / z, 1., 14.); gl_Position = projectionMatrix * mv; }`,
+  fragmentShader: `uniform float uHunt, uTime; varying float vP, vA; void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; float g = 1. - 4. * r2;
+    vec3 c = vec3(.012, .016, .028); float a = .7 * g;
+    if (vP > 1.5 && vP < 3.5) { c = vec3(.75, .72, .62) * .5; a = g; }          // bone
+    else if (vP > 3.5 && vP < 4.5) { c = vec3(.15, .4, 1.) * (.4 + .6 * sin(uTime * 3. + gl_FragCoord.x)); a = g; }   // photophores
+    else if (vP > 4.5 && vP < 5.5) { c = vec3(.5, .35, .2) * .35; a = g; }        // the stalk
+    else if (vP > 6.5) { c = vec3(.025, .05, .065) * (1. + uHunt); a = g; }   // a faint sheen: you see its bulk only against the light
+    else if (vP > 5.5) { c = mix(vec3(.6, .9, .8), vec3(1., .2, .1), uHunt) * .8; a = g; }   // eyes
+    gl_FragColor = vec4(c * vA, a * vA); }`});
+function angPoints(arr, glow) { const n = arr.length / 4, pos = new Float32Array(n * 3), part = new Float32Array(n); for (let i = 0; i < n; i++) { pos.set(arr.slice(i * 4, i * 4 + 3), i * 3); part[i] = arr[i * 4 + 3]; }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('aPart', new THREE.BufferAttribute(part, 1)); const m = new THREE.Points(g, angMat(glow)); m.frustumCulled = false; return m; }
+const angler = new THREE.Group(), angB = angPoints(aBody, false), angG = angPoints(aGlow, true); angler.add(angB, angG); angler.scale.setScalar(1.55); angler.visible = false; scene.add(angler);
+const LURE = new THREE.Vector3(0, 1.7, 3.1);
+// ------------------------------------------------------------------ a school of fish made of flecks; it scatters from you and from the angler
+const NF = 150, FISH = Array.from({length: NF}, (_, i) => ({p: new THREE.Vector3(), v: new THREE.Vector3(), o: [Math.random() * 6.28, Math.random() * 6.28, Math.random() - .5], sc: i < NF / 2 ? 0 : 1}));
+const schools = [{s: 30, x: 0, y: 0, n: 0}, {s: 95, x: 0, y: 0, n: 1}];
+const fishPos = new Float32Array(NF * 3 * 3), fishA = new Float32Array(NF * 3);
+const fishG = new THREE.BufferGeometry(); fishG.setAttribute('position', new THREE.BufferAttribute(fishPos, 3)); fishG.setAttribute('aK', new THREE.BufferAttribute(fishA, 1));
+const fishPts = new THREE.Points(fishG, new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: {uScale: {value: 1}, uTime: {value: 0}},
+  vertexShader: `uniform float uScale, uTime; attribute float aK; varying float vA, vK; void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.); float z = -mv.z; vK = aK;
+    vA = exp(-pow(.05 * z, 2.)) * smoothstep(.6, 2., z) * (.6 + .4 * sin(uTime * 6. + position.x * 4.)); gl_PointSize = max(1., (.12 - .04 * aK) * uScale / z); gl_Position = projectionMatrix * mv; }`,
+  fragmentShader: `varying float vA, vK; void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; gl_FragColor = vec4(mix(vec3(.75, .9, .95), vec3(.5, .7, .75), vK * .5) * vA * (1. - 4. * r2) * .7, 1.); }`}));
+fishPts.frustumCulled = false; scene.add(fishPts);
+function stepFish(dt) {
+  for (const sc of schools) { sc.s += dt * 4.3; const w = T * .23 + sc.n * 3; sc.x = Math.sin(w) * Rad(sc.s) * .45; sc.y = Math.cos(w * 1.3) * Rad(sc.s) * .3;
+    if (pillarR(sc.s) > .5 && Math.abs(sc.x) < pillarR(sc.s) + 2) sc.x = (sc.x < 0 ? -1 : 1) * (pillarR(sc.s) + 2);
+    if (sc.s < C.s - 26 || sc.s > C.s + 140) { sc.s = C.s + 70 + Math.random() * 40; sc.reset = true; } }
+  const am = A.cur ? A.pos : null;
+  for (let i = 0; i < NF; i++) { const f = FISH[i], sc = schools[f.sc], o = f.o, ts = sc.s + Math.sin(o[0] + T * .4) * 2.5;
+    cross(ts, sc.x + Math.cos(o[1] + T * .5) * 2.2, sc.y + Math.sin(o[1] * 1.7 + T * .45) * 1.5, _q);
+    if (sc.reset) { f.p.copy(_q); f.v.set(0, 0, 0); }
+    f.v.addScaledVector(_q.sub(f.p), dt * 1.8); let d = f.p.distanceTo(C.p); if (d < 5) f.v.addScaledVector(_p.copy(f.p).sub(C.p).normalize(), dt * 34 * (1 - d / 5));
+    if (am) { d = f.p.distanceTo(am); if (d < 8) f.v.addScaledVector(_p.copy(f.p).sub(am).normalize(), dt * 40 * (1 - d / 8)); }
+    f.v.multiplyScalar(Math.pow(.3, dt)); if (f.v.length() > 12) f.v.setLength(12); f.p.addScaledVector(f.v, dt);
+    _p.copy(f.v).normalize(); if (!isFinite(_p.x)) _p.set(0, 0, -1);
+    for (let k = 0; k < 3; k++) { const j = (i * 3 + k) * 3; fishPos[j] = f.p.x - _p.x * k * .16; fishPos[j + 1] = f.p.y - _p.y * k * .16; fishPos[j + 2] = f.p.z - _p.z * k * .16; fishA[i * 3 + k] = k; } }
+  for (const sc of schools) sc.reset = false; fishG.attributes.position.needsUpdate = true;
+}
+// ------------------------------------------------------------------ control: on rails. Where you point is where you swim in the tunnel; a tap is a dash; two fingers move the camera
+const ptr = {down: false, x: innerWidth / 2, y: innerHeight / 2, active: false}, keys = new Set(), G = {state: 'title', pinch: null, orbit: null};
+const CAM0 = () => (COARSE && innerHeight > innerWidth ? 8.5 : 6.2), CAM = {dist: CAM0(), yaw: 0, pitch: 0, idle: 9};
 let slow = 0;
 const buzz = p => { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} };
-let ac = null; const SND = {};
+const SND = {};
 function snd(n, v, loop) { if (!SND[n]) { const a = new Audio(`../paeleo/scion/videotext/memory-maker/fal/${n}.mp3`); a.loop = !!loop; SND[n] = a; } SND[n].volume = v; return SND[n]; }
 function sfx(n, v) { try { const a = snd(n, v).cloneNode(); a.volume = v; a.play().catch(() => {}); } catch (e) {} }
-function tone(f, d, g, type = 'sine') { if (!ac) return; const t = ac.currentTime, o = ac.createOscillator(), v = ac.createGain(); o.type = type; o.frequency.setValueAtTime(f, t); v.gain.setValueAtTime(0, t); v.gain.linearRampToValueAtTime(g, t + .02); v.gain.exponentialRampToValueAtTime(.0001, t + d); o.connect(v).connect(ac.destination); o.start(t); o.stop(t + d + .05); }
-function noise(d, g, f) { if (!ac) return; const t = ac.currentTime, b = ac.createBuffer(1, ac.sampleRate * d | 0, ac.sampleRate), x = b.getChannelData(0); for (let i = 0; i < x.length; i++) x[i] = (Math.random() * 2 - 1) * (1 - i / x.length);
-  const s = ac.createBufferSource(), fl = ac.createBiquadFilter(), v = ac.createGain(); fl.type = 'bandpass'; fl.frequency.value = f; fl.Q.value = 1.2; v.gain.value = g; s.buffer = b; s.connect(fl).connect(v).connect(ac.destination); s.start(t); }
-let sayT = -9; function say(t) { $('say').textContent = t; $('say').style.opacity = 1; sayT = T; }
-function dash() { if (C.dash > .4) return; C.dash = 1; sfx('sfx_surface', .4); noise(.35, .1, 800); buzz(12); }
+let sayT = -9; function say(t, hold = 0) { $('say').textContent = t; $('say').style.opacity = 1; sayT = RT + hold; }
+function dash() { if (C.dash > .4 || G.state !== 'play') return; C.dash = 1; sfx('sfx_surface', .35); AU.noise(.45, .12, 600, .4); buzz(12); }
 function stepCreature(dt) {
-  let tx = C.tx || 0, ty = C.ty || 0;
-  if (ptr.active) { tx = THREE.MathUtils.clamp((ptr.x / innerWidth - .5) * 2.4, -1, 1) * R * .7; ty = THREE.MathUtils.clamp(-(ptr.y / innerHeight - .5) * 2.4, -1, 1) * R * .6; }
+  const Rs = Rad(C.s); let tx = C.tx || 0, ty = C.ty || 0;
+  if (ptr.active && !G.pinch && !G.orbit) { tx = THREE.MathUtils.clamp((ptr.x / innerWidth - .5) * 2.4, -1, 1) * Rs * .72; ty = THREE.MathUtils.clamp(-(ptr.y / innerHeight - .5) * 2.4, -1, 1) * Rs * .62; }
   const kx = (keys.has('arrowright') || keys.has('d')) - (keys.has('arrowleft') || keys.has('a')), ky = (keys.has('arrowup') || keys.has('w')) - (keys.has('arrowdown') || keys.has('s'));
-  if (kx || ky) { tx = THREE.MathUtils.clamp(C.x + kx * 3, -R * .7, R * .7); ty = THREE.MathUtils.clamp(C.y + ky * 3, -R * .6, R * .6); }
-  C.tx = tx; C.ty = ty; C.vx += ((tx - C.x) * 8 - C.vx * 4.8) * dt; C.vy += ((ty - C.y) * 8 - C.vy * 4.8) * dt; C.x += C.vx * dt; C.y += C.vy * dt;   // a critically damped glide
-  const r = Math.hypot(C.x, C.y), lim = R - 1.4; if (r > lim) { C.x *= lim / r; C.y *= lim / r; }
-  C.dash = Math.max(0, C.dash - dt * .9); C.speed = 5 + 8 * C.dash * C.dash; C.s += C.speed * dt; C.ph += dt * (.9 + 1.4 * C.dash);
+  if (kx || ky) { tx = THREE.MathUtils.clamp(C.x + kx * 3, -Rs * .72, Rs * .72); ty = THREE.MathUtils.clamp(C.y + ky * 3, -Rs * .62, Rs * .62); }
+  C.tx = tx; C.ty = ty;
+  C.boost = laneBoost(C.s, C.x, C.y); if (C.boost > 0) for (let k = 0; k < 2; k++) { const [lx, ly] = lane(C.s, k), b = Math.max(0, 1 - Math.hypot(C.x - lx, C.y - ly) / 1.9); C.vx += (lx - C.x) * b * 3 * dt; C.vy += (ly - C.y) * b * 3 * dt; }   // a current holds you
+  C.vx += ((tx - C.x) * 8 - C.vx * 4.8) * dt; C.vy += ((ty - C.y) * 8 - C.vy * 4.8) * dt; C.x += C.vx * dt; C.y += C.vy * dt;   // a critically damped glide
+  const r = Math.hypot(C.x, C.y), lim = Rs - 1.4, pr = pillarR(C.s) + 1.5; if (r > lim) { C.x *= lim / r; C.y *= lim / r; }
+  if (pillarR(C.s) > .3 && r < pr) { const k = pr / Math.max(r, .01); if (r < .01) C.x = C.tx < 0 ? -pr : pr; else { C.x *= k; C.y *= k; } }
+  // jet propulsion: the bell's contraction is the stroke
+  const ph = C.ph % 1, thrust = ph < .28 ? Math.sin(ph / .28 * Math.PI) : 0, end = G.state === 'end';
+  const target = end ? .6 : 3.6 + 3.4 * thrust + 8 * C.dash * C.dash + 5.5 * C.boost; C.speed += (target - C.speed) * Math.min(1, dt * 4);
+  C.dash = Math.max(0, C.dash - dt * .9); C.s += C.speed * dt; C.ph += dt * (.85 + 1.2 * C.dash + .5 * C.boost) * (end ? .5 : 1);
+  if (Math.floor(C.ph) !== C.lastPh) { C.lastPh = Math.floor(C.ph); AU.stroke(); }
   const {T: Tg, N, B, C: Cc} = frameAt(C.s); C.p.copy(Cc).addScaledVector(N, C.y).addScaledVector(B, C.x);
   const h = Tg.clone().multiplyScalar(C.speed).addScaledVector(N, C.vy).addScaledVector(B, C.vx).normalize(); C.heading.lerp(h, 1 - Math.pow(.02, dt)).normalize();
   const q = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().lookAt(new THREE.Vector3(), C.heading, N)).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2));
   C.q.slerp(q, 1 - Math.pow(.01, dt)); C.hurt = Math.max(0, C.hurt - dt * .8); C.glow = Math.max(0, C.glow - dt * 1.4);
 }
-// ------------------------------------------------------------------ drinking a film; being drained
-const caught = [], seen = new Set();
-function drink(d) {
-  d.pour = .001; const t = tent.find(t => !t.clip) || tent.reduce((m, x) => (x.clip.t0 < m.clip.t0 ? x : m), tent[0]);
+// ------------------------------------------------------------------ drinking a film; being drained; being bitten
+const caught = [], seen = new Set(), TAKEN = new Set(), ST = {bad: 0, bitten: 0, eels: 0, friends: 0};
+function giveWorm(film, from, block, how) {
+  const t = tent.find(t => !t.clip) || tent.reduce((m, x) => (x.clip.t0 < m.clip.t0 ? x : m), tent[0]);
   if (t.clip) giveBlock(t.clip.block);
-  t.clip = {block: d.block, film: d.film, from: d.from, t0: T, fill: 0}; d.block = -1;   // the cloud's frames now belong to the worm
-  caught.push({film: d.film, from: d.from, s: C.s}); seen.add(d.film);
-  C.glow = 1; slow = .5; sfx('sfx_catch', .7); const f0 = 220 * Math.pow(2, (d.film % 12) / 12); tone(f0, 2.2, .06); tone(f0 * 1.5, 1.6, .03); buzz([10, 30, 18]);
-  const f = FILMS[d.film]; say(`${f.title}${f.src ? ' · ' + f.src : ''}`); if (caught.length === 1) $('act').style.opacity = 1;
+  t.clip = {block, film, from, t0: T, fill: 0}; caught.push({film, from, s: C.s, how}); seen.add(film);
+  C.glow = 1; slow = .5; sfx('sfx_catch', .6); const f0 = 220 * Math.pow(2, (film % 12) / 12); AU.tone(f0, 2.2, .05); AU.tone(f0 * 1.5, 1.6, .025); buzz([10, 30, 18]);
+  const f = FILMS[film]; say(`${f.title}${f.src ? ' · ' + f.src : ''}`); if (caught.length === 1) $('act').style.opacity = 1;
+  if (caught.length === 2) setTimeout(() => say(COARSE ? 'pinch to pull back · two fingers to peek around you' : 'scroll to pull back · right-drag (or Z / X) to peek around you', 2), 3200);
+  if (!V.on) taste(t.clip);
 }
-function drained(d) { d.live = false; C.hurt = 1; slow = .3; $('flash').style.opacity = 1; setTimeout(() => $('flash').style.opacity = 0, 180); noise(.6, .18, 2400); tone(70, .6, .2, 'sawtooth'); buzz([40, 30, 90]);
-  const t = tent.filter(t => t.clip).sort((a, b) => b.clip.t0 - a.clip.t0)[0]; if (t) { giveBlock(t.clip.block); t.clip = null; say('corrupted: it drained a worm'); } else say('corrupted'); }
+function drink(d) { d.pour = .001; d.to = null; const b = d.block; d.block = -1; giveWorm(d.film, d.from, b, 'cloud'); NET.send({t: 'drink', key: d.key}); }
+function drained(d) { d.live = false; ST.bad++; C.hurt = 1; slow = .3; flash(); AU.noise(.6, .18, 2400); AU.tone(70, .6, .2, 'sawtooth'); buzz([40, 30, 90]);
+  if (loseWorms(1)) say('corrupted: it drained a worm'); else say('corrupted'); }
+function loseWorms(n) { let k = 0; for (let i = 0; i < n; i++) { const t = tent.filter(t => t.clip).sort((a, b) => b.clip.t0 - a.clip.t0)[0]; if (!t) break; giveBlock(t.clip.block); t.clip = null; k++; } return k; }
+function flash() { $('flash').style.opacity = 1; setTimeout(() => $('flash').style.opacity = 0, 180); }
 // ------------------------------------------------------------------ write every cloud's row
 function writeRows(dt) {
-  for (let i = 0; i < ND; i++) { const d = D[i], r = DROW + i; if (!d.live) { row(r, 1, -1, 1, 0, 0); continue; }
-    if (d.pour > 0) { d.pour += dt / 1.1; if (d.pour >= 1) { d.live = false; row(r, 1, -1, 1, 0, 0); continue; } }
-    else { d.s -= dt * .6; if (d.s < C.s - 6) { d.live = false; giveBlock(d.block); d.block = -1; continue; } }
+  for (let i = 0; i < ND; i++) { const d = D[i], r = DROW + i; if (!d.live) { hide(r); continue; }
+    if (d.pour > 0) { d.pour += dt / 1.1; if (d.pour >= 1) { d.live = false; if (d.block >= 0) { giveBlock(d.block); d.block = -1; } hide(r); continue; } }
+    else { d.s += dt * (.7 + 4 * laneBoost(d.s, d.x, d.y)); if (d.s < C.s - 8) { d.live = false; giveBlock(d.block); d.block = -1; continue; } }
     const {N, B, C: Cc} = frameAt(d.s); d.pos.copy(Cc).addScaledVector(N, d.y + Math.sin(T * .5 + d.ph) * .3).addScaledVector(B, d.x + Math.cos(T * .4 + d.ph) * .3);
-    const fade = Math.min(1, (T - d.born) / 1.5), fr = (T * Math.min(10, FILMS[d.film].fps || 8));
-    row(r, 0, d.pos.x, d.pos.y, d.pos.z, d.size); row(r, 1, d.bad ? -1 : d.block, 1.35, fr, (d.bad ? .9 : 1) * fade);
-    row(r, 2, 0, d.bad ? .6 : 1.1, d.bad ? 1 : 0, d.pour); row(r, 4, d.bad ? 0 : .7, 0, 0, 0); row(r, 3, C.p.x, C.p.y, C.p.z, 0);
-    if (d.pour <= 0 && G.state === 'play') { const dd = d.pos.distanceTo(C.p); if (dd < d.size * .75 + .6) { if (d.bad) drained(d); else drink(d); } } }
-  // the worms: each node of a tentacle is a small cloud showing a later frame, so the film flows down it
+    const fade = Math.min(1, (T - d.born) / 1.5), fr = (T * Math.min(10, FILMS[d.film].fps || 8)), to = d.to || C.p;
+    row(r, 0, d.pos.x, d.pos.y, d.pos.z, d.size); row(r, 1, d.bad ? -1 : (d.block >= 0 ? d.block : -1), 1.35, fr, (d.bad ? .9 : 1.25) * fade);
+    row(r, 2, 0, d.bad ? .6 : .9, d.bad ? 1 : 0, d.pour); row(r, 3, to.x, to.y, to.z, d.to ? .1 : 0); row(r, 4, d.bad ? 0 : .9, 1.9, 0, 0);
+    if (d.pour <= 0 && G.state === 'play') { const dd = d.pos.distanceTo(C.p); if (dd < d.size * .6 + .8) { if (d.bad) drained(d); else drink(d); } } }
+  for (let i = 0; i < NR; i++) { const f = RF[i], r = RROW + i; if (f.i < 0 || f.s < C.s - 10) placeReef(f);
+    cross(f.s, f.x + Math.sin(T * .3 + i) * .2, f.y + Math.cos(T * .25 + i) * .2, f.pos); const dd = f.pos.distanceTo(camera.position), near = 1 - THREE.MathUtils.clamp((dd - 6) / 22, 0, 1);
+    row(r, 0, f.pos.x, f.pos.y, f.pos.z, f.size); row(r, 1, f.block, 1.4, T * Math.min(10, FILMS[f.film].fps || 8), Math.min(1, (T - f.born) / 2) * (.35 + 1.1 * near));
+    row(r, 2, 0, .5, 0, 0); row(r, 3, 0, 0, 0, 0); row(r, 4, 1.3, 1.5, 0, 0); }
   for (let ti = 0; ti < TN; ti++) { const t = tent[ti], cl = t.clip; if (cl) cl.fill = Math.min(1, cl.fill + dt * .8);
     for (let j = 0; j < TS; j++) { const r = WROW + ti * TS + j, i = (t.start + j) * 3, f = j / (TS - 1), on = cl && f <= cl.fill;
-      row(r, 0, X[i], X[i + 1], X[i + 2], (.26 - .14 * f) * (on ? 1.15 : .7)); row(r, 1, on ? cl.block : -1, 1, on ? T * 7 - j * .8 : 0, (on ? .5 : .3 * (1 - .6 * f)) * (1 - .8 * (V.u || 0)));
-      row(r, 2, 0, .4, 0, 0); row(r, 3, 0, 0, 0, 1); } }
+      row(r, 0, X[i], X[i + 1], X[i + 2], (.3 - .15 * f) * (on ? 1.2 : .7)); row(r, 1, on ? cl.block : -1, 1, on ? T * 7 - j * .8 : 0, (on ? .6 : .3 * (1 - .6 * f)) * (1 - .8 * (V.u || 0)));
+      row(r, 2, 0, .4, 0, 0); row(r, 3, 0, 0, 0, 1); row(r, 4, .3, 0, 0, 0); } }
+  for (const e of E) { if (e.s < C.s - 22 || e.block < 0) placeEel(e, C.s + 70 + rnd(e.n, 34) * 40);
+    e.dart = Math.max(0, e.dart - dt); e.s += dt * (e.speed + 7 * e.dart + 2.5 * laneBoost(e.s, ...lane(e.s, e.k)));
+    for (let j = 0; j < ES; j++) { const r = EROW + e.k * ES + j; eelBead(e, j, _p);
+      row(r, 0, _p.x, _p.y, _p.z, .55 * (1 - .5 * j / ES) + .1); row(r, 1, e.block, 1.1, T * 7 - j * .7, j < 1 ? .9 : .75 * (e.cool > 0 && j >= ES - 6 ? .25 : 1));
+      row(r, 2, 0, .3, 0, 0); row(r, 3, 0, 0, 0, .3); row(r, 4, .35, 0, 1, 0);
+      if (G.state === 'play' && j >= ES - 6 && e.cool <= 0 && _p.distanceTo(C.p) < 1.4) { const b = takeBlock(); if (b >= 0) { loadClip(b, e.film, e.from + 8); e.cool = 1; e.dart = 2; ST.eels++; giveWorm(e.film, e.from + 8, b, 'eel'); AU.tone(520, .5, .04, 'triangle'); } } } }
 }
-// ------------------------------------------------------------------ watching: what you carry blooms in the dark in front of you while time slows
-const V = {on: false, i: 0, t0: 0, list: []};
-function watch() { const list = tent.filter(t => t.clip).sort((a, b) => a.clip.t0 - b.clip.t0).map(t => t.clip); if (!list.length) return;
-  V.on = true; V.list = list; V.i = 0; V.t0 = RT; showView(); $('watch').textContent = 'Back'; sfx('sfx_enter_film', .35); }
+// ------------------------------------------------------------------ the angler: lurk, notice, lunge, rest
+function stepAngler(dt) {
+  const cand = ANG.find(a => a.s > C.s - 18); if (!cand) { angler.visible = false; A.cur = null; hide(LROW); return; }
+  if (A.cur !== cand) { A.cur = cand; A.state = 'lurk'; A.open = 0; const R = Rad(cand.s), x = cand.side * (pillarR(cand.s) > .5 ? pillarR(cand.s) + (R - pillarR(cand.s)) * .5 : R * .42);
+    cross(cand.s, x, -R * .15, A.home); A.pos.copy(A.home); A.vel.set(0, 0, 0); A.film = (rnd(cand.i, 42) * FILMS.length) | 0; loadClip(LUREBLOCK, A.film, (rnd(cand.i, 43) * 40) | 0); }
+  const toC = _p.copy(C.p).sub(A.pos), dist = toC.length(), ahead = cand.s - C.s; A.t += dt;
+  if (G.state !== 'play') A.state = 'rest';
+  if (A.state === 'lurk') { A.pos.lerp(_q.copy(A.home).add(new THREE.Vector3(0, Math.sin(T * .6) * .4, 0)), 1 - Math.pow(.3, dt)); A.open += (.1 - A.open) * dt * 2; A.dir.lerp(tangent(cand.s).negate(), dt);
+    if (dist < 15 && ahead > -4) { A.state = 'hunt'; A.t = 0; say('something is watching from the dark'); AU.hunt(true); } }
+  else if (A.state === 'hunt') { A.dir.lerp(toC.clone().normalize(), 1 - Math.pow(.02, dt)); A.pos.addScaledVector(A.dir, dt * 1.4); A.open += (.35 - A.open) * dt * 3;
+    if (A.t > 1.1) { A.state = 'lunge'; A.t = 0; A.vel.copy(toC).normalize().multiplyScalar(11); AU.noise(.8, .2, 180, .6); buzz(30); } if (dist > 24) { A.state = 'lurk'; AU.hunt(false); } }
+  else if (A.state === 'lunge') { A.vel.lerp(toC.clone().normalize().multiplyScalar(11), dt * 1.2); A.pos.addScaledVector(A.vel, dt); A.dir.lerp(A.vel.clone().normalize(), dt * 6); A.open += (1 - A.open) * dt * 8;
+    const mouth = _q.copy(A.dir).multiplyScalar(1.9 * 1.55).add(A.pos); if (mouth.distanceTo(C.p) < 2.1) bite(); else if (A.t > 1) { A.state = 'rest'; A.t = 0; } }
+  else { A.pos.lerp(A.home, 1 - Math.pow(.5, dt)); A.open += (0 - A.open) * dt * 3; A.dir.lerp(tangent(cand.s).negate(), dt); if (A.t > 2.6 && G.state === 'play') { A.state = 'lurk'; AU.hunt(false); } }
+  A.dir.normalize(); const R = Rad(A.pos.clone().z * -1);
+  angler.visible = true; angler.position.copy(A.pos); angler.lookAt(_q.copy(A.pos).add(A.dir)); angler.updateMatrixWorld();
+  for (const m of [angB, angG]) { m.material.uniforms.uOpen.value = A.open; m.material.uniforms.uTime.value = T; m.material.uniforms.uHunt.value = A.state === 'hunt' || A.state === 'lunge' ? 1 : 0; }
+  const lp = angler.localToWorld(_q.copy(LURE).add(new THREE.Vector3(Math.sin(T * 1.1) * .15, Math.sin(T * 1.7) * .12, 0))), hunting = A.state === 'hunt' || A.state === 'lunge';
+  row(LROW, 0, lp.x, lp.y, lp.z, .8); row(LROW, 1, LUREBLOCK, 1.3, T * 6, 1.1); row(LROW, 2, 0, .3, hunting && Math.sin(T * 20) > .3 ? 1 : 0, 0); row(LROW, 3, 0, 0, 0, .5); row(LROW, 4, .3, 1.6, 0, 0);
+  if (G.state === 'play' && A.state !== 'rest' && lp.distanceTo(C.p) < 1.3) { A.state = 'lunge'; A.t = .5; A.vel.copy(toC).setLength(11); }   // it is bait
+}
+function bite() { ST.bitten++; A.state = 'rest'; A.t = 0; A.ate++; C.hurt = 1; slow = .25; flash(); C.dash = 1; AU.noise(.5, .3, 120, .2); AU.tone(48, 1.2, .25, 'sawtooth'); buzz([60, 40, 120]);
+  const k = loseWorms(2); say(k ? `the angler took ${k === 1 ? 'a film' : 'two films'}` : 'the angler snapped at nothing'); }
+// ------------------------------------------------------------------ watching: what you carry blooms in the dark; a film you drink blooms briefly by itself
+const V = {on: false, i: 0, t0: 0, list: [], taste: 0};
+function watch() { const list = tent.filter(t => t.clip).sort((a, b) => a.clip.t0 - b.clip.t0).map(t => t.clip); if (!list.length) { say('you carry nothing yet'); return; }
+  V.on = true; V.taste = 0; V.list = list; V.i = 0; V.t0 = RT; showView(); $('watch').textContent = 'Back'; sfx('sfx_enter_film', .3); AU.open(1); }
+function taste(clip) { if (G.state !== 'play') return; V.taste = 1; V.on = false; V.list = [clip]; V.i = 0; V.t0 = RT; loadClip(VIEWBLOCK, clip.film, clip.from); }
 function showView() { const c = V.list[V.i % V.list.length]; loadClip(VIEWBLOCK, c.film, c.from); const f = FILMS[c.film]; say(`${V.i % V.list.length + 1} / ${V.list.length} · ${f.title}`); }
-function unwatch() { V.on = false; $('watch').textContent = 'Watch'; }
+function unwatch() { V.on = false; $('watch').textContent = 'Watch'; AU.open(0); }
 function writeView() {
-  if (!V.on) { row(VROW, 1, -1, 1, 0, 0); return; }
-  const F = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 2).negate(), U = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 1), p = camera.position.clone().addScaledVector(F, 4.6).addScaledVector(U, .25), u = Math.min(1, (RT - V.t0) / .9);
-  const c = V.list[V.i % V.list.length], fps = Math.min(10, FILMS[c.film].fps || 8);
-  row(VROW, 0, p.x, p.y, p.z, 2.1 * (.5 + .5 * u * u * (3 - 2 * u))); row(VROW, 1, VIEWBLOCK, 1.4, (RT - V.t0) * fps, 1.7 * u); row(VROW, 2, 0, .45, 0, 0); row(VROW, 4, 1.6, 1.1, 0, 0); row(VROW, 3, 0, 0, 0, .35);
-  if (RT - V.t0 > BLOCK / fps * 2.2) { V.i++; V.t0 = RT; if (V.i >= V.list.length * 2) unwatch(); else showView(); }
+  const live = V.on || V.taste > 0; if (!live) { hide(VROW); return; }
+  const F = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 2).negate(), U = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 1), Rr = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0);
+  const t = RT - V.t0, u = Math.min(1, t / .9), c = V.list[V.i % V.list.length], fps = Math.min(10, FILMS[c.film].fps || 8);
+  if (V.taste > 0) { const k = Math.min(1, t / .5) * (1 - THREE.MathUtils.clamp((t - 2.2) / .6, 0, 1)), p = camera.position.clone().addScaledVector(F, 4.4).addScaledVector(U, .9).addScaledVector(Rr, innerWidth > innerHeight ? 1.6 : 0);
+    row(VROW, 0, p.x, p.y, p.z, 1.05 * (.6 + .4 * k)); row(VROW, 1, VIEWBLOCK, 1.4, t * fps, 1.6 * k); row(VROW, 2, 0, .4, 0, 0); row(VROW, 3, 0, 0, 0, .3); row(VROW, 4, 1.6, 1.2, 0, 0); if (t > 2.8) V.taste = 0; return; }
+  const p = camera.position.clone().addScaledVector(F, 4.6).addScaledVector(U, .25);
+  row(VROW, 0, p.x, p.y, p.z, 2.1 * (.5 + .5 * u * u * (3 - 2 * u))); row(VROW, 1, VIEWBLOCK, 1.4, t * fps, 1.7 * u); row(VROW, 2, 0, .45, 0, 0); row(VROW, 3, 0, 0, 0, .35); row(VROW, 4, 1.6, 1.1, 0, 0);
+  if (t > BLOCK / fps * 2.2) { V.i++; V.t0 = RT; if (G.state === 'end') { if (V.i >= V.list.length) { V.on = false; showEnd(); } else showView(); } else if (V.i >= V.list.length * 2) unwatch(); else showView(); }
 }
-function saveReel() { const edl = {title: 'The Current: a reel drunk from the tunnels', made: new Date().toISOString(), events: caught.map((e, i) => ({n: i + 1, film: FILMS[e.film].slug, title: FILMS[e.film].title, source: FILMS[e.film].src, from_frame: e.from, frames: BLOCK, depth_m: +e.s.toFixed(1)}))};
-  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(edl, null, 1)], {type: 'application/json'})); a.download = 'the-current-reel.json'; a.click(); }
-// ------------------------------------------------------------------ camera: a chase shot, behind and a little above, leaning into the turns
+function reelJSON() { return {title: 'The Current: a reel carried up from the dark', made: new Date().toISOString(), room: ROOM || null, events: caught.map((e, i) => ({n: i + 1, film: FILMS[e.film].slug, title: FILMS[e.film].title, source: FILMS[e.film].src, from_frame: e.from, frames: BLOCK, depth_m: +e.s.toFixed(1), how: e.how}))}; }
+function saveReel() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(reelJSON(), null, 1)], {type: 'application/json'})); a.download = 'the-current-reel.json'; a.click(); }
+// ------------------------------------------------------------------ the end: the Source. Your worms let go of their films one by one, then the dive is told
+function arrive() { G.state = 'end'; G.endT = RT; AU.zone('end', true); AU.open(1); $('act').style.opacity = 0; unwatchQuiet();
+  const list = tent.filter(t => t.clip).sort((a, b) => a.clip.t0 - b.clip.t0).map(t => t.clip); G.carried = list.slice();
+  say(list.length ? `the Source · ${list.length} film${list.length > 1 ? 's' : ''} let go into the light` : 'the Source · you arrive with nothing', 2);
+  if (list.length) setTimeout(() => { V.on = true; V.taste = 0; V.list = list; V.i = 0; V.t0 = RT; showView(); }, 2200); else setTimeout(showEnd, 4200); }
+function unwatchQuiet() { V.on = false; V.taste = 0; $('watch').textContent = 'Watch'; }
+function showEnd() { if ($('end').style.display === 'flex') return; const n = G.carried.length, mins = ((RT - G.startT) / 60);
+  $('endp').textContent = n ? `You carried ${n} film${n > 1 ? 's' : ''} down to the Source, out of ${caught.length} you drank. ${ST.bitten ? `The angler bit ${ST.bitten} time${ST.bitten > 1 ? 's' : ''}. ` : ''}${ST.bad ? `Corruption touched you ${ST.bad} time${ST.bad > 1 ? 's' : ''}.` : ''}`
+    : `You reached the Source with nothing in your tentacles. You drank ${caught.length}; the dark took the rest back.`;
+  $('endl').innerHTML = ''; for (const c of G.carried) { const li = document.createElement('li'), f = FILMS[c.film]; li.textContent = f.title + (f.src ? ' · ' + f.src : ''); $('endl').appendChild(li); }
+  $('ends').textContent = `${Math.round(mins * 10) / 10} min · ${ST.eels} drunk from eels · ${seen.size} different films${GH.size || ST.friends ? ` · swam with ${Math.max(GH.size, ST.friends)} other${Math.max(GH.size, ST.friends) > 1 ? 's' : ''}` : ''}${ROOM ? ' · room ' + ROOM : ''}`;
+  $('end').style.display = 'flex'; }
+// ------------------------------------------------------------------ camera: a chase shot you can pull back and swing around
 const camS = {x: 0, y: 0, roll: 0};
 function stepCamera(real) {
+  CAM.idle += real; if (CAM.idle > 2.5 && G.state !== 'end') { CAM.yaw *= Math.pow(.4, real); CAM.pitch *= Math.pow(.4, real); }
+  if (G.state === 'end') { CAM.yaw += real * .12; CAM.dist += (11 - CAM.dist) * real * .4; }
+  const pk = keys.has('z') ? -1 : keys.has('x') ? 1 : 0; if (pk) { CAM.yaw += pk * real * 1.6; CAM.idle = 0; }
+  if (keys.has('-')) CAM.dist = Math.min(24, CAM.dist * Math.pow(2, real)); if (keys.has('=') || keys.has('+')) CAM.dist = Math.max(2.8, CAM.dist * Math.pow(.5, real));
   const lag = 1 - Math.pow(.004, real); camS.x += (C.x * .6 - camS.x) * lag; camS.y += (C.y * .6 - camS.y) * lag;
-  const back = 6.2 - 1.2 * C.glow + 1.4 * C.dash + (V.on ? 1.5 : 0), {T: Tt, N, B} = frameAt(C.s - back), Cc = path(C.s - back);
-  camera.position.lerp(Cc.clone().addScaledVector(N, camS.y + 1.1).addScaledVector(B, camS.x), 1 - Math.pow(.003, real));
-  camS.roll += (THREE.MathUtils.clamp(-C.vx * .05, -.3, .3) - camS.roll) * (1 - Math.pow(.05, real));
-  camera.up.copy(N).applyAxisAngle(Tt, camS.roll); camera.lookAt(C.p.clone().addScaledVector(frameAt(C.s).T, 4).addScaledVector(N, .9));
+  const back = CAM.dist - 1.2 * C.glow + 1.4 * C.dash + (V.on ? 1.5 : 0), {T: Tt, N, B} = frameAt(C.s - back), Cc = path(C.s - back), k = back / 6.2;
+  const base = Cc.clone().addScaledVector(N, camS.y + 1.1 * Math.min(2.2, k)).addScaledVector(B, camS.x), off = base.sub(C.p);
+  off.applyAxisAngle(N, CAM.yaw); const right = new THREE.Vector3().crossVectors(off, N).normalize(); if (right.lengthSq() > .5) off.applyAxisAngle(right, CAM.pitch);
+  const tgt = C.p.clone().add(off), st = C.s + Tt.dot(off), pc = path(st), dv = tgt.clone().sub(pc); dv.addScaledVector(tangent(st), -dv.dot(tangent(st)));
+  const dl = dv.length(), lim = Rad(st) - .7, pr = pillarR(st) + .8; if (dl > lim) tgt.addScaledVector(dv, lim / dl - 1); else if (pr > 1 && dl < pr) tgt.addScaledVector(dv, pr / Math.max(dl, .01) - 1);
+  camera.position.lerp(tgt, 1 - Math.pow(.002, real));
+  camS.roll += (THREE.MathUtils.clamp(-C.vx * .05, -.3, .3) * Math.cos(CAM.yaw) - camS.roll) * (1 - Math.pow(.05, real));
+  camera.up.copy(N).applyAxisAngle(Tt, camS.roll); const side = Math.min(1, Math.abs(Math.sin(CAM.yaw)) + Math.abs(CAM.pitch) * .6);
+  camera.lookAt(C.p.clone().addScaledVector(frameAt(C.s).T, 4 * (1 - side)).addScaledVector(N, .9 * (1 - side)));
   camera.fov += (60 + 12 * C.dash - camera.fov) * (1 - Math.pow(.02, real)); camera.updateProjectionMatrix(); camera.updateMatrixWorld();
   uCam.uR.value.setFromMatrixColumn(camera.matrixWorld, 0); uCam.uU.value.setFromMatrixColumn(camera.matrixWorld, 1); uCam.uF.value.setFromMatrixColumn(camera.matrixWorld, 2);
+}
+// ------------------------------------------------------------------ sound: deep water. A synthesized bed (brown noise, pressure, bubbles, distant calls), and the user's songs heard through the water
+const AU = (() => {
+  let ac = null, out, wet, music = [], mf, mg, bedLP, bedG, rushG, huntG, zoneNow = '', zoneT = -99, station = 0, current = -1, deck = 0;
+  const tracks = MUSIC ? MUSIC.tracks : [], byId = Object.fromEntries(tracks.map(t => [t.id, t]));
+  const playable = t => { const a = document.createElement('audio'); return (t.mp3 && a.canPlayType('audio/mpeg')) || a.canPlayType('audio/ogg; codecs="vorbis"') || a.canPlayType('audio/ogg'); };
+  function url(t) { const a = document.createElement('audio'), p = (!a.canPlayType('audio/ogg; codecs="vorbis"') && t.mp3) ? t.mp3 : t.src; return (Q.get('music') || MUSIC.base) + p.split('/').map(encodeURIComponent).join('/'); }
+  function start() {
+    const A = window.AudioContext || window.webkitAudioContext; if (!A || ac) { if (ac && ac.state === 'suspended') ac.resume(); return; } ac = new A();
+    out = ac.createDynamicsCompressor(); out.threshold.value = -16; out.ratio.value = 3; out.connect(ac.destination);
+    const ir = ac.createBuffer(2, ac.sampleRate * 4.5, ac.sampleRate); for (let c = 0; c < 2; c++) { const x = ir.getChannelData(c); for (let i = 0; i < x.length; i++) x[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / x.length, 3.2); }
+    wet = ac.createConvolver(); wet.buffer = ir; const wg = ac.createGain(); wg.gain.value = .5; wet.connect(wg).connect(out);
+    const nb = ac.createBuffer(2, ac.sampleRate * 8, ac.sampleRate); for (let c = 0; c < 2; c++) { const x = nb.getChannelData(c); let l = 0; for (let i = 0; i < x.length; i++) { l = (l + .02 * (Math.random() * 2 - 1)) / 1.02; x[i] = l * 3.5; } }
+    const ns = ac.createBufferSource(); ns.buffer = nb; ns.loop = true; bedLP = ac.createBiquadFilter(); bedLP.type = 'lowpass'; bedLP.frequency.value = 380; bedG = ac.createGain(); bedG.gain.value = .55;
+    ns.connect(bedLP).connect(bedG).connect(out); bedG.connect(wet); ns.start();
+    const lfo = ac.createOscillator(), lg = ac.createGain(); lfo.frequency.value = .07; lg.gain.value = 140; lfo.connect(lg).connect(bedLP.frequency); lfo.start();
+    for (const f of [38, 55.5]) { const o = ac.createOscillator(), g = ac.createGain(), am = ac.createOscillator(), ag = ac.createGain(); o.frequency.value = f; g.gain.value = .05; am.frequency.value = .05 + f / 2000; ag.gain.value = .04; am.connect(ag).connect(g.gain); o.connect(g).connect(out); o.start(); am.start(); }
+    const rs = ac.createBufferSource(); rs.buffer = nb; rs.loop = true; const rf = ac.createBiquadFilter(); rf.type = 'bandpass'; rf.frequency.value = 900; rf.Q.value = .6; rushG = ac.createGain(); rushG.gain.value = 0; rs.connect(rf).connect(rushG).connect(out); rs.start(.5);
+    huntG = ac.createGain(); huntG.gain.value = 0; huntG.connect(out); const ho = ac.createOscillator(); ho.type = 'sawtooth'; ho.frequency.value = 41; const hf = ac.createBiquadFilter(); hf.type = 'lowpass'; hf.frequency.value = 120; ho.connect(hf).connect(huntG); ho.start();
+    mf = ac.createBiquadFilter(); mf.type = 'lowpass'; mf.frequency.value = 900; mf.Q.value = .5; mg = ac.createGain(); mg.gain.value = .8; mf.connect(mg).connect(out); mg.connect(wet);
+    for (let k = 0; k < 2; k++) { const el = new Audio(); el.crossOrigin = 'anonymous'; el.preload = 'auto'; const g = ac.createGain(); g.gain.value = 0; try { ac.createMediaElementSource(el).connect(g); } catch (e) {} g.connect(mf);
+      el.onended = () => { if (deck === k) next(); }; el.onerror = () => { if (deck === k) setTimeout(next, 1500); }; music.push({el, g}); }
+    bubbles(); calls();
+  }
+  function bubbles() { if (!ac) return; const t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain(), p = ac.createStereoPanner ? ac.createStereoPanner() : null, f0 = 300 + Math.random() * 500;
+    o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f0 * (2.5 + Math.random()), t + .06); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.025 * Math.random(), t + .005); g.gain.exponentialRampToValueAtTime(.0001, t + .09);
+    if (p) { p.pan.value = Math.random() * 2 - 1; o.connect(g).connect(p).connect(out); } else o.connect(g).connect(out); g.connect(wet); o.start(t); o.stop(t + .12);
+    setTimeout(bubbles, Math.random() < .2 ? 60 + Math.random() * 120 : 300 + Math.random() * 1800); }
+  function calls() { if (!ac) return; const t = ac.currentTime, o = ac.createOscillator(), f = ac.createBiquadFilter(), g = ac.createGain(), f0 = 120 + Math.random() * 90;
+    o.type = 'sawtooth'; f.type = 'lowpass'; f.frequency.value = 420; o.frequency.setValueAtTime(f0, t); o.frequency.linearRampToValueAtTime(f0 * 1.25, t + 1.4); o.frequency.linearRampToValueAtTime(f0 * .6, t + 4.2);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.03, t + 1); g.gain.linearRampToValueAtTime(0, t + 4.5); o.connect(f).connect(g).connect(wet); o.start(t); o.stop(t + 4.6); setTimeout(calls, 16000 + Math.random() * 26000); }
+  function pool(z) { const ids = station === 1 ? MUSIC.zones.surface : MUSIC.zones[z] || MUSIC.zones.drift; return ids.map(i => byId[i]).filter(t => t && playable(t)); }
+  function play(t) { if (!ac || !music.length || !t) return; const nd = 1 - deck, a = music[deck], b = music[nd], now = ac.currentTime; current = tracks.indexOf(t);
+    b.el.src = url(t); b.el.currentTime = 0; b.el.play().catch(() => {}); b.g.gain.cancelScheduledValues(now); b.g.gain.setValueAtTime(b.g.gain.value, now); b.g.gain.linearRampToValueAtTime(.9, now + 4);
+    a.g.gain.cancelScheduledValues(now); a.g.gain.setValueAtTime(a.g.gain.value, now); a.g.gain.linearRampToValueAtTime(0, now + 4); setTimeout(() => { if (deck !== 1 - nd) a.el.pause(); }, 4200); deck = nd;
+    $('song').textContent = `♪ ${t.title} · ${t.album}`; $('song').style.opacity = .55; }
+  function next() { const p = pool(zoneNow || 'drift'); if (!p.length) return; let t = p[(Math.random() * p.length) | 0]; if (p.length > 1 && tracks.indexOf(t) === current) t = p[(p.indexOf(t) + 1) % p.length]; play(t); }
+  return {start, next,
+    zone(z, force) { if (!ac || station === 2 || !MUSIC) return; if (z === zoneNow && !force) return; if (!force && RT - zoneT < 30 && current >= 0) return; zoneNow = z; zoneT = RT; next(); },
+    station() { station = (station + 1) % 3; if (!ac) return; if (station === 2) { for (const m of music) m.g.gain.setTargetAtTime(0, ac.currentTime, .5); $('song').textContent = '♪ off · M'; return; } zoneT = -99; const z = zoneNow; zoneNow = ''; this.zone(z || 'drift', true); say(station === 1 ? 'station: the surface' : 'station: the deep'); },
+    open(k) { if (mf) mf.frequency.setTargetAtTime(k ? 9000 : 900, ac.currentTime, .6); },
+    depth(s, boost) { if (!ac) return; bedLP.frequency.setTargetAtTime(Math.max(160, 380 - s * .3), ac.currentTime, 1); if (!G.endT && !V.on) mf.frequency.setTargetAtTime(Math.max(420, 1100 - s * 1.1), ac.currentTime, 1.5); rushG.gain.setTargetAtTime(.02 + boost * .22 + C.dash * .12, ac.currentTime, .15); },
+    hunt(on) { if (!ac) return; huntG.gain.setTargetAtTime(on ? .14 : 0, ac.currentTime, .4); if (on) this.zone('hunt', true); else { zoneT = RT - 25; } },
+    stroke() { this.noise(.5, .035, 260, .5); },
+    tone(f, d, g, type = 'sine') { if (!ac) return; const t = ac.currentTime, o = ac.createOscillator(), v = ac.createGain(); o.type = type; o.frequency.setValueAtTime(f, t); v.gain.setValueAtTime(0, t); v.gain.linearRampToValueAtTime(g, t + .02); v.gain.exponentialRampToValueAtTime(.0001, t + d); o.connect(v).connect(out); v.connect(wet); o.start(t); o.stop(t + d + .05); },
+    noise(d, g, f, q = 1.2) { if (!ac) return; const t = ac.currentTime, b = ac.createBuffer(1, ac.sampleRate * d | 0, ac.sampleRate), x = b.getChannelData(0); for (let i = 0; i < x.length; i++) x[i] = (Math.random() * 2 - 1) * Math.sin(Math.PI * i / x.length);
+      const s = ac.createBufferSource(), fl = ac.createBiquadFilter(), v = ac.createGain(); fl.type = 'bandpass'; fl.frequency.value = f; fl.Q.value = q; v.gain.value = g; s.buffer = b; s.connect(fl).connect(v).connect(out); v.connect(wet); s.start(t); }};
+})();
+$('song').onclick = () => AU.next();
+// ------------------------------------------------------------------ swimming together: a room in the link. BroadcastChannel for tabs on one device; PeerJS (a public broker) across devices
+const GH = new Map(), ME = {id: Math.random().toString(36).slice(2, 8), hue: Math.random()};
+const NET = (() => { const subs = []; let bc = null, peer = null, conns = [], host = false;
+  const recv = m => { if (!m || m.id === ME.id) return; subs.forEach(f => f(m)); if (host) conns.forEach(c => c.open && c.peer !== m.from && c.send(m)); };
+  function start() { if (!ROOM) return; try { bc = new BroadcastChannel('the-current-' + ROOM); bc.onmessage = e => recv(e.data); } catch (e) {}
+    const sc = document.createElement('script'); sc.src = 'https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js'; sc.onload = () => { try { join(); } catch (e) {} }; document.head.appendChild(sc); }
+  function wire(c) { conns.push(c); c.on('data', d => { d.from = c.peer; recv(d); }); c.on('close', () => { conns = conns.filter(x => x !== c); }); }
+  function join() { const hid = 'the-current-' + ROOM; peer = new window.Peer(hid);
+    peer.on('open', () => { host = true; peer.on('connection', wire); });
+    peer.on('error', e => { if (e.type === 'unavailable-id') { peer.destroy(); peer = new window.Peer(); peer.on('open', () => wire(peer.connect(hid, {reliable: false}))); } }); }
+  return {start, on: f => subs.push(f), send(m) { if (!ROOM) return; m.id = ME.id; try { bc && bc.postMessage(m); } catch (e) {} conns.forEach(c => { try { c.open && c.send(m); } catch (e) {} }); }};
+})();
+const ghostBells = [];
+NET.on(m => {
+  if (m.t === 'st') { let g = GH.get(m.id); if (!g) { if (GH.size >= 6) return; g = {s: m.s, x: m.x, y: m.y, p: new THREE.Vector3(), q: new THREE.Quaternion(), bell: null}; GH.set(m.id, g); ST.friends = Math.max(ST.friends, GH.size);
+      const b = ghostBells.find(b => !b.userData.used) || (() => { const p = new THREE.Points(bg, bellMat(0x3fb8ff, 0x9ff2ff)); p.frustumCulled = false; const gr = new THREE.Group(); gr.add(p); gr.scale.setScalar(1.3); scene.add(gr); ghostBells.push(gr); return gr; })();
+      b.userData.used = true; g.bell = b; say('another jellyfish is in the tunnel with you'); }
+    Object.assign(g, {ts: m.s, tx: m.x, ty: m.y, w: m.w, last: RT, end: m.end}); }
+  if (m.t === 'drink') { TAKEN.add(m.key); const d = D.find(d => d.live && d.key === m.key && d.pour <= 0); const g = GH.get(m.id); if (d) { d.pour = .001; d.to = g ? g.p.clone() : null; } }
+  if (m.t === 'bye') dropGhost(m.id);
+});
+function dropGhost(id) { const g = GH.get(id); if (!g) return; g.bell.visible = false; g.bell.userData.used = false; GH.delete(id); }
+let netT = 0;
+function stepNet(dt) { netT += dt; if (ROOM && netT > .12 && G.state !== 'title') { netT = 0; NET.send({t: 'st', s: C.s, x: C.x, y: C.y, w: tent.filter(t => t.clip).length, end: G.state === 'end' ? 1 : 0}); }
+  for (const [id, g] of GH) { if (RT - g.last > 6) { dropGhost(id); continue; } g.s += (g.ts - g.s) * Math.min(1, dt * 6); g.x += (g.tx - g.x) * Math.min(1, dt * 6); g.y += (g.ty - g.y) * Math.min(1, dt * 6);
+    cross(g.s, g.x, g.y, g.p); const f = frameAt(g.s); g.bell.position.copy(g.p); g.bell.quaternion.setFromRotationMatrix(new THREE.Matrix4().lookAt(new THREE.Vector3(), f.T, f.N)).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2));
+    g.bell.visible = Math.abs(g.s - C.s) < 70; const u = g.bell.children[0].material.uniforms; u.uPulse.value = T * .9 + g.s * .01; u.uTime.value = T; u.uWhite.value = (g.w || 0) / 8; u.uScale.value = bell.material.uniforms.uScale.value; }
+}
+// ------------------------------------------------------------------ the micro-map: the next 90 m of tunnel, its forks, its films and its dangers, and the way to the Source
+const mc = $('map').getContext('2d');
+function drawMap() {
+  const W = 52, H = 312, mid = H * .72, k = H / 120, sx = 22 / 17; mc.clearRect(0, 0, W, H);
+  const yOf = s => mid - (s - C.s) * k, xOf = x => W / 2 + x * sx * .9;
+  mc.fillStyle = 'rgba(150,200,190,.18)'; for (let s = C.s - 36; s < C.s + 90; s += 1.5) { const y = yOf(s), R = Math.min(16, Rad(s)), P = pillarR(s); mc.fillRect(xOf(-R), y, 1.5, 1.5); mc.fillRect(xOf(R) - 1, y, 1.5, 1.5); if (P > .4) mc.fillRect(xOf(-P), y, xOf(P) - xOf(-P), 1.5); if (s > END - 1 && s < END + 1) { mc.fillStyle = 'rgba(255,196,106,.8)'; mc.fillRect(4, y, W - 8, 2); mc.fillStyle = 'rgba(150,200,190,.18)'; } }
+  const dot = (s, x, c, r = 2.2) => { const y = yOf(s); if (y < 2 || y > H - 2) return; mc.fillStyle = c; mc.beginPath(); mc.arc(xOf(Math.max(-16, Math.min(16, x))), y, r, 0, 7); mc.fill(); };
+  for (const d of D) if (d.live && d.pour <= 0) dot(d.s, d.x, d.bad ? '#ff4a2a' : '#e8f4f0', d.bad ? 1.8 : 2.4);
+  for (const f of RF) if (f.i >= 0) dot(f.s, f.x, 'rgba(232,244,240,.45)', 1.6);
+  for (const e of E) { dot(e.s, lane(e.s, e.k)[0], '#9fe8b8', 1.8); dot(e.s - 5, lane(e.s - 5, e.k)[0], 'rgba(159,232,184,.5)', 1.4); }
+  for (const a of ANG) dot(a.s, a.side * Math.max(4, Rad(a.s) * .45), A.cur === a && A.state !== 'lurk' ? (Math.sin(RT * 10) > 0 ? '#ffb040' : '#ff4a2a') : 'rgba(255,170,60,.6)', 2.6);
+  for (const g of GH.values()) dot(g.s, g.x, '#7fe6ff', 2.6);
+  dot(C.s, C.x, '#ffc46a', 3.2);
+  const pr = Math.min(1, C.s / END); mc.fillStyle = 'rgba(255,196,106,.25)'; mc.fillRect(W - 3, 0, 2, H); mc.fillStyle = 'rgba(255,196,106,.9)'; mc.fillRect(W - 3, 0, 2, H * pr);
 }
 // ------------------------------------------------------------------ loop
 let last = performance.now(), acc = 0, RT = 0; const DT = 1 / 120;
 function frame(now) {
   requestAnimationFrame(frame); const real = Math.min(.05, (now - last) / 1000); last = now; RT += real; const t0 = performance.now();
-  slow = Math.max(0, slow - real); const scale = V.on ? .15 : 1 - .6 * Math.min(1, slow / .25); acc += real * scale;
-  let n = 0; while (acc >= DT && n < 12) { T += DT; if (G.state === 'play') stepCreature(DT); else { C.s += 1.5 * DT; C.ph += DT * .9; const {T: Tg, N, C: Cc} = frameAt(C.s); C.p.copy(Cc).addScaledVector(N, Math.sin(T * .5) * .5); C.heading.copy(Tg);
+  slow = Math.max(0, slow - real); const scale = V.on && G.state !== 'end' ? .15 : 1 - .6 * Math.min(1, slow / .25); acc += real * scale;
+  let n = 0; while (acc >= DT && n < 12) { T += DT; if (G.state === 'play' || G.state === 'end') stepCreature(DT); else { C.s += 1.5 * DT; C.ph += DT * .9; const {T: Tg, N, C: Cc} = frameAt(C.s); C.p.copy(Cc).addScaledVector(N, Math.sin(T * .5) * .5); C.heading.copy(Tg);
     C.q.setFromRotationMatrix(new THREE.Matrix4().lookAt(new THREE.Vector3(), Tg, N)).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2)); } stepTent(DT); acc -= DT; n++; } if (n === 12) acc = 0;
-  spawn(C.s); stepCamera(real); writeRows(real * scale); writeView(); params.needsUpdate = true;
+  const sdt = real * scale;
+  spawn(C.s); stepCamera(real); stepSnow(sdt); stepFish(sdt); stepAngler(sdt); writeRows(sdt); writeView(); stepNet(real); params.needsUpdate = true;
+  if (G.state === 'play') { if (C.s >= END) arrive(); AU.depth(C.s, C.boost); AU.zone(A.state === 'hunt' || A.state === 'lunge' ? 'hunt' : inChamber(C.s) >= 0 ? 'chamber' : C.s > 300 ? 'deep' : 'drift'); }
+  if (G.state === 'end' && !V.on && G.carried && G.carried.length && RT - G.endT > 6 + G.carried.length * BLOCK / 8 * 2.2 + 3) showEnd();
   creature.position.copy(C.p); creature.quaternion.copy(C.q);
-  const bu = bell.material.uniforms; bu.uPulse.value = C.ph; bu.uTime.value = T; bu.uGlow.value = C.glow; bu.uHurt.value = C.hurt; bu.uWhite.value = tent.filter(t => t.clip).length / TN; V.u = THREE.MathUtils.lerp(V.u || 0, V.on ? 1 : 0, 1 - Math.pow(.02, real)); bu.uFade.value = 1 - .8 * V.u; bu.uScale.value = innerHeight * renderer.getPixelRatio() * .009;
-  splatMat.uniforms.uTime.value = T; splatMat.uniforms.uScale.value = innerHeight * renderer.getPixelRatio() * .5 / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-  lamp.intensity = 2 + 3 * C.glow + 2 * C.dash; lamp.color.setRGB(1, .66 - .5 * C.hurt, .32 - .25 * C.hurt);
-  if (T - sayT > 2.6) $('say').style.opacity = 0;
-  if (G.state === 'play') $('state').textContent = `${Math.round(C.s)} m · ${caught.length} drunk · ${tent.filter(t => t.clip).length} worms carrying`;
+  const bu = bell.material.uniforms, ps = innerHeight * renderer.getPixelRatio(), us = ps * .5 / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+  bu.uPulse.value = C.ph; bu.uTime.value = T; bu.uGlow.value = C.glow + C.boost * .4; bu.uHurt.value = C.hurt; bu.uWhite.value = tent.filter(t => t.clip).length / TN; bu.uScale.value = ps * .009;
+  V.u = THREE.MathUtils.lerp(V.u || 0, V.on ? 1 : 0, 1 - Math.pow(.02, real)); bu.uFade.value = 1 - .8 * V.u;
+  splatMat.uniforms.uTime.value = T; splatMat.uniforms.uScale.value = us; snowMat.uniforms.uScale.value = us; fishPts.material.uniforms.uScale.value = us; fishPts.material.uniforms.uTime.value = T;
+  angB.material.uniforms.uScale.value = us; angG.material.uniforms.uScale.value = us; wallMat.uniforms.uTime.value = T;
+  if (RT - sayT > 3.2) $('say').style.opacity = 0;
+  const carried = tent.filter(t => t.clip).length;
+  $('state').textContent = G.state === 'title' ? '' : `${Math.floor(C.s)} m · ${carried} / 8 carried${G.state === 'play' ? ` · the Source in ${Math.max(0, Math.ceil(END - C.s))} m` : ''}${GH.size ? ` · ${GH.size + 1} swimming` : ''}`;
+  if (G.state !== 'title') drawMap();
   composer.render();
   const ft = performance.now() - t0; stat.frames.push(ft); if (stat.frames.length > 240) stat.frames.shift();
-  if (DEBUG) { const s = stat.frames.slice().sort((a, b) => a - b), q = x => s[Math.floor(x * (s.length - 1))].toFixed(1); $('dbg').textContent = `splats ${16 * 2400 + 128 * 90 + 16000} · bell ${BN} · worms ${TN}×${TS} · stretch ${(stat.resid * 100).toFixed(2)}%\nclouds live ${D.filter(d => d.live).length} · free blocks ${freeBlocks.length} · images ${IMG.size}\nframe ms p50 ${q(.5)} p95 ${q(.95)} p99 ${q(.99)}`; }
+  if (DEBUG) { const s = stat.frames.slice().sort((a, b) => a - b), q = x => s[Math.floor(x * (s.length - 1))].toFixed(1); $('dbg').textContent = `stretch ${(stat.resid * 100).toFixed(2)}% · clouds ${D.filter(d => d.live).length} · free blocks ${freeBlocks.length} · images ${IMG.size}\nangler ${A.state} · boost ${C.boost.toFixed(2)} · ghosts ${GH.size}\nframe ms p50 ${q(.5)} p95 ${q(.95)} p99 ${q(.99)}`; }
 }
-function begin() { if (!ac) { const A = window.AudioContext || window.webkitAudioContext; if (A) ac = new A(); } if (ac && ac.state === 'suspended') ac.resume();
-  for (const [n, v] of [['music_ocean', .32], ['sfx_ocean_bed', .32]]) snd(n, v, true).play().catch(() => {});
-  $('title').style.display = 'none'; G.state = 'play'; say(COARSE ? 'point where you want to swim · tap to dash' : 'point where you want to swim (or arrows) · click or space to dash'); }
-const cv = $('gl');
-cv.addEventListener('pointerdown', e => { ptr.down = true; ptr.active = true; ptr.x = e.clientX; ptr.y = e.clientY; ptr.t0 = performance.now(); if (V.on) { V.i++; V.t0 = RT; showView(); } try { cv.setPointerCapture(e.pointerId); } catch (x) {} });
-cv.addEventListener('pointermove', e => { ptr.x = e.clientX; ptr.y = e.clientY; if (e.pointerType === 'mouse') ptr.active = true; });
-addEventListener('pointerup', () => { if (ptr.down && G.state === 'play' && !V.on && performance.now() - ptr.t0 < 220) dash(); ptr.down = false; });
-addEventListener('keydown', e => { const k = e.key.toLowerCase(); if (k === ' ') { e.preventDefault(); if (G.state === 'play') dash(); } if (k === 'enter' || k === 'e') { V.on ? unwatch() : watch(); } if (k === 'escape' && V.on) unwatch();
+function begin() { AU.start(); for (const [n, v] of [['sfx_ocean_bed', .18]]) snd(n, v, true).play().catch(() => {});
+  $('title').style.display = 'none'; G.state = 'play'; G.startT = RT; NET.start(); AU.zone('drift', true);
+  say(COARSE ? 'point where you want to swim · tap to dash · ride the bright currents' : 'point where you want to swim (or arrows) · click or space to dash · ride the bright currents', 1); }
+function makeRoom() { const r = Math.random().toString(36).slice(2, 7); const u = new URL(location.href); u.searchParams.set('room', r); return u.toString(); }
+async function shareLink(u) { try { if (navigator.share) { await navigator.share({title: 'The Current', text: 'Dive with me', url: u}); return true; } } catch (e) {} try { await navigator.clipboard.writeText(u); say('link copied: send it to whoever you want to dive with', 1); return true; } catch (e) {} prompt('Send this link to dive together:', u); return false; }
+if (ROOM) { $('together').textContent = `Room ${ROOM} · share`; $('how').insertAdjacentHTML('afterbegin', `<span id="room">You are in room ${ROOM}: everyone with this link swims the same tunnel. </span>`); }
+$('together').onclick = async () => { if (ROOM) { await shareLink(location.href); return; } const u = makeRoom(); await shareLink(u); location.href = u; };
+$('again').onclick = () => location.reload(); $('endsave').onclick = saveReel; $('share').onclick = () => shareLink(ROOM ? location.href : makeRoom());
+// pointer: one finger steers and taps; two fingers pinch (pull back) and drag (swing around)
+const cv = $('gl'), touches = new Map();
+const pinchState = () => { const [a, b] = [...touches.values()]; return {d: Math.hypot(a.x - b.x, a.y - b.y), mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2}; };
+cv.addEventListener('contextmenu', e => e.preventDefault());
+cv.addEventListener('pointerdown', e => { touches.set(e.pointerId, {x: e.clientX, y: e.clientY}); try { cv.setPointerCapture(e.pointerId); } catch (x) {}
+  if (e.button === 2 || (e.pointerType === 'mouse' && e.shiftKey)) { G.orbit = {x: e.clientX, y: e.clientY, yaw: CAM.yaw, pitch: CAM.pitch}; return; }
+  if (touches.size === 2) { const p = pinchState(); G.pinch = {...p, dist: CAM.dist, yaw: CAM.yaw, pitch: CAM.pitch}; ptr.down = false; return; }
+  if (touches.size > 2) return; ptr.down = true; ptr.active = true; ptr.x = e.clientX; ptr.y = e.clientY; ptr.t0 = performance.now(); ptr.moved = 0;
+  if (V.on && G.state === 'play') { V.i++; V.t0 = RT; showView(); } });
+cv.addEventListener('pointermove', e => { const t = touches.get(e.pointerId); if (t) { t.x = e.clientX; t.y = e.clientY; }
+  if (G.orbit) { CAM.yaw = G.orbit.yaw - (e.clientX - G.orbit.x) / innerWidth * 3.4; CAM.pitch = THREE.MathUtils.clamp(G.orbit.pitch + (e.clientY - G.orbit.y) / innerHeight * 2, -.9, 1.1); CAM.idle = 0; return; }
+  if (G.pinch && touches.size >= 2) { const p = pinchState(); CAM.dist = THREE.MathUtils.clamp(G.pinch.dist * G.pinch.d / Math.max(20, p.d), 2.8, 24); CAM.yaw = G.pinch.yaw - (p.mx - G.pinch.mx) / innerWidth * 3.4;
+    CAM.pitch = THREE.MathUtils.clamp(G.pinch.pitch + (p.my - G.pinch.my) / innerHeight * 2, -.9, 1.1); CAM.idle = 0; return; }
+  if (ptr.down) ptr.moved += Math.abs(e.movementX || 0) + Math.abs(e.movementY || 0);
+  ptr.x = e.clientX; ptr.y = e.clientY; if (e.pointerType === 'mouse') ptr.active = true; });
+const up = e => { touches.delete(e.pointerId); if (G.orbit) { G.orbit = null; return; } if (G.pinch) { if (touches.size < 2) { G.pinch = null; ptr.active = false; } return; }
+  if (ptr.down && G.state === 'play' && !V.on && performance.now() - ptr.t0 < 220) dash(); ptr.down = false; };
+addEventListener('pointerup', up); addEventListener('pointercancel', up);
+cv.addEventListener('wheel', e => { e.preventDefault(); CAM.dist = THREE.MathUtils.clamp(CAM.dist * Math.exp(e.deltaY * .0012), 2.8, 24); CAM.idle = 0; }, {passive: false});
+cv.addEventListener('dblclick', () => { CAM.dist = CAM0(); CAM.yaw = CAM.pitch = 0; });
+addEventListener('keydown', e => { const k = e.key.toLowerCase(); if (k === ' ') { e.preventDefault(); dash(); } if ((k === 'enter' || k === 'e') && G.state === 'play') { V.on ? unwatch() : watch(); } if (k === 'escape' && V.on) unwatch();
+  if (k === 'm') AU.station(); if (k === 'n') AU.next(); if (k === 'r') { CAM.dist = CAM0(); CAM.yaw = CAM.pitch = 0; }
   if (k.startsWith('arrow')) e.preventDefault(); keys.add(k); if (k.startsWith('arrow') || 'wasd'.includes(k)) ptr.active = false; });
 addEventListener('keyup', e => keys.delete(e.key.toLowerCase()));
+addEventListener('pagehide', () => NET.send({t: 'bye'}));
 $('go').onclick = begin; $('watch').onclick = () => V.on ? unwatch() : watch(); $('save').onclick = saveReel; if (DEBUG) $('dbg').style.display = 'block';
+for (const f of RF) placeReef(f);
 C.p.copy(path(C.s)); C.heading.copy(tangent(C.s)); C.q.setFromRotationMatrix(new THREE.Matrix4().lookAt(new THREE.Vector3(), C.heading, frameAt(C.s).N)).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2));
 seat(); camera.position.copy(path(C.s - 6)); requestAnimationFrame(frame);
-if (Q.has('debug')) window.__dbg = {V, D, tent, caught, creature, watch, loadClip, FILMS, C, THREE, atlas, scene, camera};
-window.__cur = () => ({state: G.state, s: C.s, caught: caught.length, worms: tent.filter(t => t.clip).length, watching: V.on, resid: stat.resid, images: IMG.size, free: freeBlocks.length,
+if (DEBUG) window.__dbg = {V, D, E, A, ANG, tent, caught, creature, watch, loadClip, FILMS, C, CAM, G, THREE, atlas, scene, camera, giveWorm, arrive, GH, takeBlock};
+window.__cur = () => ({state: G.state, s: C.s, caught: caught.length, worms: tent.filter(t => t.clip).length, watching: V.on, resid: stat.resid, images: IMG.size, free: freeBlocks.length, angler: A.state, bitten: ST.bitten, eels: ST.eels, ghosts: GH.size, boost: C.boost,
   p95: (() => { const s = stat.frames.slice().sort((a, b) => a - b); return s[Math.floor(.95 * (s.length - 1))]; })(),
-  good: (() => { const d = D.filter(d => d.live && !d.bad && d.pour <= 0 && d.s > C.s + 2).sort((a, b) => a.s - b.s)[0]; return d ? [0, 0, d.x, d.y] : null; })()});
+  good: (() => { const d = D.filter(d => d.live && !d.bad && d.pour <= 0 && d.s > C.s + 2).sort((a, b) => a.s - b.s)[0]; return d ? [0, 0, d.x, d.y] : null; })(), rad: Rad(C.s), end: $('end').style.display === 'flex'});
 </script>
 </body>
 </html>
