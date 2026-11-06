@@ -1,16 +1,100 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8">
 <link rel="icon" type="image/svg+xml" href="favicon.svg"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Contaminant Jelly</title><meta name="description" content="A jellyfish that gathers a counter-archive of film: the swim game, the Memory Maker, the editor and the films.">
-<style>:root{--ink:#f2e6cf;--gold:#f6c47a;--red:#c8361e;--dim:#cdb48a}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#040402;color:var(--ink);font:17px/1.5 system-ui,"Helvetica Neue",Arial,sans-serif;padding:8vh 7vw}
-h1{margin:0;font-weight:900;letter-spacing:.2em;font-size:clamp(30px,6vw,60px);line-height:1}h1 i{display:block;font-family:Georgia,serif;letter-spacing:0;color:var(--gold);font-size:1.8em}
-.bar{height:7px;width:min(320px,50vw);background:var(--red);margin:16px 0 28px}a.card{display:block;max-width:680px;padding:16px 0;border-top:1px solid rgba(246,196,122,.25);color:var(--ink);text-decoration:none}
-a.card b{font-weight:800;letter-spacing:.08em}a.card span{display:block;color:var(--dim);font:italic 16px Georgia,serif}a.card:hover b{color:var(--gold)}small{display:block;margin-top:30px;color:var(--dim);max-width:680px}small a{color:var(--gold)}</style></head>
-<body><h1>CONTAMINANT<i>jelly</i></h1><div class="bar"></div>
-<a class="card" href="current/drift/"><b>DRIFTS</b><span>Eleven small games, one for each video we made. Open water in layers of silhouette, no tube, no buttons: hold the water to swim, tap a film to take a frame, hold on a film to watch it bloom. Ascent, Pairs, Lure, Toward the Surface, Halo, Ray Run, Slices, Twin Caves, Bloom, The Long Descent, Silt Bench.</span></a>
-<a class="card" href="current/"><b>THE BRANCHING ARCHIVE</b><span>Memory Maker · Timeworm. A small amber jellyfish of celluloid swims a branching film archive: drag to steer, cast to take a frame, focus to watch, choose a current at each fork, outrun the anglerfish, and surface with a cut you can watch, shape and share. Scored by VOLHOLLA songs, one per level, cut on their beats. Alone or together.</span></a>
-<a class="card" href="paeleo/scion/videotext/maker.html"><b>MEMORY MAKER</b><span>Swim through the films: each jellyfish of images is a film, and inside it the film runs only as fast as you swim. Shape a memory, dream it, share it.</span></a>
-<a class="card" href="paeleo/scion/contaminant.html?play=1"><b>THE SWIM GAME</b><span>Be the jellyfish: catch frames that match, carry them to the sun, keep the touches out of the censor's beam.</span></a>
-<a class="card" href="paeleo/scion/videotext/editor.html"><b>THE EDITOR</b><span>Write a cut as a sentence of shared features; sign the one the projector plays.</span></a>
-<a class="card" href="paeleo/scion/contaminant.html"><b>THE FILMS</b><span>Hot cinema cuts, cool cinema contaminates: the cinema cut, the film without words, two cuts of one take.</span></a>
-<small>Split out of <a href="https://github.com/hartswf0/bolas">hartswf0/bolas</a> (PAELEO / SCION) so it can be published on its own. Archive frames are public domain, with rights recorded under <code>paeleo/handmade/*/assets.json</code>.</small>
+<title>Jelly-Films Index</title><meta name="description" content="Contaminant Jelly: every version, drift, tool, video and note. A jellyfish of celluloid swims an archive of jelly-films.">
+<style>
+:root{--ink:#f2e6cf;--gold:#f6c47a;--red:#c8361e;--dim:#cdb48a;--bg:#040402;--card:#0b1110}
+*{box-sizing:border-box}html{background:var(--bg)}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,"Helvetica Neue",Arial,sans-serif;padding:7vh max(16px,6vw) 10vh;overflow-x:hidden}
+h1{margin:0;font-weight:900;letter-spacing:.2em;font-size:clamp(28px,6vw,58px);line-height:1}h1 i{display:block;font-family:Georgia,serif;letter-spacing:0;color:var(--gold);font-size:1.7em;font-weight:400}
+.bar{height:7px;width:min(320px,50vw);background:var(--red);margin:16px 0 18px}.lede{max-width:700px;color:var(--dim);font:italic 18px/1.5 Georgia,serif;margin:0 0 8px}
+h2{font-size:13px;letter-spacing:.24em;color:var(--gold);margin:56px 0 4px;font-weight:800}h2+p{margin:0 0 16px;color:var(--dim);max-width:700px;font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr));gap:16px}
+.c{position:relative;display:block;text-decoration:none;color:var(--ink);background:var(--card);border-radius:16px;overflow:hidden;min-height:230px;isolation:isolate}
+.c .im{position:absolute;inset:0;z-index:-1;background:center/cover no-repeat;opacity:.62;filter:saturate(.9);transition:opacity .4s,transform 1.2s;
+ -webkit-mask-image:radial-gradient(ellipse 70% 62% at 50% 38%,#000 35%,transparent 100%);mask-image:radial-gradient(ellipse 70% 62% at 50% 38%,#000 35%,transparent 100%)}
+.c video.im{width:100%;height:100%;object-fit:cover}
+.c:hover .im,.c:focus-visible .im{opacity:.9;transform:scale(1.04)}.c .tx{position:absolute;left:0;right:0;bottom:0;padding:14px 16px 15px;background:linear-gradient(transparent,rgba(4,4,2,.92) 45%)}
+.c small{display:block;font:700 11px system-ui;letter-spacing:.18em;color:var(--gold)}.c b{display:block;font-weight:800;letter-spacing:.04em;font-size:17px;margin:2px 0}.c span{display:block;color:var(--dim);font:italic 14px/1.4 Georgia,serif}
+.c.big{grid-column:1/-1;min-height:min(56vw,420px)}.c.big b{font-size:clamp(20px,3vw,30px)}.c.big span{font-size:16px;max-width:640px}
+.list{max-width:760px;margin:0;padding:0;list-style:none}.list li{border-top:1px solid rgba(246,196,122,.2);padding:10px 0;display:flex;gap:14px;flex-wrap:wrap;align-items:baseline}
+.list a{color:var(--ink);font-weight:700;text-decoration:none;min-width:12em}.list a:hover{color:var(--gold)}.list span{color:var(--dim);font-size:14px;flex:1;min-width:14em}
+.t{display:inline-block;font:700 10px system-ui;letter-spacing:.14em;color:#1a1208;background:var(--gold);border-radius:99px;padding:2px 8px;margin-left:6px;vertical-align:2px}
+footer{margin-top:64px;color:var(--dim);font-size:13px;max-width:700px}footer a{color:var(--gold)}
+</style></head>
+<body>
+<h1>CONTAMINANT<i>jelly-films</i></h1><div class="bar"></div>
+<p class="lede">A small amber jellyfish of celluloid swims an archive. The films are jelly-films: clouds of light that drift apart like water far away, and come clear as you near them, as you light them, or as you pulse. This is the index of everything made so far: every version, every drift, the tools, the videos and the notes.</p>
+
+<h2>PLAY NOW</h2><p>The newest work. Gestures only, no buttons: hold the water to swim, tap a jelly-film to take it, hold on it to see it clearly in place, double-tap to pulse.</p>
+<div class="grid">
+<a class="c big" href="current/drift/"><div class="im" style="background-image:url(index-thumbs/drifts.jpg)"></div><div class="tx"><small>VERSION 7 · DRIFTS</small><b>The Drifts</b><span>Open water seen from the side, in layers of silhouette. There are 11 drifts translated from our videos, plus archive levels built from real data: secondhand-motion doodles that swim as eels and schools, bolas planes to capture, cineosis shots sorted by decade, colour, subject, image type and sign. The radar pulse flashes blue for what comes toward you and red for what moves away. The anglerfish's lure looks like a speck of light, and the anglerfish bites.</span></div></a>
+<a class="c" href="current/drift/?v=doodles"><div class="im" style="background-image:url(current/drift/archive_playtest.jpg)"></div><div class="tx"><small>EPISODE 1</small><b>Secondhand Doodles</b><span>Catch the traced drawings; their tentacles dye the fish.</span></div></a>
+<a class="c" href="current/drift/?v=menagerie"><div class="im" style="background-image:url(current/drift/drifts_playtest.jpg)"></div><div class="tx"><small>EPISODE 2</small><b>Menagerie</b><span>All 86 drawings alive as creatures: eels trailing their past keys, schools, loners.</span></div></a>
+<a class="c" href="current/drift/?v=bolas"><div class="im" style="background-image:url(current/drift/thumbs/song_nightbus-08.jpg)"></div><div class="tx"><small>EPISODE 3 · NEW</small><b>Bolas</b><span>321 drawn planes from the bolas worms, replayed along their own tracks. Try to capture them.</span></div></a>
+<a class="c" href="current/drift/?v=strata"><div class="im" style="background-image:url(current/drift/thumbs/design_v2.jpg)"></div><div class="tx"><small>EPISODE 4</small><b>Strata</b><span>Rise from the 1900s footage at the floor to the 2020s at the surface.</span></div></a>
+<a class="c" href="current/drift/?v=spectrum"><div class="im" style="background-image:url(current/drift/thumbs/song_neonbutterfly-02.jpg)"></div><div class="tx"><small>EPISODE 5</small><b>Spectrum</b><span>The archive sorted by its own colour; the water takes on the hue of the films around you.</span></div></a>
+<a class="c" href="current/drift/?v=rayrun"><div class="im" style="background-image:url(current/drift/thumbs/song_nightbus-03.jpg)"></div><div class="tx"><small>EPISODE 6</small><b>Ray Run</b><span>Ride a ray’s wake at speed.</span></div></a>
+<a class="c" href="current/drift/?v=descent"><div class="im" style="background-image:url(current/drift/thumbs/song_nightbus-14.jpg)"></div><div class="tx"><small>EPISODE 7</small><b>The Long Descent</b><span>Sink into the dark; pulse to see.</span></div></a>
+<a class="c" href="current/drift/?v=lure"><div class="im" style="background-image:url(current/drift/thumbs/design_v5.jpg)"></div><div class="tx"><small>DRIFT</small><b>Lure</b><span>The anglerfish patrols, pulses twice to warn you, then lunges. Get bitten too often and you are swallowed.</span></div></a>
+</div>
+
+<h2>EVERY VERSION</h2><p>Each one is kept playable. Newest first.</p>
+<div class="grid">
+<a class="c" href="current/"><div class="im" style="background-image:url(index-thumbs/v6.jpg)"></div><div class="tx"><small>VERSION 6</small><b>The Branching Archive</b><span>Memory Maker · Timeworm. The archive forks: choose a current, cast at films to take frames, outrun the anglerfish, and surface with a cut you can watch and share. Each level is scored by a VOLHOLLA song. Solo or multiplayer.</span></div></a>
+<a class="c" href="current/v5.html"><div class="im" style="background-image:url(index-thumbs/v5.jpg)"></div><div class="tx"><small>VERSION 5</small><b>The Dive to the Source</b><span>A golden jelly dives 605 m of drowned tunnel to the Source.</span></div></a>
+<a class="c" href="current/v4.html"><div class="im" style="background-image:url(index-thumbs/v4.jpg)"></div><div class="tx"><small>VERSION 4</small><b>Never a Frame</b><span>Films become clouds of gaussian light; drink one and a tentacle becomes a time worm.</span></div></a>
+<a class="c" href="current/v3.html"><div class="im" style="background-image:url(index-thumbs/v3.jpg)"></div><div class="tx"><small>VERSION 3</small><b>The Sewers of Internet Video</b><span>A creature of light saves clips from fog-choked sewers and avoids the corrupted ones.</span></div></a>
+<a class="c" href="current/v2.html"><div class="im" style="background-image:url(index-thumbs/v2.jpg)"></div><div class="tx"><small>VERSION 2</small><b>The Rising Tube</b><span>Rise through a tube made of the secondhand archive’s 109 films.</span></div></a>
+<a class="c" href="current/v1.html"><div class="im" style="background-image:url(index-thumbs/v1.jpg)"></div><div class="tx"><small>VERSION 1</small><b>The Current</b><span>The first version. Arms catch archive frames, and the censor’s red ink clouds the bell. Pulse to shake it off.</span></div></a>
+</div>
+
+<h2>THE EARLIER TOOLS</h2><p>The first jelly works, from PAELEO / SCION.</p>
+<div class="grid">
+<a class="c" href="paeleo/scion/videotext/maker.html"><div class="im" style="background-image:url(index-thumbs/maker.jpg)"></div><div class="tx"><small>TOOL</small><b>Memory Maker</b><span>Each jellyfish of images is a film; inside it the film runs only as fast as you swim.</span></div></a>
+<a class="c" href="paeleo/scion/contaminant.html?play=1"><div class="im" style="background-image:url(index-thumbs/swim.jpg)"></div><div class="tx"><small>GAME</small><b>The Swim Game</b><span>Catch matching frames, carry them to the sun, keep out of the censor’s beam.</span></div></a>
+<a class="c" href="paeleo/scion/videotext/editor.html"><div class="im" style="background-image:url(index-thumbs/editor.jpg)"></div><div class="tx"><small>TOOL</small><b>The Editor</b><span>Write a cut as a sentence of shared features; sign the one the projector plays.</span></div></a>
+<a class="c" href="paeleo/scion/contaminant.html"><div class="im" style="background-image:url(index-thumbs/films.jpg)"></div><div class="tx"><small>FILMS</small><b>The Films</b><span>Hot cinema cuts, cool cinema contaminates.</span></div></a>
+</div>
+
+<h2>THE VIDEOS</h2><p>Four design videos and seven song videos. Every drift was translated from one of them. No more videos are being made; the work now goes into translating these into play.</p>
+<div class="grid" id="vids"></div>
+
+<h2>SOUND</h2>
+<div class="grid">
+<a class="c" href="current/audio/spectrograms_picks.jpg"><div class="im" style="background-image:url(current/audio/spectrograms_picks.jpg)"></div><div class="tx"><small>SPECTROGRAMS</small><b>The songs, seen</b><span>The VOLHOLLA tracks analysed for beat, bass and brightness. The bell pulses on the beat.</span></div></a>
+<a class="c" href="current/fal/songs_sheet.jpg"><div class="im" style="background-image:url(current/fal/songs_sheet.jpg)"></div><div class="tx"><small>CONTACT SHEET</small><b>Song videos</b><span>Seven song videos, sampled frame by frame.</span></div></a>
+</div>
+
+<h2>NOTES &amp; SCION INSTRUCTIONS</h2>
+<ul class="list">
+<li><a href="current/drift/DRIFTS.md">DRIFTS.md</a><span>How each video becomes a drift, the archive levels, and the jelly-films, radar and angler rules.</span></li>
+<li><a href="current/NOTES.md">NOTES.md</a><span>The Branching Archive, v6.</span></li>
+<li><a href="current/SONG2GAME.md">SONG2GAME.md</a><span>How the songs map onto levels, with matched start times.</span></li>
+<li><a href="current/SCION_BRANCHING_ARCHIVE.md">SCION · Branching Archive</a><span>The system instruction for v6.</span></li>
+<li><a href="current/SCION_LUDIC_BRANCHING_ARCHIVE.md">SCION · Ludic Engine</a><span>Mechanics, powerups, length and goals.</span></li>
+<li><a href="current/SCION_GOLDEN_RIVERBED.md">SCION · Golden Riverbed</a><span>Creatures, currents, the minimap and multiplayer.</span></li>
+<li><a href="current/SCION_INTERFACE_THINKING_MACHINE.md">SCION · Interface</a><span>Reticles in place of buttons.</span></li>
+<li><a href="current/SCION_VOID_SURFACE.md">SCION · Void Surface</a><span>v5: the dive to the Source.</span></li>
+<li><a href="current/SCION_NEVER_A_FRAME.md">SCION · Never a Frame</a><span>v4: films as clouds of light.</span></li>
+<li><a href="current/SCION_STRAND_PHYSICS.md">SCION · Strand Physics</a><span>How the arms and tentacles move.</span></li>
+<li><a href="current/NOTES_v5.md">NOTES v5</a> <span>· <a href="current/NOTES_v4.md">v4</a> · <a href="current/NOTES_v3.md">v3</a> · <a href="current/NOTES_v2.md">v2</a> · <a href="current/NOTES_v1.md">v1</a></span></li>
+</ul>
+
+<h2>WHERE THE DATA COMES FROM</h2>
+<ul class="list">
+<li><a href="https://hartswf0.github.io/secondhand-motion/">secondhand-motion</a><span>86 traced subjects and 1,777 drawn keys: the doodles.</span></li>
+<li><a href="https://hartswf0.github.io/cineosis-lab/periodic-table.html">cineosis-lab</a><span>The 45 signs and 809 shots: the cineosis levels, with distant audio from their clips.</span></li>
+<li><a href="https://github.com/hartswf0/bolas">bolas</a><span>The secondhand worms’ drawn planes and tracks, and the PAELEO / SCION source this repo was split out of.</span></li>
+</ul>
+
+<footer>Archive frames are public domain; their rights are recorded under <code>paeleo/handmade/*/assets.json</code>. Music by VOLHOLLA. The favicon is the jelly: an amber bell with tentacles of film strip.</footer>
+<script>
+const V = [['design_v2', 'Design v2', 'Tier after tier of small frames around a rising jelly → Ascent'], ['design_v4', 'Design v4', 'Faces and hands arriving in pairs → Pairs'], ['design_v5', 'Design v5', 'A fork, an anglerfish, a school → Lure'], ['design_v6', 'Design v6', 'A huge face beside a tiny jelly → Toward the Surface'],
+  ['song_neonbutterfly-02', 'neonbutterfly 02', 'A ring of films under the surface → Halo'], ['song_nightbus-03', 'nightbus 03', 'A great ray overhead → Ray Run'], ['song_nightbus-06', 'nightbus 06', 'A diagonal chain of slices → Slices'], ['song_nightbus-08', 'nightbus 08', 'Two cave mouths → Twin Caves'],
+  ['song_nightbus-13', 'nightbus 13', 'Films bloom around a jelly → Bloom'], ['song_nightbus-14', 'nightbus 14', 'A jelly sinks into the void → The Long Descent'], ['song_nightbus-17', 'nightbus 17', 'An angler rises from the silt → Silt Bench']];
+const fileOf = id => id.startsWith('design') ? `current/fal/${id}_720.mp4` : `current/fal/${id}.mp4`;
+document.getElementById('vids').innerHTML = V.map(([id, t, s]) => `<a class="c" href="${fileOf(id)}"><video class="im" muted loop playsinline preload="none" poster="current/drift/thumbs/${id}.jpg" src="${fileOf(id)}"></video><div class="tx"><small>${id.startsWith('design') ? 'DESIGN VIDEO' : 'SONG VIDEO'}</small><b>${t}</b><span>${s}</span></div></a>`).join('');
+// videos play only while hovered or on screen (phones), so the page stays light
+const io = 'IntersectionObserver' in window && matchMedia('(hover: none)').matches ? new IntersectionObserver(es => es.forEach(e => { const v = e.target; e.isIntersecting ? v.play().catch(() => {}) : v.pause(); }), {threshold: .6}) : null;
+document.querySelectorAll('#vids .c').forEach(a => { const v = a.querySelector('video'); if (io) io.observe(v); a.addEventListener('mouseenter', () => v.play().catch(() => {})); a.addEventListener('mouseleave', () => v.pause()); });
+</script>
 </body></html>

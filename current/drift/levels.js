@@ -74,6 +74,9 @@ export function archiveLevels(C) {
   out.push({id: 'menagerie', kind: 'doodle', title: 'Menagerie', source: 'secondhand-motion', song: 'daehoned-18', start: null, dir: 'right', len: 420, current: 1.6, band: 10, fog: '#1d2a28', fogD: .026, films: {layout: 'menagerie'}, bad: 0,
     layers: LAYS[1].concat([{kind: 'kelp', side: -1, z: 5, glow: 0}]), creatures: ['school'], fluid, specks, goal: {type: 'doodles', n: 20, label: 'meet the creatures: touch a drawing and it joins you as a tentacle'},
     took: 'All 86 traced drawings of the second-hand archive at once, as creatures: each swims with its own gait, cycling through its keys; the curious ones come to look at you, the shy ones slip away.'});
+  out.push({id: 'bolas', kind: 'doodle', data: 'bolas', title: 'Bolas Planes', source: 'bolas', song: 'daehoned-19', start: null, dir: 'right', len: 520, current: 1.6, band: 10, fog: '#1f2624', fogD: .026, films: {layout: 'menagerie'}, bad: 0,
+    layers: LAYS[4].concat([{kind: 'reef', side: 1, z: -16, glow: .4}]), creatures: ['school'], fluid, specks, goal: {type: 'doodles', n: 24, label: 'catch the drawn planes as they replay their motion'},
+    took: 'The bolas depth-worm drawings: 321 drawn planes from 109 second-hand shots (a walking giraffe, its young, the grass in front), each in its tracked colour, replaying the motion it had in its shot as it swims.'});
   if (!C) return out;
   const decs = [...new Set(C.shots.filter(s => s.dec).map(s => s.dec))].sort();
   out.push({id: 'strata', kind: 'cineosis', title: 'Strata', source: 'cineosis-lab', pick: {by: 'decade'}, song: 'nightbus-14', start: null, dir: 'up', len: decs.length * 26, current: 1.8, band: 10, fog: '#2a2620', top: '#294f52', fogD: .026, films: {layout: 'list'}, bad: 0,

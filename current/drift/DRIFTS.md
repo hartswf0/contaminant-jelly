@@ -105,3 +105,38 @@ Rules in these levels:
 | 45 sign levels | one sign each, laid out as the periodic table; the sign's question is the goal |
 
 The main screen shows only the start, six episodes (Doodles, Menagerie, Strata, Spectrum, Ray Run, The Long Descent) and the periodic table. Everything else is under "More drifts". Every page carries the jelly favicon.
+
+## Jelly-films (this round)
+The films are now called **jelly-films**.
+
+The user's direction:
+- "the angler fish never eats us"
+- "sometimes we need to see more clearly glimpses of the splats"
+- "instead of having the videos zoom into the front … make them clear and transparent in the back and have some of their audio distantly play"
+- "why don't the doodles animate? … eels or fish timefish or schools"
+- "the bolas doodles we can populate in the ocean to try to capture"
+
+What changed:
+- **Clear in place.** Holding on a jelly-film no longer brings it to the front. It comes clear and see-through where it already is. The camera turns toward it and the water keeps moving.
+- **Glimpses.** Every 7–12 s, one nearby jelly-film comes clear for a moment on its own, so you can tell what it is.
+- **Distant audio.** When a cineosis shot with sound is lit or held, its clip plays through a lowpass filter. The filter opens as you get closer, the sound pans to where the film is, and the music ducks under it. 392 shots carry a clip.
+- **Radar Doppler pulse** (after pretext-field/aidar). A double-tap or Space sends out a ring. Whatever it crosses flashes blue if it is coming toward you and red if it is moving away. Each one pings, pitched by its speed.
+- **Doodles animate.** Each doodle cycles through its drawn keys, with a pencil scratch on each new key. It takes one of three forms:
+  - an **eel**: its past keys trail behind it;
+  - a **school**: four copies;
+  - a single creature.
+- **Bolas.** A new level with 321 drawn planes from 109 shots, taken from `bolas/allways-tensor/secondhand_worms_108.json`. Each plane replays its `strokes0` along its own track. Goal: capture 24.
+- **The angler eats.** It patrols, then warns with two pulses, then lunges. A bite costs 34 membrane and a jaw closes over the screen. At 0 the dive ends with the card "SWALLOWED". One speck of light in four is a lure.
+
+Measured (headless, software GL):
+
+| check | result |
+|---|---|
+| Menagerie, pulse | 2 creatures flashed |
+| Bolas | 321 planes load (the first is "grass", with 33 keys) |
+| Lure, forced lunge | membrane 0, swallowed, end card |
+| syntax / page errors | none |
+
+**Not verified:**
+- the distant audio and the music on a real device (github.io is blocked here);
+- a bot test of holding on a sign film to watch it. It is flaky because it depends on where the camera lands.
