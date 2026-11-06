@@ -1,0 +1,41 @@
+  0.0s  the projector runs hot; the jelly forages 14 fragments, and the censor's bell waits for the care strand
+  1.2s  "reflex" lifted by a tentacle
+  2.6s  one fragment handed to the archive in circulation
+  3.7s  "hand" lifted by a tentacle
+  4.2s  one fragment handed to the archive in circulation
+  4.2s  the censor's bell rings over "hand"
+  5.0s  "hand" is cut; it sinks into the tank and is kept
+  5.0s  "attention" lifted by a tentacle
+  5.1s  one fragment handed to the archive in circulation
+  5.1s  the censor's bell rings over "attention"
+  5.9s  "attention" is cut; it sinks into the tank and is kept
+  6.0s  "metrics" lifted by a tentacle
+  6.5s  one fragment handed to the archive in circulation
+  6.5s  the censor's bell rings over "metrics"
+  7.4s  "metrics" is cut; it sinks into the tank and is kept
+  8.1s  "freedom" lifted by a tentacle
+  9.2s  one fragment handed to the archive in circulation
+  9.2s  the censor's bell rings over "freedom"
+  9.7s  "screens" lifted by a tentacle
+ 10.0s  "freedom" is cut; it sinks into the tank and is kept
+ 10.5s  one fragment handed to the archive in circulation
+ 11.4s  the projector cools: the jelly may rescue the cuts, and speculations may touch
+ 11.5s  "proximity" lifted by a tentacle
+ 11.6s  one fragment handed to the archive in circulation
+ 12.9s  the jellyfish lifts "hand" out of the cuts
+ 15.3s  one fragment handed to the archive in circulation
+ 16.3s  the jellyfish lifts "attention" out of the cuts
+ 16.6s  "reflex" leaves the outcome gear and returns to the field
+ 19.0s  one fragment handed to the archive in circulation
+ 20.3s  the jellyfish lifts "metrics" out of the cuts
+ 22.8s  one fragment handed to the archive in circulation
+ 23.9s  the jellyfish lifts "freedom" out of the cuts
+ 24.5s  "screens" leaves the outcome gear and returns to the field
+ 25.1s  the reel of cuts: 4 fragments returned
+ 25.6s  "proximity" leaves the outcome gear and returns to the field
+ 29.4s  "hand" leaves the outcome gear and returns to the field
+ 32.4s  one fragment handed to the archive in circulation
+ 32.4s  "screens" lifted by a tentacle
+ 32.5s  one fragment handed to the archive in circulation
+ 33.1s  "attention" leaves the outcome gear and returns to the field
+ 36.9s  "metrics" leaves the outcome gear and returns to the field
