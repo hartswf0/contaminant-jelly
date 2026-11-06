@@ -59,3 +59,40 @@ export const LEVELS = [
     creatures: ['angler', 'shrimp'], floorAngler: true, startW: -4.5, goal: {type: 'unearth', n: 5, label: 'stir the silt to uncover buried films'},
     took: 'A seabed of silt where an anglerfish rises out of the floor. Here films lie buried; swim low and fast (or pulse) to stir them up, and watch the floor for the angler.'},
 ];
+
+// ---------------------------------------------------------------- the archive levels: doodles, and the moving-image archive organised by cineosis sign, by decade, by colour, by subject
+// These are fluid: no stopping; you take a frame by swimming through a film while its ring is closed; your film tentacles colour the fish they touch.
+const SONGS = ['siltwire-02', 'siltwire-06', 'siltwire-10', 'siltwire-15', 'daehoned-05', 'daehoned-10', 'nightbus-17', 'nightbus-06', 'event-04', 'firstwintera-13', 'firstwintera-18', 'twobuttons-13', 'nightbus-14', 'daehoned-19'];
+const TYPEHUE = {perception: 190, affection: 330, impulse: 20, action: 45, reflection: 270, mental: 150, time: 210, sound: 100, read: 60};
+const hsl = (h, s, l) => { const k = n => (n + h / 30) % 12, a = s * Math.min(l, 1 - l), f = n => l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1)); return '#' + [f(0), f(8), f(4)].map(x => Math.round(x * 255).toString(16).padStart(2, '0')).join(''); };
+const LAYS = [[{kind: 'reef', side: -1, z: -8, glow: .6}, {kind: 'kelp', side: 1, z: -18, glow: .2}], [{kind: 'ruin', side: -1, z: -10, glow: .5}, {kind: 'cave', side: 1, z: -6, glow: .2}], [{kind: 'mussels', side: -1, z: -6, glow: .1}, {kind: 'cave', side: 1, z: -14, glow: .1}], [{kind: 'kelp', side: -1, z: -12, glow: .3}, {kind: 'kelp', side: 1, z: -12, glow: .3}], [{kind: 'dunes', side: -1, z: -4, glow: 0}, {kind: 'reef', side: -1, z: -18, glow: .5}]];
+export function archiveLevels(C) {
+  const out = [], fluid = true, specks = true;
+  out.push({id: 'doodles', kind: 'doodle', title: 'Secondhand Doodles', source: 'secondhand-motion', song: 'daehoned-05', start: null, dir: 'right', len: 300, current: 2.2, band: 9, fog: '#1b2524', fogD: .028, films: {layout: 'doodles', every: 8}, bad: 0,
+    layers: LAYS[0].concat([{kind: 'reef', side: -1, z: 5, glow: .1}]), creatures: ['school', 'comb'], fluid, specks, goal: {type: 'color', n: 40, label: 'catch doodles; their tentacles colour the fish they touch'},
+    took: 'The crisp traced drawings of the second-hand archive (86 subjects, 1,777 keys, each with the reason it was drawn) swim as line-worms. Catch one and it lights up as a tentacle of its own drawings; brush the school with it and the fish take its colour.'});
+  out.push({id: 'menagerie', kind: 'doodle', title: 'Menagerie', source: 'secondhand-motion', song: 'daehoned-18', start: null, dir: 'right', len: 420, current: 1.6, band: 10, fog: '#1d2a28', fogD: .026, films: {layout: 'menagerie'}, bad: 0,
+    layers: LAYS[1].concat([{kind: 'kelp', side: -1, z: 5, glow: 0}]), creatures: ['school'], fluid, specks, goal: {type: 'doodles', n: 20, label: 'meet the creatures: touch a drawing and it joins you as a tentacle'},
+    took: 'All 86 traced drawings of the second-hand archive at once, as creatures: each swims with its own gait, cycling through its keys; the curious ones come to look at you, the shy ones slip away.'});
+  if (!C) return out;
+  const decs = [...new Set(C.shots.filter(s => s.dec).map(s => s.dec))].sort();
+  out.push({id: 'strata', kind: 'cineosis', title: 'Strata', source: 'cineosis-lab', pick: {by: 'decade'}, song: 'nightbus-14', start: null, dir: 'up', len: decs.length * 26, current: 1.8, band: 10, fog: '#2a2620', top: '#294f52', fogD: .026, films: {layout: 'list'}, bad: 0,
+    layers: LAYS[3], creatures: ['school', 'comb'], fluid, specks, goal: {type: 'decades', n: 8, label: 'take a frame from as many decades as you can'},
+    took: `Rise through the moving-image archive by date: ${decs[0]}s footage at the bottom, ${decs[decs.length - 1]}s at the top. Black and white thins out as you climb; the water warms from silver to colour.`});
+  out.push({id: 'spectrum', kind: 'cineosis', title: 'Spectrum', source: 'cineosis-lab', pick: {by: 'hue'}, song: 'daehoned-15', start: null, dir: 'right', len: 300, current: 2.4, band: 9, fog: '#202024', fogD: .028, films: {layout: 'list'}, bad: 0,
+    layers: LAYS[0], creatures: ['school'], fluid, specks, hueWater: true, goal: {type: 'hues', n: 8, label: 'take a frame from every colour'},
+    took: 'The archive sorted by its own colour: red footage gives way to amber, green, blue and violet as you drift, and the water takes the colour of the films around it.'});
+  for (const [sub, title, song] of [['person', 'People', 'siltwire-06'], ['machine', 'Machines', 'nightbus-06'], ['landscape', 'Landscapes', 'siltwire-15'], ['animal', 'Animals', 'daehoned-18'], ['screen', 'Screens', 'event-03'], ['crowd', 'Crowds', 'twobuttons-14']])
+    out.push({id: 'sub-' + sub, kind: 'cineosis', title, source: 'cineosis-lab', pick: {by: 'sub', v: sub}, song, start: null, dir: 'right', len: 240, current: 2.2, band: 9, fog: '#1c2423', fogD: .03, films: {layout: 'list'}, bad: 0,
+      layers: LAYS[out.length % 5], creatures: ['school', 'shrimp'], fluid, specks, goal: {type: 'frames', n: 8, label: `take ${title.toLowerCase()} from the archive`}, took: `Every shot whose main subject is ${sub === 'person' ? 'a person' : sub === 'screen' ? 'a screen' : sub}, across the decades.`});
+  const types = [...new Set(C.signs.map(g => g.image))];
+  types.forEach((ty, i) => { const gs = C.signs.filter(g => g.image === ty), n = C.shots.filter(s => gs.some(g => g.n === s.sign)).length, hue = (i * 360 / types.length + 200) % 360;
+    out.push({id: 'type-' + ty.toLowerCase().replace(/[^a-z]+/g, '-'), kind: 'cineosis', title: ty, source: 'cineosis-lab', pick: {by: 'image', v: ty}, song: SONGS[(i + 3) % SONGS.length], start: null, dir: ['right', 'up', 'down'][i % 3], len: 60 + n * 12, current: 2, band: 9,
+      fog: hsl(hue, .2, .13), top: hsl(hue, .28, .3), fogD: .028, films: {layout: 'list'}, bad: 0, layers: LAYS[(i + 2) % 5], creatures: ['school', 'comb'], surface: i % 3 === 1, fluid, specks, goal: {type: 'frames', n: Math.min(10, n), label: `take ${ty.toLowerCase()}-images: ${gs.map(g => g.sym).join(' ')}`},
+      took: `One level for the ${ty} type: every shot the lab read as ${gs.map(g => g.name).join(', ')}.`, type: true}); });
+  C.signs.forEach((g, i) => { const dom = (g.dom || '').toLowerCase(), hue = Object.entries(TYPEHUE).find(([k]) => dom.includes(k) || (g.image || '').toLowerCase().includes(k))?.[1] ?? (i * 37) % 360, n = C.shots.filter(s => s.sign === g.n).length;
+    out.push({id: 'sign-' + g.n, kind: 'cineosis', sign: g, title: `${g.sym} · ${g.name}`, source: 'cineosis-lab', pick: {by: 'sign', v: g.n}, song: SONGS[i % SONGS.length], start: null, dir: ['right', 'up', 'down'][i % 3], len: 60 + n * 16, current: 1.8, band: 9,
+      fog: hsl(hue, .22, .13), top: hsl(hue, .3, .3), fogD: .028, films: {layout: 'list'}, bad: 0, layers: LAYS[i % 5], creatures: ['school', i % 2 ? 'comb' : 'shrimp'], surface: i % 3 === 1, fluid, specks, goal: {type: 'frames', n: Math.min(6, n), label: g.q || g.gloss || g.name},
+      took: `${g.type || g.image}. ${g.gloss ? g.gloss[0].toUpperCase() + g.gloss.slice(1) + '.' : ''} ${n} shots in the archive carry this sign.`}); });
+  return out;
+}

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Drifts · The Current</title>
 <meta name="description" content="Drifts: one small game for each video of The Current. A jellyfish of celluloid drifts through open water in layers of silhouette, takes frames from films made of light, and watches them bloom. No buttons: hold, tap, double-tap, pinch.">
@@ -35,14 +36,47 @@ body.game{overflow:hidden;touch-action:none;overscroll-behavior:none;-webkit-use
 </head>
 <body>
 <script type="module">
-import {LEVELS} from './levels.js';
+import {LEVELS, archiveLevels} from './levels.js';
 const Q = new URLSearchParams(location.search), $ = id => document.getElementById(id);
+const C = await fetch('data/cineosis.json').then(r => r.json()).catch(() => null), ARCH = archiveLevels(C), ALL = LEVELS.concat(ARCH);
+const keep = ['sm', 'films', 'cineo'].map(k => Q.get(k) ? `&${k}=${encodeURIComponent(Q.get(k))}` : '').join('');
+const card = l => `<a class="card" href="?v=${l.id}${keep}"><div class="im" style="background-image:url(thumbs/${l.source}.jpg)"></div><div class="tx"><b>${l.title}</b><small>FROM ${l.source.replace('_', ' ').toUpperCase()} · ${l.goal.label.toUpperCase()}</small><span>${l.took}</span></div></a>`;
+const acard = l => `<a class="card ac" href="?v=${l.id}${keep}"><div class="tx"><b>${l.title}</b><small>${l.goal.label.toUpperCase()}</small><span>${l.took}</span></div></a>`;
 if (!Q.get('v')) {
-  document.body.innerHTML = `<div class="wrap"><div class="k">THE CURRENT · BETAS</div><h1>DRIFTS</h1>
-    <p>One small game for each video we have made. No tube: open water, in layers, with depth in front and behind. No buttons: <b>hold</b> the water to swim there, <b>tap</b> a film to take a frame, <b>hold on a film</b> to watch it bloom, <b>double-tap</b> to pulse, <b>pinch</b> to pull back, <b>two fingers</b> to look around. Each card says what the game took from its video.</p>
-    <div class="grid">${LEVELS.map(l => `<a class="card" href="?v=${l.id}${Q.get('sm') ? '&sm=' + encodeURIComponent(Q.get('sm')) : ''}${Q.get('films') ? '&films=' + encodeURIComponent(Q.get('films')) : ''}"><div class="im" style="background-image:url(thumbs/${l.source}.jpg)"></div><div class="tx"><b>${l.title}</b><small>FROM ${l.source.replace('_', ' ').toUpperCase()} · ${l.goal.label.toUpperCase()}</small><span>${l.took}</span></div></a>`).join('')}</div>
-    <p style="margin-top:30px;font-size:13px"><a href="../">The Branching Archive (v6)</a> · <a href="../../">Contaminant Jelly</a> · <a href="DRIFTS.md">How the translations work</a></p></div>`;
-} else import('./engine.js').then(m => m.play(LEVELS.find(l => l.id === Q.get('v')) || LEVELS[0], LEVELS));
+  const signs = C ? C.signs : [], nOf = g => C.shots.filter(x => x.sign === g.n).length, fogOf = id => ARCH.find(l => l.id === id)?.fog || '#222', L = id => ALL.find(l => l.id === id);
+  const EPIS = [['doodles', 'Episode 1', 'Catch the traced drawings; their tentacles dye the fish.'], ['menagerie', 'Episode 2', 'All 86 drawings alive as creatures.'], ['strata', 'Episode 3', 'Rise from the 1900s to the 2020s.'], ['spectrum', 'Episode 4', 'The archive sorted by its own colour.'], ['rayrun', 'Episode 5', 'Ride a ray’s wake at speed.'], ['descent', 'Episode 6', 'Sink into the dark; pulse to see.']];
+  const cineBase = Q.get('cineo') || (C && C.base) || '', pick = by => { if (!C) return ''; const sh = C.shots.filter(by); const x = sh[Math.floor(sh.length / 2)]; return x ? cineBase + (x.thumb || x.strip) : ''; };
+  const art = {strata: pick(x => x.dec === 1930), spectrum: pick(x => !x.bw && x.sat > .3 && x.hue > 170 && x.hue < 260), rayrun: 'thumbs/song_nightbus-03.jpg', descent: 'thumbs/song_nightbus-14.jpg'};
+  document.body.innerHTML = `<style>
+    .hero{isolation:isolate;min-height:62vh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 0 28px;position:relative}.hero canvas{position:absolute;inset:-40px -20px 0;width:calc(100% + 40px);height:calc(100% + 40px);z-index:-1;opacity:.9}
+    .wrap a.start{color:#1a1208}.start{display:inline-block;margin-top:18px;font:700 15px system-ui;letter-spacing:.08em;color:#1a1208;background:var(--gold);border-radius:999px;padding:14px 26px;text-decoration:none}
+    .ops{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:16px;font:13px system-ui;color:var(--dim)}.ops b{color:var(--ink)}
+    .eps{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-top:16px}.ep{position:relative;display:block;text-decoration:none;color:var(--ink);border-radius:14px;overflow:hidden;background:#0d1615;min-height:190px}
+    .ep .im{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.55;-webkit-mask-image:radial-gradient(ellipse at 50% 40%,#000 40%,transparent 85%);mask-image:radial-gradient(ellipse at 50% 40%,#000 40%,transparent 85%)}.ep canvas{position:absolute;inset:0;width:100%;height:100%}
+    .ep .tx{position:absolute;left:14px;right:14px;bottom:12px}.ep small{font:700 10px system-ui;letter-spacing:.24em;color:var(--gold)}.ep b{display:block;font:800 22px system-ui;margin:2px 0}.ep span{font:italic 13px Georgia,serif;color:#dfe6e0}
+    h2{font:800 12px system-ui;letter-spacing:.3em;color:var(--gold);margin:44px 0 0}.pt{display:grid;grid-template-columns:repeat(16,minmax(46px,1fr));gap:5px;margin-top:14px;overflow-x:auto;padding-bottom:6px}
+    .el{display:block;text-decoration:none;color:var(--ink);border-radius:7px;padding:5px 5px 7px;min-height:64px;border:1px solid rgba(255,255,255,.07)}.el:hover{border-color:var(--gold)}.el b{font:800 17px system-ui;display:block}.el i{font:9px/1.2 system-ui;font-style:normal;color:var(--dim);display:block}.el s{text-decoration:none;font:9px system-ui;color:var(--gold)}
+    .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}.chip{font:600 12px system-ui;color:var(--ink);text-decoration:none;border:1px solid rgba(255,196,106,.35);border-radius:999px;padding:7px 12px}.chip:hover{border-color:var(--gold)}
+    details{margin-top:40px}summary{cursor:pointer;font:800 12px system-ui;letter-spacing:.3em;color:var(--gold)}.ac{background:linear-gradient(160deg,#122120,#0c1413)}</style>
+    <div class="wrap"><div class="hero"><canvas id="hc"></canvas><div class="k">THE CURRENT</div><h1>DRIFTS</h1>
+      <p>A jellyfish of celluloid swims the moving-image archive. Films are clouds of light; shine on one and it becomes clear. Catch a doodle and it lights up as a tentacle.</p>
+      <div><a class="start" href="?v=doodles${keep}">Start swimming</a></div>
+      <div class="ops"><span><b>hold</b> to swim</span><span><b>two fingers</b> to boost</span><span><b>tap</b> a film to take it</span><span><b>double-tap</b> to pulse and see</span><span><b>pinch</b> to pull back</span></div></div>
+    <h2>EPISODES</h2><div class="eps">${EPIS.map(([id, ep, line]) => { const l = L(id); return l ? `<a class="ep" href="?v=${id}${keep}">${art[id] ? `<div class="im" style="background-image:url(${art[id]})"></div>` : `<canvas data-doodle="${id === 'doodles' ? 0 : 1}"></canvas>`}<div class="tx"><small>${ep.toUpperCase()}</small><b>${l.title}</b><span>${line}</span></div></a>` : ''; }).join('')}</div>
+    <h2>THE PERIODIC TABLE OF CINEOSIS</h2><p style="font-size:14px">One level for each sign the lab reads in moving images; or swim a whole type.</p>
+    <div class="pt">${signs.map(g => `<a class="el" href="?v=sign-${g.n}${keep}" style="grid-column:${g.col + 1};grid-row:${g.row + 1};background:${fogOf('sign-' + g.n)}" title="${g.name}: ${g.q || g.gloss || ''}"><s>${g.n}</s><b>${g.sym}</b><i>${g.name}</i><i>${nOf(g)} shots</i></a>`).join('')}</div>
+    <div class="chips">${ARCH.filter(l => l.type).map(l => `<a class="chip" href="?v=${l.id}${keep}">${l.title}</a>`).join('')}</div>
+    <details><summary>MORE DRIFTS</summary>
+      <h2>BY SUBJECT</h2><div class="grid">${ARCH.filter(l => l.id.startsWith('sub-')).map(acard).join('')}</div>
+      <h2>FROM OUR VIDEOS</h2><div class="grid">${LEVELS.map(card).join('')}</div></details>
+    <p style="margin-top:30px;font-size:13px"><a href="../">The Branching Archive (v6)</a> · <a href="../../">Contaminant Jelly</a> · <a href="DRIFTS.md">How the translations work</a> · data: <a href="data/doodles.json">doodles</a>, <a href="data/cineosis.json">cineosis</a></p></div>`;
+  // real doodles drawn live on the hero and the doodle episodes
+  fetch('data/doodles.json').then(r => r.json()).then(({doodles}) => { const draw = (cv, list, n, t) => { const g = cv.getContext('2d'), W = cv.width = cv.clientWidth * 2, H = cv.height = cv.clientHeight * 2; g.clearRect(0, 0, W, H); g.lineCap = g.lineJoin = 'round';
+      list.slice(0, n).forEach((d, i) => { const k = d.keys[Math.floor(t * 3 + i) % d.keys.length], sz = Math.min(W, H) * (n > 6 ? .22 : .5), sc = sz / Math.max(d.w, d.h), x0 = (n > 6 ? ((i * 0.137 + t * .01 * (1 + i % 3)) % 1.1 - .05) * W : W / 2) - d.w * sc / 2, y0 = (n > 6 ? (.15 + .7 * ((i * .37) % 1)) * H + Math.sin(t + i) * 10 : H * .42) - d.h * sc / 2;
+        g.strokeStyle = n > 6 ? `hsla(${(i * 137.5) % 360},70%,75%,.55)` : 'rgba(255,240,215,.9)'; g.lineWidth = n > 6 ? 2 : 3; for (const st of k.s) { g.beginPath(); st.forEach(([x, y], j) => j ? g.lineTo(x0 + x * sc, y0 + y * sc + Math.sin(x * .02 + t * 3) * 3) : g.moveTo(x0 + x * sc, y0 + y * sc)); g.stroke(); } }); };
+    const hc = $('hc'), eps = [...document.querySelectorAll('canvas[data-doodle]')], pickD = (k, n) => doodles.slice().sort((a, b) => ((a.id.charCodeAt(1) * 7 + k) % 13) - ((b.id.charCodeAt(1) * 7 + k) % 13)).slice(0, n);
+    const hero = pickD(3, 14), one = pickD(1, 1), many = pickD(5, 10); const tick = t => { t /= 1000; if (hc) draw(hc, hero, 14, t); eps.forEach(cv => draw(cv, cv.dataset.doodle === '0' ? one : many, cv.dataset.doodle === '0' ? 1 : 10, t)); requestAnimationFrame(tick); }; requestAnimationFrame(tick); }).catch(() => {});
+} else import('./engine.js').then(m => m.play(ALL.find(l => l.id === Q.get('v')) || LEVELS[0], ALL));
 </script>
 </body>
 </html>

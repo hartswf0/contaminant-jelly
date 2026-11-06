@@ -11,13 +11,27 @@ export async function play(L, ALL) {
   document.body.className = 'game';
   document.body.innerHTML = `<canvas id="gl"></canvas><div class="ui" id="dark"></div><div class="ui" id="flash"></div><div class="ui" id="tag"></div>
     <div class="ui" id="hud"><div><b>${L.title.toUpperCase()}</b> · <span id="goal"></span></div><div id="song"></div></div><div class="ui" id="say"></div><div class="ui" id="hint"></div><div class="ui" id="dbg"></div>
-    <div class="ui" id="card"><div class="k">A DRIFT FROM ${L.source.replace('_', ' ').toUpperCase()}</div><h1>${L.title}</h1><p>${L.took}</p><p style="font-style:normal;font-size:14px;color:var(--dim)">Goal: ${L.goal.label}.</p><div class="go">TOUCH THE WATER TO BEGIN</div></div>`;
+    <div class="ui" id="card"><div class="k">${L.kind ? 'FROM THE ARCHIVE · ' : 'A DRIFT FROM '}${L.source.replace('_', ' ').toUpperCase()}</div><h1>${L.title}</h1><p>${L.took}</p><p style="font-style:normal;font-size:14px;color:var(--dim)">Goal: ${L.goal.label}.</p><div class="go">TOUCH THE WATER TO BEGIN</div></div>`;
   const SM = Q.get('sm') || 'https://hartswf0.github.io/secondhand-motion/';
   let FILMS = await (await fetch('../films109.json')).json();
   if (Q.get('films')) { const keep = Q.get('films').split(','); FILMS = FILMS.filter(f => keep.includes(f.slug)); }
   const MUSIC = await fetch('../music.json').then(r => r.json()).catch(() => null), S2G = await fetch('../audio/song2game.json').then(r => r.ok ? r.json() : null).catch(() => null);
   const frameURL = (f, i) => `${SM}${f.dir}/f${String(((i % f.n) + f.n) % f.n).padStart(3, '0')}.jpg`, fps = f => Math.min(10, f.fps || 8);
-  const stamp = (film, fi) => { const t = fi / fps(FILMS[film]); return `${Math.floor(t / 60)}:${(t % 60).toFixed(1).padStart(4, '0')}`; };
+  const hueCol = h => new THREE.Color().setHSL(((h % 360) + 360) % 360 / 360, .75, .6);
+  FILMS = FILMS.map((f, i) => ({...f, kind: 'sm', col: hueCol(i * 47)}));
+  let CINEO = null, DOODLES = null;
+  if (L.kind === 'cineosis') { CINEO = await (await fetch('data/cineosis.json')).json(); const base = Q.get('cineo') || CINEO.base, signOf = n => CINEO.signs.find(g => g.n === n);
+    let sh = CINEO.shots.slice(), p = L.pick || {};
+    if (p.by === 'sign') sh = sh.filter(x => x.sign === p.v); if (p.by === 'sub') sh = sh.filter(x => x.sub === p.v && x.strip).concat(sh.filter(x => x.sub === p.v && !x.strip)).slice(0, 26);
+    if (p.by === 'decade') { const by = {}; for (const x of sh.filter(x => x.dec).sort((a, b) => (b.strip ? 1 : 0) - (a.strip ? 1 : 0))) (by[x.dec] = by[x.dec] || []).push(x); sh = Object.values(by).flatMap(v => v.slice(0, 6)).sort((a, b) => a.y - b.y || a.id.localeCompare(b.id)); }   // old footage at the bottom, newer at the top
+    if (p.by === 'hue') { const c = sh.filter(x => !x.bw && x.sat > .35).sort((a, b) => a.hue - b.hue), k = Math.max(1, c.length / 64); sh = Array.from({length: Math.min(64, c.length)}, (_, i) => c[Math.floor(i * k)]); }   // an even walk round the colour wheel
+    if (p.by === 'image') sh = sh.filter(x => x.sign && signOf(x.sign).image === p.v);
+    if (p.by === 'sign' || p.by === 'sub' || p.by === 'image') sh.sort((a, b) => (a.y || 0) - (b.y || 0));
+    FILMS = sh.map(x => { const g = x.sign ? signOf(x.sign) : null, pc = new THREE.Color(x.pal[2] || x.pal[0] || '#888'), hsl = {}; pc.getHSL(hsl);
+      return {kind: x.strip ? 'strip' : 'thumb', url: base + (x.strip || x.thumb), title: x.t.split(' · ')[0], year: x.y, dec: x.dec, hue: x.hue, bw: x.bw, sign: g, note: x.note, fps: 6, n: 8,
+        col: x.bw ? new THREE.Color(.85, .85, .8) : new THREE.Color().setHSL(hsl.h, Math.max(.5, hsl.s), .6)}; }); }
+  if (L.kind === 'doodle') { DOODLES = (await (await fetch('data/doodles.json')).json()).doodles; FILMS = DOODLES.map((d, i) => ({kind: 'doodle', d, title: d.title, film: d.film, year: d.year, fps: 4, n: d.keys.length, col: hueCol((i * 137.5) % 360)})); }
+  const stamp = (film, fi) => { const f = FILMS[film]; if (!f) return ''; if (f.kind === 'doodle') return `key ${(fi % f.n) + 1} of ${f.n}${f.year ? ' · ' + f.year : ''}`; if (f.kind !== 'sm') return `${f.year || 'undated'}${f.sign ? ' · ' + f.sign.sym + ' ' + f.sign.name : ''}`; const t = fi / fps(f); return `${Math.floor(t / 60)}:${(t % 60).toFixed(1).padStart(4, '0')}`; };
   const IMG = new Map(); const withImg = (url, fn) => { let e = IMG.get(url); if (!e) { const im = new Image(); im.crossOrigin = 'anonymous'; e = {im, ok: false, cbs: []}; im.onload = () => { e.ok = true; e.cbs.forEach(f => f(im)); e.cbs = []; }; im.onerror = () => { e.bad = true; }; im.src = url; IMG.set(url, e); } if (e.ok) fn(e.im); else if (!e.bad) e.cbs.push(fn); };
   const SEED = Q.get('seed') ? +Q.get('seed') : (Math.random() * 1e9) | 0;
   const rnd = (i, k = 0) => { let t = (SEED ^ Math.imul(i + 1, 0x9E3779B1) ^ Math.imul(k + 7, 0x85EBCA77)) >>> 0; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; };
@@ -80,8 +94,15 @@ export async function play(L, ALL) {
   const putSlot = (slot, im) => { sgx.drawImage(im, 0, 0, SWd, SHt); _v2.set((slot % COLS) * SWd, ATW - (((slot / COLS) | 0) + 1) * SHt); slotTex.needsUpdate = true; renderer.copyTextureToTexture(_v2, slotTex, atlas); };
   const free = Array.from({length: NBLOCK - 2}, (_, i) => i + 2), tags = new Int32Array(NBLOCK); let tagN = 0;
   const take = () => free.length ? free.shift() : -1, give = b => { if (b > 1) { tags[b] = -1; free.push(b); } };
-  const loadClip = (b, film, from) => { const t = ++tagN; tags[b] = t; for (let i = 0; i < BLOCK; i++) withImg(frameURL(FILMS[film], from + i), im => { if (tags[b] === t) putSlot(b * BLOCK + i, im); }); };
-  const loadList = (b, film, list) => { const t = ++tagN; tags[b] = t; for (let i = 0; i < BLOCK; i++) withImg(frameURL(FILMS[film], list[Math.min(list.length - 1, i)]), im => { if (tags[b] === t) putSlot(b * BLOCK + i, im); }); };
+    const drawC = document.createElement('canvas'); drawC.width = SWd; drawC.height = SHt; const dgx = drawC.getContext('2d');
+  const drawKey = (d, k) => { const key = d.keys[((k % d.keys.length) + d.keys.length) % d.keys.length], sc = Math.min(SWd / (d.w + 20), SHt / (d.h + 20)); dgx.fillStyle = '#000'; dgx.fillRect(0, 0, SWd, SHt); dgx.strokeStyle = '#fff'; dgx.lineWidth = 2.2; dgx.lineCap = dgx.lineJoin = 'round';
+    for (const st of key.s) { dgx.beginPath(); st.forEach(([x, y], i) => i ? dgx.lineTo(10 * sc + x * sc + (SWd - (d.w + 20) * sc) / 2, 10 * sc + y * sc + (SHt - (d.h + 20) * sc) / 2) : dgx.moveTo(10 * sc + x * sc + (SWd - (d.w + 20) * sc) / 2, 10 * sc + y * sc + (SHt - (d.h + 20) * sc) / 2)); dgx.stroke(); } return drawC; };
+  const putCrop = (slot, im, sx, sy, sw, sh) => { sgx.drawImage(im, sx, sy, sw, sh, 0, 0, SWd, SHt); _v2.set((slot % COLS) * SWd, ATW - (((slot / COLS) | 0) + 1) * SHt); slotTex.needsUpdate = true; renderer.copyTextureToTexture(_v2, slotTex, atlas); };
+  const putFrame = (b, i, f, fi, t) => { if (f.kind === 'sm') withImg(frameURL(f, fi), im => { if (tags[b] === t) putSlot(b * BLOCK + i, im); });
+    else if (f.kind === 'doodle') putSlot(b * BLOCK + i, drawKey(f.d, fi));
+    else withImg(f.url, im => { if (tags[b] !== t) return; const k = ((fi % 8) + 8) % 8; if (f.kind === 'strip') putCrop(b * BLOCK + i, im, k * im.width / 8, 0, im.width / 8, im.height); else { const z = 1 - .012 * k; putCrop(b * BLOCK + i, im, im.width * (1 - z) * (k / 8), im.height * (1 - z) / 2, im.width * z, im.height * z); } }); };   // a single still drifts slowly, like a held frame
+  const loadClip = (b, film, from) => { const t = ++tagN; tags[b] = t; for (let i = 0; i < BLOCK; i++) putFrame(b, i, FILMS[film], from + i, t); };
+  const loadList = (b, film, list) => { const t = ++tagN; tags[b] = t; for (let i = 0; i < BLOCK; i++) putFrame(b, i, FILMS[film], list[Math.min(list.length - 1, i)], t); };
   const MAXC = 220, PT = new Float32Array(MAXC * 20), params = new THREE.DataTexture(PT, 5, MAXC, THREE.RGBAFormat, THREE.FloatType); params.needsUpdate = true;
   const row = (r, k, a, b, c, d) => PT.set([a, b, c, d], (r * 5 + k) * 4), hide = r => row(r, 1, -1, 1, 0, 0);
   const uR = {value: new THREE.Vector3()}, uU = {value: new THREE.Vector3()}, uF = {value: new THREE.Vector3()};
@@ -127,6 +148,9 @@ export async function play(L, ALL) {
     if (lay === 'halo') { scatter(14, LEN - 34, every); for (let k = 0; k < 8; k++) add({u: LEN - 16, w: 0, ring: k, size: 2.3, budget: 2}); }
     if (lay === 'caves') { for (let u = 14; u < LEN - 10; u += every * (.7 + .6 * rnd(u, 54))) { const up = rnd(u, 55) < .5; add({u, w: (up ? 1 : -1) * (4.8 + rnd(u, 56) * (BAND - 6.5)), size: up ? 2.2 : 2.8, bad: rnd(u, 57) < L.bad}); } }
     if (lay === 'buried') for (let u = 12; u < LEN - 10; u += every * (.7 + .6 * rnd(u, 58))) add({u, w: -BAND + .9 + rnd(u, 59) * .8, size: 2.2, buried: true});
+    if (lay === 'list') { const n = FILMS.length, step = (LEN - 26) / Math.max(1, n); FILMS.forEach((f, k) => add({u: 14 + k * step + (rnd(k, 64) - .5) * step * .4, w: (rnd(k, 65) * 2 - 1) * BAND * .7, film: k, from: 0, z: rnd(k, 66) < .22 ? -6 : 0, size: 2.5 + rnd(k, 67) * 1.2, budget: 3})); }
+    if (lay === 'doodles') { const ord = FILMS.map((_, i) => i).sort((a, b) => rnd(a, 68) - rnd(b, 68)); let k = 0; for (let u = 14; u < LEN - 8; u += every * (.7 + .6 * rnd(u, 69))) add({u, w: (rnd(u, 70) * 2 - 1) * BAND * .75, film: ord[k++ % ord.length], from: 0, doodle: true, size: 2.8, budget: 1, z: rnd(u, 71) < .2 ? -5 : 0}); }
+    if (lay === 'menagerie') FILMS.forEach((f, k) => add({u: 10 + k * (LEN - 20) / FILMS.length, w: (rnd(k, 72) * 2 - 1) * BAND * .8, film: k, from: 0, doodle: true, roam: true, size: 2 + rnd(k, 73) * 1.6, budget: 1, z: rnd(k, 74) < .25 ? -5 : 0, shy: rnd(k, 75) < .5, gait: .6 + rnd(k, 76) * 1.4}));   // every drawing as a creature
     if (lay === 'chain') { for (let u = 40; u < LEN - 20; u += 16) add({u, w: (rnd(u, 62) * 2 - 1) * BAND * .8, bad: true, size: 1.2 + rnd(u, 63)}); }
   }
   var CHAIN; // declared below (hoisting for the chain layout)
@@ -139,7 +163,7 @@ export async function play(L, ALL) {
   const snPts = new THREE.Points(snG, snM); snPts.frustumCulled = false; scene.add(snPts);
   const PUSH = [];
   // ------------------------------------------------ the jelly: three celluloid sheets with sprocket holes, contracting one after another
-  const CS = .8, J = {u: 6, w: L.startW ?? 0, vu: 0, vw: 0, ph: 0, p: new THREE.Vector3(), pv: new THREE.Vector3(), mem: 100, hurt: 0, glow: 0, stun: 0, slip: 0, target: null};
+  const CS = .8, J = {boost: 0, lightT: 0, u: 6, w: L.startW ?? 0, vu: 0, vw: 0, ph: 0, p: new THREE.Vector3(), pv: new THREE.Vector3(), mem: 100, hurt: 0, glow: 0, stun: 0, slip: 0, target: null};
   const BN = 5000, bg = new THREE.BufferGeometry(), bp = new Float32Array(BN * 3), bt = new Float32Array(BN), bs = new Float32Array(BN), bl = new Float32Array(BN);
   { let k = 0; for (const [Ly, rad, per] of [[0, .62, 1250], [1, .78, 1650], [2, .92, 2100]]) for (let i = 0, tr = 0; i < per && k < BN && tr < per * 4; tr++) { const t = Math.sqrt(Math.random()), a = t * Math.PI / 2 * 1.05, ph = Math.random() * 6.283;
       if ((t > .86 && Math.floor(ph / 6.283 * 44) % 2 === 0 && Math.random() < .85) || (Math.abs(((ph / 6.283 * 8) % 1) - .5) < .025 && Math.random() < .7)) continue;
@@ -170,13 +194,17 @@ export async function play(L, ALL) {
     if (!A) { if (ARMS.length >= NAR) return 'full'; const b = take(); if (b < 0) return 'full'; A = {film, frames: [], block: b, n: 2, target: 2}; ARMS.push(A); isNew = true; armRoot(ARMS.length - 1, _a); for (let j = 0; j < AN; j++) { const i = ((ARMS.length - 1) * AN + j) * 3; AX[i] = AXP[i] = _a.x; AX[i + 1] = AXP[i + 1] = _a.y - j * .14; AX[i + 2] = AXP[i + 2] = _a.z; } }
     A.frames.push({fi}); loadList(A.block, film, armFrames(A)); A.target = Math.min(AN, 4 + 2 * A.frames.length); CUT.push({film, fi, tag}); return isNew ? 'new' : 'grow'; }
   // ------------------------------------------------ creatures (each with a motion and an effect on the water)
-  const CREAT = new Set(L.creatures), pointsMat = (col, size, extra = '') => new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: {uScale: {value: 1}, uTime: {value: 0}, uFog: {value: L.fogD}},
+  const CREAT = new Set(L.specks ? L.creatures.concat('angler') : L.creatures), pointsMat = (col, size, extra = '') => new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: {uScale: {value: 1}, uTime: {value: 0}, uFog: {value: L.fogD}},
     vertexShader: `uniform float uScale, uTime, uFog; attribute float aK; varying float vA, vK; void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.); float z = -mv.z; vK = aK; vA = exp(-pow(uFog * .9 * z, 2.)) * smoothstep(1., 3., z); gl_PointSize = max(1., ${size} * uScale / z); gl_Position = projectionMatrix * mv; }`,
     fragmentShader: `uniform float uTime; varying float vA, vK; vec3 hue(float h){ return clamp(abs(fract(h + vec3(0., .33, .67)) * 6. - 3.) - 1., 0., 1.); } void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; vec3 c = ${col}; ${extra} gl_FragColor = vec4(c * vA * (1. - 4. * r2), 1.); }`});
   const mkPts = (n, mat) => { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3)); g.setAttribute('aK', new THREE.BufferAttribute(new Float32Array(n), 1)); const p = new THREE.Points(g, mat); p.frustumCulled = false; scene.add(p); return p; };
   // a school of flecks
-  const FISH = CREAT.has('school') ? Array.from({length: 70}, (_, i) => ({p: new THREE.Vector3(), v: new THREE.Vector3(), o: [Math.random() * 6.28, Math.random() * 6.28], init: false})) : [];
-  const fishPts = FISH.length ? mkPts(FISH.length * 3, pointsMat('vec3(.7,.86,.9) * .6', '(.1 - .03 * vK)')) : null; const school = {u: 30, w: 3};
+  const FISH = CREAT.has('school') ? Array.from({length: L.kind ? 120 : 70}, (_, i) => ({p: new THREE.Vector3(), v: new THREE.Vector3(), o: [Math.random() * 6.28, Math.random() * 6.28], init: false, col: new THREE.Color(.42, .52, .56), dyed: false})) : [];
+  let fishPts = null; if (FISH.length) { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(FISH.length * 9), 3)); g.setAttribute('aK', new THREE.BufferAttribute(new Float32Array(FISH.length * 3), 1)); g.setAttribute('aCol', new THREE.BufferAttribute(new Float32Array(FISH.length * 9), 3));
+    fishPts = new THREE.Points(g, new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: {uScale: {value: 1}, uTime: {value: 0}, uFog: {value: L.fogD}},
+      vertexShader: `uniform float uScale, uFog; attribute float aK; attribute vec3 aCol; varying float vA; varying vec3 vC; void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.); float z = -mv.z; vC = aCol; vA = exp(-pow(uFog * .9 * z, 2.)) * smoothstep(1., 3., z); gl_PointSize = max(1., (.11 - .03 * aK) * uScale / z); gl_Position = projectionMatrix * mv; }`,
+      fragmentShader: `varying float vA; varying vec3 vC; void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; gl_FragColor = vec4(vC * vA * (1. - 4. * r2), 1.); }`})); fishPts.frustumCulled = false; scene.add(fishPts); }
+  const school = {u: 30, w: 3};
   // comb jellies: rainbow combs that drift on the current and trace it
   const COMB = CREAT.has('comb') ? Array.from({length: 7}, (_, i) => ({u: 20 + i * (LEN - 40) / 6 + rnd(i, 70) * 8, w: (rnd(i, 71) * 2 - 1) * BAND * .7, z: rnd(i, 72) < .5 ? 0 : -6, t: rnd(i, 73) * 9, p: new THREE.Vector3()})) : [];
   const combLocal = Array.from({length: 200}, (_, i) => { const row8 = i % 8, isRow = i >= 120, a = isRow ? row8 / 8 * 6.283 : Math.random() * 6.283, v = isRow ? (i - 120) / 80 : Math.random(); return [Math.cos(a) * .3 * Math.sin(v * Math.PI), .45 * Math.cos(v * Math.PI), Math.sin(a) * .3 * Math.sin(v * Math.PI), isRow ? 1 + row8 / 8 + v * .5 : 0]; });
@@ -202,7 +230,7 @@ export async function play(L, ALL) {
       const m = new THREE.Points(g, new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: add ? THREE.AdditiveBlending : THREE.NormalBlending, uniforms: {uScale: {value: 1}, uReveal: {value: 0}, uTime: {value: 0}, uFog: {value: L.fogD}},
         vertexShader: `uniform float uScale, uFog; attribute float aK; varying float vA, vK; void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.); float z = -mv.z; vK = aK; vA = exp(-pow(uFog * .8 * z, 2.)) * smoothstep(1.5, 5., z); gl_PointSize = clamp((aK > 6.5 ? .12 : aK > 1.5 ? .07 : .16) * uScale / z, 1., 14.); gl_Position = projectionMatrix * mv; }`,
         fragmentShader: `uniform float uReveal, uTime; varying float vA, vK; void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; float g = 1. - 4. * r2; vec3 c = vec3(.012, .016, .028); float a = .7 * g;
-          if (vK > 1.5 && vK < 3.5) { c = vec3(.75, .72, .62) * .5 * (.3 + .7 * uReveal); a = g; } else if (vK > 3.5 && vK < 4.5) { c = vec3(.15, .4, 1.) * (.3 + .7 * uReveal); a = g; } else if (vK > 4.5 && vK < 5.5) { c = vec3(.5, .35, .2) * .35; a = g; } else if (vK > 6.5) { c = vec3(.05, .1, .13) * (.25 + 3. * uReveal); a = g; }
+          if (vK > 1.5 && vK < 3.5) { c = vec3(.75, .72, .62) * .5 * (.3 + .7 * uReveal); a = g; } else if (vK > 3.5 && vK < 4.5) { c = vec3(.15, .4, 1.) * (.3 + .7 * uReveal); a = g; } else if (vK > 4.5 && vK < 5.5) { c = vec3(.5, .35, .2) * .35; a = g; } else if (vK > 6.5) { c = vec3(.04, .08, .1) * (.2 + 1.6 * uReveal); a = g; }
           gl_FragColor = vec4(c * vA, a * vA); }`})); m.frustumCulled = false; return m; };
     const grp = new THREE.Group(), mb = mk(body, false), mg = mk(glow, true); grp.add(mb, mg); grp.scale.setScalar(1.3); scene.add(grp);
     const lure = mkPts(1, pointsMat('vec3(.7,.95,1.) * (.2 + 1.6 * vK)', '(.25 + .9 * vK)'));
@@ -212,26 +240,65 @@ export async function play(L, ALL) {
   if (L.films.layout === 'chain') { CHAIN.film = (rnd(7, 60) * FILMS.length) | 0; CHAIN.from = (rnd(7, 61) * 30) | 0;
     for (let b = 0; b < NCH / 8; b++) { const k = take(); CHAIN.blocks.push(k); loadClip(k, CHAIN.film, CHAIN.from + b * 8); }
     for (let j = 0; j < NCH; j++) { const u = 22 + j * (LEN - 50) / NCH; CHAIN.beads.push({j, u, w: Math.sin(u * .045) * BAND * .65, taken: false, p: new THREE.Vector3()}); } }
+  // ------------------------------------------------ doodle worms: the traced drawings swim as crisp lines of light, cycling through their keys
+  const NDL = L.films.layout === 'menagerie' ? 18 : 12, DLP = L.films.layout === 'menagerie' ? 460 : 640, dlG = new THREE.BufferGeometry(); dlG.setAttribute('position', new THREE.BufferAttribute(new Float32Array(NDL * DLP * 3), 3)); dlG.setAttribute('aCol', new THREE.BufferAttribute(new Float32Array(NDL * DLP * 3), 3));
+  const dlMat = new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: {uScale: {value: 1}, uFog: {value: L.fogD}},
+    vertexShader: `uniform float uScale, uFog; attribute vec3 aCol; varying vec3 vC; varying float vA; void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.); float z = -mv.z; vC = aCol; vA = exp(-pow(uFog * .8 * z, 2.)) * smoothstep(1., 3., z); gl_PointSize = max(1.3, .05 * uScale / z); gl_Position = projectionMatrix * mv; }`,
+    fragmentShader: `varying vec3 vC; varying float vA; void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; gl_FragColor = vec4(vC * vA * (1. - 3.4 * r2), 1.); }`});
+  const dlPts = new THREE.Points(dlG, dlMat); dlPts.frustumCulled = false; if (L.kind === 'doodle') scene.add(dlPts);
+  const DLS = new Map(), dlSample = (fi, k) => { const key = `${fi}:${k}`; if (DLS.has(key)) return DLS.get(key); const f = FILMS[fi], d = f.d, kk = d.keys[k % d.keys.length], sc = 2 / Math.max(d.w, d.h), out = [];
+    let len = 0; for (const st of kk.s) for (let i = 1; i < st.length; i++) len += Math.hypot(st[i][0] - st[i - 1][0], st[i][1] - st[i - 1][1]) * sc; const sp = Math.max(.012, len / DLP);
+    for (const st of kk.s) for (let i = 1; i < st.length; i++) { const [x0, y0] = st[i - 1], [x1, y1] = st[i], l = Math.hypot(x1 - x0, y1 - y0) * sc, n = Math.max(1, Math.round(l / sp)); for (let t = 0; t < n && out.length < DLP * 2; t++) { const u = t / n; out.push(((x0 + (x1 - x0) * u) - d.w / 2) * sc, -((y0 + (y1 - y0) * u) - d.h / 2) * sc); } }
+    const a = new Float32Array(out); DLS.set(key, a); return a; };
+  function stepDoodles(dt) { if (L.kind !== 'doodle') return; const pos = dlG.attributes.position.array, col = dlG.attributes.aCol.array; let slot = 0;
+    for (const s of SP) { if (!s.doodle) continue; const near = s.u > J.u - 18 && s.u < J.u + 60, fade = s.caught ? Math.max(0, 1 - (RT - s.caught) / .7) : 1; if (!near || fade <= 0 || slot >= NDL) continue;
+      if (s.roam) { const du = J.u - s.u, dw = J.w - s.w, dd = Math.hypot(du, dw) || 1; s.u += dt * (L.current * (.5 + .4 * s.gait) + Math.sin(T * s.gait + s.i) * 1.2); s.w += dt * Math.cos(T * .7 * s.gait + s.i) * 1.4; if (dd < 6) { const k2 = (s.shy ? -3 : 1.2) * dt * (1 - dd / 6); s.u += du / dd * k2; s.w += dw / dd * k2; } if (s.u < J.u - 18) s.u += 75; }   // creatures: some come to look, some shy away
+      else { s.u += dt * L.current * .55; s.w += Math.sin(T * .4 + s.i) * dt * .6; } s.w = Math.max(-BAND + 1, Math.min(BAND - 1, s.w)); s.pos = s.pos || new THREE.Vector3(); W(s.u, s.w, s.z, s.pos);
+      const f = FILMS[s.film]; s.key = ((Math.floor(T * 4 + s.i * 3) % f.n) + f.n) % f.n; const P = dlSample(s.film, s.key), half = s.size / 2, base = slot * DLP, c = f.col, dist = Math.hypot(s.u - J.u, s.w - J.w), lit = s.caught ? 2 : 1 + Math.max(0, 1 - dist / 6) * .6;
+      for (let i = 0; i < DLP; i++) { const q = (base + i) * 3; if (i * 2 >= P.length) { pos[q] = 0; pos[q + 1] = -9999; pos[q + 2] = 0; continue; } const lx = P[i * 2], ly = P[i * 2 + 1] + Math.sin(lx * 3 - T * 5 + s.i) * .07;   // the drawing swims like a worm
+        pos[q] = s.pos.x + lx * half; pos[q + 1] = s.pos.y + ly * half; pos[q + 2] = s.pos.z; const m = (s.caught ? .9 : .3) * fade, lv = lit * fade * .55; col[q] = (.8 * (1 - m) + c.r * m) * lv; col[q + 1] = (.84 * (1 - m) + c.g * m) * lv; col[q + 2] = (.82 * (1 - m) + c.b * m) * lv; }
+      if (G.state === 'play' && !s.caught && Math.abs(s.z) < 1 && dist < half + 1) capture(s); slot++; }
+    for (let i = slot * DLP; i < NDL * DLP; i++) pos[i * 3 + 1] = -9999; dlG.attributes.position.needsUpdate = true; dlG.attributes.aCol.needsUpdate = true; }
+  // ------------------------------------------------ specks of light: most make the films around you clear; one in four is a lure, and an anglerfish is behind it
+  const SPK = []; if (L.specks) for (let u = 30, k = 0; u < LEN - 20; u += 22 + rnd(u, 80) * 14, k++) SPK.push({u, w: (rnd(u, 81) * 2 - 1) * BAND * .7, lure: rnd(u, 82) < .25, got: false, p: new THREE.Vector3()});
+  const spkPts = SPK.length ? mkPts(SPK.length, pointsMat('vec3(1., .9, .7) * (.6 + .6 * vK)', '(.22 + .1 * vK)')) : null;
+  function stepSpecks(dt) { if (!spkPts) return; const a = spkPts.geometry.attributes.position.array, kk = spkPts.geometry.attributes.aK.array;
+    SPK.forEach((sp, i) => { if (sp.got) { a.set([0, -9999, 0], i * 3); return; } W(sp.u + Math.sin(T * .5 + i) * .4, sp.w + Math.cos(T * .6 + i) * .4, 0, sp.p); a.set([sp.p.x, sp.p.y, sp.p.z], i * 3); kk[i] = .5 + .5 * Math.sin(T * 3 + i);
+      if (G.state === 'play' && sp.p.distanceTo(J.p) < 1.5) { sp.got = true; buzz(8);
+        if (sp.lure && ANG) { const A = ANG; A.u = sp.u + 2.5; A.w = sp.w - .5; W(A.u, A.w, -1, A.pos); A.dir.set(-1, 0, 0); A.st = 'warn'; A.t = 3.9; A.reveal = 1; A.rise = 1; A.cool = 0; say('that light was a lure!'); AU.tone(1250, .25, .08); buzz([20, 40, 20]); }
+        else { J.lightT = 8; G.specks = (G.specks || 0) + 1; say('a speck of light: the films near you show clearly'); AU.tone(1320, .9, .04); } } });
+    spkPts.geometry.attributes.position.needsUpdate = true; spkPts.geometry.attributes.aK.needsUpdate = true; }
+  // ------------------------------------------------ the reticle: a ring of flecks around the film or drawing ahead, with its title, year, sign
+  const retG = new THREE.BufferGeometry(); retG.setAttribute('position', new THREE.BufferAttribute(new Float32Array(32 * 3), 3));
+  const retMat = new THREE.ShaderMaterial({transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending, uniforms: {uA: {value: 0}, uK: {value: 0}}, vertexShader: `void main(){ gl_PointSize = 4.; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`,
+    fragmentShader: `uniform float uA, uK; void main(){ vec2 q = gl_PointCoord - .5; if (dot(q, q) > .25) discard; gl_FragColor = vec4(mix(vec3(.6, .72, .72), vec3(1., .8, .45), uK) * uA, 1.); }`});
+  const retPts = new THREE.Points(retG, retMat); retPts.frustumCulled = false; retPts.renderOrder = 9; scene.add(retPts);
+  function stepReticle() { let best = null, bd = 13; if (G.state === 'play') for (const s of SP) { if (!s.pos || s.budget <= 0 || s.bad || s.caught || (s.slot < 0 && !s.doodle) || !visible(s)) continue; const du = s.u - J.u, d = Math.hypot(du, s.w - J.w); if (du > -3 && d < bd) { bd = d; best = s; } }
+    const tag = $('tag'); if (!best) { retMat.uniforms.uA.value *= .85; tag.style.opacity = 0; return; } const k = THREE.MathUtils.clamp(1 - (bd - 1.5) / 9, 0, 1), ready = k > .6, rad = best.size * (1.2 - .45 * k), a = retG.attributes.position.array;
+    for (let i = 0; i < 32; i++) { const an = i / 32 * 6.283 + RT * (ready ? .4 : 1.4), gap = ready || i % 4; _a.copy(best.pos).addScaledVector(uR.value, Math.cos(an) * rad).addScaledVector(uU.value, Math.sin(an) * rad * .85 + (gap ? 0 : -9999)); a.set([_a.x, _a.y, _a.z], i * 3); }
+    retG.attributes.position.needsUpdate = true; retMat.uniforms.uA.value = .4 + .6 * k; retMat.uniforms.uK.value = ready ? 1 : 0;
+    const f = FILMS[best.film], fi = best.doodle ? best.key || 0 : best.from + Math.floor(T * fps(f)) % BLOCK; _a.copy(best.pos).addScaledVector(uU.value, rad * .9).project(camera);
+    tag.innerHTML = `<b style="font:600 10px system-ui;letter-spacing:.16em;color:var(--gold);display:block;text-align:center">${ready ? (L.fluid ? 'SWIM THROUGH' : 'TAP TO TAKE') : 'RESOLVING'}${f.sign ? ' · ' + f.sign.sym : ''}</b>${f.title}${best.doodle && f.film ? ' · from ' + f.film : ''} · ${stamp(best.film, fi)}`;
+    tag.style.left = `${(_a.x * .5 + .5) * innerWidth}px`; tag.style.top = `${(-_a.y * .5 + .5) * innerHeight}px`; tag.style.opacity = _a.z < 1 ? .92 : 0; }
   // ------------------------------------------------ input: gestures only
-  const G = {state: 'card', t0: 0, wake: 0, watched: new Map(), watchDone: 0, pairs: new Map(), pairsDone: 0, halo: 0, unearth: 0, orderN: 0, pulses: 0, look: [0, 0], zoom: 1, hold: null, watch: null, lastTap: 0, endT: 0};
+  const G = {colored: 0, state: 'card', t0: 0, wake: 0, watched: new Map(), watchDone: 0, pairs: new Map(), pairsDone: 0, halo: 0, unearth: 0, orderN: 0, pulses: 0, look: [0, 0], zoom: 1, hold: null, watch: null, lastTap: 0, endT: 0};
   const touches = new Map(); let pinch = null;
   const cv = $('gl');
   const filmAt = (x, y) => { let best = null, bd = 1e9; const test = (p, size, o) => { _a.copy(p).project(camera); if (_a.z > 1) return; const sx = (_a.x * .5 + .5) * innerWidth, sy = (-_a.y * .5 + .5) * innerHeight, dist = camera.position.distanceTo(p), rpx = size * 1.15 / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * dist) * innerHeight, d = Math.hypot(sx - x, sy - y); if (d < Math.max(28, rpx) && d < bd) { bd = d; best = o; } };
-    for (const s of SP) if (s.slot >= 0 && !s.bad && visible(s)) test(s.pos, s.size, s); for (const b of CHAIN.beads) if (!b.taken && Math.abs(b.u - J.u) < 40) test(b.p, 1, b); return best; };
+    for (const s of SP) if ((s.slot >= 0 || (s.doodle && s.pos && !s.caught)) && !s.bad && visible(s)) test(s.pos, s.size, s); for (const b of CHAIN.beads) if (!b.taken && Math.abs(b.u - J.u) < 40) test(b.p, 1, b); return best; };
   cv.addEventListener('contextmenu', e => e.preventDefault());
   cv.addEventListener('pointerdown', e => { touches.set(e.pointerId, {x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY, t0: performance.now()}); try { cv.setPointerCapture(e.pointerId); } catch (x) {}
     if (G.state === 'card') { begin(); return; }
     if (G.state === 'end') { G.swipe = {x: e.clientX, y: e.clientY, t: performance.now()}; return; }
-    if (touches.size === 2) { const [a, b] = [...touches.values()]; pinch = {d: Math.hypot(a.x - b.x, a.y - b.y), mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2, z: G.zoom}; G.hold = null; endWatch(); return; }
-    if (e.button === 2) { pinch = {mx: e.clientX, my: e.clientY, z: G.zoom, mouse: true}; return; }
+    if (touches.size === 2) { const [a, b] = [...touches.values()]; pinch = {d: Math.hypot(a.x - b.x, a.y - b.y), z: G.zoom}; G.hold = null; endWatch(); return; }
+    if (e.button === 2) { G.rmb = true; }
     const f = filmAt(e.clientX, e.clientY); G.hold = {id: e.pointerId, x: e.clientX, y: e.clientY, t0: performance.now(), film: f, moved: 0}; });
   cv.addEventListener('pointermove', e => { const t = touches.get(e.pointerId); if (t) { t.x = e.clientX; t.y = e.clientY; }
-    if (pinch && (touches.size >= 2 || pinch.mouse)) { const pts = [...touches.values()], mx = pinch.mouse ? e.clientX : (pts[0].x + pts[1].x) / 2, my = pinch.mouse ? e.clientY : (pts[0].y + pts[1].y) / 2; if (!pinch.mouse) { const d = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y); G.zoom = THREE.MathUtils.clamp(pinch.z * d / Math.max(20, pinch.d), .75, 1.3); }
-      G.look = [THREE.MathUtils.clamp(-(mx - pinch.mx) / innerWidth * 14, -6, 6), THREE.MathUtils.clamp((my - pinch.my) / innerHeight * 10, -4, 4)]; return; }
+    if (pinch && touches.size >= 2) { const pts = [...touches.values()], d = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y); if (Math.abs(d - pinch.d) > 40) G.zoom = THREE.MathUtils.clamp(pinch.z * d / Math.max(20, pinch.d), .75, 1.3); return; }
     if (G.hold && G.hold.id === e.pointerId) { G.hold.moved = Math.max(G.hold.moved, Math.hypot(e.clientX - G.hold.x, e.clientY - G.hold.y)); G.hold.cx = e.clientX; G.hold.cy = e.clientY; } });
   const up = e => { const t = touches.get(e.pointerId); touches.delete(e.pointerId);
     if (G.state === 'end' && G.swipe) { const dx = e.clientX - G.swipe.x, dy = e.clientY - G.swipe.y; G.swipe = null; if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy)) { const i = ALL.indexOf(L); go(dx < 0 ? ALL[(i + 1) % ALL.length].id : null); } else if (Math.hypot(dx, dy) < 20 && performance.now() - G.endT > 1500) go(L.id); return; }
-    if (pinch) { if (touches.size < 2) { pinch = null; G.look = [0, 0]; } return; }
+    if (e.button === 2) G.rmb = false; if (pinch) { if (touches.size < 2) pinch = null; return; }
     if (t && t.x0 < 24 && e.clientX - t.x0 > 90) { go(null); return; }   // swipe in from the left edge: back to all drifts
     const h = G.hold; if (!h || h.id !== e.pointerId) return; G.hold = null; const dt = performance.now() - h.t0;
     if (G.watch) { endWatch(); return; }
@@ -270,13 +337,16 @@ export async function play(L, ALL) {
     fragmentShader: `uniform float uA; void main(){ vec2 q = gl_PointCoord - .5; if (dot(q, q) > .25) discard; gl_FragColor = vec4(vec3(.5, .95, 1.) * uA, 1.); }`});
   { const n = 700, P = new Float32Array(n * 3); for (let i = 0; i < n; i++) { const a = i / n * 6.283 * 3, zz = (Math.random() - .5) * .3; P.set([Math.cos(a), Math.sin(a), zz], i * 3); } const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(P, 3)); const p = new THREE.Points(g, pulseMat); p.frustumCulled = false; scene.add(p); }
   function pulse() { if (G.state !== 'play' || RT - (G.pulseT || -9) < 1.5) return; const ph = AU.phase(), on = ph < .14 || ph > .86; G.pulseT = RT; PULSE = {t0: RT, R: on ? 22 : 13, c: J.p.clone(), on}; G.pulses++;
-    for (const s of SP) if (s.pos && s.pos.distanceTo(J.p) < PULSE.R) { s.lit = RT; if (s.buried && !s.up) unearth(s); } if (ANG) ANG.reveal = 1; scareShrimp(J.p); for (const f of FISH) f.v.add(_a.copy(f.p).sub(J.p).setLength(8));
-    AU.tone(on ? 660 : 440, 2, .05); buzz(on ? [8, 30, 8] : 10); say(on ? 'on the beat: the pulse reaches far' : 'pulse'); }
-  function startWatch(s) { G.watch = {s, t0: RT}; AU.focus(1); say(`${s.j !== undefined ? FILMS[CHAIN.film].title : FILMS[s.film].title} · ${stamp(s.j !== undefined ? CHAIN.film : s.film, (s.j !== undefined ? CHAIN.from + s.j : s.from + (Math.floor(T * fps(FILMS[s.film])) % BLOCK)))}`, 99); buzz(6); }
+    let nl = 0; for (const s of SP) if (s.pos && s.pos.distanceTo(J.p) < PULSE.R) { s.lit = RT; nl++; if (s.buried && !s.up) unearth(s); } if (ANG) ANG.reveal = 1; scareShrimp(J.p); for (const f of FISH) f.v.add(_a.copy(f.p).sub(J.p).setLength(8));
+    AU.tone(on ? 660 : 440, 2, .05); buzz(on ? [8, 30, 8] : 10); say(`${on ? 'on the beat: the pulse reaches far' : 'pulse'}${nl ? ` · ${nl} film${nl > 1 ? 's' : ''} light up clear` : ''}`); }
+  function startWatch(s) { G.watch = {s, t0: RT}; if (s.doodle) { loadClip(0, s.film, 0); G.watch.blk = 0; } AU.focus(1); say(`${s.j !== undefined ? FILMS[CHAIN.film].title : FILMS[s.film].title} · ${stamp(s.j !== undefined ? CHAIN.film : s.film, (s.j !== undefined ? CHAIN.from + s.j : s.from + (Math.floor(T * fps(FILMS[s.film])) % BLOCK)))}`, 99); buzz(6); }
   function endWatch() { if (!G.watch) return; const s = G.watch.s, d = RT - G.watch.t0; G.watch = null; AU.focus(0); G.sayT = RT - 2; const k = s.i ?? ('c' + s.j), tot = (G.watched.get(k) || 0) + d; G.watched.set(k, tot);
     if (tot >= 4 && !s.watchedDone) { s.watchedDone = true; G.watchDone++; say(`watched · ${G.watchDone}`); AU.tone(880, 1.4, .04); buzz([8, 30, 8]); } }
   const CAST = {t: -9, to: new THREE.Vector3()}, FLK = [{t: -9, from: new THREE.Vector3()}, {t: -9, from: new THREE.Vector3()}];
   function capture(s) { let film, fi, block, slot;
+    if (s.doodle) { if (s.budget <= 0) return; film = s.film; fi = s.key ?? 0; const r = addFrame(film, fi, 'doodle'); if (r === 'full') { say('your arms are full'); return; } s.budget = 0; s.caught = RT; const A = ARMS.find(a => a.film === film); A.frames = Array.from({length: Math.min(BLOCK, FILMS[film].n)}, (_, k) => ({fi: k})); loadList(A.block, film, A.frames.map(x => x.fi)); A.target = AN;   // the whole drawing lights up as one tentacle
+      CAST.t = RT; CAST.to.copy(s.pos); const fl = FLK[0].t < FLK[1].t ? FLK[0] : FLK[1]; fl.t = RT; fl.from.copy(s.pos); fl.block = A.block; fl.slot = 0; J.glow = 1; AU.tone(330 * Math.pow(2, (film % 12) / 12), 1.8, .05); buzz([8, 24, 8, 24, 14]);
+      const f = FILMS[film]; say(`${f.title} · drawn from ${f.film || 'the archive'}${f.year ? ' (' + f.year + ')' : ''} · ${f.d.keys[fi % f.n].why || ''}`.slice(0, 150)); G.doodles = (G.doodles || 0) + 1; return; }
     if (s.j !== undefined) { film = CHAIN.film; fi = CHAIN.from + s.j; block = CHAIN.blocks[s.j >> 3]; slot = s.j % 8; if (s.taken) return; }
     else { if (s.budget <= 0 || s.slot < 0) { say('nothing left to take here'); return; } film = s.film; slot = Math.floor(T * fps(FILMS[film])) % BLOCK; fi = s.from + slot; block = SP_BLOCK.get(s); }
     const r = addFrame(film, fi, s.j !== undefined ? 'slice' : s.pair >= 0 ? 'pair' : 'film'); if (r === 'dup') { say('already in that arm: wait for another moment'); return; } if (r === 'full') { say('your arms are full'); return; }
@@ -292,14 +362,15 @@ export async function play(L, ALL) {
   const lightR = () => L.dark ? THREE.MathUtils.lerp(12, 5, prog()) : 99;
   const prog = () => THREE.MathUtils.clamp(J.u / LEN, 0, 1);
   let T = 0, RT = 0, last = performance.now();
-  function frame(now) { requestAnimationFrame(frame); const real = Math.min(.05, (now - last) / 1000); last = now; RT += real; const ws = G.watch ? .12 : 1, dt = real * ws; T += dt;
+  function frame(now) { requestAnimationFrame(frame); const real = Math.max(0, Math.min(.05, (now - last) / 1000)); /* the first rAF stamp can precede setup */ last = now; RT += real; const ws = G.watch && !L.fluid ? .12 : 1, dt = real * ws; T += dt;
     const playing = G.state === 'play';
     // swimmer: hold the water and it swims toward your finger; let go and it drifts with the current
-    let tu = 0, tw = 0; const h = G.hold; if (playing && h && !h.film && !G.watch && !pinch && performance.now() - h.t0 > 120) { const p = screenToPlane(h.cx ?? h.x, h.cy ?? h.y); if (p) { const [pu, pw] = toUW(p); tu = pu - J.u; tw = pw - J.w; J.target = null; } }
-    if (playing && J.target) { const s = J.target, P = s.p || s.pos; if (!P || (s.j === undefined && s.slot < 0)) J.target = null; else { const [pu, pw] = toUW(P); tu = pu - J.u; tw = pw - J.w; if (Math.hypot(tu, tw) < (s.size || 1) * .5 + 2.2) { capture(s); J.target = null; } } }
+    let tu = 0, tw = 0; const h = G.hold, two = touches.size >= 2 && pinch ? [...touches.values()] : null; let boost = (keys.has('shift') || G.rmb) && h ? 1 : 0;
+    if (playing && two) { const p = screenToPlane((two[0].x + two[1].x) / 2, (two[0].y + two[1].y) / 2); if (p) { const [pu, pw] = toUW(p); tu = pu - J.u; tw = pw - J.w; J.target = null; boost = 1; } }   // two fingers: boost toward them if (playing && h && !h.film && !G.watch && !pinch && performance.now() - h.t0 > 120) { const p = screenToPlane(h.cx ?? h.x, h.cy ?? h.y); if (p) { const [pu, pw] = toUW(p); tu = pu - J.u; tw = pw - J.w; J.target = null; } }
+    if (playing && J.target) { const s = J.target, P = s.p || s.pos; if (!P || (s.j === undefined && s.slot < 0 && !s.doodle) || s.caught) J.target = null; else { const [pu, pw] = toUW(P); tu = pu - J.u; tw = pw - J.w; if (Math.hypot(tu, tw) < (s.size || 1) * .5 + 2.2) { capture(s); J.target = null; } } }
     const kx = (keys.has('arrowright') || keys.has('d')) - (keys.has('arrowleft') || keys.has('a')), ky = (keys.has('arrowup') || keys.has('w')) - (keys.has('arrowdown') || keys.has('s')); if (kx || ky) { const v = W(kx, ky, 0).sub(W(0, 0, 0)); tu = (DIR === 'right' ? kx : DIR === 'up' ? ky : -ky) * 6; tw = (DIR === 'right' ? ky : kx) * 6; }
     if (G.hold && G.hold.film && !G.watch && performance.now() - G.hold.t0 > 340 && G.hold.moved < 14) startWatch(G.hold.film);
-    const m = Math.hypot(tu, tw), sp = Math.min(6, m * 1.4), du = m > .3 ? tu / m * sp : 0, dw = m > .3 ? tw / m * sp : 0, slip = J.slip > 0 ? 4 : 0;
+    J.boost += (boost - J.boost) * Math.min(1, dt * 4); if (boost && !G.boostSaid) { G.boostSaid = 1; say('boost'); } const m = Math.hypot(tu, tw), sp = Math.min(6 + 5 * J.boost, m * 1.4 + 4 * J.boost), du = m > .3 ? tu / m * sp : 0, dw = m > .3 ? tw / m * sp : 0, slip = J.slip > 0 ? 4 : 0;
     const ph = J.ph % 1, thrust = ph < .28 ? Math.sin(ph / .28 * Math.PI) * .8 : 0;
     const ending = playing ? 1 : G.state === 'card' ? .12 : 0;
     const wantU = ending * (L.current + slip + du + thrust * (m > .3 ? 1 : .4)), wantW = ending * dw + .2 * Math.sin(T * .5);
@@ -308,38 +379,44 @@ export async function play(L, ALL) {
     if (Math.abs(J.w) > BAND) { J.w = Math.sign(J.w) * BAND; J.vw = 0; } if (tongue && Math.abs(J.w) < tongue + .6) { J.w = (J.w < 0 ? -1 : 1) * (tongue + .6); J.vw *= -.2; }
     if (J.u < 2) J.u = 2;
     const bpm = AU.bpm(), rate = bpm ? bpm / 60 / (bpm > 100 ? 2 : 1) : .8; J.ph += dt * rate; if (bpm) { const want = AU.phase() / (bpm > 100 ? 2 : 1); J.ph += (((want - J.ph % 1) % 1 + 1.5) % 1 - .5) * dt * 2; }   // the bell strokes on the beat
-    J.slip = Math.max(0, J.slip - dt); J.stun = Math.max(0, J.stun - dt); J.hurt = Math.max(0, J.hurt - dt); J.glow = Math.max(0, J.glow - dt * 1.4);
+    J.slip = Math.max(0, J.slip - dt); J.lightT = Math.max(0, J.lightT - dt); J.stun = Math.max(0, J.stun - dt); J.hurt = Math.max(0, J.hurt - dt); J.glow = Math.max(0, J.glow - dt * 1.4);
     const prev = J.p.clone(); W(J.u, J.w, 0, J.p); J.pv.copy(J.p).sub(prev).divideScalar(Math.max(dt, 1e-4)); jelly.position.copy(J.p);
     const head = _a.copy(J.pv).setLength(1); if (J.pv.lengthSq() > .01) { const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), head.lerp(new THREE.Vector3(0, 1, 0), .35).normalize()); jelly.quaternion.slerp(q, 1 - Math.pow(.05, dt)); }
     stepArms(Math.max(dt, 1e-4));
     // camera: trailing from the side, small jelly, look-ahead with the current; two fingers look around
-    const vis = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * Math.min(1, camera.aspect), d = THREE.MathUtils.clamp(2 * .92 * CS / (.12 * G.zoom * vis), 7, 26) * (G.state === 'end' ? 1.25 : 1);
-    const look = W(J.u + 3.5 + G.look[0], J.w * .75 + G.look[1], 0), camT = look.clone().add(new THREE.Vector3(0, DIR === 'right' ? 1.2 : 0, d)); camera.position.lerp(camT, 1 - Math.pow(.02, real)); camera.lookAt(look.x, look.y, 0); camera.updateMatrixWorld();
+    camera.fov += (50 + 12 * J.boost - camera.fov) * Math.min(1, real * 3); camera.updateProjectionMatrix(); const vis = 2 * Math.tan(THREE.MathUtils.degToRad(50 / 2)) * Math.min(1, camera.aspect), d = THREE.MathUtils.clamp(2 * .92 * CS / (.12 * G.zoom * vis), 7, 26) * (G.state === 'end' ? 1.25 : 1) * (1 + .15 * J.boost);
+    const look = W(J.u + 3.5 + J.vu * .45 + G.look[0], J.w * .75 + J.vw * .3 + G.look[1], 0), camT = look.clone().add(new THREE.Vector3(0, DIR === 'right' ? 1.2 : 0, d)); camera.position.lerp(camT, 1 - Math.pow(.004, real));   // the camera leads with your speed camera.lookAt(look.x, look.y, 0); camera.updateMatrixWorld();
     uR.value.setFromMatrixColumn(camera.matrixWorld, 0); uU.value.setFromMatrixColumn(camera.matrixWorld, 1); uF.value.setFromMatrixColumn(camera.matrixWorld, 2);
     // water colour toward the surface or the void
-    const k = L.surface ? sm(.55, 1, prog()) : 0; scene.fog.color.copy(FOG).lerp(TOP, k); { const hx = scene.fog.color.getHexString(); if (hx !== bgLast) { bgLast = hx; paintBG(scene.fog.color); } } scene.fog.density = L.fogD * (1 - .35 * k) * (L.dark ? 1 + 1.2 * prog() : 1);
+    const k = L.surface ? sm(.55, 1, prog()) : L.top ? prog() : 0; scene.fog.color.copy(FOG).lerp(TOP, k); if (L.hueWater) { const nr = SP.reduce((m, x) => !m || Math.abs(x.u - J.u) < Math.abs(m.u - J.u) ? x : m, null); if (nr) { G.hw = G.hw ?? nr.film; const hc = new THREE.Color().setHSL(FILMS[nr.film].hue / 360, .32, .14); scene.fog.color.lerp(hc, .85); } } { const hx = scene.fog.color.getHexString(); if (hx !== bgLast) { bgLast = hx; paintBG(scene.fog.color); } } scene.fog.density = L.fogD * (1 - .35 * k) * (L.dark ? 1 + 1.2 * prog() : 1);
     if (L.dark) { const sp2 = J.p.clone().project(camera); $('dark').style.opacity = .35 + .6 * prog(); $('dark').style.setProperty('--x', `${(sp2.x * .5 + .5) * 100}%`); $('dark').style.setProperty('--y', `${(-sp2.y * .5 + .5) * 100}%`); $('dark').style.setProperty('--r', `${Math.max(9, 34 - 24 * prog()) * (PULSE ? 1.8 : 1)}vmin`); }
     // films: activate near the swimmer, release behind it
-    for (const s of SP) { const near = s.u > J.u - 22 && s.u < J.u + 70; if (near && s.slot < 0 && rowsFree.length) { const b = s.bad ? -1 : take(); if (s.bad || b >= 0) { s.slot = rowsFree.shift(); s.born = T; s.pos = s.pos || new THREE.Vector3(); if (b >= 0) { SP_BLOCK.set(s, b); loadClip(b, s.film, s.from); } } }
+    for (const s of SP) { if (s.doodle) continue; const near = s.u > J.u - 22 && s.u < J.u + 70; if (near && s.slot < 0 && rowsFree.length) { const b = s.bad ? -1 : take(); if (s.bad || b >= 0) { s.slot = rowsFree.shift(); s.born = T; s.pos = s.pos || new THREE.Vector3(); if (b >= 0) { SP_BLOCK.set(s, b); loadClip(b, s.film, s.from); } } }
       else if (!near && s.slot >= 0) { hide(FROW + s.slot); rowsFree.push(s.slot); s.slot = -1; give(SP_BLOCK.get(s)); SP_BLOCK.delete(s); } }
-    for (const s of SP) { if (s.slot < 0) continue; const r = FROW + s.slot; let u = s.u, w = s.w;
+    let LIT = null;
+    for (const s of SP) { if (s.slot < 0 || s.doodle) continue; const r = FROW + s.slot; let u = s.u, w = s.w;
       if (s.ring !== false) { const a = s.ring / 8 * 6.283 + T * .35; u += Math.sin(a) * 4; w += Math.cos(a) * 6.5; }
       if (s.buried && s.up) w += Math.min(1.6, (RT - s.lit) * 1.2);
       W(u + Math.sin(T * .3 + s.i) * .2, w + Math.cos(T * .25 + s.i) * .2, s.z, s.pos);
       const dist = Math.hypot(u - J.u, w - J.w), res = THREE.MathUtils.clamp(1 - (dist - 3) / 14, 0, 1), watching = G.watch && G.watch.s === s ? 1 : 0;
       if (s.sleep && !s.awake && dist < 4.2 && Math.abs(s.z) < 9) { s.awake = true; G.wake++; AU.tone(520 + G.wake * 20, 1, .03); buzz(6); }
       const shown = visible(s) ? 1 : (s.buried ? .35 + .15 * Math.sin(T * 2 + s.i) : s.dark ? .06 : 0), sleepy = s.sleep && !s.awake ? .35 : 1, fade = Math.min(1, (T - s.born) / 1.5);
+      if (L.fluid && playing && !s.bad && s.budget > 0 && res > .55 && dist < s.size * .45 + 1.1 && Math.abs(s.z) < 1 && RT - (s.lastCap ?? -9) > 2.2 && !G.watch) { s.lastCap = RT; capture(s); }   // fluid: swim through it to take the frame
       if (s.bad && playing && dist < s.size * .6 + .6 && Math.abs(s.z) < 1) { J.mem = Math.max(0, J.mem - 10); J.hurt = 1; flash(); say('red interference: your membrane tears; nothing is lost'); buzz([20, 20, 40]); G.burst = RT; s.bad = false; s.budget = 0; s.gone = true; }
       if (s.gone) { hide(r); continue; }
-      row(r, 0, s.pos.x, s.pos.y, s.pos.z, s.size * (1 + .08 * res)); row(r, 1, s.bad ? -1 : SP_BLOCK.get(s), 1.35, s.sleep && !s.awake ? 0 : T * fps(FILMS[s.film]), (s.bad ? .9 : 1.15) * shown * sleepy * fade * (s.giant ? 1.2 : 1));
-      row(r, 2, 0, s.bad ? .6 : .7, s.bad ? 1 : 0, 0); row(r, 3, 0, 0, 0, s.awake ? .4 : 0); row(r, 4, s.bad ? 0 : .7 + .6 * res + (s.giant ? .5 : 0), 1.8, 0, s.bad ? 0 : (1 - res) * .9); }
+      const lightR = J.lightT > 0 ? 9 : 4.5, clear = s.bad ? 0 : Math.max(s.lit > RT - 6 ? Math.min(1, (6 - (RT - s.lit)) / 2) : 0, Math.max(0, 1 - dist / lightR) * .85); s.clear = clear; if (clear > .35 && visible(s) && (!LIT || clear - dist * .02 > LIT.clear - LIT.d * .02)) { LIT = s; LIT.d = dist; }   // light shines on a cloud and it becomes readable video
+      row(r, 0, s.pos.x, s.pos.y, s.pos.z, s.size * (1 + .08 * res + .28 * clear)); row(r, 1, s.bad ? -1 : SP_BLOCK.get(s), 1.35, s.sleep && !s.awake ? 0 : T * fps(FILMS[s.film]), (s.bad ? .9 : 1.15) * shown * sleepy * fade * (s.giant ? 1.2 : 1) * (1 + .5 * clear));
+      row(r, 2, 0, s.bad ? .6 : .7 * (1 - .7 * clear), s.bad ? 1 : 0, 0); row(r, 3, 0, 0, 0, s.awake ? .4 : 0); row(r, 4, s.bad ? 0 : .7 + .6 * res + (s.giant ? .5 : 0) + .7 * clear, 1.8 - .75 * clear, 0, s.bad ? 0 : (1 - res) * .9 * (1 - clear)); }
     // the chain: one film laid out as slices in time
     for (const b of CHAIN.beads) { const r = CHROW + b.j; if (b.taken || Math.abs(b.u - J.u) > 45) { hide(r); continue; } W(b.u, b.w + Math.sin(T * .8 + b.j * .4) * .25, 0, b.p); const nxt = b.j === CHAIN.next;
       row(r, 0, b.p.x, b.p.y, b.p.z, .95); row(r, 1, CHAIN.blocks[b.j >> 3], 1.35, b.j % 8, nxt ? 1.5 : .9); row(r, 2, 0, .4, 0, 0); row(r, 3, 0, 0, 0, nxt ? .5 : 0); row(r, 4, .6, 1.6, 0, .1); }
     // watching: hold on a film and it blooms, large and clear, while the water nearly stops
     if (G.watch) { const s = G.watch.s, F = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 2).negate(), p = camera.position.clone().addScaledVector(F, 5), u = Math.min(1, (RT - G.watch.t0) / .5), src = s.p || s.pos, at = src.clone().lerp(p, u * u * (3 - 2 * u));
-      const blk = s.j !== undefined ? CHAIN.blocks[s.j >> 3] : SP_BLOCK.get(s), fr = s.j !== undefined ? s.j % 8 : (RT - G.watch.t0) * fps(FILMS[s.film]) % BLOCK;
+      const blk = G.watch.blk ?? (s.j !== undefined ? CHAIN.blocks[s.j >> 3] : SP_BLOCK.get(s)), fr = s.j !== undefined ? s.j % 8 : (RT - G.watch.t0) * fps(FILMS[s.film]) % BLOCK;
       row(VROW, 0, at.x, at.y, at.z, (s.size * .4) + 2.1 * u); row(VROW, 1, blk, 1.4, fr, 1.75 * u + .3); row(VROW, 2, 0, .45, 0, 0); row(VROW, 3, 0, 0, 0, .25); row(VROW, 4, 1.6, 1.1, 0, 0); }
+    else if (G.state !== 'end' && LIT && SP_BLOCK.get(LIT) >= 0) { const s = LIT, c = s.clear;   // the lit film takes the fine cloud: 48,000 flecks, enough to read the footage
+      row(VROW, 0, s.pos.x, s.pos.y, s.pos.z + .05, s.size * (1.15 + .25 * c)); row(VROW, 1, SP_BLOCK.get(s), 1.4, T * fps(FILMS[s.film]), .85 * c); row(VROW, 2, 0, .25, 0, 0); row(VROW, 3, 0, 0, 0, .15); row(VROW, 4, 1.5, 1.15, 0, 0);
+      row(FROW + s.slot, 1, SP_BLOCK.get(s), 1.35, T * fps(FILMS[s.film]), 1.15 * (1 - .8 * c)); }
     else if (G.state !== 'end') hide(VROW);
     // casting, flecks travelling into the bell, the interference burst
     { const ct = RT - CAST.t, kk = ct < .25 ? ct / .25 : ct < .45 ? 1 : Math.max(0, 1 - (ct - .45) / .3); for (let j = 0; j < NCAST; j++) { const r = CROW + j; if (kk <= 0) { hide(r); continue; } _a.copy(J.p).lerp(CAST.to, (j + 1) / NCAST * kk); row(r, 0, _a.x, _a.y, _a.z, .12); row(r, 1, -1, 1, 0, .9); row(r, 4, 0, 0, 0, 0); } }
@@ -350,10 +427,11 @@ export async function play(L, ALL) {
       row(r, 0, AX[i], AX[i + 1], AX[i + 2], (.22 - .08 * f) * CS); row(r, 1, A.block, 1.1, Math.max(0, Math.min(nf - 1, Math.floor(f * nf))), .85); row(r, 2, 0, .3, 0, 0); row(r, 3, 0, 0, 0, .55); row(r, 4, .25, 0, 0, 0); }
     const lastA = ARMS.length ? ARMS.find(a => a.film === CUT[CUT.length - 1].film) : null; if (lastA) { row(COREROW, 0, J.p.x, J.p.y + .1, J.p.z, .3 * CS); row(COREROW, 1, lastA.block, 1.2, Math.floor(T * 3) % Math.min(BLOCK, lastA.frames.length), .8); row(COREROW, 3, 0, 0, 0, .7); row(COREROW, 4, .5, 1.4, 0, 0); } else hide(COREROW);
     // creatures
-    if (fishPts) { school.u += dt * (L.current * 1.1); if (school.u < J.u - 20 || school.u > J.u + 90) { school.u = J.u + 40; FISH.forEach(f => f.init = false); } school.w = Math.sin(T * .2) * BAND * .5; const c0 = W(school.u, school.w, -2);
-      const a = fishPts.geometry.attributes.position.array, kk = fishPts.geometry.attributes.aK.array; FISH.forEach((f, i) => { const tgt = c0.clone().add(new THREE.Vector3(Math.cos(f.o[0] + T * .5) * 2.5, Math.sin(f.o[1] + T * .4) * 1.6, Math.sin(f.o[0] * 2) * 2)); if (!f.init) { f.p.copy(tgt); f.init = true; }
-        f.v.addScaledVector(tgt.sub(f.p), dt * 1.8); const dd = f.p.distanceTo(J.p); if (dd < 4) f.v.addScaledVector(_a.copy(f.p).sub(J.p).normalize(), dt * 30 * (1 - dd / 4)); f.v.multiplyScalar(Math.pow(.3, dt)); f.p.addScaledVector(f.v, dt); _b.copy(f.v).normalize();
-        for (let q = 0; q < 3; q++) { a.set([f.p.x - _b.x * q * .16, f.p.y - _b.y * q * .16, f.p.z - _b.z * q * .16], (i * 3 + q) * 3); kk[i * 3 + q] = q; } }); fishPts.geometry.attributes.position.needsUpdate = true; fishPts.geometry.attributes.aK.needsUpdate = true; }
+    if (fishPts) { school.u += dt * (L.current * 1.1); if (school.u < J.u - 20 || school.u > J.u + 90) { school.u = J.u + 40; FISH.forEach(f => f.init = false); } school.w += ((J.w * .6 + Math.sin(T * .2) * BAND * .35) - school.w) * Math.min(1, dt * .5); const c0 = W(school.u, school.w, 0);
+      const a = fishPts.geometry.attributes.position.array, kk = fishPts.geometry.attributes.aK.array, ca = fishPts.geometry.attributes.aCol.array; FISH.forEach((f, i) => { const tgt = c0.clone().add(new THREE.Vector3(Math.cos(f.o[0] + T * .5) * 2.5, Math.sin(f.o[1] + T * .4) * 1.6, Math.sin(f.o[0] * 2) * 2)); if (!f.init) { f.p.copy(tgt); f.init = true; }
+        f.v.addScaledVector(tgt.sub(f.p), dt * 1.8); const dd = f.p.distanceTo(J.p); if (dd < 2.2) f.v.addScaledVector(_a.copy(f.p).sub(J.p).normalize(), dt * 14 * (1 - dd / 2.2));
+        if (dd < 6) for (let kA = 0; kA < ARMS.length; kA++) { const n = Math.round(ARMS[kA].n); for (let j = 2; j < n; j += 2) { const q = (kA * AN + j) * 3; if (Math.abs(AX[q] - f.p.x) < .75 && Math.abs(AX[q + 1] - f.p.y) < .75 && Math.abs(AX[q + 2] - f.p.z) < 1.2) { const c = FILMS[ARMS[kA].film].col; if (!f.dyed || !f.col.equals(c)) { if (!f.dyed) { G.colored++; if (G.colored % 10 === 0) say(`${G.colored} fish wear your films' colours`); } f.dyed = true; f.col.copy(c); buzz(3); } } } }   // a film tentacle dyes the fish it touches f.v.multiplyScalar(Math.pow(.3, dt)); f.p.addScaledVector(f.v, dt); _b.copy(f.v).normalize();
+        const br = f.dyed ? 1.1 : .9; for (let q = 0; q < 3; q++) { a.set([f.p.x - _b.x * q * .16, f.p.y - _b.y * q * .16, f.p.z - _b.z * q * .16], (i * 3 + q) * 3); kk[i * 3 + q] = q; ca.set([f.col.r * br, f.col.g * br, f.col.b * br], (i * 3 + q) * 3); } }); fishPts.geometry.attributes.position.needsUpdate = true; fishPts.geometry.attributes.aK.needsUpdate = true; fishPts.geometry.attributes.aCol.needsUpdate = true; }
     if (combPts) { const a = combPts.geometry.attributes.position.array; COMB.forEach((c, ci) => { c.t += dt; c.u += dt * L.current * .85; if (c.u < J.u - 25) c.u += 110; W(c.u + Math.sin(c.t * .3) * 1.5, c.w + Math.sin(c.t * .21) * 1, c.z, c.p); combLocal.forEach((l, i) => a.set([c.p.x + l[0], c.p.y + l[1], c.p.z + l[2]], (ci * 200 + i) * 3));
         if (playing && c.p.distanceTo(J.p) < 1.6 && !c.used) { c.used = true; J.glow = 1; say('a comb jelly: your reach grows'); AU.tone(2400, 1, .03); } }); combPts.geometry.attributes.position.needsUpdate = true; }
     if (shrPts) { const a = shrPts.geometry.attributes.position.array; SHR.forEach((s, i) => { const home = W(s.home + Math.sin(s.o[0] + T * .2) * 3, -BAND + 1.2 + Math.sin(s.o[1] + T * .3) * 1, -1); if (!s.init) { s.p.copy(home); s.init = true; }
@@ -362,7 +440,7 @@ export async function play(L, ALL) {
     if (RAY) { RAY.u += dt * (L.current * 1.25); if (RAY.u < J.u - 25 || RAY.u > J.u + 60) RAY.u = J.u + 45; RAY.w = BAND * .45 + Math.sin(T * .17) * BAND * .3; const prevR = RAY.p.clone(); W(RAY.u, RAY.w, -.5, RAY.p); RAY.v.copy(RAY.p).sub(prevR).divideScalar(Math.max(dt, 1e-4));
       RAY.m.position.copy(RAY.p); RAY.m.lookAt(_a.copy(RAY.p).add(RAY.v)); RAY.m.rotateZ(Math.PI / 2 * 0); RAY.m.material.uniforms.uTime.value = T; PUSH.push({p: RAY.p.clone(), r: 5, k: 3, vx: RAY.v.x * .5, vy: RAY.v.y * .5});
       if (playing && RAY.p.distanceTo(J.p) < 6 && J.u < RAY.u) { if (J.slip <= 0) { say('slipstream: the ray carries you'); buzz(10); } J.slip = 1.2; } }
-    if (ANG) stepAngler(dt);
+    if (ANG) stepAngler(dt); stepDoodles(dt); stepSpecks(dt); stepReticle();
     // snow
     { const cx = camera.position.x, cy = camera.position.y, cur = W(L.current, 0, 0).sub(W(0, 0, 0)).multiplyScalar(.6);
       for (let i = 0; i < NSN; i++) { const p = sn[i]; for (const u of PUSH) { const dx = cx + p.x - u.p.x, dy = cy + p.y - u.p.y, dz = p.z - u.p.z, d2 = dx * dx + dy * dy + dz * dz; if (d2 < u.r * u.r) { const dd = Math.sqrt(d2) + .01, kk = (1 - dd / u.r) * u.k * dt; p.vx += (dx / dd + (u.vx || 0)) * kk; p.vy += (dy / dd + (u.vy || 0)) * kk; } }
@@ -375,13 +453,13 @@ export async function play(L, ALL) {
     // pulse ring
     if (PULSE) { const u = (RT - PULSE.t0) / 1.2; if (u > 1) { PULSE = null; pulseMat.uniforms.uA.value = 0; } else { pulseMat.uniforms.uR.value = PULSE.R * u; pulseMat.uniforms.uA.value = (1 - u) * (PULSE.on ? .9 : .5); pulseMat.uniforms.uC.value.copy(PULSE.c); } }
     // goal, end
-    if (playing) { $('goal').textContent = `${L.goal.label} · ${goalN()} / ${L.goal.n}${J.mem < 100 ? ` · membrane ${Math.round(J.mem)}%` : ''}`; if (J.u >= LEN || J.mem <= 0) arrive(); }
+    if (playing) { const era = L.pick?.by === 'decade' ? (SP.reduce((m, x) => !m || Math.abs(x.u - J.u) < Math.abs(m.u - J.u) ? x : m, null)) : null; $('goal').textContent = `${era ? (FILMS[era.film].dec || '') + 's · ' : ''}${L.goal.label} · ${goalN()} / ${L.goal.n}${J.mem < 100 ? ` · membrane ${Math.round(J.mem)}%` : ''}`; if (J.u >= LEN || J.mem <= 0) arrive(); }
     if (G.state === 'end') reelStep();
     // uniforms
     const ps = innerHeight * renderer.getPixelRatio(), us = ps * .5 / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
     splat.uniforms.uTime.value = T; splat.uniforms.uScale.value = us; splat.uniforms.uJ.value.copy(J.p); splat.uniforms.uJv.value.copy(J.pv).multiplyScalar(.15); splat.uniforms.uBeat.value = 1 - AU.phase();
     snM.uniforms.uScale.value = us; snM.uniforms.uHigh.value = AU.high(); pulseMat.uniforms.uScale.value = us; if (surfMat) { surfMat.uniforms.uScale.value = us; surfMat.uniforms.uTime.value = T; }
-    for (const m of [fishPts, combPts, shrPts, RAY && RAY.m, ANG && ANG.mb, ANG && ANG.mg, ANG && ANG.lure]) if (m) { m.material.uniforms.uScale.value = us; if (m.material.uniforms.uTime) m.material.uniforms.uTime.value = T; }
+    for (const m of [fishPts, dlPts, spkPts, combPts, shrPts, RAY && RAY.m, ANG && ANG.mb, ANG && ANG.mg, ANG && ANG.lure]) if (m) { m.material.uniforms.uScale.value = us; if (m.material.uniforms.uTime) m.material.uniforms.uTime.value = T; }
     const bu = bellM.uniforms; bu.uPulse.value = J.ph; bu.uTime.value = T; bu.uGlow.value = J.glow + (1 - AU.phase()) * .15; bu.uHurt.value = J.hurt; bu.uFray.value = 1 - J.mem / 100; bu.uScale.value = ps * .0095;
     AU.speed(Math.hypot(J.vu, J.vw)); params.needsUpdate = true;
     if (RT - (G.sayT ?? -9) > 3.2) $('say').style.opacity = 0;
@@ -399,7 +477,7 @@ export async function play(L, ALL) {
     PUSH.push({p: A.pos.clone(), r: 4.5, k: 4}); A.grp.position.copy(A.pos); A.grp.lookAt(_b.copy(A.pos).add(A.dir)); A.grp.updateMatrixWorld(); A.mb.material.uniforms.uReveal.value = A.mg.material.uniforms.uReveal.value = A.reveal;
     const lp = A.grp.localToWorld(new THREE.Vector3(0, 1.7, 3.1)); A.lure.geometry.attributes.position.array.set([lp.x, lp.y, lp.z]); A.lure.geometry.attributes.aK.array[0] = A.pulse * (A.st === 'patrol' ? .35 : 1); A.lure.geometry.attributes.position.needsUpdate = true; A.lure.geometry.attributes.aK.needsUpdate = true;
     if (A.u < J.u - 40) A.u += LEN * .35; }
-  function goalN() { const g = L.goal.type; return g === 'wake' ? G.wake : g === 'pairs' ? G.pairsDone : g === 'watch' ? G.watchDone : g === 'halo' ? G.halo : g === 'order' ? G.orderN : g === 'unearth' ? G.unearth : CUT.length; }
+  function goalN() { const g = L.goal.type; if (g === 'color') return G.colored; if (g === 'doodles') return G.doodles || 0; if (g === 'specks') return G.specks || 0; if (g === 'decades') return new Set(CUT.map(c => FILMS[c.film].dec).filter(Boolean)).size; if (g === 'hues') return new Set(CUT.map(c => Math.floor(FILMS[c.film].hue / 45))).size; return g === 'wake' ? G.wake : g === 'pairs' ? G.pairsDone : g === 'watch' ? G.watchDone : g === 'halo' ? G.halo : g === 'order' ? G.orderN : g === 'unearth' ? G.unearth : CUT.length; }
   // ------------------------------------------------ the end: the reel plays behind the account; tap to swim again, swipe for the next drift
   const REEL = {i: 0, t0: 0, b: 0};
   function arrive() { G.state = 'end'; G.endT = performance.now(); endWatch(); AU.focus(1); buzz([30, 60, 30]); const met = goalN() >= L.goal.n, secs = Math.round(RT - G.t0);
@@ -415,6 +493,6 @@ export async function play(L, ALL) {
     const F = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 2).negate(), R = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0), p = camera.position.clone().addScaledVector(F, 6).addScaledVector(R, innerWidth > innerHeight ? 2.2 : 0);
     row(VROW, 0, p.x, p.y, p.z, 2.1); row(VROW, 1, VB(REEL.i), 1.4, (RT - REEL.t0) * fps(FILMS[it.film]) % BLOCK, 1.5); row(VROW, 2, 0, .45, 0, 0); row(VROW, 3, 0, 0, 0, .25); row(VROW, 4, 1.6, 1.1, 0, 0); }
   window.__drift = () => ({state: G.state, u: J.u, w: J.w, len: LEN, goal: goalN(), n: L.goal.n, cut: CUT.length, films: ARMS.length, mem: J.mem, watch: !!G.watch, angler: ANG && ANG.st, spots: SP.length, active: SP.filter(s => s.slot >= 0).length});
-  if (DEBUG) window.__dd = {J, G, SP, CHAIN, ARMS, CUT, camera, filmAt, capture, startWatch, endWatch, pulse, THREE, visible};
+  if (DEBUG) window.__dd = {FILMS, dlSample, J, G, SP, CHAIN, ARMS, CUT, camera, filmAt, capture, startWatch, endWatch, pulse, THREE, visible};
   requestAnimationFrame(frame);
 }

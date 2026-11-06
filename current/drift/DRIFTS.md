@@ -75,3 +75,33 @@ Headless Chromium, software GL, five films served locally; music streams are blo
 - how each drift feels to play.
 
 These are betas: each one tests one translated rule.
+
+## The archive levels (real data, fluid play)
+Built from the source repositories, not from screenshots:
+- **`data/doodles.json`:** all 86 traced subjects of [secondhand-motion](https://hartswf0.github.io/secondhand-motion/), 1,777 drawn keys from `shots/*/drawn/k*.json`. Each key keeps its strokes (simplified), the note on why it was drawn, the source film and the year.
+- **`data/cineosis.json`:** from [cineosis-lab](https://hartswf0.github.io/cineosis-lab/periodic-table.html) `lab/lab-data.json` and `cineosis-table.json`. It holds the 45 signs and 809 shots:
+  - all 410 signed shots, each with an 8-frame strip;
+  - up to 26 per decade from the 1900s to the 2020s;
+  - an even spread across hues.
+
+  Each shot has its title, year, palette, hue, subject and sign note.
+
+Rules in these levels:
+- **The water never stops.** Swim through a film while its reticle ring is closed to take its frame. Tapping still works for films set back in depth.
+- **Light makes a film clear.** A pulse (double-tap), a speck of light, or the jelly's own light sharpens nearby clouds. The nearest lit one takes the 48,000-fleck cloud and shows its footage in place.
+- **Doodles are crisp line-worms.** They are drawn from the real strokes and cycle through their keys. Catch one and its whole drawing lights up as a tentacle.
+- **Tentacles dye fish.** A fish touched by a film tentacle takes that film's colour (the shot's palette, or the doodle's hue).
+- **Specks of light.** Most give eight seconds of clear sight. One in four is an anglerfish's lure, and the angler comes out of the dark behind it.
+- **Boost.** Two fingers steer toward their midpoint at speed (pinch still zooms). On desktop, hold Shift or the right mouse button. The camera leads with your velocity and widens when you boost.
+
+| level | organised by |
+|---|---|
+| Secondhand Doodles | doodles only; goal: dye 40 fish |
+| Menagerie | all 86 doodles as roaming creatures (curious or shy) |
+| Strata | time: the oldest footage at the bottom, the newest at the top; the water warms from silver to colour |
+| Spectrum | colour: the archive sorted by hue, and the water takes the colour of the films around it |
+| People, Machines, Landscapes, Animals, Screens, Crowds | subject |
+| 16 type levels | one cineosis image type each (Perception, Affection, Impulse, … Lectosign) |
+| 45 sign levels | one sign each, laid out as the periodic table; the sign's question is the goal |
+
+The main screen shows only the start, six episodes (Doodles, Menagerie, Strata, Spectrum, Ray Run, The Long Descent) and the periodic table. Everything else is under "More drifts". Every page carries the jelly favicon.
