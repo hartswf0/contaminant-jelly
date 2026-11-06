@@ -4,42 +4,40 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>The Current</title>
-<meta name="description" content="A golden energy creature swims the fog-choked sewers of internet video, saving clips from the depths onto its tentacles and avoiding corrupted ones.">
+<meta name="description" content="A golden jellyfish of light swims a fog-choked tunnel where old films drift as clouds of light. It drinks them into its tentacles, which become time worms; you watch them bloom in the dark.">
 <style>
-:root{--ink:#f2e6cf;--gold:#ffc46a;--red:#ff3a24;--dim:rgba(214,190,150,.75)}
-*{box-sizing:border-box}html,body{margin:0;height:100%;background:#02060a;color:var(--ink);overflow:hidden;touch-action:none;overscroll-behavior:none;font-family:system-ui,"Helvetica Neue",Arial,sans-serif;-webkit-user-select:none;user-select:none}
+:root{--ink:#eef2ee;--gold:#ffc46a;--dim:rgba(200,214,206,.7)}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:#0c1312;color:var(--ink);overflow:hidden;touch-action:none;overscroll-behavior:none;font-family:system-ui,"Helvetica Neue",Arial,sans-serif;-webkit-user-select:none;user-select:none}
 #gl{position:fixed;inset:0;width:100%;height:100%;display:block}
-.ui{position:fixed;pointer-events:none;transition:opacity .6s}
+.ui{position:fixed;pointer-events:none;transition:opacity .7s}
 #state{top:max(10px,env(safe-area-inset-top));right:14px;font:italic 14px Georgia,serif;color:var(--dim);text-shadow:0 0 6px #000;opacity:.4}
 #say{left:0;right:0;bottom:max(16px,env(safe-area-inset-bottom));text-align:center;font:italic clamp(15px,2vw,20px) Georgia,serif;text-shadow:0 0 8px #000,0 0 2px #000;opacity:0}
-#edit{top:max(10px,env(safe-area-inset-top));left:14px;pointer-events:auto;opacity:0}
-#edit button{font:600 13px system-ui;letter-spacing:.05em;color:var(--ink);background:rgba(4,8,12,.6);border:1px solid rgba(255,196,106,.5);border-radius:999px;padding:9px 14px;min-height:40px;margin-right:6px;cursor:pointer}
-#title{inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 8vw;background:radial-gradient(ellipse at 65% 50%,rgba(2,6,10,0),rgba(2,6,10,.88) 70%);pointer-events:auto}
+#act{top:max(10px,env(safe-area-inset-top));left:14px;pointer-events:auto;opacity:0}
+#act button{font:600 13px system-ui;letter-spacing:.05em;color:var(--ink);background:rgba(6,10,10,.55);border:1px solid rgba(255,196,106,.45);border-radius:999px;padding:9px 14px;min-height:40px;margin-right:6px;cursor:pointer}
+#title{inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 8vw;background:radial-gradient(ellipse at 65% 55%,rgba(12,19,18,0),rgba(6,10,10,.86) 72%);pointer-events:auto}
 #title h1{margin:0;font-weight:900;letter-spacing:.22em;font-size:clamp(26px,5vw,54px);line-height:1}#title h1 i{display:block;font-family:Georgia,serif;letter-spacing:0;color:var(--gold);font-size:1.9em}
-#title p{margin:16px 0 0;max-width:520px;font-size:clamp(15px,1.9vw,19px);line-height:1.5;color:#ecd8b4}
+#title p{margin:16px 0 0;max-width:520px;font-size:clamp(15px,1.9vw,19px);line-height:1.5;color:#dfe6e0}
 #title button{align-self:flex-start;margin-top:20px;font:600 15px system-ui;letter-spacing:.06em;color:#1a1208;background:var(--gold);border:0;border-radius:999px;padding:13px 24px;min-height:48px;cursor:pointer}
 #title small{margin-top:14px;max-width:520px;color:var(--dim);font:italic 13px Georgia,serif}#title a{color:var(--gold)}
-#reel{position:fixed;inset:0;display:none;background:#000}#reel canvas{width:100%;height:100%;display:block}
 #dbg{left:10px;bottom:10px;font:12px ui-monospace,monospace;color:#9ccfa4;white-space:pre;display:none;text-shadow:0 0 4px #000}
-#flash{inset:0;background:radial-gradient(ellipse,rgba(255,40,20,0),rgba(255,40,20,.45));opacity:0;transition:opacity .25s}
+#flash{inset:0;background:radial-gradient(ellipse,rgba(255,40,20,0),rgba(255,40,20,.4));opacity:0;transition:opacity .25s}
 @media (max-height:520px){#title h1{font-size:22px}#title p{font-size:14px;margin-top:10px}#title small{display:none}}
 </style>
 <script type="importmap">{"imports":{"three":"../paeleo/scion/videotext/vendor/three.module.min.js","three/addons/":"../paeleo/scion/videotext/vendor/addons/"}}</script>
 </head>
 <body>
-<canvas id="gl" aria-label="A golden creature of light swimming down a foggy tunnel lined with old film"></canvas>
+<canvas id="gl" aria-label="A golden jellyfish of light in a foggy tunnel where old films drift as glowing clouds"></canvas>
 <div class="ui" id="flash"></div>
 <div class="ui" id="state"></div>
 <div class="ui" id="say"></div>
-<div class="ui" id="edit"><button id="play">Play your reel</button><button id="save">Save reel</button></div>
+<div class="ui" id="act"><button id="watch">Watch</button><button id="save">Save reel</button></div>
 <div class="ui" id="dbg"></div>
 <div class="ui" id="title">
   <h1>THE<i>current</i></h1>
-  <p>Down in the sewers of internet video, the clips still play. You are a creature of light. Point where you want to swim; tap to dash. Touch a clip to save it: it threads onto one of your tentacles and keeps playing there.</p>
+  <p>In the drowned tunnels of old video, films drift as clouds of light. You are a jellyfish of light. Point where you want to swim; tap to dash. Swim into a cloud and it pours into you: your tentacles become time worms, carrying its moving pictures.</p>
   <button id="go">Dive</button>
-  <small>The red static is corrupted video. Touch it and it eats your newest clip. The clips come from the second-hand archive's 109 films. <a href="NOTES.md">How it works</a> · <a href="v2.html">v2</a> · <a href="v1.html">v1</a> · <a href="../">Contaminant Jelly</a></small>
+  <small>Red clouds are corrupted; they drain a worm. Press Watch to let what you carry bloom in the dark. The films come from the second-hand archive's 109. <a href="NOTES.md">How it works</a> · <a href="v3.html">v3</a> · <a href="../">Contaminant Jelly</a></small>
 </div>
-<div id="reel"><canvas id="rc"></canvas></div>
 <script type="module">
 import * as THREE from 'three';
 import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
@@ -55,111 +53,109 @@ const IMG = new Map();
 function img(url) { let e = IMG.get(url); if (e) return e; const im = new Image(); im.crossOrigin = 'anonymous'; e = {im, ok: false, cbs: []};
   im.onload = () => { e.ok = true; e.cbs.forEach(f => f(im)); e.cbs = []; }; im.onerror = () => { e.bad = true; }; im.src = url; IMG.set(url, e); if (IMG.size > 900) IMG.delete(IMG.keys().next().value); return e; }
 function withImg(url, fn) { const e = img(url); if (e.ok) fn(e.im); else if (!e.bad) e.cbs.push(fn); }
-const hash = (a, b) => ((a * 73856093) ^ (b * 19349663)) >>> 0;
-// ------------------------------------------------------------------ renderer: fog that swallows, glow that bleeds through it
-const renderer = new THREE.WebGLRenderer({canvas: $('gl'), antialias: true, powerPreference: 'high-performance'});
-renderer.setPixelRatio(Math.min(COARSE ? 1.25 : 1.75, devicePixelRatio || 1)); renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = .9;
-const FOG = new THREE.Color(0x010508), scene = new THREE.Scene(); scene.background = FOG.clone(); scene.fog = new THREE.FogExp2(FOG, .085);
-const camera = new THREE.PerspectiveCamera(62, 1, .05, 140);
+// ------------------------------------------------------------------ renderer: a teal dark that swallows, light that bleeds through it
+const renderer = new THREE.WebGLRenderer({canvas: $('gl'), antialias: false, powerPreference: 'high-performance'});
+renderer.setPixelRatio(Math.min(COARSE ? 1.25 : 1.6, devicePixelRatio || 1)); renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = .95;
+const FOG = new THREE.Color(0x0c1514), scene = new THREE.Scene(); scene.background = FOG.clone(); scene.fog = new THREE.FogExp2(FOG, .06);
+const camera = new THREE.PerspectiveCamera(60, 1, .05, 120);
 const composer = new EffectComposer(renderer); composer.addPass(new RenderPass(scene, camera));
-const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), .85, .6, .5); composer.addPass(bloom); composer.addPass(new OutputPass());
-function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); composer.setSize(w, h); bloom.setSize(w * .5, h * .5); camera.aspect = w / h; camera.updateProjectionMatrix(); $('rc').width = w; $('rc').height = h; }
+const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), .75, .6, .72); composer.addPass(bloom); composer.addPass(new OutputPass());
+function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); composer.setSize(w, h); bloom.setSize(w * .5, h * .5); camera.aspect = w / h; camera.updateProjectionMatrix(); }
 addEventListener('resize', resize); resize();
-// ------------------------------------------------------------------ the sewer: a long winding pipe; its centreline gives every frame of reference
-const R = 5.2, path = s => new THREE.Vector3(6 * Math.sin(s * .035) + 2.5 * Math.sin(s * .011 + 1), 3.5 * Math.sin(s * .027 + .5) + 1.5 * Math.sin(s * .063), -s);
+// ------------------------------------------------------------------ the tunnel: you never see its walls, only its fog and the faint seams of the old pipe
+const R = 6, path = s => new THREE.Vector3(6 * Math.sin(s * .03) + 2.5 * Math.sin(s * .011 + 1), 3.5 * Math.sin(s * .023 + .5) + 1.5 * Math.sin(s * .057), -s);
 const tangent = s => path(s + .4).sub(path(s - .4)).normalize();
 function frameAt(s) { const T = tangent(s), N = new THREE.Vector3(0, 1, 0).addScaledVector(T, -T.y).normalize(), B = new THREE.Vector3().crossVectors(T, N); return {T, N, B, C: path(s)}; }
 const LEN = 3000; class PC extends THREE.Curve { getPoint(u, o = new THREE.Vector3()) { return o.copy(path(u * LEN)); } }
-const pipeMat = new THREE.ShaderMaterial({side: THREE.BackSide, fog: true, uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, {uTime: {value: 0}}]),
+const pipeMat = new THREE.ShaderMaterial({side: THREE.BackSide, fog: true, uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog]),
   vertexShader: `varying vec2 vUv; #include <fog_pars_vertex>
     void main(){ vUv = uv; vec4 mvPosition = modelViewMatrix * vec4(position, 1.); gl_Position = projectionMatrix * mvPosition; #include <fog_vertex> }`,
-  fragmentShader: `uniform float uTime; varying vec2 vUv; #include <fog_pars_fragment>
-    void main(){ float s = vUv.x * ${LEN}., a = vUv.y; float seam = smoothstep(.06, 0., abs(fract(s / 3.2) - .5) - .44);   // the pipe's segment joints
-      float wet = .5 + .5 * sin(a * 40. + s * .3) * sin(s * 1.7 + a * 9.); vec3 c = vec3(.008, .02, .026) * (.7 + .5 * wet) + vec3(.02, .035, .04) * seam;
-      float drip = pow(max(0., sin(a * 6.283 * 3. + 1.)), 30.) * (.5 + .5 * sin(s * .5 - uTime * 2.)); c += vec3(.02, .04, .05) * drip;
-      gl_FragColor = vec4(c, 1.); #include <fog_fragment> }`});
-pipeMat.vertexShader = pipeMat.vertexShader.replace(/#include (<[^>]+>)/g, '\n#include $1\n'); pipeMat.fragmentShader = pipeMat.fragmentShader.replace(/#include (<[^>]+>)/g, '\n#include $1\n');
-scene.add(new THREE.Mesh(new THREE.TubeGeometry(new PC(), 3000, R + .25, 32, false), pipeMat));
-// ------------------------------------------------------------------ one atlas for every visible frame: wall screens, drifting clips, and the clips on the tentacles
-const ATW = 2048, SW = 128, SH = 96, COLS = 16;
-const atlasC = document.createElement('canvas'); atlasC.width = atlasC.height = ATW; const ag = atlasC.getContext('2d'); ag.fillStyle = '#0a0806'; ag.fillRect(0, 0, ATW, ATW);
+  fragmentShader: `varying vec2 vUv; #include <fog_pars_fragment>
+    void main(){ float s = vUv.x * ${LEN}.; float seam = smoothstep(.05, 0., abs(fract(s / 4.) - .5) - .45); vec3 c = vec3(.0035, .0065, .006) + vec3(.004, .007, .0065) * seam; gl_FragColor = vec4(c, 1.); #include <fog_fragment> }`});
+for (const k of ['vertexShader', 'fragmentShader']) pipeMat[k] = pipeMat[k].replace(/#include (<[^>]+>)/g, '\n#include $1\n');
+scene.add(new THREE.Mesh(new THREE.TubeGeometry(new PC(), 2000, R + .3, 24, false), pipeMat));
+// ------------------------------------------------------------------ frames live in an atlas the clouds sample; a clip owns a block of 8 consecutive frames
+const ATW = 2048, SW = 128, SH = 96, COLS = 16, BLOCK = 8, NBLOCK = 40;
+const atlasC = document.createElement('canvas'); atlasC.width = atlasC.height = ATW; const ag = atlasC.getContext('2d'); ag.fillStyle = '#000'; ag.fillRect(0, 0, ATW, ATW);
 const atlas = new THREE.CanvasTexture(atlasC); atlas.colorSpace = THREE.SRGBColorSpace; atlas.generateMipmaps = false; atlas.minFilter = THREE.LinearFilter;
 const slotC = document.createElement('canvas'); slotC.width = SW; slotC.height = SH; const sg = slotC.getContext('2d'), slotTex = new THREE.CanvasTexture(slotC); slotTex.colorSpace = THREE.SRGBColorSpace;
 const _v2 = new THREE.Vector2();
 function putSlot(slot, im) { sg.drawImage(im, 0, 0, SW, SH); const c = slot % COLS, r = (slot / COLS) | 0; _v2.set(c * SW, ATW - (r + 1) * SH); slotTex.needsUpdate = true; renderer.copyTextureToTexture(_v2, slotTex, atlas); }
-const screenMat = (billboard) => { const m = new THREE.ShaderMaterial({fog: true, transparent: true, depthWrite: false, uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, {uAtlas: {value: null}, uTime: {value: 0}}]),
-  vertexShader: `attribute float aSlot, aGlow, aBad; varying vec2 vUv, vQ; varying float vGlow, vBad; #include <fog_pars_vertex>
-    void main(){ float c = mod(aSlot, ${COLS}.), r = floor(aSlot / ${COLS}.); vUv = vec2((c + uv.x) * ${SW}. / ${ATW}., 1. - (r + 1. - uv.y) * ${SH}. / ${ATW}.); vQ = uv; vGlow = aGlow; vBad = aBad;
-      vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4(position, 1.); gl_Position = projectionMatrix * mvPosition; #include <fog_vertex> }`,
-  fragmentShader: `uniform sampler2D uAtlas; uniform float uTime; varying vec2 vUv, vQ; varying float vGlow, vBad; #include <fog_pars_fragment>
-    float h(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
-    void main(){ vec3 im = texture2D(uAtlas, vUv).rgb; float l = dot(im, vec3(.3, .55, .15));
-      vec3 col = vec3(.7, .88, 1.) * pow(l, 1.2) * (.12 + 1.05 * vGlow);   // the sewer's cold screens, dark until the light reaches them
-      vec2 e = min(vQ, 1. - vQ); float rim = 1. - smoothstep(0., .05, min(e.x, e.y)); col += vec3(1., .7, .35) * rim * vGlow * vGlow * .6;
-      if (vBad > .5) { float n = h(floor(vQ * vec2(60., 40.)) + floor(uTime * 18.)), band = step(.85, fract(vQ.y * 7. + uTime * 3.));   // corrupted: static and torn lines
-        col = mix(col * vec3(1.4, .3, .2), vec3(1., .12, .06) * (.4 + n), .55 + .3 * band) + vec3(1., .2, .1) * rim; }
-      gl_FragColor = vec4(col, ${billboard ? '.95' : '1.'}); #include <fog_fragment> }`});
-  m.vertexShader = m.vertexShader.replace(/#include (<[^>]+>)/g, '\n#include $1\n'); m.fragmentShader = m.fragmentShader.replace(/#include (<[^>]+>)/g, '\n#include $1\n'); m.uniforms.uAtlas.value = atlas; return m; };
-function instanced(n, w, h, billboard) {
-  const g = new THREE.PlaneGeometry(w, h); for (const a of ['aSlot', 'aGlow', 'aBad']) g.setAttribute(a, new THREE.InstancedBufferAttribute(new Float32Array(n), 1));
-  const m = new THREE.InstancedMesh(g, screenMat(billboard), n); m.frustumCulled = false; scene.add(m); return m;
+const freeBlocks = Array.from({length: NBLOCK - 1}, (_, i) => i + 1), VIEWBLOCK = 0;   // block 0 is the viewer's
+const blockTag = new Int32Array(NBLOCK).fill(-1); let tagN = 0;
+function loadClip(block, film, from) { const tag = ++tagN; blockTag[block] = tag; for (let i = 0; i < BLOCK; i++) withImg(frameURL(FILMS[film], from + i), im => { if (blockTag[block] === tag) putSlot(block * BLOCK + i, im); }); }
+const takeBlock = () => freeBlocks.length ? freeBlocks.shift() : -1, giveBlock = b => { if (b > 0) { blockTag[b] = -1; freeBlocks.push(b); } };
+// ------------------------------------------------------------------ the splat engine: every moving image is a cloud of gaussian points, never a rectangle.
+// Each cloud is one row of a float parameter texture; every point reads its row, samples its frame from the atlas in the vertex shader,
+// is lifted into depth by its own light, breathes at its edges, and fades as a gaussian, so a film has no border, only a falloff.
+const MAXC = 256, PT = new Float32Array(MAXC * 5 * 4), params = new THREE.DataTexture(PT, 5, MAXC, THREE.RGBAFormat, THREE.FloatType); params.needsUpdate = true;
+const row = (r, k, a, b, c, d) => PT.set([a, b, c, d], (r * 5 + k) * 4);   // t4 = softness, so a cloud can be grain or picture
+const uCam = {uR: {value: new THREE.Vector3()}, uU: {value: new THREE.Vector3()}, uF: {value: new THREE.Vector3()}};
+const splatMat = new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+  uniforms: {uP: {value: params}, uAtlas: {value: atlas}, uTime: {value: 0}, uScale: {value: 1}, uFog: {value: .06}, ...uCam},
+  vertexShader: `uniform sampler2D uP, uAtlas; uniform vec3 uR, uU, uF; uniform float uTime, uScale, uFog; attribute float aCloud; attribute vec4 aUV; varying vec3 vC; varying float vA;
+    vec4 P(int k){ return texelFetch(uP, ivec2(k, int(aCloud + .5)), 0); }
+    float hs(float n){ return fract(sin(n) * 43758.5453); }
+    void main(){
+      vec4 a = P(0), b = P(1), c = P(2), d = P(3), e = P(4); float sf = 1. + e.x;
+      if (b.w < .003) { gl_Position = vec4(2., 2., 2., 1.); gl_PointSize = 0.; vA = 0.; return; }
+      float r2 = dot(aUV.xy, aUV.xy), seed = aUV.z;
+      vec3 im = vec3(0.); float l = 0.;
+      if (b.x >= 0.) { float fr = mod(floor(b.z + c.x * (aUV.y * .5 + .5)), ${BLOCK}.), slot = b.x * ${BLOCK}. + fr, col = mod(slot, ${COLS}.), rw = floor(slot / ${COLS}.);
+        vec2 iu = vec2(aUV.x * .5 + .5, aUV.y * .5 + .5); im = texture2D(uAtlas, vec2((col + iu.x) * ${SW}. / ${ATW}., 1. - (rw + 1. - iu.y) * ${SH}. / ${ATW}.)).rgb; l = dot(im, vec3(.3, .55, .15)); }
+      float dz = (l - .5) * c.y * a.w, dist = max(.5, length(a.xyz - cameraPosition));
+      vec3 off = (uR * aUV.x * b.y + uU * aUV.y) * a.w * (dist - dz) / dist + uF * dz;   // the frame's own light lifts it into depth; seen from where it was shot, it still reads true
+      off += a.w * (.006 + .11 * r2 * r2) * vec3(sin(uTime * 1.3 + seed * 41.), cos(uTime * 1.05 + seed * 31.), sin(uTime * .9 + seed * 17.));   // the edges breathe like smoke
+      float bad = c.z; if (bad > .5) { float t = floor(uTime * 22.); off += a.w * .1 * vec3(hs(seed + t) - .5, hs(seed * 3. + t) - .5, hs(seed * 7. + t) - .5); }
+      vec3 p = a.xyz + off;
+      if (c.w > 0.) { float q = clamp(c.w * 1.7 - seed * .7, 0., 1.); q = q * q * (3. - 2. * q); vec3 sw = (uR * sin(seed * 23. + c.w * 9.) + uU * cos(seed * 17. + c.w * 7.)) * 1.2 * q * (1. - q) * a.w; p = mix(p, d.xyz + (uR * (hs(seed * 5.) - .5) + uU * (hs(seed * 11.) - .5) + uF * (hs(seed * 13.) - .5)) * 1.3, q) + sw; }   // pouring into the creature
+      float lf = .06 + .94 * smoothstep(.06, .82, l); vec3 tc = mix(vec3(lf), im + .1, .55), cold = tc * vec3(.88, .97, 1.) * 1.5, warm = tc * vec3(1., .88, .7) * 1.4, gold = vec3(1., .66, .28) * .45;
+      vec3 g = b.x >= 0. ? mix(cold, warm, d.w) : gold;
+      if (bad > .5) g = vec3(1., .16, .06) * (.2 + .9 * hs(seed * 9. + floor(uTime * 16.)));
+      vec4 mv = viewMatrix * vec4(p, 1.), wp = vec4(p, 1.);
+      float fog = exp(-pow(uFog * .8 * -mv.z, 2.)) * smoothstep(.9, 2.6, -mv.z);   // nothing smears across the lens
+      vC = g; vA = b.w / (sf * sf) * exp(-r2 * (e.y > 0. ? e.y : 2.4)) * fog * (c.w > 0. ? 1. - c.w : 1.);
+      gl_PointSize = max(1.5, (.55 + 1.1 * fract(seed * 7.)) * sf * aUV.w * a.w * uScale / -mv.z); gl_Position = projectionMatrix * mv; }`,
+  fragmentShader: `varying vec3 vC; varying float vA; void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; float g = (exp(-r2 * 12.) - .0498) / .9502; gl_FragColor = vec4(vC * g * vA * .55, 1.); }`});
+function cloudPoints(firstRow, nRows, pts, spread) {
+  const n = nRows * pts, aC = new Float32Array(n), aU = new Float32Array(n * 4), kw = spread * Math.sqrt(3 * Math.PI / pts);
+  for (let r = 0; r < nRows; r++) for (let i = 0; i < pts; i++) { const k = r * pts + i, a = Math.random() * 6.283, rr = Math.sqrt(Math.random()) * spread;
+    aC[k] = firstRow + r; aU.set([Math.cos(a) * rr, Math.sin(a) * rr, Math.random(), kw], k * 4); }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3)); g.setAttribute('aCloud', new THREE.BufferAttribute(aC, 1)); g.setAttribute('aUV', new THREE.BufferAttribute(aU, 4));
+  const p = new THREE.Points(g, splatMat); p.frustumCulled = false; scene.add(p); return p;
 }
-// the walls: rings of screens every 3.2 m, some missing; each screen holds a moment of a film and plays when you come near
-const RS = 3.2, PER = 10, NR = 20, NW = NR * PER, walls = instanced(NW, 2.6, 1.95, false);
-const W = Array.from({length: NW}, () => ({}));
-const ringOf = new Int32Array(NR).fill(-9999), _o = new THREE.Object3D();
-function layRing(m, k) {
-  ringOf[m] = k; const s = k * RS, {N, B, C} = frameAt(s);
-  for (let j = 0; j < PER; j++) { const i = m * PER + j, w = W[i], th = j / PER * Math.PI * 2 + k * .31, on = hash(k + 500, j) % 10 < 6;
-    _o.position.copy(C).addScaledVector(N, Math.cos(th) * R).addScaledVector(B, Math.sin(th) * R); _o.lookAt(C); _o.scale.setScalar(on ? 1 : 0); _o.updateMatrix(); walls.setMatrixAt(i, _o.matrix);
-    Object.assign(w, {k, on, film: hash(k + 1000, j) % FILMS.length, frame: (k * 3 + j) % 97, next: 0, glow: 0, shown: -1, pos: _o.position.clone()}); walls.geometry.attributes.aSlot.setX(i, i); show(i, walls, W, i); }
-  walls.instanceMatrix.needsUpdate = true; walls.geometry.attributes.aSlot.needsUpdate = true;
-}
-function show(i, mesh, list, slot) { const w = list[i], f = FILMS[w.film], fr = w.frame, tag = w.k; if (w.shown === fr) return; withImg(frameURL(f, fr), im => { if (w.k !== tag || w.frame !== fr) return; putSlot(slot, im); w.shown = fr; }); }
-// ------------------------------------------------------------------ the clips that drift down the pipe: save them, or avoid the corrupted ones
-const NC = 36, clips = instanced(NC, 1.35, 1.0, true), CL = Array.from({length: NC}, () => ({live: false}));
-const CLIPSLOT = 220;
-let spawnS = 14;
-function spawnClips(s) {
-  while (spawnS < s + 70) { spawnS += 3 + Math.random() * 3.5; const i = CL.findIndex(c => !c.live); if (i < 0) break;
-    const bad = Math.random() < Math.min(.45, .2 + s / 2500), a = Math.random() * 6.283, r = Math.sqrt(Math.random()) * R * .62;
-    Object.assign(CL[i], {live: true, s: spawnS, x: Math.cos(a) * r, y: Math.sin(a) * r, bad, film: (Math.random() * FILMS.length) | 0, frame: (Math.random() * 40) | 0, next: 0, shown: -1, k: Math.random(), ph: Math.random() * 6});
-    clips.geometry.attributes.aSlot.setX(i, CLIPSLOT + i); clips.geometry.attributes.aBad.setX(i, bad ? 1 : 0); show(i, clips, CL, CLIPSLOT + i); }
-  clips.geometry.attributes.aSlot.needsUpdate = true; clips.geometry.attributes.aBad.needsUpdate = true;
-}
-// ------------------------------------------------------------------ the creature: a mantle of golden particles with a nervous system of light inside
-const C = {s: 6, x: 0, y: 0, vx: 0, vy: 0, speed: 5.5, dash: 0, ph: 0, q: new THREE.Quaternion(), heading: new THREE.Vector3(0, 0, -1), p: new THREE.Vector3(), hurt: 0, glow: 0};
-const mantleGLSL = `float c(float ph){ ph = fract(ph); return ph < .25 ? sin(ph / .25 * 1.5708) : 1. - smoothstep(0., 1., (ph - .25) / .75); }`;
-const MN = 5200, mg = new THREE.BufferGeometry(), mp = new Float32Array(MN * 3), mt = new Float32Array(MN), ms = new Float32Array(MN), mk = new Float32Array(MN);
-for (let i = 0; i < MN; i++) {   // a prolate mantle along +y (the head leads), densest at the skin; 22% of points form the inner nervous system
-  const inner = i < MN * .22, y = inner ? -.5 + 2.1 * Math.pow(Math.random(), .8) : -.6 + 2.3 * Math.random(), t = (y + .6) / 2.3, rr = .95 * Math.sqrt(Math.max(0, 1 - Math.pow((y - .55) / 1.2, 2))) * (1 - .25 * t * t), a = Math.random() * 6.283;
-  const rad = inner ? rr * (.15 + .35 * Math.abs(Math.sin(a * 3 + y * 4))) : rr * (.92 + .08 * Math.random());
-  mp.set([Math.cos(a) * rad, y, Math.sin(a) * rad], i * 3); mt[i] = t; ms[i] = Math.random(); mk[i] = inner ? 1 : 0; }
-mg.setAttribute('position', new THREE.BufferAttribute(mp, 3)); mg.setAttribute('aT', new THREE.BufferAttribute(mt, 1)); mg.setAttribute('aS', new THREE.BufferAttribute(ms, 1)); mg.setAttribute('aK', new THREE.BufferAttribute(mk, 1));
-const mantle = new THREE.Points(mg, new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-  uniforms: {uPulse: {value: 0}, uTime: {value: 0}, uScale: {value: 1}, uGlow: {value: 0}, uHurt: {value: 0}, uDash: {value: 0}},
-  vertexShader: `uniform float uPulse, uTime, uScale, uDash; attribute float aT, aS, aK; varying float vT, vK, vS; ${mantleGLSL}
-    void main(){ vec3 p = position; float k = c(uPulse - (1. - aT) * .35);   // the contraction runs from the head back
-      p.xz *= 1. - .22 * k * (1. - aK * .5); p.y += .12 * k * aT;
-      p += .025 * vec3(sin(uTime * 3. + aS * 50.), cos(uTime * 2.3 + aS * 31.), sin(uTime * 2.7 + aS * 17.)) * (1. + 2. * uDash);
-      vT = aT; vK = aK; vS = aS; vec4 mv = modelViewMatrix * vec4(p, 1.); gl_PointSize = (1.6 + 2.6 * aS + aK * 1.5) * uScale / -mv.z; gl_Position = projectionMatrix * mv; }`,
-  fragmentShader: `uniform float uGlow, uHurt, uDash; varying float vT, vK, vS;
-    void main(){ vec2 q = gl_PointCoord - .5; float g = exp(-dot(q, q) * 14.); vec3 skin = mix(vec3(1., .5, .16), vec3(1., .78, .42), vT), nerve = vec3(1., .93, .78);
-      vec3 col = mix(skin * .55, nerve * 1.4, vK) * (1. + uGlow * 1.5 + uDash * .8); col = mix(col, vec3(1., .12, .05), uHurt * .6); gl_FragColor = vec4(col * g * .15, 1.); }`}));
-mantle.frustumCulled = false;
-const creature = new THREE.Group(); creature.add(mantle); creature.scale.setScalar(1.85); scene.add(creature);
-const lamp = new THREE.PointLight(0xffa850, 4, 10, 1.5); creature.add(lamp);
-// ------------------------------------------------------------------ tentacles: time worms. Verlet chains trailing in the water; each saved clip threads onto one and lengthens it
+// rows: 0..15 drifting clouds, 16..143 time-worm beads (8 worms × 16), 150 the viewer
+const ND = 16, DROW = 0, WROW = 16, VROW = 150;
+cloudPoints(DROW, ND, 2400, 1.15); cloudPoints(WROW, 128, 90, 1); cloudPoints(VROW, 1, 48000, 1.1);
+// ------------------------------------------------------------------ the creature: a golden jellyfish of light (bell of splats, crown forward)
+const C = {s: 6, x: 0, y: 0, vx: 0, vy: 0, speed: 5, dash: 0, ph: 0, q: new THREE.Quaternion(), heading: new THREE.Vector3(0, 0, -1), p: new THREE.Vector3(), hurt: 0, glow: 0};
+const BN = 4200, bg = new THREE.BufferGeometry(), bp = new Float32Array(BN * 3), bt = new Float32Array(BN), bs = new Float32Array(BN);
+for (let i = 0; i < BN; i++) { const t = Math.sqrt(Math.random()), a = t * Math.PI / 2 * 1.05, ph = Math.random() * 6.283, rr = .9 * Math.sin(a) * (1 + .06 * Math.sin(t * Math.PI)), y = .72 * Math.cos(a), inner = Math.random() < .25 ? .55 + .35 * Math.random() : 1;
+  bp.set([Math.cos(ph) * rr * inner, y * inner, Math.sin(ph) * rr * inner], i * 3); bt[i] = t; bs[i] = Math.random(); }
+bg.setAttribute('position', new THREE.BufferAttribute(bp, 3)); bg.setAttribute('aT', new THREE.BufferAttribute(bt, 1)); bg.setAttribute('aS', new THREE.BufferAttribute(bs, 1));
+const bell = new THREE.Points(bg, new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: {uPulse: {value: 0}, uTime: {value: 0}, uScale: {value: 1}, uGlow: {value: 0}, uHurt: {value: 0}, uWhite: {value: 0}, uFade: {value: 1}},
+  vertexShader: `uniform float uPulse, uTime, uScale; attribute float aT, aS; varying float vT, vS;
+    float c(float ph){ ph = fract(ph); return ph < .28 ? sin(ph / .28 * 1.5708) : 1. - smoothstep(0., 1., (ph - .28) / .72); }
+    void main(){ vec3 p = position; float k = c(uPulse - aT * .18) * pow(aT, 1.4); p.xz *= 1. - .3 * k; p.y += .18 * k * (1. - aT) + .06 * k; p.y += .02 * sin(atan(p.z, p.x) * 8. + uTime * 2.) * aT;
+      p += .012 * vec3(sin(uTime * 2. + aS * 40.), cos(uTime * 1.7 + aS * 30.), sin(uTime * 1.3 + aS * 20.)); vT = aT; vS = aS;
+      vec4 mv = modelViewMatrix * vec4(p, 1.); gl_PointSize = (1.4 + 2.4 * aS) * uScale / -mv.z; gl_Position = projectionMatrix * mv; }`,
+  fragmentShader: `uniform float uGlow, uHurt, uWhite, uFade; varying float vT, vS; void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; float g = (exp(-r2 * 14.) - .0302) / .9698;
+    vec3 col = mix(vec3(1., .62, .22), vec3(1., .86, .5), pow(vT, 3.)) * (.55 + .8 * pow(vT, 5.)) * (1. + uGlow * 1.2); col = mix(col, vec3(1., .96, .9), uWhite * .35); col = mix(col, vec3(1., .12, .05), uHurt * .6); gl_FragColor = vec4(col * g * .2 * uFade, 1.); }`}));
+bell.frustumCulled = false; const creature = new THREE.Group(); creature.add(bell); creature.scale.setScalar(1.5); scene.add(creature);
+const lamp = new THREE.PointLight(0xffa850, 3, 10, 1.5); creature.add(lamp);
+// ------------------------------------------------------------------ tentacles: Verlet chains that become time worms when they carry a film
 const TN = 8, TS = 16, NN = TN * TS, X = new Float32Array(NN * 3), XP = new Float32Array(NN * 3);
-const tent = Array.from({length: TN}, (_, i) => ({start: i * TS, n: TS, L: .18, a: i / TN * Math.PI * 2, clips: []}));
-const _r = new THREE.Vector3(), _f = new THREE.Vector3(), _p = new THREE.Vector3();
-const rootOf = (t, out) => out.set(Math.cos(t.a) * .92, -1.02, Math.sin(t.a) * .92).applyQuaternion(C.q).add(C.p);
+const tent = Array.from({length: TN}, (_, i) => ({start: i * TS, n: TS, L: .22, a: i / TN * Math.PI * 2, clip: null}));
+const _r = new THREE.Vector3(), _p = new THREE.Vector3();
+const rootOf = (t, out) => out.set(Math.cos(t.a) * .75, -.05, Math.sin(t.a) * .75).applyQuaternion(C.q).multiplyScalar(1.5).add(C.p);
 function seat() { for (const t of tent) { rootOf(t, _r); for (let j = 0; j < t.n; j++) { const i = (t.start + j) * 3; X[i] = XP[i] = _r.x - C.heading.x * j * t.L; X[i + 1] = XP[i + 1] = _r.y - C.heading.y * j * t.L; X[i + 2] = XP[i + 2] = _r.z - C.heading.z * j * t.L; } } }
 const stat = {resid: 0, frames: []};
-function stepTent(dt, vel) {
-  for (const t of tent) for (let j = 1; j < t.n; j++) { const i = (t.start + j) * 3, vx = (X[i] - XP[i]) / dt, vy = (X[i + 1] - XP[i + 1]) / dt, vz = (X[i + 2] - XP[i + 2]) / dt;
-    const w = Math.sin(T * 3.2 - j * .45 + t.a * 2) * 1.6 * (j / t.n);   // the undulation: a wave travelling down each arm
-    const {N, B} = frameAt(C.s); const ax = 1.6 * (0 - vx) + (N.x * Math.cos(t.a) + B.x * Math.sin(t.a)) * w, ay = 1.6 * (0 - vy) + (N.y * Math.cos(t.a) + B.y * Math.sin(t.a)) * w, az = 1.6 * (0 - vz) + (N.z * Math.cos(t.a) + B.z * Math.sin(t.a)) * w;
+let T = 0;
+function stepTent(dt) {
+  const {N, B} = frameAt(C.s);
+  for (const t of tent) for (let j = 1; j < t.n; j++) { const i = (t.start + j) * 3, vx = (X[i] - XP[i]) / dt, vy = (X[i + 1] - XP[i + 1]) / dt, vz = (X[i + 2] - XP[i + 2]) / dt, w = Math.sin(T * 2.6 - j * .42 + t.a * 2) * 1.3 * (j / t.n);
+    const sx = N.x * Math.cos(t.a) + B.x * Math.sin(t.a), sy = N.y * Math.cos(t.a) + B.y * Math.sin(t.a), sz = N.z * Math.cos(t.a) + B.z * Math.sin(t.a);
+    const ax = -1.5 * vx + sx * w, ay = -1.5 * vy + sy * w - .2, az = -1.5 * vz + sz * w;
     const nx = X[i] + (X[i] - XP[i]) * .96 + ax * dt * dt, ny = X[i + 1] + (X[i + 1] - XP[i + 1]) * .96 + ay * dt * dt, nz = X[i + 2] + (X[i + 2] - XP[i + 2]) * .96 + az * dt * dt;
     XP[i] = X[i]; XP[i + 1] = X[i + 1]; XP[i + 2] = X[i + 2]; X[i] = nx; X[i + 1] = ny; X[i + 2] = nz; }
   for (const t of tent) { rootOf(t, _r); const i = t.start * 3; X[i] = XP[i] = _r.x; X[i + 1] = XP[i + 1] = _r.y; X[i + 2] = XP[i + 2] = _r.z; }
@@ -168,157 +164,135 @@ function stepTent(dt, vel) {
     for (let jj = 0; jj < t.n - 1; jj++) { const j = fwd ? jj : t.n - 2 - jj, a = (t.start + j) * 3, b = a + 3, dx = X[b] - X[a], dy = X[b + 1] - X[a + 1], dz = X[b + 2] - X[a + 2], d = Math.hypot(dx, dy, dz) || 1e-6, e = (d - t.L) / d;
       if (it === 11) resid = Math.max(resid, Math.abs(d - t.L) / t.L); const wa = j === 0 ? 0 : .5, wb = j === 0 ? 1 : .5;
       X[a] += dx * e * wa; X[a + 1] += dy * e * wa; X[a + 2] += dz * e * wa; X[b] -= dx * e * wb; X[b + 1] -= dy * e * wb; X[b + 2] -= dz * e * wb; } }
-  for (const t of tent) for (let j = 1; j < t.n; j++) { const i = (t.start + j) * 3; _p.set(X[i], X[i + 1], X[i + 2]);   // the pipe's SDF keeps every node inside
-    let s = C.s - j * t.L; const Cc = path(s), Tt = tangent(s); s += Tt.dot(_p.clone().sub(Cc)); const C2 = path(s), d = _p.distanceTo(C2), lim = R - .25;
-    if (d > lim) { _p.sub(C2).multiplyScalar(lim / d).add(C2); X[i] = _p.x; X[i + 1] = _p.y; X[i + 2] = _p.z; } }
+  for (const t of tent) for (let j = 1; j < t.n; j++) { const i = (t.start + j) * 3; _p.set(X[i], X[i + 1], X[i + 2]); let s = C.s - j * t.L; s += tangent(s).dot(_p.clone().sub(path(s)));
+    const Cc = path(s), d = _p.distanceTo(Cc), lim = R - .3; if (d > lim) { _p.sub(Cc).multiplyScalar(lim / d).add(Cc); X[i] = _p.x; X[i + 1] = _p.y; X[i + 2] = _p.z; } }   // the tunnel's SDF
   stat.resid = resid;
 }
-const tentG = new THREE.BufferGeometry(), RAD = 6, tv = NN * RAD; tentG.setAttribute('position', new THREE.BufferAttribute(new Float32Array(tv * 3), 3).setUsage(THREE.DynamicDrawUsage));
-tentG.setAttribute('aT', new THREE.BufferAttribute(new Float32Array(tv), 1)); { const idx = [], at = tentG.attributes.aT.array; let o = 0;
-  for (let c = 0; c < TN; c++) for (let j = 0; j < TS; j++) for (let k = 0; k < RAD; k++) { at[o++] = j / (TS - 1); if (j < TS - 1) { const a = (c * TS + j) * RAD + k, b = (c * TS + j) * RAD + (k + 1) % RAD; idx.push(a, a + RAD, b, b, a + RAD, b + RAD); } } tentG.setIndex(idx); }
-const tentMesh = new THREE.Mesh(tentG, new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: {uTime: {value: 0}, uHurt: {value: 0}},
-  vertexShader: `attribute float aT; varying float vT, vNear; void main(){ vT = aT; vec4 mv = modelViewMatrix * vec4(position, 1.); vNear = smoothstep(1.2, 3.2, -mv.z); gl_Position = projectionMatrix * mv; }`,
-  fragmentShader: `uniform float uTime, uHurt; varying float vT, vNear; void main(){ float seg = .55 + .45 * smoothstep(.3, .5, abs(fract(vT * 22. - uTime * 1.5) - .5));   // segmented like a worm, pulses running down it
-    vec3 c = mix(vec3(1., .62, .25), vec3(.9, .35, .12), vT) * seg * (1. - .75 * vT); c = mix(c, vec3(1., .1, .05), uHurt * .5); gl_FragColor = vec4(c * .7 * vNear, 1.); }`}));   // nothing fills the lens
-tentMesh.frustumCulled = false; scene.add(tentMesh);
-const _t = new THREE.Vector3(), _n = new THREE.Vector3(), _b = new THREE.Vector3();
-function skinTent() { const P = tentG.attributes.position.array; let o = 0;
-  for (const t of tent) { _n.set(0, 0, 0); for (let j = 0; j < t.n; j++) { const i = (t.start + j) * 3, i2 = (t.start + Math.min(t.n - 1, j + 1)) * 3, i0 = (t.start + Math.max(0, j - 1)) * 3;
-    _t.set(X[i2] - X[i0], X[i2 + 1] - X[i0 + 1], X[i2 + 2] - X[i0 + 2]).normalize(); if (j === 0) { _n.set(0, 1, 0).applyQuaternion(C.q); } _n.addScaledVector(_t, -_n.dot(_t)).normalize(); _b.crossVectors(_t, _n);
-    const r = .042 * (1 - .7 * j / t.n) + .01; for (let k = 0; k < RAD; k++) { const th = k / RAD * 6.283, cx = Math.cos(th) * r, sx = Math.sin(th) * r; P[o++] = X[i] + _n.x * cx + _b.x * sx; P[o++] = X[i + 1] + _n.y * cx + _b.y * sx; P[o++] = X[i + 2] + _n.z * cx + _b.z * sx; } } }
-  tentG.attributes.position.needsUpdate = true; }
-// the saved clips ride on the tentacles as small screens, each still playing its moment
-const NB = 64, beads = instanced(NB, .5, .375, true), BD = []; const BEADSLOT = 260;
-function threadClip(c) {
-  const t = tent.reduce((m, x) => x.clips.length < m.clips.length ? x : m, tent[0]);   // the shortest time worm takes it
-  if (BD.length >= NB) { const old = BD.shift(); const ot = tent[old.tent]; ot.clips.shift(); }
-  const b = {film: c.film, frame: c.frame, from: c.frame, tent: tent.indexOf(t), k: Math.random(), next: 0, shown: -1, t0: T}; BD.push(b); t.clips.push(b);
-  t.L = Math.min(.27, .18 + .012 * t.clips.length);   // the worm grows as it fills
-  BD.forEach((x, i) => { beads.geometry.attributes.aSlot.setX(i, BEADSLOT + i); x.slot = BEADSLOT + i; x.shown = -1; }); beads.geometry.attributes.aSlot.needsUpdate = true;
+// ------------------------------------------------------------------ drifting films: clouds that come out of the fog, sometimes in pairs; some are corrupted
+const D = Array.from({length: ND}, () => ({live: false, block: -1}));
+let spawnS = 16;
+function spawn(s) {
+  while (spawnS < s + 55) { spawnS += 6 + Math.random() * 7; const pair = Math.random() < .35, n = pair ? 2 : 1, a0 = Math.random() * 6.283;
+    for (let k = 0; k < n; k++) { const i = D.findIndex(d => !d.live); if (i < 0) return; const bad = Math.random() < Math.min(.4, .18 + s / 2600);
+      const block = bad ? -1 : takeBlock(); if (!bad && block < 0) return;
+      const film = (Math.random() * FILMS.length) | 0, from = (Math.random() * 40) | 0, a = a0 + k * 1.3, r = (pair ? 2.2 : Math.sqrt(Math.random()) * 2.4);
+      Object.assign(D[i], {live: true, bad, block, film, from, s: spawnS + k * .6, x: Math.cos(a) * r, y: Math.sin(a) * r * .8, size: bad ? 1.1 + Math.random() * .6 : 1.7 + Math.random() * 1.1, pour: 0, born: T, ph: Math.random() * 6, pos: new THREE.Vector3()});
+      if (!bad) loadClip(block, film, from); } }
 }
-// ------------------------------------------------------------------ sound and touch
+// ------------------------------------------------------------------ control: on rails. Where you point is where the creature swims in the tunnel; a tap is a dash
+const ptr = {down: false, x: innerWidth / 2, y: innerHeight / 2, active: false}, keys = new Set(), G = {state: 'title'};
+let slow = 0;
+const buzz = p => { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} };
 let ac = null; const SND = {};
 function snd(n, v, loop) { if (!SND[n]) { const a = new Audio(`../paeleo/scion/videotext/memory-maker/fal/${n}.mp3`); a.loop = !!loop; SND[n] = a; } SND[n].volume = v; return SND[n]; }
 function sfx(n, v) { try { const a = snd(n, v).cloneNode(); a.volume = v; a.play().catch(() => {}); } catch (e) {} }
-function tone(f, d, g, type = 'triangle') { if (!ac) return; const t = ac.currentTime, o = ac.createOscillator(), v = ac.createGain(); o.type = type; o.frequency.setValueAtTime(f, t); v.gain.setValueAtTime(0, t); v.gain.linearRampToValueAtTime(g, t + .01); v.gain.exponentialRampToValueAtTime(.0001, t + d); o.connect(v).connect(ac.destination); o.start(t); o.stop(t + d + .05); }
+function tone(f, d, g, type = 'sine') { if (!ac) return; const t = ac.currentTime, o = ac.createOscillator(), v = ac.createGain(); o.type = type; o.frequency.setValueAtTime(f, t); v.gain.setValueAtTime(0, t); v.gain.linearRampToValueAtTime(g, t + .02); v.gain.exponentialRampToValueAtTime(.0001, t + d); o.connect(v).connect(ac.destination); o.start(t); o.stop(t + d + .05); }
 function noise(d, g, f) { if (!ac) return; const t = ac.currentTime, b = ac.createBuffer(1, ac.sampleRate * d | 0, ac.sampleRate), x = b.getChannelData(0); for (let i = 0; i < x.length; i++) x[i] = (Math.random() * 2 - 1) * (1 - i / x.length);
   const s = ac.createBufferSource(), fl = ac.createBiquadFilter(), v = ac.createGain(); fl.type = 'bandpass'; fl.frequency.value = f; fl.Q.value = 1.2; v.gain.value = g; s.buffer = b; s.connect(fl).connect(v).connect(ac.destination); s.start(t); }
-const buzz = p => { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} };
 let sayT = -9; function say(t) { $('say').textContent = t; $('say').style.opacity = 1; sayT = T; }
-// ------------------------------------------------------------------ control: on rails. Where you point is where it swims in the pipe; a tap is a dash
-const ptr = {down: false, x: innerWidth / 2, y: innerHeight / 2, active: false}, keys = new Set(), G = {state: 'title'};
-let T = 0, slow = 0;
-function dash() { if (C.dash > .4) return; C.dash = 1; sfx('sfx_surface', .45); noise(.35, .12, 900); buzz(14); }
+function dash() { if (C.dash > .4) return; C.dash = 1; sfx('sfx_surface', .4); noise(.35, .1, 800); buzz(12); }
 function stepCreature(dt) {
-  // the target in the cross-section: the pointer's place on screen, or the keys
   let tx = C.tx || 0, ty = C.ty || 0;
-  if (ptr.active) { tx = THREE.MathUtils.clamp((ptr.x / innerWidth - .5) * 2.4, -1, 1) * R * .72; ty = THREE.MathUtils.clamp(-(ptr.y / innerHeight - .5) * 2.4, -1, 1) * R * .62; }
+  if (ptr.active) { tx = THREE.MathUtils.clamp((ptr.x / innerWidth - .5) * 2.4, -1, 1) * R * .7; ty = THREE.MathUtils.clamp(-(ptr.y / innerHeight - .5) * 2.4, -1, 1) * R * .6; }
   const kx = (keys.has('arrowright') || keys.has('d')) - (keys.has('arrowleft') || keys.has('a')), ky = (keys.has('arrowup') || keys.has('w')) - (keys.has('arrowdown') || keys.has('s'));
-  if (kx || ky) { tx = THREE.MathUtils.clamp(C.x + kx * 3, -R * .72, R * .72); ty = THREE.MathUtils.clamp(C.y + ky * 3, -R * .62, R * .62); }
-  C.tx = tx; C.ty = ty;
-  const ax = (tx - C.x) * 9 - C.vx * 5, ay = (ty - C.y) * 9 - C.vy * 5; C.vx += ax * dt; C.vy += ay * dt; C.x += C.vx * dt; C.y += C.vy * dt;   // a critically-damped glide: smooth, never twitchy
-  const r = Math.hypot(C.x, C.y), lim = R - 1.1; if (r > lim) { C.x *= lim / r; C.y *= lim / r; }
-  C.dash = Math.max(0, C.dash - dt * .9); C.speed = 5.5 + 9 * C.dash * C.dash; C.s += C.speed * dt;
-  C.ph += dt * (1.1 + 1.6 * C.dash);
+  if (kx || ky) { tx = THREE.MathUtils.clamp(C.x + kx * 3, -R * .7, R * .7); ty = THREE.MathUtils.clamp(C.y + ky * 3, -R * .6, R * .6); }
+  C.tx = tx; C.ty = ty; C.vx += ((tx - C.x) * 8 - C.vx * 4.8) * dt; C.vy += ((ty - C.y) * 8 - C.vy * 4.8) * dt; C.x += C.vx * dt; C.y += C.vy * dt;   // a critically damped glide
+  const r = Math.hypot(C.x, C.y), lim = R - 1.4; if (r > lim) { C.x *= lim / r; C.y *= lim / r; }
+  C.dash = Math.max(0, C.dash - dt * .9); C.speed = 5 + 8 * C.dash * C.dash; C.s += C.speed * dt; C.ph += dt * (.9 + 1.4 * C.dash);
   const {T: Tg, N, B, C: Cc} = frameAt(C.s); C.p.copy(Cc).addScaledVector(N, C.y).addScaledVector(B, C.x);
   const h = Tg.clone().multiplyScalar(C.speed).addScaledVector(N, C.vy).addScaledVector(B, C.vx).normalize(); C.heading.lerp(h, 1 - Math.pow(.02, dt)).normalize();
-  const look = new THREE.Matrix4().lookAt(new THREE.Vector3(), C.heading, N), q = new THREE.Quaternion().setFromRotationMatrix(look).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2));
-  C.q.slerp(q, 1 - Math.pow(.01, dt)); C.hurt = Math.max(0, C.hurt - dt * .8); C.glow = Math.max(0, C.glow - dt * 1.6);
+  const q = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().lookAt(new THREE.Vector3(), C.heading, N)).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2));
+  C.q.slerp(q, 1 - Math.pow(.01, dt)); C.hurt = Math.max(0, C.hurt - dt * .8); C.glow = Math.max(0, C.glow - dt * 1.4);
 }
-// ------------------------------------------------------------------ catching, corruption, the walls waking
+// ------------------------------------------------------------------ drinking a film; being drained
 const caught = [], seen = new Set();
-function stepWorld(dt) {
-  spawnClips(C.s); const k0 = Math.round(C.s / RS);
-  for (let k = k0 - 3; k < k0 + NR - 3; k++) { const m = ((k % NR) + NR) % NR; if (ringOf[m] !== k) layRing(m, k); }
-  // walls: screens within reach of the light wake and play
-  const ga = walls.geometry.attributes.aGlow;
-  for (let i = 0; i < NW; i++) { const w = W[i]; if (!w.on) continue; const d = w.pos.distanceTo(C.p), g = THREE.MathUtils.clamp(1.25 - d / 7, 0, 1);
-    if (Math.abs(g - ga.getX(i)) > .01) ga.setX(i, ga.getX(i) + (g - ga.getX(i)) * Math.min(1, dt * 4));
-    if (g > .35 && T > w.next) { w.frame++; w.next = T + 1 / Math.min(10, FILMS[w.film].fps || 8); show(i, walls, W, i); } }
-  ga.needsUpdate = true;
-  // drifting clips: billboards that play their film and turn slowly; touched by the mantle or a tentacle, they are saved
-  const cg = clips.geometry.attributes.aGlow, Fc = new THREE.Vector3();
-  for (let i = 0; i < NC; i++) { const c = CL[i]; if (!c.live) { _o.scale.setScalar(0); _o.updateMatrix(); clips.setMatrixAt(i, _o.matrix); continue; }
-    if (c.s < C.s - 8) { c.live = false; continue; }
-    c.s -= dt * .5; const {N, B, C: Cc} = frameAt(c.s), bob = Math.sin(T * .8 + c.ph) * .25; Fc.copy(Cc).addScaledVector(N, c.y + bob).addScaledVector(B, c.x); c.pos = Fc.clone();
-    _o.position.copy(Fc); _o.quaternion.copy(camera.quaternion); _o.rotateZ(Math.sin(T * .6 + c.ph) * .15); const sc = 1 + .08 * Math.sin(T * 3 + c.ph); _o.scale.setScalar(sc); _o.updateMatrix(); clips.setMatrixAt(i, _o.matrix);
-    cg.setX(i, THREE.MathUtils.clamp(1.4 - Fc.distanceTo(C.p) / 14, .35, 1));
-    if (T > c.next) { c.frame++; c.next = T + 1 / Math.min(10, FILMS[c.film].fps || 8); show(i, clips, CL, CLIPSLOT + i); }
-    let hit = Fc.distanceTo(C.p) < 1.55; if (!hit) for (let j = 4; j < NN && !hit; j += 3) { const q = j * 3; hit = Math.hypot(Fc.x - X[q], Fc.y - X[q + 1], Fc.z - X[q + 2]) < .45; }
-    if (hit) { c.live = false; if (c.bad) corrupt(); else save(c); } }
-  clips.instanceMatrix.needsUpdate = true; cg.needsUpdate = true;
-  // beads: the saved clips, placed along their tentacles, each playing a few frames from where it was caught
-  for (let i = 0; i < NB; i++) { const b = BD[i]; if (!b) { _o.scale.setScalar(0); _o.updateMatrix(); beads.setMatrixAt(i, _o.matrix); continue; }
-    const t = tent[b.tent], idx = t.clips.indexOf(b), j = Math.min(t.n - 1, 3 + Math.round((idx + 1) / (t.clips.length + 1) * (t.n - 4))), q = (t.start + j) * 3;
-    _o.position.set(X[q], X[q + 1], X[q + 2]); _o.quaternion.copy(camera.quaternion); _o.scale.setScalar(1 - .35 * j / t.n); _o.updateMatrix(); beads.setMatrixAt(i, _o.matrix);
-    beads.geometry.attributes.aGlow.setX(i, .9); if (T > b.next) { b.frame = b.from + (((T - b.t0) * 6) | 0) % 8; b.next = T + .16; b.k = b.slot; show(i, beads, BD, b.slot); } }
-  beads.instanceMatrix.needsUpdate = true; beads.geometry.attributes.aGlow.needsUpdate = true;
+function drink(d) {
+  d.pour = .001; const t = tent.find(t => !t.clip) || tent.reduce((m, x) => (x.clip.t0 < m.clip.t0 ? x : m), tent[0]);
+  if (t.clip) giveBlock(t.clip.block);
+  t.clip = {block: d.block, film: d.film, from: d.from, t0: T, fill: 0}; d.block = -1;   // the cloud's frames now belong to the worm
+  caught.push({film: d.film, from: d.from, s: C.s}); seen.add(d.film);
+  C.glow = 1; slow = .5; sfx('sfx_catch', .7); const f0 = 220 * Math.pow(2, (d.film % 12) / 12); tone(f0, 2.2, .06); tone(f0 * 1.5, 1.6, .03); buzz([10, 30, 18]);
+  const f = FILMS[d.film]; say(`${f.title}${f.src ? ' · ' + f.src : ''}`); if (caught.length === 1) $('act').style.opacity = 1;
 }
-function save(c) { const f = FILMS[c.film]; caught.push({film: c.film, frame: c.frame, s: C.s}); seen.add(c.film); threadClip(c);
-  C.glow = 1; slow = .35; sfx('sfx_catch', .8); tone(330 * Math.pow(2, (c.film % 12) / 12), 1.2, .07); tone(660 * Math.pow(2, (c.film % 12) / 12), .5, .03); buzz([12, 30, 20]);
-  say(`${f.title}${f.src ? ' · ' + f.src : ''}`); if (caught.length === 3) $('edit').style.opacity = 1; }
-function corrupt() { C.hurt = 1; slow = .25; $('flash').style.opacity = 1; setTimeout(() => $('flash').style.opacity = 0, 180); noise(.6, .2, 2600); tone(70, .6, .25, 'sawtooth'); buzz([40, 30, 90]);
-  if (BD.length) { const b = BD.pop(), t = tent[b.tent]; t.clips.splice(t.clips.indexOf(b), 1); caught.pop(); say('corrupted video: it ate your newest clip'); } else say('corrupted video'); }
-// ------------------------------------------------------------------ the camera: a chase shot, low and behind, leaning into the turns, pushing in when you save
-const camS = {s: 0, x: 0, y: 0, roll: 0};
-function stepCamera(dt, real) {
-  const lag = 1 - Math.pow(.004, real); camS.x += (C.x * .55 - camS.x) * lag; camS.y += (C.y * .55 - camS.y) * lag;
-  const back = 5.4 - 1.2 * C.glow + 1.2 * C.dash, {T: Tt, N, B} = frameAt(C.s - back), Cc = path(C.s - back);
-  const pos = Cc.clone().addScaledVector(N, camS.y + 1.25).addScaledVector(B, camS.x + .9);
-  camera.position.lerp(pos, 1 - Math.pow(.002, real));
-  const ahead = C.p.clone().addScaledVector(frameAt(C.s).T, 3.2);
-  camS.roll += (THREE.MathUtils.clamp(-C.vx * .06, -.35, .35) - camS.roll) * (1 - Math.pow(.05, real));
-  camera.up.copy(N).applyAxisAngle(Tt, camS.roll); camera.lookAt(ahead);
-  camera.fov += (62 + 14 * C.dash - camera.fov) * (1 - Math.pow(.02, real)); camera.updateProjectionMatrix();
+function drained(d) { d.live = false; C.hurt = 1; slow = .3; $('flash').style.opacity = 1; setTimeout(() => $('flash').style.opacity = 0, 180); noise(.6, .18, 2400); tone(70, .6, .2, 'sawtooth'); buzz([40, 30, 90]);
+  const t = tent.filter(t => t.clip).sort((a, b) => b.clip.t0 - a.clip.t0)[0]; if (t) { giveBlock(t.clip.block); t.clip = null; say('corrupted: it drained a worm'); } else say('corrupted'); }
+// ------------------------------------------------------------------ write every cloud's row
+function writeRows(dt) {
+  for (let i = 0; i < ND; i++) { const d = D[i], r = DROW + i; if (!d.live) { row(r, 1, -1, 1, 0, 0); continue; }
+    if (d.pour > 0) { d.pour += dt / 1.1; if (d.pour >= 1) { d.live = false; row(r, 1, -1, 1, 0, 0); continue; } }
+    else { d.s -= dt * .6; if (d.s < C.s - 6) { d.live = false; giveBlock(d.block); d.block = -1; continue; } }
+    const {N, B, C: Cc} = frameAt(d.s); d.pos.copy(Cc).addScaledVector(N, d.y + Math.sin(T * .5 + d.ph) * .3).addScaledVector(B, d.x + Math.cos(T * .4 + d.ph) * .3);
+    const fade = Math.min(1, (T - d.born) / 1.5), fr = (T * Math.min(10, FILMS[d.film].fps || 8));
+    row(r, 0, d.pos.x, d.pos.y, d.pos.z, d.size); row(r, 1, d.bad ? -1 : d.block, 1.35, fr, (d.bad ? .9 : 1) * fade);
+    row(r, 2, 0, d.bad ? .6 : 1.1, d.bad ? 1 : 0, d.pour); row(r, 4, d.bad ? 0 : .7, 0, 0, 0); row(r, 3, C.p.x, C.p.y, C.p.z, 0);
+    if (d.pour <= 0 && G.state === 'play') { const dd = d.pos.distanceTo(C.p); if (dd < d.size * .75 + .6) { if (d.bad) drained(d); else drink(d); } } }
+  // the worms: each node of a tentacle is a small cloud showing a later frame, so the film flows down it
+  for (let ti = 0; ti < TN; ti++) { const t = tent[ti], cl = t.clip; if (cl) cl.fill = Math.min(1, cl.fill + dt * .8);
+    for (let j = 0; j < TS; j++) { const r = WROW + ti * TS + j, i = (t.start + j) * 3, f = j / (TS - 1), on = cl && f <= cl.fill;
+      row(r, 0, X[i], X[i + 1], X[i + 2], (.26 - .14 * f) * (on ? 1.15 : .7)); row(r, 1, on ? cl.block : -1, 1, on ? T * 7 - j * .8 : 0, (on ? .5 : .3 * (1 - .6 * f)) * (1 - .8 * (V.u || 0)));
+      row(r, 2, 0, .4, 0, 0); row(r, 3, 0, 0, 0, 1); } }
 }
-// ------------------------------------------------------------------ your reel: every saved clip, in order, each playing its eight frames
-function playReel() {
-  if (!caught.length) return; G.state = 'reel'; $('reel').style.display = 'block'; const cv = $('rc'), g = cv.getContext('2d'), t0 = performance.now();
-  const step = () => { if (G.state !== 'reel') return; const t = (performance.now() - t0) / 1000, i = Math.floor(t / .9); if (i >= caught.length) { G.state = 'play'; $('reel').style.display = 'none'; return; }
-    const e = caught[i], f = FILMS[e.film], fr = e.frame + Math.floor((t - i * .9) * 9), im = img(frameURL(f, fr)); g.fillStyle = '#000'; g.fillRect(0, 0, cv.width, cv.height);
-    if (im.ok) { const s = Math.max(cv.width / im.im.naturalWidth, cv.height / im.im.naturalHeight); g.drawImage(im.im, (cv.width - im.im.naturalWidth * s) / 2, (cv.height - im.im.naturalHeight * s) / 2, im.im.naturalWidth * s, im.im.naturalHeight * s); }
-    else withImg(frameURL(f, fr), () => {});
-    g.fillStyle = 'rgba(242,230,207,.85)'; g.font = `italic ${Math.round(cv.height * .03)}px Georgia`; g.fillText(`${i + 1} / ${caught.length} · ${f.title}`, cv.width * .03, cv.height * .95); requestAnimationFrame(step); };
-  step();
+// ------------------------------------------------------------------ watching: what you carry blooms in the dark in front of you while time slows
+const V = {on: false, i: 0, t0: 0, list: []};
+function watch() { const list = tent.filter(t => t.clip).sort((a, b) => a.clip.t0 - b.clip.t0).map(t => t.clip); if (!list.length) return;
+  V.on = true; V.list = list; V.i = 0; V.t0 = RT; showView(); $('watch').textContent = 'Back'; sfx('sfx_enter_film', .35); }
+function showView() { const c = V.list[V.i % V.list.length]; loadClip(VIEWBLOCK, c.film, c.from); const f = FILMS[c.film]; say(`${V.i % V.list.length + 1} / ${V.list.length} · ${f.title}`); }
+function unwatch() { V.on = false; $('watch').textContent = 'Watch'; }
+function writeView() {
+  if (!V.on) { row(VROW, 1, -1, 1, 0, 0); return; }
+  const F = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 2).negate(), U = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 1), p = camera.position.clone().addScaledVector(F, 4.6).addScaledVector(U, .25), u = Math.min(1, (RT - V.t0) / .9);
+  const c = V.list[V.i % V.list.length], fps = Math.min(10, FILMS[c.film].fps || 8);
+  row(VROW, 0, p.x, p.y, p.z, 2.1 * (.5 + .5 * u * u * (3 - 2 * u))); row(VROW, 1, VIEWBLOCK, 1.4, (RT - V.t0) * fps, 1.7 * u); row(VROW, 2, 0, .45, 0, 0); row(VROW, 4, 1.6, 1.1, 0, 0); row(VROW, 3, 0, 0, 0, .35);
+  if (RT - V.t0 > BLOCK / fps * 2.2) { V.i++; V.t0 = RT; if (V.i >= V.list.length * 2) unwatch(); else showView(); }
 }
-function saveReel() { const edl = {title: 'The Current: a reel from the sewers', made: new Date().toISOString(), events: caught.map((e, i) => ({n: i + 1, film: FILMS[e.film].slug, title: FILMS[e.film].title, source: FILMS[e.film].src, from_frame: e.frame, frames: 8, url: frameURL(FILMS[e.film], e.frame), depth_m: +e.s.toFixed(1)}))};
+function saveReel() { const edl = {title: 'The Current: a reel drunk from the tunnels', made: new Date().toISOString(), events: caught.map((e, i) => ({n: i + 1, film: FILMS[e.film].slug, title: FILMS[e.film].title, source: FILMS[e.film].src, from_frame: e.from, frames: BLOCK, depth_m: +e.s.toFixed(1)}))};
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(edl, null, 1)], {type: 'application/json'})); a.download = 'the-current-reel.json'; a.click(); }
-// ------------------------------------------------------------------ the loop: fixed physics tick; time slows for a beat when something happens
-let last = performance.now(), acc = 0; const DT = 1 / 120;
+// ------------------------------------------------------------------ camera: a chase shot, behind and a little above, leaning into the turns
+const camS = {x: 0, y: 0, roll: 0};
+function stepCamera(real) {
+  const lag = 1 - Math.pow(.004, real); camS.x += (C.x * .6 - camS.x) * lag; camS.y += (C.y * .6 - camS.y) * lag;
+  const back = 6.2 - 1.2 * C.glow + 1.4 * C.dash + (V.on ? 1.5 : 0), {T: Tt, N, B} = frameAt(C.s - back), Cc = path(C.s - back);
+  camera.position.lerp(Cc.clone().addScaledVector(N, camS.y + 1.1).addScaledVector(B, camS.x), 1 - Math.pow(.003, real));
+  camS.roll += (THREE.MathUtils.clamp(-C.vx * .05, -.3, .3) - camS.roll) * (1 - Math.pow(.05, real));
+  camera.up.copy(N).applyAxisAngle(Tt, camS.roll); camera.lookAt(C.p.clone().addScaledVector(frameAt(C.s).T, 4).addScaledVector(N, .9));
+  camera.fov += (60 + 12 * C.dash - camera.fov) * (1 - Math.pow(.02, real)); camera.updateProjectionMatrix(); camera.updateMatrixWorld();
+  uCam.uR.value.setFromMatrixColumn(camera.matrixWorld, 0); uCam.uU.value.setFromMatrixColumn(camera.matrixWorld, 1); uCam.uF.value.setFromMatrixColumn(camera.matrixWorld, 2);
+}
+// ------------------------------------------------------------------ loop
+let last = performance.now(), acc = 0, RT = 0; const DT = 1 / 120;
 function frame(now) {
-  requestAnimationFrame(frame); const real = Math.min(.05, (now - last) / 1000); last = now; if (G.state === 'reel') return; const t0 = performance.now();
-  slow = Math.max(0, slow - real); const scale = 1 - .65 * Math.min(1, slow / .2); acc += real * scale;
-  let n = 0; while (acc >= DT && n < 12) { T += DT; if (G.state === 'play') stepCreature(DT); else { C.s += 2 * DT; C.ph += DT; const {T: Tg, N, B, C: Cc} = frameAt(C.s); C.p.copy(Cc).addScaledVector(N, Math.sin(T * .5) * .6); C.heading.copy(Tg);
+  requestAnimationFrame(frame); const real = Math.min(.05, (now - last) / 1000); last = now; RT += real; const t0 = performance.now();
+  slow = Math.max(0, slow - real); const scale = V.on ? .15 : 1 - .6 * Math.min(1, slow / .25); acc += real * scale;
+  let n = 0; while (acc >= DT && n < 12) { T += DT; if (G.state === 'play') stepCreature(DT); else { C.s += 1.5 * DT; C.ph += DT * .9; const {T: Tg, N, C: Cc} = frameAt(C.s); C.p.copy(Cc).addScaledVector(N, Math.sin(T * .5) * .5); C.heading.copy(Tg);
     C.q.setFromRotationMatrix(new THREE.Matrix4().lookAt(new THREE.Vector3(), Tg, N)).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2)); } stepTent(DT); acc -= DT; n++; } if (n === 12) acc = 0;
-  stepWorld(real * scale); skinTent();
+  spawn(C.s); stepCamera(real); writeRows(real * scale); writeView(); params.needsUpdate = true;
   creature.position.copy(C.p); creature.quaternion.copy(C.q);
-  const mu = mantle.material.uniforms; mu.uPulse.value = C.ph; mu.uTime.value = T; mu.uGlow.value = C.glow; mu.uHurt.value = C.hurt; mu.uDash.value = C.dash; mu.uScale.value = innerHeight * renderer.getPixelRatio() * .0095;
-  tentMesh.material.uniforms.uTime.value = T; tentMesh.material.uniforms.uHurt.value = C.hurt; pipeMat.uniforms.uTime.value = T; for (const m of [walls, clips, beads]) m.material.uniforms.uTime.value = T;
-  lamp.intensity = 2.2 + 3 * C.glow + 2 * C.dash; lamp.color.setRGB(1, .66 - .5 * C.hurt, .32 - .25 * C.hurt);
-  stepCamera(real, real);
-  if (T - sayT > 2.4) $('say').style.opacity = 0;
-  if (G.state === 'play') $('state').textContent = `${Math.round(C.s)} m deep · ${caught.length} clips · ${seen.size} films`;
+  const bu = bell.material.uniforms; bu.uPulse.value = C.ph; bu.uTime.value = T; bu.uGlow.value = C.glow; bu.uHurt.value = C.hurt; bu.uWhite.value = tent.filter(t => t.clip).length / TN; V.u = THREE.MathUtils.lerp(V.u || 0, V.on ? 1 : 0, 1 - Math.pow(.02, real)); bu.uFade.value = 1 - .8 * V.u; bu.uScale.value = innerHeight * renderer.getPixelRatio() * .009;
+  splatMat.uniforms.uTime.value = T; splatMat.uniforms.uScale.value = innerHeight * renderer.getPixelRatio() * .5 / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+  lamp.intensity = 2 + 3 * C.glow + 2 * C.dash; lamp.color.setRGB(1, .66 - .5 * C.hurt, .32 - .25 * C.hurt);
+  if (T - sayT > 2.6) $('say').style.opacity = 0;
+  if (G.state === 'play') $('state').textContent = `${Math.round(C.s)} m · ${caught.length} drunk · ${tent.filter(t => t.clip).length} worms carrying`;
   composer.render();
   const ft = performance.now() - t0; stat.frames.push(ft); if (stat.frames.length > 240) stat.frames.shift();
-  if (DEBUG) { const s = stat.frames.slice().sort((a, b) => a - b), q = x => s[Math.floor(x * (s.length - 1))].toFixed(1); $('dbg').textContent = `tentacles ${TN} × ${TS} · stretch ${(stat.resid * 100).toFixed(2)}% · clips live ${CL.filter(c => c.live).length}\nframe ms p50 ${q(.5)} p95 ${q(.95)} p99 ${q(.99)} · images ${IMG.size}`; }
+  if (DEBUG) { const s = stat.frames.slice().sort((a, b) => a - b), q = x => s[Math.floor(x * (s.length - 1))].toFixed(1); $('dbg').textContent = `splats ${16 * 2400 + 128 * 90 + 16000} · bell ${BN} · worms ${TN}×${TS} · stretch ${(stat.resid * 100).toFixed(2)}%\nclouds live ${D.filter(d => d.live).length} · free blocks ${freeBlocks.length} · images ${IMG.size}\nframe ms p50 ${q(.5)} p95 ${q(.95)} p99 ${q(.99)}`; }
 }
-// ------------------------------------------------------------------ start
 function begin() { if (!ac) { const A = window.AudioContext || window.webkitAudioContext; if (A) ac = new A(); } if (ac && ac.state === 'suspended') ac.resume();
-  for (const [n, v] of [['music_ocean', .3], ['sfx_ocean_bed', .3], ['sfx_projector_loop', .08]]) snd(n, v, true).play().catch(() => {});
-  $('title').style.display = 'none'; G.state = 'play'; say(COARSE ? 'point where you want to swim · tap to dash' : 'point the mouse where you want to swim (or arrows) · click or space to dash'); }
+  for (const [n, v] of [['music_ocean', .32], ['sfx_ocean_bed', .32]]) snd(n, v, true).play().catch(() => {});
+  $('title').style.display = 'none'; G.state = 'play'; say(COARSE ? 'point where you want to swim · tap to dash' : 'point where you want to swim (or arrows) · click or space to dash'); }
 const cv = $('gl');
-cv.addEventListener('pointerdown', e => { ptr.down = true; ptr.active = true; ptr.x = e.clientX; ptr.y = e.clientY; ptr.t0 = performance.now(); try { cv.setPointerCapture(e.pointerId); } catch (x) {} });
+cv.addEventListener('pointerdown', e => { ptr.down = true; ptr.active = true; ptr.x = e.clientX; ptr.y = e.clientY; ptr.t0 = performance.now(); if (V.on) { V.i++; V.t0 = RT; showView(); } try { cv.setPointerCapture(e.pointerId); } catch (x) {} });
 cv.addEventListener('pointermove', e => { ptr.x = e.clientX; ptr.y = e.clientY; if (e.pointerType === 'mouse') ptr.active = true; });
-addEventListener('pointerup', e => { if (ptr.down && G.state === 'play' && performance.now() - ptr.t0 < 220) dash(); ptr.down = false; if (e.pointerType !== 'mouse') ptr.active = true; });   // a finger's last place stays the target
-addEventListener('keydown', e => { const k = e.key.toLowerCase(); if (k === ' ') { e.preventDefault(); if (G.state === 'play') dash(); else if (G.state === 'reel') { G.state = 'play'; $('reel').style.display = 'none'; } } if (k.startsWith('arrow')) e.preventDefault(); keys.add(k); if (k.startsWith('arrow') || 'wasd'.includes(k)) ptr.active = false; });
+addEventListener('pointerup', () => { if (ptr.down && G.state === 'play' && !V.on && performance.now() - ptr.t0 < 220) dash(); ptr.down = false; });
+addEventListener('keydown', e => { const k = e.key.toLowerCase(); if (k === ' ') { e.preventDefault(); if (G.state === 'play') dash(); } if (k === 'enter' || k === 'e') { V.on ? unwatch() : watch(); } if (k === 'escape' && V.on) unwatch();
+  if (k.startsWith('arrow')) e.preventDefault(); keys.add(k); if (k.startsWith('arrow') || 'wasd'.includes(k)) ptr.active = false; });
 addEventListener('keyup', e => keys.delete(e.key.toLowerCase()));
-$('reel').addEventListener('pointerdown', () => { G.state = 'play'; $('reel').style.display = 'none'; });
-$('go').onclick = begin; $('play').onclick = playReel; $('save').onclick = saveReel; if (DEBUG) $('dbg').style.display = 'block';
+$('go').onclick = begin; $('watch').onclick = () => V.on ? unwatch() : watch(); $('save').onclick = saveReel; if (DEBUG) $('dbg').style.display = 'block';
 C.p.copy(path(C.s)); C.heading.copy(tangent(C.s)); C.q.setFromRotationMatrix(new THREE.Matrix4().lookAt(new THREE.Vector3(), C.heading, frameAt(C.s).N)).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2));
 seat(); camera.position.copy(path(C.s - 6)); requestAnimationFrame(frame);
-window.__cur = () => ({state: G.state, s: C.s, caught: caught.length, films: seen.size, beads: BD.length, resid: stat.resid, images: IMG.size,
+if (Q.has('debug')) window.__dbg = {V, D, tent, caught, creature, watch, loadClip, FILMS, C, THREE, atlas, scene, camera};
+window.__cur = () => ({state: G.state, s: C.s, caught: caught.length, worms: tent.filter(t => t.clip).length, watching: V.on, resid: stat.resid, images: IMG.size, free: freeBlocks.length,
   p95: (() => { const s = stat.frames.slice().sort((a, b) => a - b); return s[Math.floor(.95 * (s.length - 1))]; })(),
-  good: (() => { const c = CL.filter(c => c.live && !c.bad && c.pos && c.s > C.s + 2).sort((a, b) => a.s - b.s)[0]; if (!c) return null; const p = c.pos.clone().project(camera); return [(p.x + 1) / 2 * innerWidth, (1 - p.y) / 2 * innerHeight, c.x, c.y]; })()});
+  good: (() => { const d = D.filter(d => d.live && !d.bad && d.pour <= 0 && d.s > C.s + 2).sort((a, b) => a.s - b.s)[0]; return d ? [0, 0, d.x, d.y] : null; })()});
 </script>
 </body>
 </html>

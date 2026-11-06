@@ -13,5 +13,20 @@
   "files": [
    "fal/design_v2.mp4"
   ]
+ },
+ {
+  "endpoint": "minimax/h3-max/text-to-video",
+  "name": "design_v4",
+  "seconds": 15.9,
+  "arguments": {
+   "duration": 10,
+   "resolution": "1080P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "prompt": "Dark foggy underwater sewer tunnel, 3D game, chase camera behind a glowing golden creature of light, a squid-like jellyfish made of thousands of shimmering particles with long trailing tentacles. Old black-and-white film clips drift through the fog not as rectangles but as soft glowing clouds of gaussian splats, faces and hands and animals dissolving at the edges like smoke; other clips stretch into long luminous worms of time, the moving image flowing along them. The creature touches a cloud and it pours into its tentacles, which become glowing time worms carrying the moving pictures. A few red corrupted clouds of static crackle in the haze. Organic, no frames, no screens, haunting, deep fog, soft glow bleeding through the haze.",
+  "files": [
+   "fal/design_v4.mp4"
+  ]
  }
 ]
