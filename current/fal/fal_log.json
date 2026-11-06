@@ -43,5 +43,153 @@
   "files": [
    "fal/design_v5_720.mp4"
   ]
+ },
+ {
+  "endpoint": "minimax/h3-max/text-to-video",
+  "name": "song_nightbus-03",
+  "seconds": 22.7,
+  "arguments": {
+   "duration": 10,
+   "resolution": "1080P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in Ray Run, a fast straight channel where a great ray silhouette of dark flecks sweeps overhead, its wake pulling everything forward, and shrimp of tiny sparks skitter. FLOW: the jellyfish races down the channel with quick even pulses while spark-shrimp streak past; at about four seconds the great ray silhouette sweeps in overhead and its wake surges, the film-bead tentacles stream straight ahead and drifting fleck-clouds of old footage are pulled into long luminous trails; in the last seconds the jellyfish rides the wake at full speed, the channel walls rushing by. Fast, smooth, exhilarating.",
+  "files": [
+   "fal/song_nightbus-03.mp4"
+  ],
+  "song": "nightbus-03",
+  "level": "ray_run",
+  "audio_start": 54.079,
+  "request_id": "01a1b2de-083a-7421-89b7-d191a5c35f63"
+ },
+ {
+  "endpoint": "minimax/h3-max/text-to-video",
+  "name": "song_nightbus-06",
+  "seconds": 21.9,
+  "arguments": {
+   "duration": 10,
+   "resolution": "1080P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in Interference, a passage where film comes apart into rust-red broken fragments of flecks with frame order scrambled. FLOW: a chain of film slices climbs and falls in neat stepping staircases beside the jellyfish; at about four seconds a wave of rust-red static breaks over the passage, the slices shatter into scattered red flecks and their order scrambles, faces and hands flashing out of sequence; in the last seconds the red thins to drifting embers and the jellyfish swims on through clear dark water. Tense, then still.",
+  "files": [
+   "fal/song_nightbus-06.mp4"
+  ],
+  "song": "nightbus-06",
+  "level": "interference",
+  "audio_start": 92.949,
+  "request_id": "01a1b2de-60e1-72e2-902e-52832f7f71fb"
+ },
+ {
+  "endpoint": "minimax/h3-max/text-to-video",
+  "name": "song_nightbus-08",
+  "seconds": 22.3,
+  "arguments": {
+   "duration": 10,
+   "resolution": "1080P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in the rejoin, where two passages merge around a dark rock pillar into one wider tunnel. FLOW: the jellyfish swims out of the left passage as a second stream of fleck-clouds pours from the right; at about four seconds the two currents meet behind the dark pillar and braid together, the jellyfish caught in the swirl, film beads wrapping around it; in the last seconds the tunnel widens and the flow slows into one calm river of drifting footage-clouds. Steady, warm, unhurried.",
+  "files": [
+   "fal/song_nightbus-08.mp4"
+  ],
+  "song": "nightbus-08",
+  "level": "rejoin",
+  "audio_start": 17.671,
+  "request_id": "01a1b2de-b65e-70b3-808f-adc7700eac41"
+ },
+ {
+  "endpoint": "minimax/h3-max/text-to-video",
+  "name": "song_nightbus-13",
+  "seconds": 22.5,
+  "arguments": {
+   "duration": 10,
+   "resolution": "1080P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in the surface and the Screening Room, where the water thins toward a pale ceiling of light and the carried films bloom large in the dark. FLOW: the jellyfish rises toward a pale shimmering ceiling, its celluloid layers catching the light one by one; at about four seconds it breaks into the brighter water and the film beads on its tentacles lift free and bloom into large soft clouds of flecks showing old footage, a horse running, a face turning; in the last seconds the clouds hang luminous around the small jellyfish. Bright, glad, weightless.",
+  "files": [
+   "fal/song_nightbus-13.mp4"
+  ],
+  "song": "nightbus-13",
+  "level": "surface",
+  "audio_start": 18.414,
+  "request_id": "01a1b2df-0ddf-7133-b043-a15ddde301f0"
+ },
+ {
+  "endpoint": "minimax/h3-max/text-to-video",
+  "name": "song_nightbus-14",
+  "seconds": 21.9,
+  "arguments": {
+   "duration": 10,
+   "resolution": "1080P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in the deep reach, a vast dark descent where the tunnel opens into void and marine snow falls. FLOW: the jellyfish glides at the lip of the void with chains of film slices curving beside it like slow ribbons; at about four seconds the floor falls away and it begins to sink, the ribbons bending downward after it, marine snow drifting up past the camera; in the last seconds it is a small amber light descending into vast dark teal, a few fleck-clouds of footage sinking with it. Elegant, slow, falling.",
+  "files": [
+   "fal/song_nightbus-14.mp4"
+  ],
+  "song": "nightbus-14",
+  "level": "deep",
+  "audio_start": 62.786,
+  "request_id": "01a1b2df-6560-77b0-a8ee-f5a12ae9f926"
+ },
+ {
+  "endpoint": "minimax/h3-max/text-to-video",
+  "name": "song_nightbus-17",
+  "seconds": 21.8,
+  "arguments": {
+   "duration": 10,
+   "resolution": "1080P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in Silt Pocket at the moment of the strike, the anglerfish silhouette of dim particles lunging from the dark behind its lure, the escape eddy spinning at one side. FLOW: the jellyfish flees in hard rapid pulses while the anglerfish silhouette of dim particles surges behind it, jaw opening, its lure swinging; the chase holds at full pressure, silt exploding off the floor; at about seven seconds the jellyfish dives into the spinning escape eddy and is flung clear, and the dark shape stops dead and fades back into the gloom. Relentless, then sudden quiet.",
+  "files": [
+   "fal/song_nightbus-17.mp4"
+  ],
+  "song": "nightbus-17",
+  "level": "strike",
+  "audio_start": 109.319,
+  "request_id": "01a1b2df-bac7-72f2-91b6-deb609b3d937"
+ },
+ {
+  "endpoint": "minimax/h3-max/text-to-video",
+  "name": "song_neonbutterfly-02",
+  "seconds": 21.9,
+  "arguments": {
+   "duration": 10,
+   "resolution": "1080P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in the surface and the Screening Room, where the water thins toward a pale ceiling of light and the carried films bloom large in the dark. FLOW: in the pale water under the surface the jellyfish turns slowly while its film beads loosen; at about four seconds the music returns and every carried film releases into soft fleck-clouds that spin around it in a wide glittering ring, showing dancers, a bicycle, a waving hand; in the last seconds the ring rises toward the light like confetti made of footage. Nostalgic, joyful, swirling.",
+  "files": [
+   "fal/song_neonbutterfly-02.mp4"
+  ],
+  "song": "neonbutterfly-02",
+  "level": "surface",
+  "audio_start": 149.672,
+  "request_id": "01a1b2e0-0fd4-7b31-bd33-cd8de56795ae"
+ },
+ {
+  "endpoint": "minimax/h3-max/text-to-video",
+  "name": "design_v6",
+  "seconds": 18.1,
+  "arguments": {
+   "duration": 10,
+   "resolution": "1080P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "prompt": "LAW: a small amber jellyfish of light, small in the frame, swims away from a level trailing camera through a branching underwater archive tunnel of near-black teal water; there is always open dark water ahead of it. Films exist only as soft clouds of luminous flecks beside the route, never rectangles: a raised hand gathers out of pale flecks, then a face. Behind the jellyfish trail a few thin arms made of successive glowing film slices. The tunnel splits into two smooth mouths: the left a quiet pale alcove where a film hangs suspended in slow light, the right a faster stream where a wide pale ray glides across and drags the drifting silt with its wake. FLOW: translucent comb jellies with shimmering rainbow rows trace the current; a shoal of tiny shrimp flicks away; deeper, a lure pulses twice in the dark and an anglerfish silhouette is revealed by the silt it pushes aside; a brief rust-red flicker of broken film fragments clears into dark water; at the end the water brightens toward a rippling surface of light. Slow, calm, readable, haunting.",
+  "files": [
+   "fal/design_v6_720.mp4"
+  ]
  }
 ]

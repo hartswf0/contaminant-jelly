@@ -1,62 +1,83 @@
-# The Current (fifth version): the dive to the Source
+# The Branching Archive (The Current, sixth version)
 
-A golden jellyfish of light dives 605 m of drowned tunnel to the Source.
-- **Films:** clouds of light. Some drift with the water, some grow on the walls as reefs, some flow inside eels, and one dangles from an anglerfish as bait.
-- **Drinking:** drink a film and it blooms briefly by itself. Your tentacle becomes a time worm that carries it.
-- **The end:** at the Source your worms let go, one film at a time, and the dive is told.
-- **Together:** with others, everyone in a room meets the same films.
+Memory Maker · Timeworm. A small amber jellyfish of layered celluloid swims a branching film archive. It takes frames by casting at films as they resolve, grows one timeline arm per film, and chooses a current at each fork. It outruns an anglerfish that announces itself, and it surfaces at 590 m with a cut it can watch (as splats or a timeworm), shape and share.
 
-Rules:
-- [SCION_NEVER_A_FRAME.md](SCION_NEVER_A_FRAME.md): video is only clouds, worms or a bloom.
-- [SCION_GOLDEN_RIVERBED.md](SCION_GOLDEN_RIVERBED.md): the prompt engine, run on the game itself as [riverbed_v5.json](riverbed_v5.json).
+**Documents for this version:**
+- **Spec of record:** [riverbed_v6.json](riverbed_v6.json), the user's GOLDEN RIVERBED record.
+- **As built:** [SCION_BRANCHING_ARCHIVE.md](SCION_BRANCHING_ARCHIVE.md): the invariants, the control surface, the title, the reticle, sound layers, haptics.
+- **Theory of play:** [SCION_LUDIC_BRANCHING_ARCHIVE.md](SCION_LUDIC_BRANCHING_ARCHIVE.md).
+- **Songs:** [SONG2GAME.md](SONG2GAME.md), with `audio/song2game.json` and `audio/song2video.py`.
 
-Earlier: [v4](v4.html) ([notes](NOTES_v4.md)), [v3](v3.html), [v2](v2.html), [v1](v1.html).
+Earlier: [v5](v5.html) ([notes](NOTES_v5.md)), [v4](v4.html), [v3](v3.html).
 
-## What changed from v4, and why
-| ask | answer |
+## The loop this time: video2game + song2game
+1. **Source.** The user's riverbed JSON. It is stored as-is and governs the build.
+2. **Listening.** All 56 VOLHOLLA songs were fetched from the moto repository and analysed offline (`music.json` → `an`):
+   - tempo and beat phase from spectral flux;
+   - a 4 Hz energy envelope;
+   - spectral centroid;
+   - a 48-band spectrogram strip per song (`audio/spec/`, sheet: `audio/spectrograms_picks.jpg`).
+3. **Song2game.** An agent read the spectrograms and assigned one song per level, each with a start and end on a beat:
+
+| level | song | start |
+|---|---|---|
+| landing | *Preparation & Drift* | 0.3 s |
+| entry | *Stay in the Current* | 0.3 s |
+| Lantern Grotto | *Tizita* | 0.4 s |
+| Ray Run | *Command Decent* | 58.4 s |
+| rejoin | *Silt Bench* | 75.9 s |
+| Silt Pocket | *Ritual of the Ash and Silt (1)* | 3.0 s |
+| the strike | *Ritual (2)* | 78.1 s |
+| Interference | *Heart Is Stone* | 156.2 s |
+| the deep | *Gospel Under Water* | 0.0 s |
+| the surface | *Go Home and Be Free* | 10.9 s |
+
+   It also matched the earlier design videos to songs (design_v5 ↔ *Steel & Static* at 83 s), wrote a Directorial Gardener treatment and a video prompt for each of the 26 songs, and wrote `song2video.py` to render them.
+4. **Design videos.**
+   - `fal/design_v6_720.mp4`, from the riverbed's laws. It shows a small low jelly, a huge face and hand beside it, twin mouths, an angler in a round passage, and water brightening toward a surface.
+   - **Seven song videos** (`fal/song_*.mp4`, sheet `fal/songs_sheet.jpg`) before the fal balance ran out again. Three of them drew framed photo cards or red rectangles despite the prompt's law. Treat them as mood references, not as targets.
+5. **What the design video changed:** a larger first screening (a face beside a small jelly), and water that pales toward the surface.
+
+## What changed from v5, and why
+| riverbed rule / ask | built |
 |---|---|
-| "the videos aren't visible anywhere really" | Clouds are bigger, softer and brighter (softness 0.9). **Film reefs**, 6 large soft clouds rooted on the walls and pillars, brighten as you pass. Every drink makes a **taste bloom**: the new film blooms beside you for 2.5 s. |
-| other animals and predators | **Anglerfish** (original design): a dark bulk of particles with a faint sheen, blue photophores, irregular fangs and a stalk whose lure *is a film*. It lurks, notices you within 15 m, hunts, then lunges. A bite or touching the lure costs two carried films. **Film eels** ride the currents; their bodies are one film flowing head to tail; drink from the tail and they dart away. **Fish schools** of flecks scatter from you and from the angler. |
-| more paths and currents | **Three chambers** where the tunnel forks around a pillar. The right side is richer (75% pairs, 5% corrupted) and the angler waits there; the left side is poorer and 45% corrupted. **Two spiral currents**: ride one and it holds you, speeds you up (+5.5 m/s), streams your tentacles and carries the films in it. Marine snow shows them. |
-| better physics | Thrust comes from the bell's contraction. Tentacles are dragged by water that flows down the tunnel, faster in currents, with eddies, and kept out of the pillars by their SDF. |
-| pinch to zoom out, peek along the side | Pinch pulls back (2.8 to 24 m). Two fingers dragging swing the camera around the creature and tilt it. Desktop: scroll, right-drag or shift-drag, Z / X, − / =; double-click or R resets. The view eases back behind you after 2.5 s. The camera stays inside the tunnel and out of the pillar. |
-| micro-minimap | A 26 px strip at the right edge: the next 90 m and the last 36 m of tunnel, its forks, film clouds (white), corruption (red), reefs, eels (green), anglers (amber, flashing when hunting), other divers (cyan), you (gold), the Source line, and a progress bar to the end. |
-| clearer end state | The Source at 605 m. The tunnel opens into a hall, the camera orbits, and each carried film blooms in turn while *Go Home and Be Free* plays. Then the end card lists the films you carried, out of those you drank, with bites, corruption, eels, time and companions, plus Dive again, Save reel and Share the dive. |
-| multiplayer | **Swim together** makes a room link. The room seeds the world, so everyone meets the same films in the same places. Others appear as cyan jellyfish. A film one diver drinks pours toward them and is gone for everyone. Transport: BroadcastChannel between tabs on one device, and PeerJS through its public broker across devices; the first diver hosts. |
-| deep underwater sound and the songs | A synthesized bed: brown noise through a breathing low-pass, 38 and 55 Hz pressure tones, panned bubble chirps, distant calls through a 4.5 s reverb, a rush in currents and dashes, a stroke for every pulse, and a low drone when the angler hunts. **The 56 VOLHOLLA songs you chose** (`music.json`, with your notes) stream from the moto site through an underwater low-pass that darkens with depth and opens when you watch. They change by zone: drift, chamber, deep, hunt (*Ritual of the Ash and Silt (2)*), end (*Go Home and Be Free*). **M** switches station (the deep, the surface for the bright and lyric songs, off); tap the song line or press N to skip. |
-
-## The video-to-game loop
-1. **Source.** The GOLDEN RIVERBED prompt, transformed into SCION and run on the game: `riverbed_v5.json`.
-2. **Design video.** `fal/design_v5_720.mp4` (sheet `fal/design_v5_sheet.jpg`), from the master prompt. It shows large soft film clouds (a horse, a face, a hand), the small golden jellyfish, an anglerfish silhouette with a lure, round passages, a cyan jellyfish, rows of small film clouds and red grain at the walls.
-3. **Build, then fix by looking:**
-
-| what the screenshots showed | fix |
-|---|---|
-| Wall plankton drew as teal squares | Round, sub-cell specks. |
-| The angler's teeth lined up as a dotted rectangle | 30 uneven, curved fangs that point inward. |
-| The angler was invisible on dark water | A faint sheen of larger dark-teal points, which brightens when it hunts. |
-| The sheen swelled into bubbles at the lens | Size capped, and a fade from 1.5 to 5 m. |
-| On a phone the films filled the screen and hid the creature | Portrait phones start 8.5 m back. |
+| Jelly small; bell 12–18% of the short side | Camera distance is derived from the bell's width and the viewport. Measured 14–15% in ordinary play on desktop and phone, about 10% during the ray crossing (the spec allows wider framing there) |
+| Level trailing camera; Look returns along the same arc | `camera.up` is the passage normal. Look arcs ≤ 35° at a fixed rate, by hold, Q / E, V or a two-finger side slide |
+| Proportional drag steering; screen-right is right | The drag vector is projected through the camera axes. Measured: with Look held, screen-right input moved the jelly along camera-right (+0.11 m in the test window) |
+| Wall slide | Outward velocity is removed at the wall. Measured: the jelly holds at the boundary, and the outward velocity drops to 0 |
+| "The tube gets in the way" | Walls are additive outlines (rings, plankton, the spectrogram trace) and can no longer black out a film |
+| Real forks | Two passages per fork with different currents, films, animals and music. The commit happens only after the throat; the far passage is hidden after the commit; each fork rejoins at a ⊕ eddy. The Chart offers "Return to the last fork" |
+| One film, one arm, source order | Verified: `giraffe: [14,15,17,20,27,29,30,34]`, `cat: [15,16,18,22,23,25,26]` (frames sorted regardless of capture order) |
+| Films resolve before they can be gathered; better reticles | Far clouds drift as flecks and close in as a picture; the reticle ring closes; the label goes from RESOLVING to CAST READY, with title, timestamp and arm count |
+| Videos behave like fluid | Flecks are advected by flow noise, more so when far, and the swimmer's wake pushes and swirls nearby flecks |
+| A clearer jellyfish of celluloid | Three nested sheets (amber, honey, pale celluloid) with sprocket perforations and frame lines, contracting one after another. The film you last took lights the bell. The silt is cold, fine and dim, so the jelly cannot be mistaken for it |
+| Creatures change the water | Comb jellies (rainbow combs; touch for Long Reach). Shrimp (scatter and kick silt; the early cue of the angler). The ray (its wake pulls you and the silt: Slipstream). The anglerfish (bulk revealed by the silt it shoves). Interference fragments (orbiting red warning ticks, broken frame order) |
+| Predators announce; banked work is safe | patrol → warn (two cold pulses) → turn → chase ≤ 3.2 s → patrol. The escape eddy stops it. A bite costs membrane (35), never frames |
+| How long, how many | A dive is 3–5 minutes. The surface reports frames, films, time, membrane and echoes on the beat. Membrane damage and eddy repair are a stake; a torn membrane surfaces early with every frame kept |
+| Powerups | Lantern motes (16 on the route) charge the Lantern, which reveals dark reels and the angler. Long Reach (8 → 14 m). Slipstream (+4 m/s). Echo (22 m, or 40 m on the beat) |
+| Onboarding, tutorial, title | The landing is four operations and four buttons. The particle title condenses, is punched with sprocket holes, breathes with the music and parts around a swimming jelly. The tutorial teaches steer, Look, Focus, Cast and fork, each advancing when done |
+| Audio through the experience | Layers far, mid and near. Creatures sit in HRTF space. Focus quiets the water. Each level has its own song, switched on a downbeat. The bell strokes on the beat. Splats brighten on beats. Screening cuts land on beats. The walls carry the spectrogram of what you heard. The Chart draws the route as thick as the sound was loud. The Pause menu has *Gospel Under Water*, *Stay in the Current*, *Preparation & Drift* or water only |
+| Haptics on mobile | Patterns for wall, commit, capture, lure pulse, chase, bite, interference, on-beat echo and surface (Android Chrome; iOS Safari has no vibration API) |
+| Multiplayer (optional) | Room link, seeded world, ghost jellies; each capture is claimed once (the earliest claim wins); Cast at a partner to share a frame; departure removes nothing |
+| Screening | Splats or timeworm (the format switch keeps the playhead). Optical match: the first frame flies from its arm into the screening. Shape the cut with ↑ ↓ ✕. Save as an EDL. A share link opens the cut directly in the Screening Room |
 
 ## Measured
-Headless Chromium, software GL, five films served locally. Music and PeerJS are blocked in this sandbox.
+Headless Chromium, software GL, five films served locally, seed 7. The music and PeerJS hosts are blocked in this sandbox, so the beat sync ran on live-onset fallback with no songs.
 
-| measure | result |
+| check | result |
 |---|---|
-| 60 s scripted run, 640×360 | 9 films drunk, 7 carried, no page errors |
-| 60 s scripted run, 390×844 touch | 5 drunk, no page errors |
-| two tabs in room `test1` (BroadcastChannel) | each sees the other as a ghost; of the 10 clouds live in both, all 10 agree in film, frame and corruption; a film drunk in one tab is gone in the other |
-| real two-finger pinch (CDP touch events) | pinching in pulled the camera from 6.2 to 24 m; a two-finger drag swung it −0.73 rad |
-| angler, framed run | lurk → hunt at 15 m → lunge → bite → rest → lurk |
-| the Source, forced with 4 worms | hall, reel bloom of all 4, end card listing them |
-| tentacle stretch | 1.4–5% in play (it spikes when a test teleports the creature) |
-| frame time p95, CPU side, software GL | 7–17 ms |
+| route left (Grotto), 640×360 | commits after the throat; 15 frames, 2 arms in source order; no page errors |
+| route right (Ray Run), 640×360 | commits; 5 frames, 2 arms; bell 14–15%; no page errors |
+| Silt Pocket, desktop and 390×760 touch | patrol → warn → turn; in the eddy the chase ends; no page errors |
+| surface | Screening Room opens; splats → timeworm keeps playing; the cut link reopens the same 3 frames |
+| arm tips leaving the frame | 0 in every sample |
 
-**Not measured:**
-- the songs actually playing: github.io is blocked here (the stream URLs, decoding and the Web Audio graph are untested);
+**Not verified:**
+- the songs actually playing, decoding and syncing in a browser (github.io was unreachable here);
 - PeerJS across devices;
 - real GPUs and phones;
-- all 109 films from github.io;
+- physical pinch;
+- haptics on hardware;
 - how it feels in the hand.
 
-No person has played it yet.
+No person has played it yet. The remaining 19 song videos need fal credit: `FAL_KEY=… python3 audio/song2video.py` resumes and skips videos already on disk.

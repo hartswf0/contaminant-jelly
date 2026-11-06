@@ -1,0 +1,2185 @@
+{
+ "meta": {
+  "name": "SONG2GAME",
+  "version": 1,
+  "source": "music.json + audio/spec/*.png",
+  "time_note": "env is 4 samples/s; spec PNGs are about 4.31 columns/s (width/dur), not 4: convert spec columns with width/dur.",
+  "start_rule": "start = beat0 + k*60/bpm (nearest beat to the section onset); end = start + a whole number of 4-beat bars that fits inside the section",
+  "video_endpoint": "minimax/h3-max/text-to-video"
+ },
+ "levels": {
+  "landing": {
+   "name": "Landing / onboarding",
+   "primary": "daehoned-10",
+   "title": "Preparation & Drift",
+   "alternates": [
+    {
+     "id": "daehoned-05",
+     "start": 28.051,
+     "end": 89.354
+    },
+    {
+     "id": "siltwire-06",
+     "start": 0.395,
+     "end": 93.274
+    }
+   ],
+   "start": 0.302,
+   "end": 47.301,
+   "loop": true,
+   "bpm": 117.45,
+   "beat": 0.5109,
+   "why": "Its 2.04 s sawtooth breath (four beats) is the most regular pulse in the set and can drive the bell's idle pulse; the sparse first 48 s loops under the title without crowding it. Kept from the provisional table."
+  },
+  "entry": {
+   "name": "Entry reach (tutorial)",
+   "primary": "siltwire-10",
+   "title": "Stay in the Current",
+   "alternates": [
+    {
+     "id": "siltwire-06",
+     "start": 0.395,
+     "end": 93.274
+    },
+    {
+     "id": "daehoned-02",
+     "start": 0.163,
+     "end": 84.687
+    }
+   ],
+   "start": 0.279,
+   "end": 78.294,
+   "loop": true,
+   "bpm": 92.29,
+   "beat": 0.6501,
+   "why": "Gentle 0 to 11.75 s, then the bass figure gives a steady steering pulse to 80 s; the bass-out drop at 80.25 s and the hole near 112 s are natural pauses for the first watched film. Kept."
+  },
+  "grotto": {
+   "name": "Fork A: Lantern Grotto",
+   "primary": "firstwintera-13",
+   "title": "Tizita",
+   "alternates": [
+    {
+     "id": "siltwire-15",
+     "start": 8.244,
+     "end": 44.468
+    },
+    {
+     "id": "nightbus-14",
+     "start": 80.339,
+     "end": 121.298
+    }
+   ],
+   "start": 0.395,
+   "end": 130.803,
+   "loop": true,
+   "bpm": 143.55,
+   "beat": 0.418,
+   "why": "47% silent frames and free-time phrases: the most space of any song, so films can bloom without competing. Loop ends before the 131 s silence and the climax. Kept."
+  },
+  "ray_run": {
+   "name": "Fork A: Ray Run",
+   "primary": "nightbus-03",
+   "title": "Command Decent",
+   "alternates": [
+    {
+     "id": "event-03",
+     "start": 26.285,
+     "end": 58.793
+    },
+    {
+     "id": "daehoned-23",
+     "start": 51.618,
+     "end": 152.67
+    }
+   ],
+   "start": 58.421,
+   "end": 142.105,
+   "loop": true,
+   "bpm": 152.0,
+   "beat": 0.3947,
+   "why": "OVERTURNED. event-03 is the smoothest song of the set (jump 0.23) and drops to near silence at 59.75 to 70.5 s and 86.25 to 97.5 s, which would stall a fast channel. nightbus-03 holds 7.2 to 7.8 for 84 s from its 58 s step at 152 bpm. event-03 stays as the alternate for a single ray pass (its 49.5 s swell then silent wake)."
+  },
+  "rejoin": {
+   "name": "The rejoin",
+   "primary": "siltwire-15",
+   "title": "Silt Bench",
+   "alternates": [
+    {
+     "id": "daehoned-19",
+     "start": 48.369,
+     "end": 181.193
+    },
+    {
+     "id": "nightbus-08",
+     "start": 21.433,
+     "end": 161.871
+    }
+   ],
+   "start": 75.863,
+   "end": 153.142,
+   "loop": true,
+   "bpm": 99.38,
+   "beat": 0.6037,
+   "why": "From 75.75 s it rebuilds out of the hole into bell-like dashes, a merging-and-stirring arc. Never start at 0: 8 s of silence opens it and a 29 s hole sits at 46.75 to 75.75 s. Kept, with a start offset."
+  },
+  "pocket": {
+   "name": "Fork B: Silt Pocket (ambient)",
+   "primary": "twobuttons-13",
+   "title": "Ritual of the Ash and Silt (1)",
+   "alternates": [
+    {
+     "id": "firstwintera-13",
+     "start": 61.001,
+     "end": 106.142
+    },
+    {
+     "id": "event-04",
+     "start": 0.209,
+     "end": 30.86
+    }
+   ],
+   "start": 2.995,
+   "end": 77.299,
+   "loop": true,
+   "bpm": 103.36,
+   "beat": 0.5805,
+   "why": "Seven breath phrases with shrinking gaps (about 15 s down to 10 s): dread builds on its own. The loop ends before the 78.75 s accent, which the strike can take over. Kept."
+  },
+  "strike": {
+   "name": "Fork B: Silt Pocket (strike)",
+   "primary": "twobuttons-14",
+   "title": "Ritual of the Ash and Silt (2)",
+   "alternates": [
+    {
+     "id": "nightbus-17",
+     "start": 43.932,
+     "end": 112.291
+    },
+    {
+     "id": "daehoned-02",
+     "start": 29.143,
+     "end": 84.687
+    }
+   ],
+   "start": 78.109,
+   "end": 144.98,
+   "loop": true,
+   "bpm": 107.67,
+   "beat": 0.5573,
+   "why": "The slam at 78.25 s is the hardest onset available. Its own 59.5 to 78.25 s section is paired isolated hits, a two-pulse lure, which can be used as the warning when the angler starts to hunt. Kept.",
+   "warn": {
+    "start": 59.72,
+    "end": 78.109,
+    "note": "optional pre-roll: paired lure hits before the slam"
+   }
+  },
+  "interference": {
+   "name": "Fork B: Interference",
+   "primary": "firstwintera-18",
+   "title": "Heart Is Stone",
+   "alternates": [
+    {
+     "id": "nightbus-06",
+     "start": 81.92,
+     "end": 128.359
+    },
+    {
+     "id": "daehoned-18",
+     "start": 72.582,
+     "end": 150.597
+    }
+   ],
+   "start": 156.223,
+   "end": 188.917,
+   "loop": true,
+   "bpm": 80.75,
+   "beat": 0.743,
+   "why": "Only its 159.25 to 191.75 s section is broken (gating 0 to 9, std 3.2, the largest swing of any section); the rest is a steady pulse. Start one bar early for a lead-in, or at the break. Kept, with a start offset.",
+   "break_at": 159.195
+  },
+  "deep": {
+   "name": "The deep reach",
+   "primary": "siltwire-02",
+   "title": "Gospel Under Water",
+   "alternates": [
+    {
+     "id": "event-04",
+     "start": 33.647,
+     "end": 159.039
+    },
+    {
+     "id": "nightbus-14",
+     "start": 32.554,
+     "end": 120.323
+    }
+   ],
+   "start": 0.023,
+   "end": 183.931,
+   "loop": true,
+   "bpm": 117.45,
+   "beat": 0.5109,
+   "why": "The darkest song (centroid 347 Hz) with two great swells at 52.25 and 161.5 s. The last 29 s are silence and must be cut. Kept."
+  },
+  "surface": {
+   "name": "Surface and Screening Room",
+   "primary": "twobuttons-06",
+   "title": "Go Home and Be Free",
+   "alternates": [
+    {
+     "id": "daehoned-15",
+     "start": 19.599,
+     "end": 191.804
+    },
+    {
+     "id": "nightbus-13",
+     "start": 0.418,
+     "end": 40.73
+    }
+   ],
+   "start": 10.937,
+   "end": 178.962,
+   "loop": true,
+   "bpm": 95.7,
+   "beat": 0.627,
+   "why": "The flattest song (3.3 to 4.4 for 168 s): a bed that never steals attention from the bloom. daehoned-15's burst at 19.5 s suits the moment of surfacing itself. Kept."
+  }
+ },
+ "songs": {
+  "nightbus-03": {
+   "title": "Command Decent",
+   "album": "NIGHT BUS",
+   "mood": "probably good",
+   "bpm": 152.0,
+   "dur": 216.55,
+   "cent": 1142,
+   "reading": "Full-band, dense rhythmic cells in the low mids under a wall of sustained upper partials; 152 bpm. Steady drive at 5.7, a step up at 58 s where the upper bands fill, held near 7.5 to 142 s. After 142.5 s env falls to about 1.8 while the spectrogram stays full: a mix-down, not a thinning. The most sustained high-energy stretch of the 26.",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 6,
+     "character": "onset"
+    },
+    {
+     "t0": 6,
+     "t1": 58.25,
+     "character": "steady drive, 5.7"
+    },
+    {
+     "t0": 58.25,
+     "t1": 88.5,
+     "character": "full drive, upper bands fill, 7.8"
+    },
+    {
+     "t0": 88.5,
+     "t1": 117,
+     "character": "drive, slight dip, 7.2"
+    },
+    {
+     "t0": 117,
+     "t1": 142.5,
+     "character": "full drive then ease, 7.8 to 6.4"
+    },
+    {
+     "t0": 142.5,
+     "t1": 216.55,
+     "character": "quiet coda at 1.8, spectrum still full"
+    }
+   ],
+   "best_use": "Steering at speed. Ray Run from the 58 s step; the coda is a usable cool-down.",
+   "treatment": {
+    "level": "ray_run",
+    "north_star": "Speed that never stumbles: the channel is a single held breath at full stroke. The jellyfish does not fight the current, it becomes the fastest thing in it.",
+    "seed": "The ray's shadow passing over the jellyfish so close that its wake tears the film beads off the tentacles and streams them ahead.",
+    "acts": [
+     {
+      "t0": 6,
+      "t1": 58.25,
+      "act": "Drive: steady pulse; the channel narrows and the shrimp sparks streak by."
+     },
+     {
+      "t0": 58.25,
+      "t1": 142.5,
+      "act": "Full drive: the upper bands fill at 58 s; the ray crosses and its wake carries everything."
+     },
+     {
+      "t0": 142.5,
+      "t1": 216.55,
+      "act": "Coda: level drops but texture stays; the wake settles and the jellyfish coasts."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 54.079,
+    "turn_at": 58.25,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in Ray Run, a fast straight channel where a great ray silhouette of dark flecks sweeps overhead, its wake pulling everything forward, and shrimp of tiny sparks skitter. FLOW: the jellyfish races down the channel with quick even pulses while spark-shrimp streak past; at about four seconds the great ray silhouette sweeps in overhead and its wake surges, the film-bead tentacles stream straight ahead and drifting fleck-clouds of old footage are pulled into long luminous trails; in the last seconds the jellyfish rides the wake at full speed, the channel walls rushing by. Fast, smooth, exhilarating."
+   }
+  },
+  "nightbus-06": {
+   "title": "Phosphor Waveform Log",
+   "album": "NIGHT BUS",
+   "mood": "pretty good",
+   "bpm": 103.36,
+   "dur": 165.0,
+   "cent": 973,
+   "reading": "Arpeggio sweeps that read in the spectrogram as rising and falling diagonal staircases in the mid bands, 0 to 95 s, at a mid level (4.4 to 5.9). A peak 82 to 104.5 s (7.1), and at about 97 s a broadband noise burst floods the top bands: static. From 114.75 s a near-silent hum with sparse ticks (1.9) to the end.",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 44,
+     "character": "arpeggio staircases, 4.5 to 5.5"
+    },
+    {
+     "t0": 44,
+     "t1": 82,
+     "character": "staircases continue, 4.4 to 5.9"
+    },
+    {
+     "t0": 82,
+     "t1": 104.5,
+     "character": "peak, 7.1; noise burst at about 97 s"
+    },
+    {
+     "t0": 104.5,
+     "t1": 114.75,
+     "character": "static recedes, 5.7"
+    },
+    {
+     "t0": 114.75,
+     "t1": 165,
+     "character": "hum and sparse ticks, 1.9"
+    }
+   ],
+   "best_use": "Interference alternate: the 97 s static burst and the collapse after it are a disturbance followed by clearing.",
+   "treatment": {
+    "level": "interference",
+    "north_star": "Order dissolving into static and then into quiet. The film forgets its sequence, burns red, and the water comes back clean.",
+    "seed": "A chain of film slices climbing in a perfect staircase, and at its top every slice bursting into red static at once.",
+    "acts": [
+     {
+      "t0": 0,
+      "t1": 82,
+      "act": "Order: staircase arpeggios; film slices line up in sequence."
+     },
+     {
+      "t0": 82,
+      "t1": 114.75,
+      "act": "Breakdown: the peak, then static floods at about 97 s; red fragments."
+     },
+     {
+      "t0": 114.75,
+      "t1": 165,
+      "act": "Aftermath: near-silent hum; silhouettes readable again."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 92.949,
+    "turn_at": 97,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in Interference, a passage where film comes apart into rust-red broken fragments of flecks with frame order scrambled. FLOW: a chain of film slices climbs and falls in neat stepping staircases beside the jellyfish; at about four seconds a wave of rust-red static breaks over the passage, the slices shatter into scattered red flecks and their order scrambles, faces and hands flashing out of sequence; in the last seconds the red thins to drifting embers and the jellyfish swims on through clear dark water. Tense, then still."
+   }
+  },
+  "nightbus-08": {
+   "title": "Saltwater Static (The Last Shanty)",
+   "album": "NIGHT BUS",
+   "mood": "nostalgic engine",
+   "bpm": 95.7,
+   "dur": 173.41,
+   "cent": 716,
+   "reading": "Checkerboard: alternating low chords make a regular block pattern in the bottom bands; mid-high detail above. Peaks early (21.5 to 39.5 s at 7.6), then a long slow decline: 5.2 to 91.5 s, 3.2 to 163 s, then a fade. No holes.",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 6,
+     "character": "onset"
+    },
+    {
+     "t0": 6,
+     "t1": 21.5,
+     "character": "pattern establishes, 6.7"
+    },
+    {
+     "t0": 21.5,
+     "t1": 39.5,
+     "character": "peak, 7.6"
+    },
+    {
+     "t0": 39.5,
+     "t1": 91.5,
+     "character": "gentle decline, 5.2"
+    },
+    {
+     "t0": 91.5,
+     "t1": 163,
+     "character": "low steady, 3.2"
+    },
+    {
+     "t0": 163,
+     "t1": 173.41,
+     "character": "fade"
+    }
+   ],
+   "best_use": "Steering that settles into watching: the rejoin, or any stretch that should calm down by itself.",
+   "treatment": {
+    "level": "rejoin",
+    "north_star": "An engine that slowly forgets it was running. The passages merge and the swimmer is allowed to slow down without being told to.",
+    "seed": "Two currents of fleck-light meeting head-on at the pillar and braiding into one.",
+    "acts": [
+     {
+      "t0": 0,
+      "t1": 21.5,
+      "act": "Approach: the checker figure starts; two passages run side by side."
+     },
+     {
+      "t0": 21.5,
+      "t1": 39.5,
+      "act": "Merge: the peak; the currents braid around the pillar."
+     },
+     {
+      "t0": 39.5,
+      "t1": 163,
+      "act": "Settle: a long decline; the wide tunnel calms."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 17.671,
+    "turn_at": 21.5,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in the rejoin, where two passages merge around a dark rock pillar into one wider tunnel. FLOW: the jellyfish swims out of the left passage as a second stream of fleck-clouds pours from the right; at about four seconds the two currents meet behind the dark pillar and braid together, the jellyfish caught in the swirl, film beads wrapping around it; in the last seconds the tunnel widens and the flow slows into one calm river of drifting footage-clouds. Steady, warm, unhurried."
+   }
+  },
+  "nightbus-13": {
+   "title": "The Fragile Iron Ghost",
+   "album": "NIGHT BUS",
+   "mood": "bright and poppy",
+   "bpm": 83.35,
+   "dur": 41.42,
+   "cent": 1434,
+   "reading": "Short (41 s). Bright sustained horizontal tones with a clear melody line in the upper mids; dense and even. 0 to 7.75 s at 6.3, a slight dip to 22.5 s, then a lift to 7.6 to the end. Loops cleanly.",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 7.75,
+     "character": "bright opening, 6.3"
+    },
+    {
+     "t0": 7.75,
+     "t1": 22.5,
+     "character": "slight dip, 5.6"
+    },
+    {
+     "t0": 22.5,
+     "t1": 41.42,
+     "character": "lift, 7.6"
+    }
+   ],
+   "best_use": "Release. A surfacing sting or a short Screening Room loop.",
+   "treatment": {
+    "level": "surface",
+    "north_star": "The moment of breaking into light. Short, bright and whole, like the first breath after a long dive.",
+    "seed": "The jellyfish's celluloid bell catching pale light from above, every layer lit separately, like a stack of slides held to a window.",
+    "acts": [
+     {
+      "t0": 0,
+      "t1": 7.75,
+      "act": "Glimpse: bright tones; the ceiling of light is sighted."
+     },
+     {
+      "t0": 7.75,
+      "t1": 22.5,
+      "act": "Rise: a small dip, the last climb."
+     },
+     {
+      "t0": 22.5,
+      "t1": 41.42,
+      "act": "Break: the lift; the films bloom in the pale water."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 18.414,
+    "turn_at": 22.5,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in the surface and the Screening Room, where the water thins toward a pale ceiling of light and the carried films bloom large in the dark. FLOW: the jellyfish rises toward a pale shimmering ceiling, its celluloid layers catching the light one by one; at about four seconds it breaks into the brighter water and the film beads on its tentacles lift free and bloom into large soft clouds of flecks showing old footage, a horse running, a face turning; in the last seconds the clouds hang luminous around the small jellyfish. Bright, glad, weightless."
+   }
+  },
+  "nightbus-14": {
+   "title": "The Long Descent (Memory Rot)",
+   "album": "NIGHT BUS",
+   "mood": "elegant classic",
+   "bpm": 123.05,
+   "dur": 121.95,
+   "cent": 930,
+   "reading": "Builds from sparse (0 to 7 s) to a plateau 32.5 to 67 s (6.7) where wavy pitch lines glide through the upper mids (vibrato or portamento). From 67 s energy descends steadily, and 80.5 to 122 s sits near 1.5 while the spectrogram stays full and the wavy lines continue: a literal descent in level.",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 7,
+     "character": "sparse opening, 2.1"
+    },
+    {
+     "t0": 7,
+     "t1": 32.5,
+     "character": "build, 4.1 to 5.7"
+    },
+    {
+     "t0": 32.5,
+     "t1": 67,
+     "character": "plateau with gliding lines, 6.7"
+    },
+    {
+     "t0": 67,
+     "t1": 80.5,
+     "character": "descent, 4.3"
+    },
+    {
+     "t0": 80.5,
+     "t1": 121.95,
+     "character": "quiet full tail, 1.5"
+    }
+   ],
+   "best_use": "The deep reach (the descent from 67 s), or a viewing tail.",
+   "treatment": {
+    "level": "deep",
+    "north_star": "Elegance going down into the dark. The tunnel opens and the music lets go of its strength without losing its shape.",
+    "seed": "Gliding lines of film slices bending slowly downward like the strings of a sinking kite.",
+    "acts": [
+     {
+      "t0": 0,
+      "t1": 32.5,
+      "act": "Gather: the build; the tunnel floor tilts."
+     },
+     {
+      "t0": 32.5,
+      "t1": 67,
+      "act": "Hold: the gliding plateau; the void opens below."
+     },
+     {
+      "t0": 67,
+      "t1": 121.95,
+      "act": "Descend: level drains away; marine snow and the quiet full tail."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 62.786,
+    "turn_at": 67,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in the deep reach, a vast dark descent where the tunnel opens into void and marine snow falls. FLOW: the jellyfish glides at the lip of the void with chains of film slices curving beside it like slow ribbons; at about four seconds the floor falls away and it begins to sink, the ribbons bending downward after it, marine snow drifting up past the camera; in the last seconds it is a small amber light descending into vast dark teal, a few fleck-clouds of footage sinking with it. Elegant, slow, falling."
+   }
+  },
+  "nightbus-17": {
+   "title": "The Wet Console",
+   "album": "NIGHT BUS",
+   "mood": "good sound texture",
+   "bpm": 80.75,
+   "dur": 120.0,
+   "cent": 1308,
+   "reading": "A continuous ramp. Low and thin to 14 s (3.3), then a checker bass figure; it rises to 44 s and holds at maximum 44.25 to 114 s (8.0); a new high band enters near 100 s; a hard stop at about 118 s.",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 14.25,
+     "character": "thin start, 3.3"
+    },
+    {
+     "t0": 14.25,
+     "t1": 44.25,
+     "character": "checker bass enters, climbs 5.2 to 6.0"
+    },
+    {
+     "t0": 44.25,
+     "t1": 100,
+     "character": "maximum, 8.0"
+    },
+    {
+     "t0": 100,
+     "t1": 114,
+     "character": "high band added, 8.2"
+    },
+    {
+     "t0": 114,
+     "t1": 120,
+     "character": "hard stop"
+    }
+   ],
+   "best_use": "Danger that ends cleanly: a strike alternate, or a chase that stops dead at an exit.",
+   "treatment": {
+    "level": "strike",
+    "north_star": "Pressure that only increases, then stops. The chase ends the instant the swimmer is through.",
+    "seed": "The anglerfish's open jaw of dim particles filling the dark behind the jellyfish, the lure light swinging inches from the bell.",
+    "acts": [
+     {
+      "t0": 0,
+      "t1": 44.25,
+      "act": "Sense: the bass figure; something is behind."
+     },
+     {
+      "t0": 44.25,
+      "t1": 114,
+      "act": "Chase: maximum held for 70 s; the jaw keeps pace."
+     },
+     {
+      "t0": 114,
+      "t1": 120,
+      "act": "Cut: hard stop; the eddy spits the jellyfish free."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 109.319,
+    "turn_at": 117,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in Silt Pocket at the moment of the strike, the anglerfish silhouette of dim particles lunging from the dark behind its lure, the escape eddy spinning at one side. FLOW: the jellyfish flees in hard rapid pulses while the anglerfish silhouette of dim particles surges behind it, jaw opening, its lure swinging; the chase holds at full pressure, silt exploding off the floor; at about seven seconds the jellyfish dives into the spinning escape eddy and is flung clear, and the dark shape stops dead and fades back into the gloom. Relentless, then sudden quiet."
+   }
+  },
+  "neonbutterfly-02": {
+   "title": "Catastrophic Elegance   Math Dance",
+   "album": "NEON BUTTERFLY DREAMS",
+   "mood": "nostalgic, with lyrics",
+   "bpm": 112.35,
+   "dur": 195.6,
+   "cent": 1347,
+   "reading": "Song form with lyrics: formant bands of a voice over a busy mid texture. Verse 9 to 52 s (5.0), chorus 52 to 68.5 s (6.3), dip, second half 78.75 to 128.75 s (4.8 to 5.9), breakdown 128.75 to 153.5 s (down to 1.9), a last chorus 153.5 to 172 s (6.0), outro, and 6 s of silence.",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 9,
+     "character": "intro, 1.5"
+    },
+    {
+     "t0": 9,
+     "t1": 52,
+     "character": "verse, 5.0"
+    },
+    {
+     "t0": 52,
+     "t1": 68.5,
+     "character": "chorus, 6.3"
+    },
+    {
+     "t0": 68.5,
+     "t1": 78.75,
+     "character": "dip, 3.6"
+    },
+    {
+     "t0": 78.75,
+     "t1": 128.75,
+     "character": "second verse and chorus, 4.8 to 5.9"
+    },
+    {
+     "t0": 128.75,
+     "t1": 153.5,
+     "character": "breakdown, 3.8 to 1.9"
+    },
+    {
+     "t0": 153.5,
+     "t1": 172,
+     "character": "last chorus, 6.0"
+    },
+    {
+     "t0": 172,
+     "t1": 195.6,
+     "character": "outro and silence"
+    }
+   ],
+   "best_use": "Release after the reel: end credits in the Screening Room. The voice competes with watching, so not under a bloom.",
+   "treatment": {
+    "level": "surface",
+    "north_star": "Nostalgia with a voice in it: the dive remembered as a song. The films the swimmer gathered dance once more before the lights come up.",
+    "seed": "Every fleck-cloud the jellyfish carried released at once, spinning around it like a mirror-ball made of memories.",
+    "acts": [
+     {
+      "t0": 0,
+      "t1": 68.5,
+      "act": "Recall: verse and first chorus; the films circle."
+     },
+     {
+      "t0": 68.5,
+      "t1": 153.5,
+      "act": "Drift: second half and breakdown; the circle loosens."
+     },
+     {
+      "t0": 153.5,
+      "t1": 195.6,
+      "act": "Last dance: the final chorus; all films lift and spin."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 149.672,
+    "turn_at": 153.5,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in the surface and the Screening Room, where the water thins toward a pale ceiling of light and the carried films bloom large in the dark. FLOW: in the pale water under the surface the jellyfish turns slowly while its film beads loosen; at about four seconds the music returns and every carried film releases into soft fleck-clouds that spin around it in a wide glittering ring, showing dancers, a bicycle, a waving hand; in the last seconds the ring rises toward the light like confetti made of footage. Nostalgic, joyful, swirling."
+   }
+  },
+  "neonbutterfly-18": {
+   "title": "Wings Outside the Seam",
+   "album": "NEON BUTTERFLY DREAMS",
+   "mood": "ethereal, with lyrics",
+   "bpm": 73.83,
+   "dur": 238.0,
+   "cent": 1271,
+   "reading": "Long (238 s), slow 74 bpm, with lyrics: dense vertical striations (percussion) over sustained pads; choppy at 4 Hz. A gradual climb with swells: 67 to 78.5 s (6.7), 91 to 131 s (5.6), 144.5 to 157 s (6.1) and a closing swell 209 to 232 s (6.3).",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 67,
+     "character": "slow climb, 3.8 to 4.7"
+    },
+    {
+     "t0": 67,
+     "t1": 78.5,
+     "character": "first swell, 6.7"
+    },
+    {
+     "t0": 78.5,
+     "t1": 91.25,
+     "character": "settle, 4.2"
+    },
+    {
+     "t0": 91.25,
+     "t1": 131.25,
+     "character": "body, 5.6"
+    },
+    {
+     "t0": 131.25,
+     "t1": 157,
+     "character": "dip then swell, 4.2 to 6.1"
+    },
+    {
+     "t0": 157,
+     "t1": 209,
+     "character": "body, 4.9"
+    },
+    {
+     "t0": 209,
+     "t1": 238,
+     "character": "closing swell, 6.3, and end"
+    }
+   ],
+   "best_use": "Screening Room credits; ethereal background where words are welcome.",
+   "treatment": {
+    "level": "surface",
+    "north_star": "Something leaving through a seam in the water. The jellyfish rises like a moth through the archive's ceiling.",
+    "seed": "Fleck-clouds opening like two great wings on either side of the small jellyfish.",
+    "acts": [
+     {
+      "t0": 0,
+      "t1": 67,
+      "act": "Climb: slow rise; wings of flecks gather."
+     },
+     {
+      "t0": 67,
+      "t1": 157,
+      "act": "Unfold: swells; the wings open and close."
+     },
+     {
+      "t0": 157,
+      "t1": 238,
+      "act": "Pass through: the closing swell; out through the light."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 62.228,
+    "turn_at": 66,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in the surface and the Screening Room, where the water thins toward a pale ceiling of light and the carried films bloom large in the dark. FLOW: the jellyfish rises slowly as two soft clouds of film flecks gather on either side of it; at about four seconds the clouds open wide like a pair of wings, footage of birds and fluttering curtains shimmering inside them, beating once in time with the bell; in the last seconds the jellyfish and its wings drift up through a seam of pale light at the surface. Ethereal, tender, rising."
+   }
+  },
+  "siltwire-02": {
+   "title": "Gospel Under Water",
+   "album": "SILT, WIRE & MOUNTAIN CURRENT",
+   "mood": "beautiful surreal underwater",
+   "bpm": 117.45,
+   "dur": 214.46,
+   "cent": 347,
+   "reading": "The darkest song (centroid 347 Hz): stacked low horizontal organ or choir bands below about 400 Hz with almost nothing above. Block form of swells and holes: 52.25 to 80.25 s swell (7.8), holes at 80 to 94.5 and 110.5 to 120.75 s, a final swell 161.5 to 185.5 s (8.0), then 29 s of silence (185.5 to 214.5 s).",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 24.25,
+     "character": "low gospel, 4.9"
+    },
+    {
+     "t0": 24.25,
+     "t1": 52.25,
+     "character": "withdrawn, 2.4"
+    },
+    {
+     "t0": 52.25,
+     "t1": 80.25,
+     "character": "first great swell, 7.8"
+    },
+    {
+     "t0": 80.25,
+     "t1": 94.5,
+     "character": "hole, 1.9"
+    },
+    {
+     "t0": 94.5,
+     "t1": 110.5,
+     "character": "swell, 6.3"
+    },
+    {
+     "t0": 110.5,
+     "t1": 120.75,
+     "character": "hole, 1.5"
+    },
+    {
+     "t0": 120.75,
+     "t1": 161.5,
+     "character": "low, 2.3 to 3.8"
+    },
+    {
+     "t0": 161.5,
+     "t1": 185.5,
+     "character": "final swell, 8.0"
+    },
+    {
+     "t0": 185.5,
+     "t1": 214.46,
+     "character": "silence"
+    }
+   ],
+   "best_use": "The deep reach: watching and awe. Cut the silent tail.",
+   "treatment": {
+    "level": "deep",
+    "north_star": "A hymn sung by the deep itself. The void is not empty: it is a cathedral, and the jellyfish is its one candle.",
+    "seed": "The tiny amber jellyfish as the only light in a black space so large that marine snow falls through it like dust in a cathedral beam.",
+    "acts": [
+     {
+      "t0": 0,
+      "t1": 52.25,
+      "act": "Enter: low gospel then withdrawal; the walls fall away."
+     },
+     {
+      "t0": 52.25,
+      "t1": 120.75,
+      "act": "Swell and hole: the deep breathes; vast silhouettes rise and vanish."
+     },
+     {
+      "t0": 120.75,
+      "t1": 185.5,
+      "act": "Final swell: the grandest light; then silence (cut at 185.5)."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 48.043,
+    "turn_at": 52.25,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in the deep reach, a vast dark descent where the tunnel opens into void and marine snow falls. FLOW: the jellyfish sinks into a black void with only marine snow around it; at about four seconds a deep swell rises and huge faint fleck-clouds of old footage bloom slowly in the distance like stained glass, a choir of faces, hands lifted, a silhouette of a giant drifting creature made of sparse particles passing far below; in the last seconds the jellyfish hangs small and amber at the center of the vast glowing dark. Reverent, immense, slow."
+   }
+  },
+  "siltwire-06": {
+   "title": "Lost & Found (Under the Courthouse Eddy)",
+   "album": "SILT, WIRE & MOUNTAIN CURRENT",
+   "mood": "beautiful guitar underwater echo",
+   "bpm": 103.36,
+   "dur": 99.85,
+   "cent": 1072,
+   "reading": "Guitar: uniform texture from bottom to top with fine vertical picking marks; flat at 4.8 for 94 s with no sections, then a short tail. Choppy at 4 Hz but flat at every larger scale.",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 93.75,
+     "character": "even picked guitar, 4.8"
+    },
+    {
+     "t0": 93.75,
+     "t1": 99.85,
+     "character": "tail"
+    }
+   ],
+   "best_use": "A neutral steering bed for landing or entry; loops anywhere.",
+   "treatment": {
+    "level": "entry",
+    "north_star": "Lost things turning up in the current, one after another, with no hurry. The tunnel is friendly.",
+    "seed": "A single fleck-cloud of a lost film hanging under a ledge like something dropped long ago, waiting.",
+    "acts": [
+     {
+      "t0": 0,
+      "t1": 31,
+      "act": "Echo: the guitar figure; the tunnel opens."
+     },
+     {
+      "t0": 31,
+      "t1": 62,
+      "act": "Find: same texture; clouds appear under ledges."
+     },
+     {
+      "t0": 62,
+      "t1": 99.85,
+      "act": "Keep: the figure continues and trails off."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 23.034,
+    "turn_at": 26.75,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in the entry reach, a wide gentle tunnel with soft silt walls and a slow current flowing forward. FLOW: the jellyfish swims an even line through a gentle silt tunnel, small fleck-clouds of film tucked under the ledges like lost things; at about four seconds it brushes one and the cloud pours into its bell and runs out along a tentacle as a chain of film slices; in the last seconds it swims on, the new chain trailing, another lost cloud glimmering ahead. Calm, curious, even."
+   }
+  },
+  "siltwire-10": {
+   "title": "Stay in the Current",
+   "album": "SILT, WIRE & MOUNTAIN CURRENT",
+   "mood": "stay in the current",
+   "bpm": 92.29,
+   "dur": 199.27,
+   "cent": 989,
+   "reading": "A steady pulse with a bass checker figure that enters at 11.75 s. 11.75 to 52.5 s (6.3), 52.5 to 80.25 s (5.3), a drop with the bass out 80.25 to 95.5 s (3.3), back 95.5 to 107 s, a short hole near 112 s, 118 to 140.5 s (6.4), a breakdown 140.5 to 168 s, and a solid coda 180.5 to 193 s.",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 11.75,
+     "character": "gentle opening, 3.1"
+    },
+    {
+     "t0": 11.75,
+     "t1": 52.5,
+     "character": "bass figure, 6.3"
+    },
+    {
+     "t0": 52.5,
+     "t1": 80.25,
+     "character": "body, 5.3"
+    },
+    {
+     "t0": 80.25,
+     "t1": 95.5,
+     "character": "bass out, 3.3"
+    },
+    {
+     "t0": 95.5,
+     "t1": 118.25,
+     "character": "return, with a hole near 112 s"
+    },
+    {
+     "t0": 118.25,
+     "t1": 140.5,
+     "character": "full, 6.4"
+    },
+    {
+     "t0": 140.5,
+     "t1": 180.5,
+     "character": "breakdown, 3.7 to 1.9"
+    },
+    {
+     "t0": 180.5,
+     "t1": 199.27,
+     "character": "coda, 5.5"
+    }
+   ],
+   "best_use": "The tutorial: steady steering with built-in quiet holes for instruction moments (80 s, 112 s).",
+   "treatment": {
+    "level": "entry",
+    "north_star": "Learning to swim by being carried. The current teaches before the player does anything.",
+    "seed": "The jellyfish touching its first fleck-cloud and the film running into its bell like ink into water.",
+    "acts": [
+     {
+      "t0": 0,
+      "t1": 11.75,
+      "act": "Float: gentle opening; the current alone moves the jellyfish."
+     },
+     {
+      "t0": 11.75,
+      "t1": 80.25,
+      "act": "Steer: the bass figure; first clouds, first touch."
+     },
+     {
+      "t0": 80.25,
+      "t1": 95.5,
+      "act": "Pause: the bass drops out; the first watched film."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 7.43,
+    "turn_at": 11.75,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in the entry reach, a wide gentle tunnel with soft silt walls and a slow current flowing forward. FLOW: the jellyfish drifts in a slow forward current through the wide entry tunnel; at about four seconds a steady pulse begins and it starts to swim, angling toward a soft fleck-cloud of old footage, a hand waving; it touches the cloud, the light pours into its celluloid bell and runs down one tentacle as a chain of tiny film slices; in the last seconds it swims on, steady, the first worm of film trailing behind. Calm, rhythmic, inviting."
+   }
+  },
+  "siltwire-15": {
+   "title": "Silt Bench",
+   "album": "SILT, WIRE & MOUNTAIN CURRENT",
+   "mood": "silt ocean",
+   "bpm": 99.38,
+   "dur": 182.42,
+   "cent": 929,
+   "reading": "Opens with 8 s of silence; 8 to 46.75 s a sparse rising mid texture (3.7); then a 29 s hole (46.75 to 75.75 s, true zeros 54 to 71 s). It rebuilds 75.75 to 112 s (4.5 to 5.9), dips, then 131.5 to 154.5 s bright bell-like dashes in the upper mids (5.1); fade to 182 s.",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 8,
+     "character": "silence"
+    },
+    {
+     "t0": 8,
+     "t1": 46.75,
+     "character": "sparse rising, 3.7"
+    },
+    {
+     "t0": 46.75,
+     "t1": 75.75,
+     "character": "hole, zeros 54 to 71 s"
+    },
+    {
+     "t0": 75.75,
+     "t1": 112.25,
+     "character": "rebuild, 4.5 to 5.9"
+    },
+    {
+     "t0": 112.25,
+     "t1": 131.5,
+     "character": "settle, 3.4"
+    },
+    {
+     "t0": 131.5,
+     "t1": 154.5,
+     "character": "bright bell dashes, 5.1"
+    },
+    {
+     "t0": 154.5,
+     "t1": 182.42,
+     "character": "fade"
+    }
+   ],
+   "best_use": "The rejoin from 75.75 s. Never loop from 0: the hole would read as a bug.",
+   "treatment": {
+    "level": "rejoin",
+    "north_star": "Silt lifting after a long stillness. Two paths become one, and the settled floor stirs into a new current.",
+    "seed": "Silt rising from the floor in a slow column, and inside it fleck-images of the other passage, the road not taken.",
+    "acts": [
+     {
+      "t0": 8,
+      "t1": 46.75,
+      "act": "Approach: sparse rise; the pillar ahead."
+     },
+     {
+      "t0": 46.75,
+      "t1": 75.75,
+      "act": "Still: the hole; settled silt (skipped in game)."
+     },
+     {
+      "t0": 75.75,
+      "t1": 154.5,
+      "act": "Stir: rebuild and bell dashes; the joined tunnel flows."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 71.637,
+    "turn_at": 75.75,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in the rejoin, where two passages merge around a dark rock pillar into one wider tunnel. FLOW: the jellyfish rounds the dark rock pillar where two passages meet, the water still and silt settled; at about four seconds the silt begins to lift in slow columns and inside them fleck-images flicker, glimpses of the passage it did not choose; bright pinpoints chime along the walls as the current gathers; in the last seconds it swims into the wide joined tunnel with the silt streaming beside it. Hushed, then stirring."
+   }
+  },
+  "twobuttons-06": {
+   "title": "Go Home and Be Free",
+   "album": "THE LITURGY OF THE TWO BUTTONS",
+   "mood": "best old time",
+   "bpm": 95.7,
+   "dur": 185.39,
+   "cent": 1314,
+   "reading": "Full-band, uniform old-time string texture; the flattest song of the set: 10.75 to 179 s all within 3.3 to 4.4, with no holes and no build.",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 10.75,
+     "character": "opening, 1.8"
+    },
+    {
+     "t0": 10.75,
+     "t1": 130,
+     "character": "even old-time, 3.5"
+    },
+    {
+     "t0": 130,
+     "t1": 143.25,
+     "character": "slight lift, 4.4"
+    },
+    {
+     "t0": 143.25,
+     "t1": 179.25,
+     "character": "even, 3.5"
+    },
+    {
+     "t0": 179.25,
+     "t1": 185.39,
+     "character": "end"
+    }
+   ],
+   "best_use": "The Screening Room bed: it never steals attention from the films.",
+   "treatment": {
+    "level": "surface",
+    "north_star": "Home, and free. The dive is over, and what was gathered is shown without hurry.",
+    "seed": "The jellyfish resting at the surface while its carried films bloom one after another in the dark in front of it.",
+    "acts": [
+     {
+      "t0": 0,
+      "t1": 10.75,
+      "act": "Arrive: a short opening; the surface."
+     },
+     {
+      "t0": 10.75,
+      "t1": 130,
+      "act": "Watch: even texture; the reel plays as blooms."
+     },
+     {
+      "t0": 130,
+      "t1": 185.39,
+      "act": "Go home: a slight lift, then rest."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 6.549,
+    "turn_at": 10.75,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in the surface and the Screening Room, where the water thins toward a pale ceiling of light and the carried films bloom large in the dark. FLOW: the jellyfish floats just below a pale ceiling of light, still; at about four seconds its first carried film blooms large in the dark in front of it, a soft dense cloud of flecks resolving into old black-and-white footage of people walking home along a road; the cloud gently dissolves and the next blooms; in the last seconds the jellyfish rests beside the drifting picture, tentacles loose. Warm, settled, old-time."
+   }
+  },
+  "twobuttons-13": {
+   "title": "Ritual of the Ash and Silt (1)",
+   "album": "THE LITURGY OF THE TWO BUTTONS",
+   "mood": "good texture",
+   "bpm": 103.36,
+   "dur": 88.24,
+   "cent": 773,
+   "reading": "Very quiet (lowest low-band energy of the set, 2.23): seven bowed-tone phrases, curved arcs that rise and fall in the low mids, separated by silence (40% of frames are zero). Phrase onsets near 3, 17.75, 33.25, 46.5, 58, 68 and 78.75 s: the gaps shrink from about 15 s to about 10 s, so the breathing quickens. It ends with an accent at 78.75 s (9).",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 3,
+     "character": "silence"
+    },
+    {
+     "t0": 3,
+     "t1": 28,
+     "character": "phrases 1 and 2, slow"
+    },
+    {
+     "t0": 28,
+     "t1": 46.5,
+     "character": "phrase 3"
+    },
+    {
+     "t0": 46.5,
+     "t1": 68,
+     "character": "phrases 4 and 5, closer"
+    },
+    {
+     "t0": 68,
+     "t1": 78.75,
+     "character": "phrase 6, closest"
+    },
+    {
+     "t0": 78.75,
+     "t1": 88.24,
+     "character": "accent and end"
+    }
+   ],
+   "best_use": "The Silt Pocket ambient state: waiting, the lure. The quickening gaps build dread on their own.",
+   "treatment": {
+    "level": "pocket",
+    "north_star": "The pocket breathes, and the breaths come faster. Something patient is waiting in the silt for you to linger one moment too long.",
+    "seed": "Two pinpricks of light pulsing in the black, which the swimmer takes for a film and which are a lure.",
+    "acts": [
+     {
+      "t0": 3,
+      "t1": 33.25,
+      "act": "Settle: slow phrases; silt and stillness."
+     },
+     {
+      "t0": 33.25,
+      "t1": 68,
+      "act": "Notice: phrases come closer; the lure pulses twice."
+     },
+     {
+      "t0": 68,
+      "t1": 88.24,
+      "act": "Too long: the closest phrase and the accent at 78.75 s."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 54.079,
+    "turn_at": 58,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in Silt Pocket, a low chamber of settled silt where an anglerfish silhouette of sparse dim particles hangs in the dark, its lure pulsing twice, and a slow escape eddy circles at one side. FLOW: the jellyfish drifts into a low silent chamber of settled silt; ahead, a small light pulses twice in the dark, then again, a tiny film flickering in it; the jellyfish edges closer; at about four seconds the pulses come faster and behind the light the faint outline of a huge anglerfish made of sparse dim particles begins to show; in the last seconds the jellyfish hangs very still, the lure inches from its bell, the slow escape eddy turning at the edge of the frame. Hushed, patient, ominous."
+   }
+  },
+  "twobuttons-14": {
+   "title": "Ritual of the Ash and Silt (2)",
+   "album": "THE LITURGY OF THE TWO BUTTONS",
+   "mood": "ritual of war",
+   "bpm": 107.67,
+   "dur": 154.32,
+   "cent": 1311,
+   "reading": "Hard-edged blocks of bright full-band sound with vertical cuts. 0 to 59.5 s builds in blocks (2.6 to 5.9). 59.5 to 78.25 s is near-silence with isolated paired hits every 2 to 4 s (about 66, 68, 70 and 72.5 s): a ready-made two-pulse lure. At 78.25 s a slam; blocks to 146.75 s (4.6 to 6.2) with stops near 95 and 113 s.",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 9,
+     "character": "intro, 2.6"
+    },
+    {
+     "t0": 9,
+     "t1": 59.5,
+     "character": "war blocks, 4.1 to 5.9"
+    },
+    {
+     "t0": 59.5,
+     "t1": 78.25,
+     "character": "near-silence, paired lure hits"
+    },
+    {
+     "t0": 78.25,
+     "t1": 113.75,
+     "character": "strike blocks, 4.6 to 4.8"
+    },
+    {
+     "t0": 113.75,
+     "t1": 146.75,
+     "character": "strike peak, 5.5 to 6.2"
+    },
+    {
+     "t0": 146.75,
+     "t1": 154.32,
+     "character": "tail"
+    }
+   ],
+   "best_use": "The strike, entered at 78.25 s; 59.5 to 78.25 s is the warning that predators announce.",
+   "treatment": {
+    "level": "strike",
+    "north_star": "The ritual becomes war in one beat. The lure stops pulsing and the dark comes forward.",
+    "seed": "The lure going out, a half-second of pure black, and the jaw arriving.",
+    "acts": [
+     {
+      "t0": 59.5,
+      "t1": 78.25,
+      "act": "Warn: paired hits; the lure pulses, the silhouette resolves."
+     },
+     {
+      "t0": 78.25,
+      "t1": 113.75,
+      "act": "Strike: the slam; the jaw lunges, the swimmer dashes."
+     },
+     {
+      "t0": 113.75,
+      "t1": 146.75,
+      "act": "Escape: peak blocks; through the eddy and out."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 74.208,
+    "turn_at": 78.25,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in Silt Pocket at the moment of the strike, the anglerfish silhouette of dim particles lunging from the dark behind its lure, the escape eddy spinning at one side. FLOW: in the silent silt chamber the lure pulses twice in the dark, then twice again; at about four seconds the lure snaps out and the huge anglerfish silhouette of dim particles lunges forward, jaw open, silt bursting up in a cloud; the amber jellyfish dashes sideways in hard pulses, film beads whipping, and dives into the spinning escape eddy; in the last seconds it is flung out of the pocket as the dark shape closes on empty water. Violent, sudden, decisive."
+   }
+  },
+  "daehoned-02": {
+   "title": "Cedar Tank Splash",
+   "album": "D-A-E · HONED FOR FILM",
+   "mood": "good vibe",
+   "bpm": 99.38,
+   "dur": 127.52,
+   "cent": 1504,
+   "reading": "29 s of nearly silent pad (0.6), then a hard slam into a dense percussive pulse in which every 4 Hz frame alternates (largest frame-to-frame jump of the set, 3.25), even to 121.5 s.",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 29.25,
+     "character": "near-silent pad, 0.6"
+    },
+    {
+     "t0": 29.25,
+     "t1": 85.5,
+     "character": "dense splashing pulse, 5.0"
+    },
+    {
+     "t0": 85.5,
+     "t1": 121.5,
+     "character": "pulse continues, 5.3"
+    },
+    {
+     "t0": 121.5,
+     "t1": 127.52,
+     "character": "tail"
+    }
+   ],
+   "best_use": "A launch: strike alternate, or the tutorial's 'now go'.",
+   "treatment": {
+    "level": "entry",
+    "north_star": "Still water, then a splash that sets everything moving. The jellyfish learns its dash.",
+    "seed": "The jellyfish's first dash throwing a ring of flecks out from its bell like a stone dropped in a tank.",
+    "acts": [
+     {
+      "t0": 0,
+      "t1": 29.25,
+      "act": "Wait: still pad; the jellyfish hovers."
+     },
+     {
+      "t0": 29.25,
+      "t1": 85.5,
+      "act": "Splash: the slam; dash and swim."
+     },
+     {
+      "t0": 85.5,
+      "t1": 127.52,
+      "act": "Keep going: the pulse holds."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 25.52,
+    "turn_at": 29.25,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in the entry reach, a wide gentle tunnel with soft silt walls and a slow current flowing forward. FLOW: the jellyfish hovers motionless in still dark water at the start of the tunnel; at about four seconds it dashes forward in one hard pulse, a splash-ring of luminous flecks bursting out from its bell, and the current wakes, fleck-clouds of footage tumbling along; in the last seconds it swims fast and bouncy with quick even strokes, film beads bobbing. Playful, sudden, buoyant."
+   }
+  },
+  "daehoned-05": {
+   "title": "Chicha Surf & Boreal Glitch Workshop",
+   "album": "D-A-E · HONED FOR FILM",
+   "mood": "dream underwater",
+   "bpm": 86.13,
+   "dur": 179.03,
+   "cent": 771,
+   "reading": "Dream texture: a slow build 0 to 28 s, then a plateau 28 to 91 s (about 5) with regular low pulse spikes; a 22 s hole 91 to 113 s in which a falling tonal glide is visible; it returns 113 to 158.75 s, then fades.",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 28.25,
+     "character": "slow build, 1.4 to 3.5"
+    },
+    {
+     "t0": 28.25,
+     "t1": 91,
+     "character": "dream plateau, 5"
+    },
+    {
+     "t0": 91,
+     "t1": 113,
+     "character": "hole with a falling glide"
+    },
+    {
+     "t0": 113,
+     "t1": 158.75,
+     "character": "return, 5"
+    },
+    {
+     "t0": 158.75,
+     "t1": 179.03,
+     "character": "fade"
+    }
+   ],
+   "best_use": "Landing alternate; the hole is a held breath before the dive.",
+   "treatment": {
+    "level": "landing",
+    "north_star": "Dreaming at the threshold. The surf of the outside world fades and the archive pulls the dreamer under.",
+    "seed": "A single falling glide of light, like a slide dropping from a carousel, sinking past the jellyfish into the tunnel mouth.",
+    "acts": [
+     {
+      "t0": 0,
+      "t1": 91,
+      "act": "Dream: build and plateau; light plays over the threshold."
+     },
+     {
+      "t0": 91,
+      "t1": 113,
+      "act": "Fall: the hole; a glide sinks."
+     },
+     {
+      "t0": 113,
+      "t1": 158.75,
+      "act": "Under: the return; the dive begins."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 87.264,
+    "turn_at": 91,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in the threshold at the mouth of the archive tunnel, the jellyfish hovering in place and pulsing before the dive. FLOW: the jellyfish hovers at the mouth of the archive while dappled light and slow fleck-clouds drift over it like surf seen from below; at about four seconds everything hushes and a single glide of light falls past it into the dark tunnel; the jellyfish follows, sinking gently; in the last seconds it is inside the tunnel, the dream-light above fading, the first film-clouds glimmering ahead. Dreamy, hushed, drawn under."
+   }
+  },
+  "daehoned-10": {
+   "title": "Preparation & Drift",
+   "album": "D-A-E · HONED FOR FILM",
+   "mood": "preparing for drift",
+   "bpm": 117.45,
+   "dur": 180.05,
+   "cent": 394,
+   "reading": "Low piano-like notes (centroid 394 Hz) in regular breaths: the env is a sawtooth 0 to 6 to 0 every 2.04 s (four beats at 117.45 bpm), the most regular pulse in the set. Sparse 0 to 48.25 s (2.4), thickening at 48.25 s, fuller 64 to 174 s (4.3 to 5.2), small dips near 140 s, end at 174 s.",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 48.25,
+     "character": "sparse 2 s breaths, 2.4"
+    },
+    {
+     "t0": 48.25,
+     "t1": 64.25,
+     "character": "thickening, 3.7"
+    },
+    {
+     "t0": 64.25,
+     "t1": 128.25,
+     "character": "fuller breaths, 4.3"
+    },
+    {
+     "t0": 128.25,
+     "t1": 138.75,
+     "character": "peak, 5.2"
+    },
+    {
+     "t0": 138.75,
+     "t1": 174,
+     "character": "fuller, 4.3"
+    },
+    {
+     "t0": 174,
+     "t1": 180.05,
+     "character": "end"
+    }
+   ],
+   "best_use": "Landing and onboarding: the 2.04 s breath can drive the bell's idle pulse.",
+   "treatment": {
+    "level": "landing",
+    "north_star": "Preparing for drift: the swimmer learns to breathe with the bell. Every two seconds the water holds still, and then gives.",
+    "seed": "The jellyfish's celluloid layers separating and closing with each pulse, light breathing through the gaps.",
+    "acts": [
+     {
+      "t0": 0,
+      "t1": 48.25,
+      "act": "Breathe: sparse 2 s pulses; the bell pulses with them."
+     },
+     {
+      "t0": 48.25,
+      "t1": 128.25,
+      "act": "Ready: the breaths thicken; the tunnel mouth glows."
+     },
+     {
+      "t0": 128.25,
+      "t1": 174,
+      "act": "Drift: the peak; the jellyfish lets go."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 44.236,
+    "turn_at": 48.25,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in the threshold at the mouth of the archive tunnel, the jellyfish hovering in place and pulsing before the dive. FLOW: the jellyfish hovers at the dark mouth of the archive, its celluloid layers opening and closing with a slow even pulse every two seconds, amber light breathing through the gaps; at about four seconds the pulses deepen and faint fleck-clouds of old footage begin to glow far down the tunnel; in the last seconds the jellyfish lets the current take it and drifts in, bell still breathing. Calm, ready, breathing."
+   }
+  },
+  "daehoned-15": {
+   "title": "Salvaged Room, Traveling Light",
+   "album": "D-A-E · HONED FOR FILM",
+   "mood": "traveling light, bright",
+   "bpm": 143.55,
+   "dur": 198.53,
+   "cent": 1165,
+   "reading": "19.5 s of near-silence, then dense bright moving lines; zigzag arpeggios read as rows of V shapes in the mids. Holds 5.7 to 6.2 from 39 to 192 s with a dip 99 to 118 s. 143.55 bpm.",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 19.5,
+     "character": "near-silence"
+    },
+    {
+     "t0": 19.5,
+     "t1": 39,
+     "character": "entry, 4.1"
+    },
+    {
+     "t0": 39,
+     "t1": 99.25,
+     "character": "bright travel, 5.7 to 6.2"
+    },
+    {
+     "t0": 99.25,
+     "t1": 117.75,
+     "character": "dip, 4.6"
+    },
+    {
+     "t0": 117.75,
+     "t1": 192.5,
+     "character": "bright travel, 6.1"
+    },
+    {
+     "t0": 192.5,
+     "t1": 198.53,
+     "character": "end"
+    }
+   ],
+   "best_use": "Emergence at the surface (the 19.5 s entry), or a bright Ray Run alternate.",
+   "treatment": {
+    "level": "surface",
+    "north_star": "Traveling light: the swimmer comes up with only what it carries. Brightness arrives all at once and keeps moving.",
+    "seed": "The jellyfish bursting through the surface layer, a spray of film slices thrown up into the light around it.",
+    "acts": [
+     {
+      "t0": 0,
+      "t1": 19.5,
+      "act": "Below: near-silence; the last dark."
+     },
+     {
+      "t0": 19.5,
+      "t1": 99.25,
+      "act": "Surface: the burst; bright zigzags."
+     },
+     {
+      "t0": 99.25,
+      "t1": 192.5,
+      "act": "Carry: a dip, then on, light and quick."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 15.419,
+    "turn_at": 19.5,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in the surface and the Screening Room, where the water thins toward a pale ceiling of light and the carried films bloom large in the dark. FLOW: the jellyfish swims up through the last of the dark water toward a bright ceiling; at about four seconds it bursts into the pale upper layer and a spray of tiny film slices fans out around it in zigzag chains, glinting with footage; in the last seconds it swims quickly along beneath the light, its film chains bright and dancing. Bright, quick, free."
+   }
+  },
+  "daehoned-18": {
+   "title": "Salvaged Timber",
+   "album": "D-A-E · HONED FOR FILM",
+   "mood": "funk fish",
+   "bpm": 92.29,
+   "dur": 158.13,
+   "cent": 1275,
+   "reading": "Choppy staccato stabs: short vertical blocks with gaps; sparse (mean 2.5). Holes at 88 to 91 and 113.25 to 123.5 s (silence); strongest 72.75 to 90 and 123.5 to 152 s (about 4).",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 28.75,
+     "character": "sparse stabs, 0.7 to 1.7"
+    },
+    {
+     "t0": 28.75,
+     "t1": 72.75,
+     "character": "funk stabs, 2.3 to 3.1"
+    },
+    {
+     "t0": 72.75,
+     "t1": 90,
+     "character": "stronger, 4.0"
+    },
+    {
+     "t0": 90,
+     "t1": 113.25,
+     "character": "thinner, 2.1"
+    },
+    {
+     "t0": 113.25,
+     "t1": 123.5,
+     "character": "silence"
+    },
+    {
+     "t0": 123.5,
+     "t1": 152,
+     "character": "return, 4.1"
+    },
+    {
+     "t0": 152,
+     "t1": 158.13,
+     "character": "end"
+    }
+   ],
+   "best_use": "Interference alternate: the stop-start reads as broken frame order; also shrimp skitter.",
+   "treatment": {
+    "level": "interference",
+    "north_star": "Funk in a broken projector. The film skips, stops, and starts again on the wrong frame.",
+    "seed": "A shoal of spark-shrimp jerking in perfect stop-start unison through red fragments.",
+    "acts": [
+     {
+      "t0": 0,
+      "t1": 72.75,
+      "act": "Skip: sparse stabs; fragments jitter."
+     },
+     {
+      "t0": 72.75,
+      "t1": 123.5,
+      "act": "Jam: stronger, then the silent hole; the film stops."
+     },
+     {
+      "t0": 123.5,
+      "t1": 152,
+      "act": "Restart: back on the wrong frame."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 119.391,
+    "turn_at": 123.5,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in Interference, a passage where film comes apart into rust-red broken fragments of flecks with frame order scrambled. FLOW: rust-red broken fragments of film flecks jerk and stutter through the passage, a shoal of spark-shrimp darting in stop-start unison; the jellyfish weaves through them; everything freezes for a beat and goes dark; at about four seconds it all lurches back into motion, footage jumping out of order, a face, a door, the face again; in the last seconds the jellyfish slips out past the last red fragments into clear dark water. Jerky, playful, unsettling."
+   }
+  },
+  "daehoned-19": {
+   "title": "Slide Carousel at Blue Hour",
+   "album": "D-A-E · HONED FOR FILM",
+   "mood": "go around",
+   "bpm": 99.38,
+   "dur": 231.13,
+   "cent": 622,
+   "reading": "Long (231 s). 10 s of silence, a build 10 to 48 s with a checker figure, a slam at 48.25 s into a dense pulse (5.6), a dip 85.75 to 105.75 s, full 105.75 to 182 s (6.2), a break at 182 to 192 s, and full again to the end.",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 10,
+     "character": "silence"
+    },
+    {
+     "t0": 10,
+     "t1": 48.25,
+     "character": "build with checker figure, 1.9 to 3.0"
+    },
+    {
+     "t0": 48.25,
+     "t1": 85.75,
+     "character": "dense, 5.6"
+    },
+    {
+     "t0": 85.75,
+     "t1": 105.75,
+     "character": "dip, 3.5"
+    },
+    {
+     "t0": 105.75,
+     "t1": 182.25,
+     "character": "full, 6.2"
+    },
+    {
+     "t0": 182.25,
+     "t1": 192.5,
+     "character": "break, 4.7"
+    },
+    {
+     "t0": 192.5,
+     "t1": 231.13,
+     "character": "full, 5.9"
+    }
+   ],
+   "best_use": "Rejoin alternate; a long steady steering bed that circles ('go around').",
+   "treatment": {
+    "level": "rejoin",
+    "north_star": "Going around: the pillar is a carousel and the films are its slides. The joined tunnel turns like a slow wheel.",
+    "seed": "Film slices orbiting the rock pillar in a ring, each one showing the next frame, like a slide carousel at blue hour.",
+    "acts": [
+     {
+      "t0": 10,
+      "t1": 48.25,
+      "act": "Turn: the build; slices begin to orbit."
+     },
+     {
+      "t0": 48.25,
+      "t1": 105.75,
+      "act": "Carousel: the slam; the ring spins."
+     },
+     {
+      "t0": 105.75,
+      "t1": 231.13,
+      "act": "Around again: full and long."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 44.143,
+    "turn_at": 48.25,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in the rejoin, where two passages merge around a dark rock pillar into one wider tunnel. FLOW: the jellyfish circles the dark rock pillar where the passages rejoin, a ring of small film slices orbiting the pillar like a slide carousel, each slice a later frame; at about four seconds the ring speeds up and the current takes the jellyfish around with it in a wide sweep; in the last seconds it peels off into the joined tunnel, a few slices following as a chain. Blue, turning, hypnotic."
+   }
+  },
+  "daehoned-23": {
+   "title": "The Geezer's Stride",
+   "album": "D-A-E · HONED FOR FILM",
+   "mood": "old time",
+   "bpm": 152.0,
+   "dur": 182.69,
+   "cent": 3162,
+   "reading": "The brightest song by far (centroid 3162 Hz, about three times the set's median). Sparse stabs with silences 0 to 51.75 s (about 1.2), then a continuous bright stride 51.75 to 176.5 s (4.6), 152 bpm.",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 51.75,
+     "character": "sparse stabs and silences, 1.0 to 1.5"
+    },
+    {
+     "t0": 51.75,
+     "t1": 153.25,
+     "character": "bright stride, 4.6"
+    },
+    {
+     "t0": 153.25,
+     "t1": 176.5,
+     "character": "stride, 4.7"
+    },
+    {
+     "t0": 176.5,
+     "t1": 182.69,
+     "character": "end"
+    }
+   ],
+   "best_use": "Ray Run alternate: high glitter suits shrimp sparks and speed.",
+   "treatment": {
+    "level": "ray_run",
+    "north_star": "An old-timer's quick stride: the channel is crowded with bright small life and nobody slows down.",
+    "seed": "A cloud of spark-shrimp exploding upward as the jellyfish cuts through them.",
+    "acts": [
+     {
+      "t0": 0,
+      "t1": 51.75,
+      "act": "Stalk: sparse stabs; shrimp freeze and flick."
+     },
+     {
+      "t0": 51.75,
+      "t1": 153.25,
+      "act": "Stride: bright constant pace."
+     },
+     {
+      "t0": 153.25,
+      "t1": 182.69,
+      "act": "Home stretch."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 47.67,
+    "turn_at": 51.75,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in Ray Run, a fast straight channel where a great ray silhouette of dark flecks sweeps overhead, its wake pulling everything forward, and shrimp of tiny sparks skitter. FLOW: the jellyfish waits at the head of the fast channel as spark-shrimp flick and freeze around it; at about four seconds it strides off at speed and the shrimp scatter in bright glittering bursts, the ray silhouette gliding in the distance; in the last seconds it races down the channel through a sparkling haze of flecks, film beads streaming. Bright, brisk, sparkling."
+   }
+  },
+  "event-03": {
+   "title": "Steel & Static — The 2 AM Express",
+   "album": "EVENT HORIZON DISCOVERY",
+   "mood": "underwater flux",
+   "bpm": 103.36,
+   "dur": 115.73,
+   "cent": 1312,
+   "reading": "Sustained horizontal drones: the smoothest song of the set (frame-to-frame jump 0.23). Block cuts: 0 to 26.25 s (3.5), 26.25 to 49.5 s (4.9), a swell 49.5 to 59.75 s (7.5), near silence 59.75 to 70.5 s, 70.5 to 86.25 s (5.0), a drop 86.25 to 97.5 s, 97.5 to 109.5 s (4.5).",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 26.25,
+     "character": "drone, 3.5"
+    },
+    {
+     "t0": 26.25,
+     "t1": 49.5,
+     "character": "drone, 4.9"
+    },
+    {
+     "t0": 49.5,
+     "t1": 59.75,
+     "character": "swell, 7.5"
+    },
+    {
+     "t0": 59.75,
+     "t1": 70.5,
+     "character": "near silence"
+    },
+    {
+     "t0": 70.5,
+     "t1": 86.25,
+     "character": "drone, 5.0"
+    },
+    {
+     "t0": 86.25,
+     "t1": 97.5,
+     "character": "drop, 1.6"
+    },
+    {
+     "t0": 97.5,
+     "t1": 115.73,
+     "character": "drone and end, 4.5"
+    }
+   ],
+   "best_use": "Flux and watching; a single ray pass (swell, then wake silence). Not a fast channel: two silences break the drive.",
+   "treatment": {
+    "level": "ray_run",
+    "north_star": "The ray is a weather system. It passes, the water swells and then goes silent in its wake.",
+    "seed": "The underside of the ray gliding overhead like a dark sky, its fringe made of falling flecks.",
+    "acts": [
+     {
+      "t0": 26.25,
+      "t1": 49.5,
+      "act": "Approach: drone thickens; the ray's shadow far off."
+     },
+     {
+      "t0": 49.5,
+      "t1": 59.75,
+      "act": "Pass: the swell; the ray overhead."
+     },
+     {
+      "t0": 59.75,
+      "t1": 97.5,
+      "act": "Wake: silence, then a return and a second drop."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 55.891,
+    "turn_at": 59.75,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in Ray Run, a fast straight channel where a great ray silhouette of dark flecks sweeps overhead, its wake pulling everything forward, and shrimp of tiny sparks skitter. FLOW: the jellyfish swims down a long channel under a heavy hum of water; overhead a vast ray silhouette of dark flecks glides in, its underside like a moving sky, and the water swells, every fleck-cloud of footage leaning in its wake; at about four seconds the ray is gone and the channel falls silent and still; in the last seconds the jellyfish drifts in the quiet wake, film beads slowly settling. Heavy, sweeping, then still."
+   }
+  },
+  "event-04": {
+   "title": "Stratospheric Void Crossing",
+   "album": "EVENT HORIZON DISCOVERY",
+   "mood": "deep dark void",
+   "bpm": 86.13,
+   "dur": 174.71,
+   "cent": 1299,
+   "reading": "13 s of silence, a hint, another near-silence to 33.5 s, then a pulsing low tone line (a horizontal band with periodic blips) and a dense vertical texture 33.5 to 128 s (about 5), decay 128 to 161 s, and 14 s of silence at the end.",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 13,
+     "character": "silence"
+    },
+    {
+     "t0": 13,
+     "t1": 33.5,
+     "character": "hints in near-silence"
+    },
+    {
+     "t0": 33.5,
+     "t1": 77,
+     "character": "low tone line and texture, 4.8"
+    },
+    {
+     "t0": 77,
+     "t1": 128,
+     "character": "dense, 5.4"
+    },
+    {
+     "t0": 128,
+     "t1": 161,
+     "character": "decay"
+    },
+    {
+     "t0": 161,
+     "t1": 174.71,
+     "character": "silence"
+    }
+   ],
+   "best_use": "Deep reach alternate; a pocket alternate for its silent opening.",
+   "treatment": {
+    "level": "deep",
+    "north_star": "Crossing a void with no walls. A single low signal keeps the swimmer company in the dark.",
+    "seed": "A line of evenly spaced light pulses running out into the black like a cable.",
+    "acts": [
+     {
+      "t0": 0,
+      "t1": 33.5,
+      "act": "Nothing: silence and hints."
+     },
+     {
+      "t0": 33.5,
+      "t1": 128,
+      "act": "Signal: the low line and texture; the crossing."
+     },
+     {
+      "t0": 128,
+      "t1": 161,
+      "act": "Fade: decay to silence."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 29.467,
+    "turn_at": 33.5,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in the deep reach, a vast dark descent where the tunnel opens into void and marine snow falls. FLOW: the jellyfish drifts in total darkness, only its own amber glow visible; at about four seconds a line of evenly spaced light pulses switches on and runs out ahead of it into the void like a cable, and around it a dense field of fleck-clouds glimmers into view, footage of stars and night roads; in the last seconds the jellyfish follows the pulsing line deeper. Vast, lonely, steady."
+   }
+  },
+  "firstwintera-13": {
+   "title": "Tizita",
+   "album": "SOMEONE WROTE MY FIRST WINTER · A SIDE",
+   "mood": "beautiful haunting",
+   "bpm": 143.55,
+   "dur": 209.82,
+   "cent": 977,
+   "reading": "Sparse, isolated pitch-bent phrases (curved formant shapes, like a voice or krar) surrounded by silence: 47% of env frames are zero. 0 to 107 s sparse phrases (about 0.9), 107 to 131 s denser plucks (1.8), 131 to 152.75 s near silence, 152.75 to 198.5 s a full chordal climax with the low bands filled (2.7 to 3.3), fade. The detected 143.55 bpm is nominal: the phrases are in free time.",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 61,
+     "character": "isolated phrases with silence"
+    },
+    {
+     "t0": 61,
+     "t1": 107.25,
+     "character": "phrases, a little closer"
+    },
+    {
+     "t0": 107.25,
+     "t1": 131.25,
+     "character": "denser plucks, 1.8"
+    },
+    {
+     "t0": 131.25,
+     "t1": 152.75,
+     "character": "near silence"
+    },
+    {
+     "t0": 152.75,
+     "t1": 198.5,
+     "character": "chordal climax, 2.7 to 3.3"
+    },
+    {
+     "t0": 198.5,
+     "t1": 209.82,
+     "character": "fade"
+    }
+   ],
+   "best_use": "Lantern Grotto: watching. Plenty of space for films to bloom; loop 0 to 131 s.",
+   "treatment": {
+    "level": "grotto",
+    "north_star": "Haunting stillness where the swimmer is allowed to stop. Each phrase is a lantern lit and left to burn out.",
+    "seed": "A comb jelly's rainbow ripple lighting a single film-cloud, one face, in an otherwise black alcove.",
+    "acts": [
+     {
+      "t0": 0,
+      "t1": 107.25,
+      "act": "Linger: phrases and silence; comb jellies light one by one."
+     },
+     {
+      "t0": 107.25,
+      "t1": 152.75,
+      "act": "Gather: denser plucks, then a held silence."
+     },
+     {
+      "t0": 152.75,
+      "t1": 198.5,
+      "act": "Bloom: the chordal climax (beyond the game loop)."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 56.821,
+    "turn_at": 61,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in Lantern Grotto, a quiet side alcove where the current stops and comb jellies of particle light ripple faint rainbow cilia along the walls. FLOW: the jellyfish slips out of the current into a dark still alcove and holds position; along the walls comb jellies of particle light ripple faint rainbows one at a time; at about four seconds a fleck-cloud before it slowly condenses into a readable film, a woman's face turning in old black-and-white, and the jellyfish hangs watching, tentacles loose; in the last seconds the picture softens back to flecks and a second comb jelly glows. Haunting, intimate, still."
+   }
+  },
+  "firstwintera-18": {
+   "title": "Heart Is Stone",
+   "album": "SOMEONE WROTE MY FIRST WINTER · A SIDE",
+   "mood": "good and deep",
+   "bpm": 80.75,
+   "dur": 198.39,
+   "cent": 853,
+   "reading": "A repeated beating pulse (vertical striations at about 1.3 Hz) throughout. Soft 0 to 63 s (2.0), 63 to 78 s (4.2), 95 to 142.5 s (4.6) with strong periodic pulses, 142.5 to 159 s (2.8). From 159.25 to 191.75 s the sound breaks: hard on/off gating between 0 and 9, a new sustained high tone and broken stepped tones in the low bands.",
+   "sections": [
+    {
+     "t0": 0,
+     "t1": 63.25,
+     "character": "soft beating, 2.0"
+    },
+    {
+     "t0": 63.25,
+     "t1": 95,
+     "character": "stronger, 3.0 to 4.2"
+    },
+    {
+     "t0": 95,
+     "t1": 142.5,
+     "character": "deep pulse, 4.6"
+    },
+    {
+     "t0": 142.5,
+     "t1": 159.25,
+     "character": "settle, 2.8"
+    },
+    {
+     "t0": 159.25,
+     "t1": 191.75,
+     "character": "broken gating 0 to 9, high tone"
+    },
+    {
+     "t0": 191.75,
+     "t1": 198.39,
+     "character": "end"
+    }
+   ],
+   "best_use": "Interference from 159.25 s (a broken heart); deep reach alternate from 0 to 142.5 s.",
+   "treatment": {
+    "level": "interference",
+    "north_star": "A heart turning to stone mid-beat. The film's pulse stutters, goes red, and keeps beating anyway.",
+    "seed": "The jellyfish's bell flickering on and off in red with every broken beat while its film beads shatter and re-form.",
+    "acts": [
+     {
+      "t0": 95,
+      "t1": 142.5,
+      "act": "Pulse: deep beating; red flecks gather at the walls."
+     },
+     {
+      "t0": 142.5,
+      "t1": 159.25,
+      "act": "Hold: settle; the passage narrows."
+     },
+     {
+      "t0": 159.25,
+      "t1": 191.75,
+      "act": "Break: on/off gating; red fragments, scrambled order, then out."
+     }
+    ]
+   },
+   "video": {
+    "audio_start": 155.48,
+    "turn_at": 159.25,
+    "prompt": "LAW: one small amber jellyfish made of layered celluloid, its bell thin translucent sheets of film stock stacked like onion skin and lit from within, small in frame with dark water all around it; moving pictures exist only as soft clouds of luminous flecks or as chains of small film slices trailing like beads, never as rectangles, screens, cards or frames with edges; near-black teal water; every other creature is a silhouette of sparse particles; only the films and the creatures give light; chase camera low and behind, level horizon; set in Interference, a passage where film comes apart into rust-red broken fragments of flecks with frame order scrambled. FLOW: the jellyfish swims a narrow passage to a deep heartbeat while rust-red fleck-clouds gather at the walls; at about four seconds the beat breaks into hard stuttering gates and the red fragments burst across the water, film slices flashing on and off out of order, a hand, a stone, a hand; the jellyfish pushes through with steady pulses; in the last seconds the red falls away behind it and its amber glow returns in clear dark water. Heavy, broken, resolute."
+   }
+  }
+ },
+ "video_matches": {
+  "design_v2": {
+   "file": "fal/design_v2_720.mp4",
+   "motion": [
+    7.71,
+    7.82,
+    8.19,
+    8.22,
+    8.77,
+    9.15,
+    8.82,
+    9.09,
+    9.04,
+    8.87
+   ],
+   "luma": [
+    54.38,
+    52.15,
+    52.62,
+    54.13,
+    55.05,
+    54.66,
+    54.7,
+    54.65,
+    54.54,
+    53.98
+   ],
+   "top": [
+    {
+     "id": "nightbus-08",
+     "offset": 8.27,
+     "score": 0.833,
+     "r_motion": 0.95,
+     "r_luma": 0.78,
+     "level_fit": 0.74
+    },
+    {
+     "id": "nightbus-13",
+     "offset": 19.13,
+     "score": 0.804,
+     "r_motion": 0.88,
+     "r_luma": 0.7,
+     "level_fit": 0.8
+    },
+    {
+     "id": "siltwire-02",
+     "offset": 159.92,
+     "score": 0.749,
+     "r_motion": 0.86,
+     "r_luma": 0.37,
+     "level_fit": 0.97
+    }
+   ]
+  },
+  "design_v4": {
+   "file": "fal/design_v4_720.mp4",
+   "motion": [
+    2.04,
+    5.33,
+    1.18,
+    2.36,
+    4.92,
+    2.05,
+    2.22,
+    1.45,
+    2.06,
+    1.28
+   ],
+   "luma": [
+    48.35,
+    56.66,
+    42.68,
+    56.19,
+    56.43,
+    44.24,
+    43.64,
+    46.37,
+    46.03,
+    45.16
+   ],
+   "top": [
+    {
+     "id": "nightbus-06",
+     "offset": 117.91,
+     "score": 0.741,
+     "r_motion": 0.67,
+     "r_luma": 0.73,
+     "level_fit": 0.84
+    },
+    {
+     "id": "firstwintera-18",
+     "offset": 75.98,
+     "score": 0.74,
+     "r_motion": 0.67,
+     "r_luma": 0.79,
+     "level_fit": 0.79
+    },
+    {
+     "id": "siltwire-02",
+     "offset": 130.8,
+     "score": 0.738,
+     "r_motion": 0.72,
+     "r_luma": 0.61,
+     "level_fit": 0.9
+    }
+   ]
+  },
+  "design_v5": {
+   "file": "fal/design_v5_720.mp4",
+   "motion": [
+    4.39,
+    7.68,
+    4.94,
+    1.51,
+    1.15,
+    1.23,
+    1.5,
+    1.32,
+    0.91,
+    0.73
+   ],
+   "luma": [
+    42.37,
+    51.09,
+    46.75,
+    21.17,
+    20.93,
+    23.2,
+    25.91,
+    24.41,
+    20.78,
+    19.7
+   ],
+   "top": [
+    {
+     "id": "event-03",
+     "offset": 83.17,
+     "score": 0.945,
+     "r_motion": 0.91,
+     "r_luma": 0.94,
+     "level_fit": 1.0
+    },
+    {
+     "id": "nightbus-06",
+     "offset": 113.27,
+     "score": 0.857,
+     "r_motion": 0.88,
+     "r_luma": 0.74,
+     "level_fit": 0.94
+    },
+    {
+     "id": "nightbus-14",
+     "offset": 84.24,
+     "score": 0.838,
+     "r_motion": 0.79,
+     "r_luma": 0.79,
+     "level_fit": 0.94
+    }
+   ]
+  }
+ }
+}
