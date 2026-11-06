@@ -8,6 +8,8 @@ Memory Maker · Timeworm. A small amber jellyfish of layered celluloid swims a b
 - **Theory of play:** [SCION_LUDIC_BRANCHING_ARCHIVE.md](SCION_LUDIC_BRANCHING_ARCHIVE.md).
 - **Songs:** [SONG2GAME.md](SONG2GAME.md), with `audio/song2game.json` and `audio/song2video.py`.
 
+**New: [Drifts](drift/)**: one gesture-only, open-water game per video. See [drift/DRIFTS.md](drift/DRIFTS.md).
+
 Earlier: [v5](v5.html) ([notes](NOTES_v5.md)), [v4](v4.html), [v3](v3.html).
 
 ## The loop this time: video2game + song2game

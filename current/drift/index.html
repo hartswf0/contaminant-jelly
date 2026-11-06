@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Drifts · The Current</title>
+<meta name="description" content="Drifts: one small game for each video of The Current. A jellyfish of celluloid drifts through open water in layers of silhouette, takes frames from films made of light, and watches them bloom. No buttons: hold, tap, double-tap, pinch.">
+<style>
+:root{--ink:#eef2ee;--gold:#ffc46a;--dim:rgba(200,214,206,.7);--bg:#070c0b}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:system-ui,"Helvetica Neue",Arial,sans-serif}
+body.game{overflow:hidden;touch-action:none;overscroll-behavior:none;-webkit-user-select:none;user-select:none}
+#gl{position:fixed;inset:0;width:100%;height:100%;display:block}
+.ui{position:fixed;pointer-events:none;transition:opacity .7s}
+#hud{top:max(12px,env(safe-area-inset-top));left:16px;right:16px;display:flex;justify-content:space-between;gap:12px;font:italic 13px Georgia,serif;color:var(--dim);text-shadow:0 0 6px #000;opacity:0}
+#hud b{font:700 11px system-ui;letter-spacing:.24em;color:var(--gold);font-style:normal}
+#say{left:0;right:0;top:max(48px,calc(env(safe-area-inset-top) + 38px));text-align:center;font:italic clamp(14px,2vw,18px) Georgia,serif;text-shadow:0 0 8px #000;opacity:0;padding:0 30px}
+#tag{font:italic 13px Georgia,serif;color:#fff3dc;text-shadow:0 0 6px #000,0 0 2px #000;white-space:nowrap;transform:translate(-50%,-100%);opacity:0;transition:opacity .25s}
+#hint{left:0;right:0;bottom:max(18px,env(safe-area-inset-bottom));text-align:center;font:13px/1.7 system-ui;color:rgba(230,238,232,.75);text-shadow:0 0 6px #000;opacity:0;padding:0 20px}
+#card{inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 8vw;background:radial-gradient(ellipse at 60% 50%,rgba(7,12,11,.1),rgba(7,12,11,.85) 75%)}
+#card .k{font:700 11px system-ui;letter-spacing:.3em;color:var(--gold)}#card h1{margin:8px 0 0;font:900 clamp(34px,7vw,72px)/1 system-ui;letter-spacing:.08em}
+#card p{max-width:560px;font:italic 15px/1.55 Georgia,serif;color:#dfe6e0;margin:14px 0 0}#card .go{margin-top:22px;font:600 14px system-ui;letter-spacing:.12em;color:var(--gold)}
+#card ol{margin:10px 0 0;padding-left:18px;max-width:560px;max-height:28vh;overflow:hidden;font:italic 13px/1.5 Georgia,serif;color:#dfe6e0}
+#dark{inset:0;opacity:0;background:radial-gradient(circle at var(--x,50%) var(--y,50%),rgba(0,0,0,0) 0,rgba(0,0,0,0) var(--r,30vmin),rgba(2,4,4,.92) calc(var(--r,30vmin) * 2.2))}
+#flash{inset:0;background:radial-gradient(ellipse,rgba(255,60,20,0) 40%,rgba(255,60,20,.3));opacity:0;transition:opacity .3s}
+#dbg{left:10px;bottom:10px;font:11px ui-monospace,monospace;color:#9ccfa4;white-space:pre;display:none;text-shadow:0 0 4px #000}
+/* gallery */
+.wrap{max-width:1100px;margin:0 auto;padding:40px 20px 60px}.wrap h1{margin:0;font:900 clamp(36px,7vw,64px)/1 system-ui;letter-spacing:.08em}.wrap .k{font:700 11px system-ui;letter-spacing:.3em;color:var(--gold)}
+.wrap>p{max-width:640px;font:italic 16px/1.55 Georgia,serif;color:#dfe6e0}.wrap a{color:var(--gold)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;margin-top:26px}
+.card{display:block;text-decoration:none;color:var(--ink);border-radius:14px;overflow:hidden;background:#0c1413;transition:transform .2s}.card:hover{transform:translateY(-3px)}
+.card .im{aspect-ratio:16/9;background-size:cover;background-position:center;filter:saturate(.8);-webkit-mask-image:radial-gradient(ellipse at 50% 50%,#000 55%,transparent 100%);mask-image:radial-gradient(ellipse at 50% 50%,#000 55%,transparent 100%)}
+.card .tx{padding:10px 14px 16px}.card b{font:800 18px system-ui;letter-spacing:.04em}.card small{display:block;font:600 10px system-ui;letter-spacing:.2em;color:var(--gold);margin:4px 0 6px}.card span{font:italic 13px/1.45 Georgia,serif;color:var(--dim)}
+</style>
+<script type="importmap">{"imports":{"three":"../../paeleo/scion/videotext/vendor/three.module.min.js","three/addons/":"../../paeleo/scion/videotext/vendor/addons/"}}</script>
+</head>
+<body>
+<script type="module">
+import {LEVELS} from './levels.js';
+const Q = new URLSearchParams(location.search), $ = id => document.getElementById(id);
+if (!Q.get('v')) {
+  document.body.innerHTML = `<div class="wrap"><div class="k">THE CURRENT · BETAS</div><h1>DRIFTS</h1>
+    <p>One small game for each video we have made. No tube: open water, in layers, with depth in front and behind. No buttons: <b>hold</b> the water to swim there, <b>tap</b> a film to take a frame, <b>hold on a film</b> to watch it bloom, <b>double-tap</b> to pulse, <b>pinch</b> to pull back, <b>two fingers</b> to look around. Each card says what the game took from its video.</p>
+    <div class="grid">${LEVELS.map(l => `<a class="card" href="?v=${l.id}${Q.get('sm') ? '&sm=' + encodeURIComponent(Q.get('sm')) : ''}${Q.get('films') ? '&films=' + encodeURIComponent(Q.get('films')) : ''}"><div class="im" style="background-image:url(thumbs/${l.source}.jpg)"></div><div class="tx"><b>${l.title}</b><small>FROM ${l.source.replace('_', ' ').toUpperCase()} · ${l.goal.label.toUpperCase()}</small><span>${l.took}</span></div></a>`).join('')}</div>
+    <p style="margin-top:30px;font-size:13px"><a href="../">The Branching Archive (v6)</a> · <a href="../../">Contaminant Jelly</a> · <a href="DRIFTS.md">How the translations work</a></p></div>`;
+} else import('./engine.js').then(m => m.play(LEVELS.find(l => l.id === Q.get('v')) || LEVELS[0], LEVELS));
+</script>
+</body>
+</html>
