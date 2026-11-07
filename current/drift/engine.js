@@ -6,14 +6,20 @@ import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {makeScreens, cinema} from '../screens.js';
-import {jarSVG} from '../../jar.js';
+import {bottle, BOTTLE_CSS, iconFor} from '../../labels/jarlab.js';
+import {makePredators, predatorsFor, seaOf, regionOf} from './sea.js';
+import {mountEditor, ED_CSS} from './editor.js';
 
 export async function play(L, ALL) {
   const Q = new URLSearchParams(location.search), DEBUG = Q.has('debug'), COARSE = matchMedia('(pointer: coarse)').matches, $ = id => document.getElementById(id);
   document.body.className = 'game';
+  const PALJ = [['#8fb3d6', '#d79a3e', '#1d2a4f'], ['#3e8f9a', '#b8452f', '#1f1720'], ['#7fb9c9', '#6c8ea8', '#16263a'], ['#c49ad6', '#8c5aa8', '#2a1736'], ['#5d7ea6', '#a37a4a', '#141c2a'], ['#e0b45a', '#c98d2e', '#2e2210'], ['#7bb39a', '#4e8a6c', '#13261d'], ['#d98b74', '#b4553c', '#2a1410']];
+  const CARDJAR = (() => { const k = [...L.id].reduce((a, c) => a + c.charCodeAt(0), 0), [tint, lid, ink] = PALJ[k % PALJ.length]; try { return bottle('specimen', L.sign ? {name: L.sign.name, sym: L.sign.sym, n: L.sign.n, no: 0, line: L.title.toUpperCase().slice(0, 22), seed: 500 + k, tint, lid, ink, icon: ''} : {name: L.title, seed: 500 + k, no: (k % 90) + 1, tint, lid, ink, icon: iconFor(L.sea ? 'reel' : L.id, ink, lid), poster: `play/${L.id}.jpg`}); } catch (e) { return {html: '', defs: ''}; } })();
   document.body.innerHTML = `<canvas id="gl"></canvas><div class="ui" id="dark"></div><div class="ui" id="flash"></div><div class="ui" id="tag"></div>
     <div class="ui" id="hud"><div><b>${L.title.toUpperCase()}</b> · <span id="goal"></span></div><div id="song"></div></div><div class="ui" id="say"></div><div class="ui" id="hint"></div><div class="ui" id="dbg"></div>
-    <div class="ui" id="card">${L.jar ? `<div class="jarimg">${jarSVG({seed: L.id.length * 7, sym: L.sign ? L.sign.sym : ""})}</div>` : ""}<div class="k">${L.kind ? 'FROM THE ARCHIVE · ' : 'A DRIFT FROM '}${L.source.replace('_', ' ').toUpperCase()}</div><h1>${L.title}</h1><p>${L.took}</p><p style="font-style:normal;font-size:14px;color:var(--dim)">Goal: ${L.goal.label}.</p><div class="go">TOUCH THE WATER TO BEGIN</div></div>`;
+    <canvas class="ui" id="guide"></canvas><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="jdefs"></defs></svg><style>${BOTTLE_CSS}${ED_CSS}#guide{inset:0;width:100%;height:100%;opacity:1}#card .jarimg{width:min(22vmin,150px)}</style>
+    <div class="ui" id="card">${CARDJAR.html ? `<div class="jarimg">${CARDJAR.html}</div>` : ""}<div class="k">${L.kind ? 'FROM THE ARCHIVE · ' : 'A DRIFT FROM '}${L.source.replace('_', ' ').toUpperCase()}</div><h1>${L.title}</h1><p>${L.took}</p><p style="font-style:normal;font-size:14px;color:var(--dim)">Goal: ${L.goal.label}.</p><div class="go">TOUCH THE WATER TO BEGIN</div></div>`;
+  $('jdefs').innerHTML = CARDJAR.defs;
   const SM = Q.get('sm') || 'https://hartswf0.github.io/secondhand-motion/';
   let FILMS = await (await fetch('../films109.json')).json();
   if (Q.get('films')) { const keep = Q.get('films').split(','); FILMS = FILMS.filter(f => keep.includes(f.slug)); }
@@ -29,6 +35,7 @@ export async function play(L, ALL) {
     if (p.by === 'decade') { const by = {}; for (const x of sh.filter(x => x.dec).sort((a, b) => (b.strip ? 1 : 0) - (a.strip ? 1 : 0))) (by[x.dec] = by[x.dec] || []).push(x); sh = Object.values(by).flatMap(v => v.slice(0, 6)).sort((a, b) => a.y - b.y || a.id.localeCompare(b.id)); }   // old footage at the bottom, newer at the top
     if (p.by === 'hue') { const c = sh.filter(x => !x.bw && x.sat > .35).sort((a, b) => a.hue - b.hue), k = Math.max(1, c.length / 64); sh = Array.from({length: Math.min(64, c.length)}, (_, i) => c[Math.floor(i * k)]); }   // an even walk round the colour wheel
     if (p.by === 'image') sh = sh.filter(x => x.sign && signOf(x.sign).image === p.v);
+    if (p.by === 'regions') { let k = 0; sh = L.regions.flatMap(r => { const xs = sh.filter(x => x.sign && signOf(x.sign).image === r.image).sort((a, b) => (b.clip ? 2 : b.strip ? 1 : 0) - (a.clip ? 2 : a.strip ? 1 : 0)).slice(0, 8); r.fr = [k, k += xs.length]; return xs; }); }   // the archive sea: eight shots from each type, its region
     if (p.by === 'sign' || p.by === 'sub' || p.by === 'image') sh.sort((a, b) => (a.y || 0) - (b.y || 0));
     FILMS = sh.map(x => { const g = x.sign ? signOf(x.sign) : null, pc = new THREE.Color(x.pal[2] || x.pal[0] || '#888'), hsl = {}; pc.getHSL(hsl);
       return {kind: x.strip ? 'strip' : 'thumb', clip: x.clip ? base + x.clip : null, speech: x.speech, url: base + (x.strip || x.thumb), title: x.t.split(' · ')[0], year: x.y, dec: x.dec, hue: x.hue, bw: x.bw, sign: g, note: x.note, fps: 6, n: 8,
@@ -39,6 +46,8 @@ export async function play(L, ALL) {
       for (const k of keys) k.s = k.s.map(st => st.map(([x, y]) => [x - mnx, y - mny])); return {id: p.id, title: p.title.toLowerCase(), film: p.film, year: p.year, w: mxx - mnx, h: mxy - mny, keys, color: p.color, shot: p.shot, fps: p.fps}; }); }
   else if (L.kind === 'doodle') { DOODLES = (await (await fetch('data/doodles.json')).json()).doodles; }
   if (L.kind === 'doodle') FILMS = DOODLES.map((d, i) => ({kind: 'doodle', d, title: d.title, film: d.film, year: d.year, fps: d.fps || 4, n: d.keys.length, col: d.color ? new THREE.Color(d.color) : hueCol((i * 137.5) % 360)}));
+  if (L.regions && L.kind === 'crashlab') { const ix = f => { const k = L.regions.findIndex(r => r.match && new RegExp(r.match).test(f.slug)); return k < 0 ? L.regions.length - 1 : k; }; FILMS.sort((a, b) => ix(a) - ix(b));
+    L.regions.forEach((r, k) => { const a = FILMS.findIndex(f => ix(f) === k); let b = a; while (b >= 0 && b < FILMS.length && ix(FILMS[b]) === k) b++; r.fr = a < 0 ? null : [a, b]; r.films = {layout: a < 0 ? 'scatter' : 'list', every: 12}; }); }
   const stamp = (film, fi) => { const f = FILMS[film]; if (!f) return ''; if (f.kind === 'doodle') return `key ${(fi % f.n) + 1} of ${f.n}${f.year ? ' · ' + f.year : ''}`; if (f.kind !== 'sm') return `${f.year || 'undated'}${f.sign ? ' · ' + f.sign.sym + ' ' + f.sign.name : ''}`; const t = fi / fps(f); return `${Math.floor(t / 60)}:${(t % 60).toFixed(1).padStart(4, '0')}`; };
   const IMG = new Map(); const withImg = (url, fn) => { let e = IMG.get(url); if (!e) { const im = new Image(); im.crossOrigin = 'anonymous'; e = {im, ok: false, cbs: []}; im.onload = () => { e.ok = true; e.cbs.forEach(f => f(im)); e.cbs = []; }; im.onerror = () => { e.bad = true; }; im.src = url; IMG.set(url, e); } if (e.ok) fn(e.im); else if (!e.bad) e.cbs.push(fn); };
   const SEED = Q.get('seed') ? +Q.get('seed') : (Math.random() * 1e9) | 0;
@@ -144,23 +153,28 @@ export async function play(L, ALL) {
   cloud(FROW, NFR, 4200); cloud(VROW, 1, 52000, 1.1); cloud(CHROW, NCH, 700); cloud(XROW, 1, 1500, 1.2); cloud(FLROW, 2, 500); cloud(CROW, NCAST, 30); cloud(AROW, NAR * AN, 90, 1); cloud(COREROW, 1, 700);
   for (let r = 0; r < MAXC; r++) hide(r);
   // ------------------------------------------------ the films of this drift, translated from its video
-  const SP = []; let order = 0;
-  { const lay = L.films.layout, every = L.films.every || 10, add = (o) => { const film = (rnd(SP.length, 41) * FILMS.length) | 0; SP.push({i: SP.length, film, from: (rnd(SP.length, 42) * 40) | 0, z: 0, size: 2.4, budget: 3, bad: false, slot: -1, sleep: false, buried: false, pair: -1, ring: false, ...o}); };
-    const scatter = (u0, u1, step, opt = {}) => { for (let u = u0; u < u1; u += step * (.7 + .6 * rnd(u, 43))) { const k = SP.length, bad = rnd(k, 44) < L.bad, back = !bad && rnd(k, 45) < .3;
-        add({u, w: (rnd(k, 46) * 2 - 1) * BAND * .8, z: back ? -7 : 0, size: back ? 3.4 + rnd(k, 47) : 1.9 + rnd(k, 48) * 1.1, bad, ...opt}); } };
-    if (lay === 'scatter' || lay === 'stream') scatter(12, LEN - 8, every, lay === 'stream' ? {size: 1.8} : {});
-    if (lay === 'dark') scatter(12, LEN - 8, every, {dark: true});
-    if (lay === 'giant') { add({u: 16, w: BAND * .35, z: -5, size: 8.5, budget: 5, giant: true}); scatter(34, LEN - 8, every); }
-    if (lay === 'tiers') for (let u = 10, t = 0; u < LEN - 8; u += every, t++) for (const sd of [-1, 1]) add({u: u + sd * 1.5, w: sd * (BAND - 1.6 - (t % 2) * 2), z: -(t % 3) * 4, size: 2 + (t % 3) * .5, sleep: true, bad: rnd(u + sd, 49) < L.bad});
-    if (lay === 'pairs') { let p = 0; for (let u = 14; u < LEN - 10; u += every * (.8 + .4 * rnd(u, 50))) { const w0 = (rnd(u, 51) * 2 - 1) * BAND * .5; add({u, w: w0 - 2.4, pair: p, size: 2.6}); add({u, w: w0 + 2.4, pair: p, size: 2.6}); p++; if (rnd(u, 52) < L.bad * 2) add({u: u + 7, w: (rnd(u, 53) * 2 - 1) * BAND * .7, bad: true, size: 1.4}); } }
-    if (lay === 'halo') { scatter(14, LEN - 34, every); for (let k = 0; k < 8; k++) add({u: LEN - 16, w: 0, ring: k, size: 2.3, budget: 2}); }
-    if (lay === 'caves') { for (let u = 14; u < LEN - 10; u += every * (.7 + .6 * rnd(u, 54))) { const up = rnd(u, 55) < .5; add({u, w: (up ? 1 : -1) * (4.8 + rnd(u, 56) * (BAND - 6.5)), size: up ? 2.2 : 2.8, bad: rnd(u, 57) < L.bad}); } }
-    if (lay === 'buried') for (let u = 12; u < LEN - 10; u += every * (.7 + .6 * rnd(u, 58))) add({u, w: -BAND + .9 + rnd(u, 59) * .8, size: 2.2, buried: true});
-    if (lay === 'list') { const n = FILMS.length, step = (LEN - 26) / Math.max(1, n); FILMS.forEach((f, k) => add({u: 14 + k * step + (rnd(k, 64) - .5) * step * .4, w: (rnd(k, 65) * 2 - 1) * BAND * .7, film: k, from: 0, z: rnd(k, 66) < .22 ? -6 : 0, size: 2.5 + rnd(k, 67) * 1.2, budget: 3})); }
-    if (lay === 'doodles') { const ord = FILMS.map((_, i) => i).sort((a, b) => rnd(a, 68) - rnd(b, 68)); let k = 0; for (let u = 14; u < LEN - 8; u += every * (.7 + .6 * rnd(u, 69))) add({u, w: (rnd(u, 70) * 2 - 1) * BAND * .75, film: ord[k++ % ord.length], from: 0, doodle: true, size: 2.8, budget: 1, z: rnd(u, 71) < .2 ? -5 : 0}); }
-    if (lay === 'menagerie') FILMS.forEach((f, k) => add({u: 10 + k * (LEN - 20) / FILMS.length, w: (rnd(k, 72) * 2 - 1) * BAND * .8, film: k, from: 0, doodle: true, roam: true, size: 2 + rnd(k, 73) * 1.6, budget: 1, z: rnd(k, 74) < .25 ? -5 : 0, shy: rnd(k, 75) < .5, gait: .6 + rnd(k, 76) * 1.4}));   // every drawing as a creature
-    if (lay === 'chain') { for (let u = 40; u < LEN - 20; u += 16) add({u, w: (rnd(u, 62) * 2 - 1) * BAND * .8, bad: true, size: 1.2 + rnd(u, 63)}); }
+  const SP = []; let order = 0, CHAIN_AT = null;
+  // a level is one stretch of water, or (the seas) a chain of regions, each laid out as the level it came from
+  const REG = L.regions || [{id: L.id, title: L.title, u0: 0, u1: LEN, films: L.films, bad: L.bad}]; let pairN = 0;
+  const add = (o) => { const film = o.fr ? o.fr[0] + ((rnd(SP.length, 41) * (o.fr[1] - o.fr[0])) | 0) : (rnd(SP.length, 41) * FILMS.length) | 0; SP.push({i: SP.length, film, from: (rnd(SP.length, 42) * 40) | 0, z: 0, size: 2.4, budget: 3, bad: false, slot: -1, sleep: false, buried: false, pair: -1, ring: false, ...o}); };
+  for (const R of REG) { const lay = R.films.layout, every = R.films.every || 10, U0 = R.u0, U1 = R.u1, BADR = R.bad ?? 0, fr = R.fr, a = (o) => add({fr, reg: R.id, ...o});
+    const scatter = (u0, u1, step, opt = {}) => { for (let u = u0; u < u1; u += step * (.7 + .6 * rnd(u, 43))) { const k = SP.length, bad = rnd(k, 44) < BADR, back = !bad && rnd(k, 45) < .3;
+        a({u, w: (rnd(k, 46) * 2 - 1) * BAND * .8, z: back ? -7 : 0, size: back ? 3.4 + rnd(k, 47) : 1.9 + rnd(k, 48) * 1.1, bad, ...opt}); } };
+    if (lay === 'scatter' || lay === 'stream') scatter(U0 + 12, U1 - 8, every, lay === 'stream' ? {size: 1.8} : {});
+    if (lay === 'dark') scatter(U0 + 12, U1 - 8, every, {dark: true});
+    if (lay === 'giant') { a({u: U0 + 16, w: BAND * .35, z: -5, size: 8.5, budget: 5, giant: true}); scatter(U0 + 34, U1 - 8, every); }
+    if (lay === 'tiers') for (let u = U0 + 10, t = 0; u < U1 - 8; u += every, t++) for (const sd of [-1, 1]) a({u: u + sd * 1.5, w: sd * (BAND - 1.6 - (t % 2) * 2), z: -(t % 3) * 4, size: 2 + (t % 3) * .5, sleep: true, bad: rnd(u + sd, 49) < BADR});
+    if (lay === 'pairs') { for (let u = U0 + 14; u < U1 - 10; u += every * (.8 + .4 * rnd(u, 50))) { const w0 = (rnd(u, 51) * 2 - 1) * BAND * .5; a({u, w: w0 - 2.4, pair: pairN, size: 2.6}); a({u, w: w0 + 2.4, pair: pairN, size: 2.6}); pairN++; if (rnd(u, 52) < BADR * 2) a({u: u + 7, w: (rnd(u, 53) * 2 - 1) * BAND * .7, bad: true, size: 1.4}); } }
+    if (lay === 'halo') { scatter(U0 + 14, U1 - 34, every); for (let k = 0; k < 8; k++) a({u: U1 - 16, w: L.regions ? BAND * .5 : 0, ring: k, size: 2.3, budget: 2}); }
+    if (lay === 'caves') { for (let u = U0 + 14; u < U1 - 10; u += every * (.7 + .6 * rnd(u, 54))) { const up = rnd(u, 55) < .5; a({u, w: (up ? 1 : -1) * (4.8 + rnd(u, 56) * (BAND - 6.5)), size: up ? 2.2 : 2.8, bad: rnd(u, 57) < BADR}); } }
+    if (lay === 'buried') for (let u = U0 + 12; u < U1 - 10; u += every * (.7 + .6 * rnd(u, 58))) a({u, w: -BAND + .9 + rnd(u, 59) * .8, size: 2.2, buried: true});
+    if (lay === 'list') { const ks = fr ? Array.from({length: fr[1] - fr[0]}, (_, i) => fr[0] + i) : FILMS.map((_, k) => k), step = (U1 - U0 - 26) / Math.max(1, ks.length); ks.forEach((k, i) => a({u: U0 + 14 + i * step + (rnd(k, 64) - .5) * step * .4, w: (rnd(k, 65) * 2 - 1) * BAND * .7, film: k, from: 0, z: rnd(k, 66) < .22 ? -6 : 0, size: 2.5 + rnd(k, 67) * 1.2, budget: 3})); }
+    if (lay === 'doodles') { const ord = FILMS.map((_, i) => i).sort((x, y) => rnd(x, 68) - rnd(y, 68)); let k = 0; for (let u = U0 + 14; u < U1 - 8; u += every * (.7 + .6 * rnd(u, 69))) a({u, w: (rnd(u, 70) * 2 - 1) * BAND * .75, film: ord[k++ % ord.length], from: 0, doodle: true, size: 2.8, budget: 1, z: rnd(u, 71) < .2 ? -5 : 0}); }
+    if (lay === 'menagerie') FILMS.forEach((f, k) => a({u: U0 + 10 + k * (U1 - U0 - 20) / FILMS.length, w: (rnd(k, 72) * 2 - 1) * BAND * .8, film: k, from: 0, doodle: true, roam: true, size: 2 + rnd(k, 73) * 1.6, budget: 1, z: rnd(k, 74) < .25 ? -5 : 0, shy: rnd(k, 75) < .5, gait: .6 + rnd(k, 76) * 1.4}));   // every drawing as a creature
+    if (lay === 'chain') { CHAIN_AT = [U0, U1]; for (let u = U0 + 40; u < U1 - 20; u += 16) a({u, w: (rnd(u, 62) * 2 - 1) * BAND * .8, bad: true, size: 1.2 + rnd(u, 63)}); }
   }
+  const SP_BURIED = SP.some(x => x.buried);
+  const regionAt = u => REG.find(R => u >= R.u0 && u < R.u1) || REG[REG.length - 1];
   var CHAIN; // declared below (hoisting for the chain layout)
   // ------------------------------------------------ marine snow and silt that the animals push
   const NSN = 2600, snP = new Float32Array(NSN * 3), snA = new Float32Array(NSN), sn = Array.from({length: NSN}, () => ({x: (Math.random() - .5) * 44, y: (Math.random() - .5) * 30, z: -32 + Math.random() * 38, vx: 0, vy: 0, s: Math.random()}));
@@ -172,6 +186,7 @@ export async function play(L, ALL) {
   const PUSH = [];
   // ------------------------------------------------ the jelly: three celluloid sheets with sprocket holes, contracting one after another
   const CS = .8, J = {boost: 0, lightT: 0, u: 6, w: L.startW ?? 0, vu: 0, vw: 0, ph: 0, p: new THREE.Vector3(), pv: new THREE.Vector3(), mem: 100, hurt: 0, glow: 0, stun: 0, slip: 0, target: null};
+  if (Q.get('at')) { const R0 = REG.find(r => r.id === Q.get('at')); if (R0) J.u = R0.u0 + 6; }
   const BN = 5000, bg = new THREE.BufferGeometry(), bp = new Float32Array(BN * 3), bt = new Float32Array(BN), bs = new Float32Array(BN), bl = new Float32Array(BN);
   { let k = 0; for (const [Ly, rad, per] of [[0, .62, 1250], [1, .78, 1650], [2, .92, 2100]]) for (let i = 0, tr = 0; i < per && k < BN && tr < per * 4; tr++) { const t = Math.sqrt(Math.random()), a = t * Math.PI / 2 * 1.05, ph = Math.random() * 6.283;
       if ((t > .86 && Math.floor(ph / 6.283 * 44) % 2 === 0 && Math.random() < .85) || (Math.abs(((ph / 6.283 * 8) % 1) - .5) < .025 && Math.random() < .7)) continue;
@@ -198,9 +213,13 @@ export async function play(L, ALL) {
         AX[a] += dx * e * wa; AX[a + 1] += dy * e * wa; AX[a + 2] += dz * e * wa; AX[b] -= dx * e * wb; AX[b + 1] -= dy * e * wb; AX[b + 2] -= dz * e * wb; }
       A.n += (A.target - A.n) * Math.min(1, dt * 1.5); }); }
   const armFrames = A => { const f = A.frames.map(x => x.fi).sort((a, b) => a - b); return f.length <= BLOCK ? f : Array.from({length: BLOCK}, (_, i) => f[Math.round(i * (f.length - 1) / (BLOCK - 1))]); };
-  function addFrame(film, fi, tag) { let A = ARMS.find(a => a.film === film), isNew = false; if (A && A.frames.some(x => x.fi === fi)) return 'dup';
-    if (!A) { if (ARMS.length >= NAR) return 'full'; const b = take(); if (b < 0) return 'full'; A = {film, frames: [], block: b, n: 2, target: 2}; ARMS.push(A); isNew = true; armRoot(ARMS.length - 1, _a); for (let j = 0; j < AN; j++) { const i = ((ARMS.length - 1) * AN + j) * 3; AX[i] = AXP[i] = _a.x; AX[i + 1] = AXP[i + 1] = _a.y - j * .14; AX[i + 2] = AXP[i + 2] = _a.z; } }
-    A.frames.push({fi}); loadList(A.block, film, armFrames(A)); A.target = Math.min(AN, 4 + 2 * A.frames.length); CUT.push({film, fi, tag}); return isNew ? 'new' : 'grow'; }
+  function addFrame(film, fi, tag) { let A = ARMS.find(a => a.film === film), isNew = false, swap = false; if (A && A.frames.some(x => x.fi === fi)) return 'dup';
+    if (!A && ARMS.length >= NAR) {   // full: let go of the arm that holds least, and take the new film on it
+      const k = ARMS.reduce((m, a, i) => a.frames.length < ARMS[m].frames.length ? i : m, 0); A = ARMS[k]; for (const c of CUT) if (c.film === A.film && !c.lost) c.lost = 'let go'; G.letGo = FILMS[A.film].title; G.lost.push({film: A.film, by: 'let go'}); A.film = film; A.frames = []; A.n = 2; A.target = 2; isNew = swap = true; }
+    if (!A) { const b = take(); if (b < 0) return 'full'; A = {film, frames: [], block: b, n: 2, target: 2}; ARMS.push(A); isNew = true; armRoot(ARMS.length - 1, _a); for (let j = 0; j < AN; j++) { const i = ((ARMS.length - 1) * AN + j) * 3; AX[i] = AXP[i] = _a.x; AX[i + 1] = AXP[i + 1] = _a.y - j * .14; AX[i + 2] = AXP[i + 2] = _a.z; } }
+    A.frames.push({fi}); loadList(A.block, film, armFrames(A)); A.target = Math.min(AN, 4 + 2 * A.frames.length); CUT.push({film, fi, tag, dur: .8, at: RT}); if (REG.length > 1) G.regs.add(regionAt(J.u).id); return swap ? 'swap' : isNew ? 'new' : 'grow'; }
+  // a predator takes the newest arm, and the film on it, out of your cut
+  function loseArm(by) { if (!ARMS.length) return null; const A = ARMS.pop(); give(A.block); for (const c of CUT) if (c.film === A.film && !c.lost) c.lost = by; G.lost.push({film: A.film, by}); G.burst = RT; return A; }
   // ------------------------------------------------ creatures (each with a motion and an effect on the water)
   const CREAT = new Set(L.specks ? L.creatures.concat('angler') : L.creatures), pointsMat = (col, size, extra = '') => new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: {uScale: {value: 1}, uTime: {value: 0}, uFog: {value: L.fogD}},
     vertexShader: `uniform float uScale, uTime, uFog; attribute float aK; varying float vA, vK; void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.); float z = -mv.z; vK = aK; vA = exp(-pow(uFog * .9 * z, 2.)) * smoothstep(1., 3., z); gl_PointSize = max(1., ${size} * uScale / z); gl_Position = projectionMatrix * mv; }`,
@@ -245,9 +264,9 @@ export async function play(L, ALL) {
     ANG = {grp, mb, mg, lure, st: 'patrol', t: 0, u: L.floorAngler ? LEN * .45 : LEN * .55, w: -BAND * .55, pos: new THREE.Vector3(), dir: new THREE.Vector3(-1, 0, 0), cool: 0, reveal: 0, pulse: 0, init: false, rise: L.floorAngler ? 0 : 1}; }
   // ------------------------------------------------ chain layout: one film laid out in time as a timeworm of slices
   CHAIN = {film: 0, from: 0, beads: [], next: 0, blocks: []};
-  if (L.films.layout === 'chain') { CHAIN.film = (rnd(7, 60) * FILMS.length) | 0; CHAIN.from = (rnd(7, 61) * 30) | 0;
+  if (CHAIN_AT) { CHAIN.film = (rnd(7, 60) * FILMS.length) | 0; CHAIN.from = (rnd(7, 61) * 30) | 0;
     for (let b = 0; b < NCH / 8; b++) { const k = take(); CHAIN.blocks.push(k); loadClip(k, CHAIN.film, CHAIN.from + b * 8); }
-    for (let j = 0; j < NCH; j++) { const u = 22 + j * (LEN - 50) / NCH; CHAIN.beads.push({j, u, w: Math.sin(u * .045) * BAND * .65, taken: false, p: new THREE.Vector3()}); } }
+    for (let j = 0; j < NCH; j++) { const u = CHAIN_AT[0] + 22 + j * (CHAIN_AT[1] - CHAIN_AT[0] - 50) / NCH; CHAIN.beads.push({j, u, w: Math.sin(u * .045) * BAND * .65, taken: false, p: new THREE.Vector3()}); } }
   // ------------------------------------------------ doodle worms: the traced drawings swim as crisp lines of light, cycling through their keys
   const NDL = L.films.layout === 'menagerie' ? 18 : 12, DLP = L.films.layout === 'menagerie' ? 460 : 640, dlG = new THREE.BufferGeometry(); dlG.setAttribute('position', new THREE.BufferAttribute(new Float32Array(NDL * DLP * 3), 3)); dlG.setAttribute('aCol', new THREE.BufferAttribute(new Float32Array(NDL * DLP * 3), 3));
   const dlMat = new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: {uScale: {value: 1}, uFog: {value: L.fogD}},
@@ -299,8 +318,8 @@ export async function play(L, ALL) {
     tag.innerHTML = `<b style="font:600 10px system-ui;letter-spacing:.16em;color:var(--gold);display:block;text-align:center">${ready ? (L.fluid ? 'SWIM THROUGH' : 'TAP TO TAKE') : 'RESOLVING'}${f.sign ? ' · ' + f.sign.sym : ''}</b>${f.title}${best.doodle && f.film ? ' · from ' + f.film : ''} · ${stamp(best.film, fi)}`;
     { const hw = Math.min(innerWidth / 2 - 8, (tag.offsetWidth || 0) / 2 + 8); tag.style.left = `${THREE.MathUtils.clamp((_a.x * .5 + .5) * innerWidth, hw, innerWidth - hw)}px`; } tag.style.top = `${(-_a.y * .5 + .5) * innerHeight}px`; tag.style.opacity = _a.z < 1 ? .92 : 0; }
   // ------------------------------------------------ input: gestures only
-  const TRAILER = Q.has('trailer'), AUTO = Q.has('auto') || TRAILER ? {} : null, CINE = cinema(['hud', 'say', 'hint', 'dbg', 'tag', 'card']);   // cinema: no words on screen (H, or a three-finger tap)
-  const G = {colored: 0, state: 'card', t0: 0, wake: 0, watched: new Map(), watchDone: 0, pairs: new Map(), pairsDone: 0, halo: 0, unearth: 0, orderN: 0, pulses: 0, look: [0, 0], zoom: 1, hold: null, watch: null, lastTap: 0, endT: 0};
+  const TRAILER = Q.has('trailer'), AUTO = Q.has('auto') || TRAILER ? {} : null, CINE = cinema(['guide', 'hud', 'say', 'hint', 'dbg', 'tag', 'card']);   // cinema: no words on screen (H, or a three-finger tap)
+  const G = {colored: 0, state: 'card', t0: 0, wake: 0, watched: new Map(), watchDone: 0, pairs: new Map(), pairsDone: 0, halo: 0, unearth: 0, orderN: 0, pulses: 0, look: [0, 0], zoom: 1, hold: null, watch: null, lastTap: 0, endT: 0, lost: [], regs: new Set(), yaw: 0, pitch: 0};
   const touches = new Map(); let pinch = null;
   const cv = $('gl');
   const filmAt = (x, y) => { let best = null, bd = 1e9; const test = (p, size, o) => { _a.copy(p).project(camera); if (_a.z > 1) return; const sx = (_a.x * .5 + .5) * innerWidth, sy = (-_a.y * .5 + .5) * innerHeight, dist = camera.position.distanceTo(p), rpx = size * 1.15 / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * dist) * innerHeight, d = Math.hypot(sx - x, sy - y); if (d < Math.max(28, rpx) && d < bd) { bd = d; best = o; } };
@@ -313,10 +332,10 @@ export async function play(L, ALL) {
     if (e.button === 2) { G.rmb = true; }
     const f = filmAt(e.clientX, e.clientY); G.hold = {id: e.pointerId, x: e.clientX, y: e.clientY, t0: performance.now(), film: f, moved: 0}; });
   cv.addEventListener('pointermove', e => { const t = touches.get(e.pointerId); if (t) { t.x = e.clientX; t.y = e.clientY; }
-    if (pinch && touches.size >= 2) { const pts = [...touches.values()], d = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y); if (Math.abs(d - pinch.d) > 40) G.zoom = THREE.MathUtils.clamp(pinch.z * d / Math.max(20, pinch.d), .75, 1.3); return; }
+    if (pinch && touches.size >= 2) { const pts = [...touches.values()], d = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y); if (Math.abs(d - pinch.d) > 40) G.zoom = THREE.MathUtils.clamp(pinch.z * d / Math.max(20, pinch.d), .55, 1.6); return; }
     if (G.hold && G.hold.id === e.pointerId) { G.hold.moved = Math.max(G.hold.moved, Math.hypot(e.clientX - G.hold.x, e.clientY - G.hold.y)); G.hold.cx = e.clientX; G.hold.cy = e.clientY; } });
   const up = e => { const t = touches.get(e.pointerId); touches.delete(e.pointerId);
-    if (G.state === 'end' && G.swipe) { const dx = e.clientX - G.swipe.x, dy = e.clientY - G.swipe.y; G.swipe = null; if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy)) { const i = ALL.indexOf(L); go(dx < 0 ? ALL[(i + 1) % ALL.length].id : null); } else if (Math.hypot(dx, dy) < 20 && performance.now() - G.endT > 1500) go(L.id); return; }
+    if (G.state === 'end' && G.swipe) { const dx = e.clientX - G.swipe.x, dy = e.clientY - G.swipe.y; G.swipe = null; if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy)) { const i = ALL.indexOf(L); go(dx < 0 ? ALL[(i + 1) % ALL.length].id : null); } else if (dy < -70 && SEA) go(SEA.id, regionOf(L)); else if (Math.hypot(dx, dy) < 20 && performance.now() - G.endT > 1500) go(L.id); return; }
     if (e.button === 2) G.rmb = false; if (pinch) { if (touches.size < 2) pinch = null; return; }
     if (t && t.x0 < 24 && e.clientX - t.x0 > 90) { go(null); return; }   // swipe in from the left edge: back to all drifts
     const h = G.hold; if (!h || h.id !== e.pointerId) return; G.hold = null; const dt = performance.now() - h.t0;
@@ -325,10 +344,11 @@ export async function play(L, ALL) {
       else { const now = performance.now(); if (now - G.lastTap < 320 && Math.hypot(e.clientX - G.lastX, e.clientY - G.lastY) < 40) { pulse(); G.lastTap = 0; } else { G.lastTap = now; G.lastX = e.clientX; G.lastY = e.clientY; } } } };
   cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
   cv.addEventListener('dblclick', e => { e.preventDefault(); });
-  cv.addEventListener('wheel', e => { e.preventDefault(); G.zoom = THREE.MathUtils.clamp(G.zoom * Math.exp(-e.deltaY * .001), .75, 1.3); }, {passive: false});
-  const keys = new Set(); addEventListener('keydown', e => { const k = e.key.toLowerCase(); keys.add(k); if (k === 'escape') go(null); if (G.state === 'card') begin(); if (G.state === 'end') { if (k === 'enter' || k === ' ') go(L.id); if (k === 'n' || k === 'arrowright') go(ALL[(ALL.indexOf(L) + 1) % ALL.length].id); } if (k === ' ' && G.state === 'play') { e.preventDefault(); pulse(); } });
+  cv.addEventListener('wheel', e => { e.preventDefault(); G.zoom = THREE.MathUtils.clamp(G.zoom * Math.exp(-e.deltaY * .001), .55, 1.6); }, {passive: false});
+  const keys = new Set(); addEventListener('keydown', e => { const k = e.key.toLowerCase(); keys.add(k); if (k === 'escape') go(null); if (G.state === 'card') begin(); if (G.state === 'end') { if (k === 'enter' || k === ' ') go(L.id); if (k === 'n' || k === 'arrowright') go(ALL[(ALL.indexOf(L) + 1) % ALL.length].id); } if (k === ' ' && G.state === 'play') { e.preventDefault(); pulse(); } if (k === 'c') { G.yaw = G.pitch = 0; G.zoom = 1; } });
   addEventListener('keyup', e => keys.delete(e.key.toLowerCase()));
-  const go = id => { const u = new URL(location.href); if (id) u.searchParams.set('v', id); else u.searchParams.delete('v'); location.href = u.toString(); };
+  const go = (id, at) => { const u = new URL(location.href); if (id) u.searchParams.set('v', id); else u.searchParams.delete('v'); if (at) u.searchParams.set('at', at); else u.searchParams.delete('at'); location.href = u.toString(); };
+  const SEA = seaOf(L) ? ALL.find(x => x.id === seaOf(L)) : null;
   // ------------------------------------------------ sound: water in layers, the song of this video, beats
   const AU = { ac: null, el: null, t: null, lp: null, bed: null, an: null,
     start() { const A = window.AudioContext || window.webkitAudioContext; if (!A || this.ac) return; const ac = this.ac = new A(); const out = ac.createDynamicsCompressor(); out.connect(ac.destination);
@@ -363,32 +383,37 @@ export async function play(L, ALL) {
   const buzz = p => { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} };
   const say = (t, hold = 0) => { $('say').textContent = t; $('say').style.opacity = 1; G.sayT = RT + hold; };
   function begin() { G.state = 'play'; G.t0 = RT; AU.start(); $('card').style.opacity = 0; setTimeout(() => $('card').style.display = 'none', 700); $('hud').style.opacity = 1; buzz(10);
-    $('hint').innerHTML = COARSE ? 'hold the water to swim · two fingers to boost · tap a jelly-film to take a frame<br>hold on a jelly-film to see it clearly · double-tap to pulse (radar) · pinch to pull back' : 'hold the mouse in the water to swim · shift or right button to boost · click a jelly-film to take a frame<br>hold on a jelly-film to see it clearly · space to pulse (radar) · scroll to pull back · Esc for all drifts';
+    $('hint').innerHTML = COARSE ? 'hold the water to swim · two fingers to boost · tap a jelly-film to take a frame<br>hold on a jelly-film: the clip lasts as long as you hold · double-tap to sting (pulse) · pinch to pull back<br>red marks are hunters: outrun them, or sting the ones that feel it' : 'hold the mouse in the water to swim · shift or right button to boost · click a jelly-film to take a frame<br>hold on a jelly-film: the clip lasts as long as you hold · space to sting (pulse) · scroll to pull back · Q/E R/F turn the camera, C recentres<br>red marks are hunters: outrun them, or sting the ones that feel it · Esc for all drifts';
     $('hint').style.opacity = 1; setTimeout(() => $('hint').style.opacity = 0, 11000); }
   // ------------------------------------------------ pulse, watch, capture
   let PULSE = null; const pulseMat = new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: {uR: {value: 0}, uA: {value: 0}, uC: {value: new THREE.Vector3()}, uScale: {value: 1}},
     vertexShader: `uniform float uR, uScale; uniform vec3 uC; void main(){ vec4 mv = viewMatrix * vec4(uC + position * uR, 1.); gl_PointSize = max(1., .1 * uScale / -mv.z); gl_Position = projectionMatrix * mv; }`,
     fragmentShader: `uniform float uA; void main(){ vec2 q = gl_PointCoord - .5; if (dot(q, q) > .25) discard; gl_FragColor = vec4(vec3(.5, .95, 1.) * uA, 1.); }`});
   { const n = 700, P = new Float32Array(n * 3); for (let i = 0; i < n; i++) { const a = i / n * 6.283 * 3, zz = (Math.random() - .5) * .3; P.set([Math.cos(a), Math.sin(a), zz], i * 3); } const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(P, 3)); const p = new THREE.Points(g, pulseMat); p.frustumCulled = false; scene.add(p); }
-  function pulse() { if (G.state !== 'play' || RT - (G.pulseT || -9) < 1.5) return; const ph = AU.phase(), on = ph < .14 || ph > .86; G.pulseT = RT; PULSE = {t0: RT, R: on ? 22 : 13, c: J.p.clone(), on}; G.pulses++;
+  function pulse() { if (G.state !== 'play' || RT - (G.pulseT || -9) < 1.5) return; if (G.noSting > RT) { say('no stings: the nudibranch took them; they grow back soon'); G.pulseT = RT; return; } const ph = AU.phase(), on = ph < .14 || ph > .86; G.pulseT = RT; PULSE = {t0: RT, R: on ? 22 : 13, c: J.p.clone(), on}; G.pulses++;
     let nl = 0; for (const s of SP) if (s.pos && s.pos.distanceTo(J.p) < PULSE.R) { s.lit = RT; nl++; if (s.buried && !s.up) unearth(s); } if (ANG) ANG.reveal = 1; scareShrimp(J.p); for (const f of FISH) f.v.add(_a.copy(f.p).sub(J.p).setLength(8));
-    AU.tone(on ? 660 : 440, 2, .05); buzz(on ? [8, 30, 8] : 10); say(`${on ? 'on the beat: the pulse reaches far' : 'pulse'}${nl ? ` · ${nl} jelly-film${nl > 1 ? 's' : ''} come clear` : ''}`); }
-  function startWatch(s) { G.watch = {s, t0: RT}; if (!s.doodle && s.film !== undefined) G.backFilm = s.film; if (s.doodle) { loadClip(0, s.film, 0); G.watch.blk = 0; } AU.focus(1); say(`${s.j !== undefined ? FILMS[CHAIN.film].title : FILMS[s.film].title} · ${stamp(s.j !== undefined ? CHAIN.film : s.film, (s.j !== undefined ? CHAIN.from + s.j : s.from + (Math.floor(T * fps(FILMS[s.film])) % BLOCK)))}`, 99); buzz(6); }
-  function endWatch() { if (!G.watch) return; const s = G.watch.s, d = RT - G.watch.t0; G.watch = null; AU.focus(0); G.sayT = RT - 2; const k = s.i ?? ('c' + s.j), tot = (G.watched.get(k) || 0) + d; G.watched.set(k, tot);
+    AU.tone(on ? 660 : 440, 2, .05); buzz(on ? [8, 30, 8] : 10); say(`${on ? 'on the beat: the pulse reaches far' : 'pulse'}${nl ? ` · ${nl} jelly-film${nl > 1 ? 's' : ''} come clear` : ''}`);
+    if (PR) for (const e of PR.stung(J.p, PULSE.R)) { const p = e.p; if (e.type === 'flee') say(`stung: ${p.name} turns away`); if (e.type === 'immune') say(`${p.name} doesn't feel your stings: swim`);
+      if (e.type === 'release') { for (const film of e.films) add({u: p.u + 1, w: THREE.MathUtils.clamp(p.w, -BAND + 1, BAND - 1), film, from: 0, size: 2.8, budget: 3}); say(`${p.name} lets go: take your film${e.films.length > 1 ? 's' : ''} back`); AU.tone(880, 1.4, .05); } } }
+  function startWatch(s) { G.watch = {s, t0: RT, r0: performance.now()}; if (!s.doodle && s.film !== undefined) G.backFilm = s.film; if (s.doodle) { loadClip(0, s.film, 0); G.watch.blk = 0; } AU.focus(1); G.watch.title = `${s.j !== undefined ? FILMS[CHAIN.film].title : FILMS[s.film].title} · ${stamp(s.j !== undefined ? CHAIN.film : s.film, (s.j !== undefined ? CHAIN.from + s.j : s.from + (Math.floor(T * fps(FILMS[s.film])) % BLOCK)))}`; say(G.watch.title, 99); mkRec(FILMS[s.j !== undefined ? CHAIN.film : s.film].title + ' · held', 3); buzz(6); }
+  function endWatch() { if (!G.watch) return; const s = G.watch.s, d = RT - G.watch.t0, held = (performance.now() - G.watch.r0) / 1000; G.watch = null; AU.focus(0); G.sayT = RT - 2;
+    if (held >= .4 && !s.bad && G.state === 'play') { const film = s.j !== undefined ? CHAIN.film : s.film; let c = null; for (let i = CUT.length - 1; i >= 0; i--) if (CUT[i].film === film && !CUT[i].lost) { c = CUT[i]; break; }
+      if (!c) { const n0 = CUT.length; capture(s); if (CUT.length > n0) c = CUT[CUT.length - 1]; }
+      if (c) { c.dur = Math.min(20, (c.held ? c.dur : 0) + held); c.held = true; if (s.j !== undefined) c.fi = CHAIN.from + s.j; else if (!s.doodle) c.fi = s.from; say(`a ${c.dur.toFixed(1)} s clip of ${FILMS[film].title}: as long as you held it`); } } const k = s.i ?? ('c' + s.j), tot = (G.watched.get(k) || 0) + d; G.watched.set(k, tot);
     if (tot >= 4 && !s.watchedDone) { s.watchedDone = true; G.watchDone++; say(`watched · ${G.watchDone}`); AU.tone(880, 1.4, .04); buzz([8, 30, 8]); } }
   const CAST = {t: -9, to: new THREE.Vector3()}, FLK = [{t: -9, from: new THREE.Vector3()}, {t: -9, from: new THREE.Vector3()}];
   function capture(s) { if (s && !s.doodle && s.film !== undefined && FILMS[s.film] && FILMS[s.film].kind !== 'doodle') G.backFilm = s.film; let film, fi, block, slot;
-    if (s.doodle) { if (s.budget <= 0) return; film = s.film; fi = s.key ?? 0; const r = addFrame(film, fi, 'doodle'); if (r === 'full') { say('your arms are full'); return; } s.budget = 0; s.caught = RT; const A = ARMS.find(a => a.film === film); A.frames = Array.from({length: Math.min(BLOCK, FILMS[film].n)}, (_, k) => ({fi: k})); loadList(A.block, film, A.frames.map(x => x.fi)); A.target = AN;   // the whole drawing lights up as one tentacle
+    if (s.doodle) { if (s.budget <= 0) return; film = s.film; fi = s.key ?? 0; const r = addFrame(film, fi, 'doodle'); if (r === 'full') { say('your arms are full'); return; } mkRec(FILMS[film].title, 2.6); s.budget = 0; s.caught = RT; const A = ARMS.find(a => a.film === film); A.frames = Array.from({length: Math.min(BLOCK, FILMS[film].n)}, (_, k) => ({fi: k})); loadList(A.block, film, A.frames.map(x => x.fi)); A.target = AN;   // the whole drawing lights up as one tentacle
       CAST.t = RT; CAST.to.copy(s.pos); const fl = FLK[0].t < FLK[1].t ? FLK[0] : FLK[1]; fl.t = RT; fl.from.copy(s.pos); fl.block = A.block; fl.slot = 0; J.glow = 1; AU.tone(330 * Math.pow(2, (film % 12) / 12), 1.8, .05); buzz([8, 24, 8, 24, 14]);
       const f = FILMS[film]; say(`${f.title} · drawn from ${f.film || 'the archive'}${f.year ? ' (' + f.year + ')' : ''} · ${f.d.keys[fi % f.n].why || ''}`.slice(0, 150)); G.doodles = (G.doodles || 0) + 1; return; }
     if (s.j !== undefined) { film = CHAIN.film; fi = CHAIN.from + s.j; block = CHAIN.blocks[s.j >> 3]; slot = s.j % 8; if (s.taken) return; }
     else { if (s.budget <= 0 || s.slot < 0) { say('nothing left to take here'); return; } film = s.film; slot = Math.floor(T * fps(FILMS[film])) % BLOCK; fi = s.from + slot; block = SP_BLOCK.get(s); }
     const r = addFrame(film, fi, s.j !== undefined ? 'slice' : s.pair >= 0 ? 'pair' : 'film'); if (r === 'dup') { say('already in that arm: wait for another moment'); return; } if (r === 'full') { say('your arms are full'); return; }
-    CAST.t = RT; CAST.to.copy(s.p || s.pos); const fl = FLK[0].t < FLK[1].t ? FLK[0] : FLK[1]; fl.t = RT; fl.from.copy(s.p || s.pos); fl.block = block; fl.slot = slot;
+    mkRec(FILMS[film].title, 2.6); CAST.t = RT; CAST.to.copy(s.p || s.pos); const fl = FLK[0].t < FLK[1].t ? FLK[0] : FLK[1]; fl.t = RT; fl.from.copy(s.p || s.pos); fl.block = block; fl.slot = slot;
     J.glow = 1; AU.tone(220 * Math.pow(2, (film % 12) / 12), 2, .05); buzz(r === 'new' ? [8, 24, 8, 24, 14] : [8, 20, 10]);
     if (s.j !== undefined) { s.taken = true; if (s.j === CHAIN.next || CHAIN.next === 0 && G.orderN === 0) { G.orderN++; CHAIN.next = s.j + 1; say(`slice ${s.j + 1} · in order (${G.orderN})`); } else { say(`slice ${s.j + 1} · out of order`); CHAIN.next = s.j + 1; } return; }
     s.budget--; if (s.pair >= 0) { const set = G.pairs.get(s.pair) || new Set(); set.add(s.i); G.pairs.set(s.pair, set); if (set.size === 2 && !set.done) { set.done = true; G.pairsDone++; say(`a pair joins: ${G.pairsDone}`); AU.tone(990, 1.6, .05); } else say(`${FILMS[film].title} · ${stamp(film, fi)} · now its pair`); }
-    else if (s.ring !== false) { G.halo++; say(`from the halo · ${G.halo}`); } else if (s.buried) { G.unearth++; say(`unearthed · ${FILMS[film].title} · ${stamp(film, fi)}`); } else say(`${FILMS[film].title} · ${stamp(film, fi)} · ${r === 'new' ? 'a new arm' : 'its arm grows'}`); }
+    else if (s.ring !== false) { G.halo++; say(`from the halo · ${G.halo}`); } else if (s.buried) { G.unearth++; say(`unearthed · ${FILMS[film].title} · ${stamp(film, fi)}`); } else say(`${FILMS[film].title} · ${stamp(film, fi)} · ${r === 'swap' ? `arms full (${NAR}): you let go of ${G.letGo}` : r === 'new' ? `a new arm (${ARMS.length} of ${NAR})` : 'its arm grows'}`); }
   function unearth(s) { s.up = true; s.lit = RT; AU.tone(330, 1.2, .04); buzz(8); }
   // ------------------------------------------------ the loop
   const SP_BLOCK = new Map(), ROWOF = new Map(); const rowsFree = Array.from({length: NFR}, (_, i) => i);
@@ -434,7 +459,7 @@ export async function play(L, ALL) {
         const k = Math.min(1, dt * .9); A.su = (A.su ?? tu) + (tu - (A.su ?? tu)) * k; A.sw = (A.sw ?? tw) + (tw - (A.sw ?? tw)) * k;
         tu = A.su + Math.sin(RT * .31) * .7 + .8; tw = A.sw + Math.sin(RT * .19 + 1.3) * .9; } }
     if (G.hold && G.hold.film && !G.watch && performance.now() - G.hold.t0 > 340 && G.hold.moved < 14) startWatch(G.hold.film);
-    J.boost += (boost - J.boost) * Math.min(1, dt * 4); if (boost && !G.boostSaid) { G.boostSaid = 1; say('boost'); } const m = Math.hypot(tu, tw), sp = Math.min(6 + 5 * J.boost, m * 1.4 + 4 * J.boost), du = m > .3 ? tu / m * sp : 0, dw = m > .3 ? tw / m * sp : 0, slip = J.slip > 0 ? 4 : 0;
+    J.boost += (boost - J.boost) * Math.min(1, dt * 4); if (boost && !G.boostSaid) { G.boostSaid = 1; say('boost'); } const heavy = 1 - .03 * ARMS.length, m = Math.hypot(tu, tw), sp = heavy * Math.min(6 + 5 * J.boost, m * 1.4 + 4 * J.boost), du = m > .3 ? tu / m * sp : 0, dw = m > .3 ? tw / m * sp : 0, slip = J.slip > 0 ? 4 : 0;
     const ph = J.ph % 1, thrust = ph < .28 ? Math.sin(ph / .28 * Math.PI) * .8 : 0;
     const ending = playing ? 1 : G.state === 'card' ? .12 : 0;
     const wantU = ending * (L.current + slip + du + thrust * (m > .3 ? 1 : .4)), wantW = ending * dw + .2 * Math.sin(T * .5);
@@ -448,10 +473,16 @@ export async function play(L, ALL) {
     const head = _a.copy(J.pv).setLength(1); if (J.pv.lengthSq() > .01) { const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), head.lerp(new THREE.Vector3(0, 1, 0), .35).normalize()); jelly.quaternion.slerp(q, 1 - Math.pow(.05, dt)); }
     stepArms(Math.max(dt, 1e-4));
     // camera: trailing from the side, small jelly, look-ahead with the current; two fingers look around
-    camera.fov += (50 + 12 * J.boost - camera.fov) * Math.min(1, real * 3); camera.updateProjectionMatrix(); const vis = 2 * Math.tan(THREE.MathUtils.degToRad(50 / 2)) * Math.min(1, camera.aspect), d = THREE.MathUtils.clamp(2 * .92 * CS / (.12 * G.zoom * vis), 7, 26) * (G.state === 'end' ? 1.25 : 1) * (1 + .15 * J.boost);
-    const look = W(J.u + 3.5 + J.vu * .45 + G.look[0], J.w * .75 + J.vw * .3 + G.look[1], 0); if (G.watch && G.watch.s.pos) look.lerp((G.watch.s.p || G.watch.s.pos).clone().setZ(0), (TRAILER ? .62 : .88) * sm(0, 1, (RT - G.watch.t0) * (TRAILER ? .7 : 2))); const lookZ = G.watch ? .75 : 1, camT = look.clone().add(new THREE.Vector3(0, DIR === 'right' ? 1.2 : 0, d * lookZ)); camera.position.lerp(camT, 1 - Math.pow(TRAILER ? .06 : .004, real));   // the camera leads with your speed camera.lookAt(look.x, look.y, 0); camera.updateMatrixWorld();
+    camera.fov += (50 + 12 * J.boost - camera.fov) * Math.min(1, real * 3); camera.updateProjectionMatrix(); const vis = 2 * Math.tan(THREE.MathUtils.degToRad(50 / 2)) * Math.min(1, camera.aspect), d0 = THREE.MathUtils.clamp(2 * .92 * CS / (.12 * G.zoom * vis), 6, 34) * (G.state === 'end' ? 1.25 : 1) * (1 + .15 * J.boost);
+    const spd = Math.min(1, Math.hypot(J.vu, J.vw) / 9), hunter = PR ? PR.list.filter(p => p.m.visible && (p.st === 'hunt' || p.st === 'mark' || p.st === 'dive')).sort((a, b) => a.pos.distanceTo(J.p) - b.pos.distanceTo(J.p))[0] : null, hk = hunter ? Math.max(0, 1 - hunter.pos.distanceTo(J.p) / 18) : 0;
+    G.hk = (G.hk ?? 0) + (hk - (G.hk ?? 0)) * Math.min(1, real * 2); G.lean = (G.lean ?? 0) + ((G.litD < 3.5 && !G.watch ? 1 : 0) - (G.lean ?? 0)) * Math.min(1, real * 1.5);
+    const d = d0 * (1 + .22 * spd + .4 * G.hk - .12 * G.lean);
+    if (playing) { const kx2 = (keys.has('e') ? 1 : 0) - (keys.has('q') ? 1 : 0), ky2 = (keys.has('r') ? 1 : 0) - (keys.has('f') ? 1 : 0); G.yaw = THREE.MathUtils.clamp(G.yaw + kx2 * real * 1.2, -1, 1); G.pitch = THREE.MathUtils.clamp(G.pitch + ky2 * real * .9, -.7, .7); }
+    const look = W(J.u + 3.5 + J.vu * .45 + G.look[0], J.w * .75 + J.vw * .3 + G.look[1], 0); if (G.watch && G.watch.s.pos) look.lerp((G.watch.s.p || G.watch.s.pos).clone().setZ(0), (TRAILER ? .62 : .88) * sm(0, 1, (RT - G.watch.t0) * (TRAILER ? .7 : 2))); if (hunter && G.hk > .01) look.lerp(hunter.pos.clone().setZ(0), .3 * G.hk); const lookZ = G.watch ? .75 : 1, off = new THREE.Vector3(0, DIR === 'right' ? 1.2 : 0, d * lookZ).applyAxisAngle(new THREE.Vector3(1, 0, 0), -G.pitch).applyAxisAngle(new THREE.Vector3(0, 1, 0), G.yaw), camT = look.clone().add(off); camera.position.lerp(camT, 1 - Math.pow(TRAILER ? .06 : .004, real));   /* the camera leads with your speed */ camera.lookAt(look.x, look.y, 0); camera.updateMatrixWorld();
     uR.value.setFromMatrixColumn(camera.matrixWorld, 0); uU.value.setFromMatrixColumn(camera.matrixWorld, 1); uF.value.setFromMatrixColumn(camera.matrixWorld, 2);
     // water colour toward the surface or the void
+    if (REG.length > 1) { const Rg = regionAt(J.u); Rg._fog = Rg._fog || new THREE.Color(Rg.fog || L.fog); Rg._top = Rg._top || new THREE.Color(Rg.top || Rg.fog || L.fog); FOG.lerp(Rg._fog, Math.min(1, real * .5)); TOP.lerp(Rg._top, Math.min(1, real * .5));
+      if (G.reg !== Rg && playing) { G.reg = Rg; say(`${Rg.title}${Rg.goal ? ' · ' + Rg.goal.label : ''}`, 1.5); AU.tone(392, 1.6, .04); AU.tone(588, 2, .025); } }
     const k = L.surface ? sm(.55, 1, prog()) : L.top ? prog() : 0; scene.fog.color.copy(FOG).lerp(TOP, k); if (L.hueWater) { const nr = SP.reduce((m, x) => !m || Math.abs(x.u - J.u) < Math.abs(m.u - J.u) ? x : m, null); if (nr) { G.hw = G.hw ?? nr.film; const hc = new THREE.Color().setHSL(FILMS[nr.film].hue / 360, .32, .14); scene.fog.color.lerp(hc, .85); } } { const hx = scene.fog.color.getHexString(); if (hx !== bgLast) { bgLast = hx; paintBG(scene.fog.color); } } scene.fog.density = L.fogD * (1 - .35 * k) * (L.dark ? 1 + 1.2 * prog() : 1);
     if (L.dark) { const sp2 = J.p.clone().project(camera); $('dark').style.opacity = .35 + .6 * prog(); $('dark').style.setProperty('--x', `${(sp2.x * .5 + .5) * 100}%`); $('dark').style.setProperty('--y', `${(-sp2.y * .5 + .5) * 100}%`); $('dark').style.setProperty('--r', `${Math.max(9, 34 - 24 * prog()) * (PULSE ? 1.8 : 1)}vmin`); }
     // films: activate near the swimmer, release behind it
@@ -472,12 +503,13 @@ export async function play(L, ALL) {
       row(r, 0, s.pos.x, s.pos.y, s.pos.z, s.size * (1 + .08 * res + .28 * clear)); row(r, 1, s.bad ? -1 : SP_BLOCK.get(s), 1.35, s.sleep && !s.awake ? 0 : T * fps(FILMS[s.film]), (s.bad ? .9 : 1.15) * shown * sleepy * fade * (s.giant ? 1.2 : 1) * (1 + .5 * clear) * (1 - .85 * scrA(s)));
       row(r, 2, 0, s.bad ? .6 : .7 * (1 - .7 * clear), s.bad ? 1 : 0, 0); row(r, 3, 0, 0, 0, s.awake ? .4 : 0); row(r, 4, s.bad ? 0 : .7 + .6 * res + (s.giant ? .5 : 0) + .7 * clear, 1.8 - .75 * clear, 0, s.bad ? 0 : (1 - res) * .9 * (1 - clear)); }
     if (playing && RT > (G.nextGlimpse ?? 6)) { G.nextGlimpse = RT + 7 + Math.random() * 5; const c = SP.filter(x => x.slot >= 0 && !x.bad && !x.doodle && visible(x) && x.pos && Math.abs(x.u - J.u) < 22); if (c.length) { const g = c[(Math.random() * c.length) | 0]; g.glimpse = RT; AU.tone(1760, .6, .012); } }   // a glimpse: light catches one jelly-film
-    AU.filmAudio(LIT || (G.watch && G.watch.s));
+    G.litD = LIT ? LIT.d : 99; AU.filmAudio(LIT || (G.watch && G.watch.s));
     stepScreens(real);
     // the chain: one film laid out as slices in time
     for (const b of CHAIN.beads) { const r = CHROW + b.j; if (b.taken || Math.abs(b.u - J.u) > 45) { hide(r); continue; } W(b.u, b.w + Math.sin(T * .8 + b.j * .4) * .25, 0, b.p); const nxt = b.j === CHAIN.next;
       row(r, 0, b.p.x, b.p.y, b.p.z, .95); row(r, 1, CHAIN.blocks[b.j >> 3], 1.35, b.j % 8, nxt ? 1.5 : .9); row(r, 2, 0, .4, 0, 0); row(r, 3, 0, 0, 0, nxt ? .5 : 0); row(r, 4, .6, 1.6, 0, .1); }
     // watching: hold on a film and it blooms, large and clear, while the water nearly stops
+    if (G.watch) { $('say').textContent = `● ${((performance.now() - G.watch.r0) / 1000).toFixed(1)} s  ${G.watch.title}`; $('say').style.opacity = 1; G.sayT = RT; if (MK.rec) MK.until = Math.max(MK.until, RT + .6); }
     if (G.watch) { const s = G.watch.s, u = Math.min(1, (RT - G.watch.t0) / .5), at = (s.p || s.pos).clone();   // seen clearly where it is, in the back, transparent
       const blk = G.watch.blk ?? (s.j !== undefined ? CHAIN.blocks[s.j >> 3] : SP_BLOCK.get(s)), fr = s.j !== undefined ? s.j % 8 : (RT - G.watch.t0) * fps(FILMS[s.film]) % BLOCK;
       row(VROW, 0, at.x, at.y, at.z + .05, s.size * (1.1 + .5 * u)); row(VROW, 1, blk, 1.4, fr, (.95 * u + .2) * (1 - .88 * scrA(s))); row(VROW, 2, 0, .45, 0, 0); row(VROW, 3, 0, 0, 0, .25); row(VROW, 4, 1.6, 1.1, 0, 0); }
@@ -497,17 +529,17 @@ export async function play(L, ALL) {
     if (fishPts) { school.u += dt * (L.current * 1.1); if (school.u < J.u - 20 || school.u > J.u + 90) { school.u = J.u + 40; FISH.forEach(f => f.init = false); } school.w += ((J.w * .6 + Math.sin(T * .2) * BAND * .35) - school.w) * Math.min(1, dt * .5); const c0 = W(school.u, school.w, 0);
       const a = fishPts.geometry.attributes.position.array, kk = fishPts.geometry.attributes.aK.array, ca = fishPts.geometry.attributes.aCol.array; FISH.forEach((f, i) => { const tgt = c0.clone().add(new THREE.Vector3(Math.cos(f.o[0] + T * .5) * 2.5, Math.sin(f.o[1] + T * .4) * 1.6, Math.sin(f.o[0] * 2) * 2)); if (!f.init) { f.p.copy(tgt); f.init = true; }
         f.v.addScaledVector(tgt.sub(f.p), dt * 1.8); const dd = f.p.distanceTo(J.p); if (dd < 2.2) f.v.addScaledVector(_a.copy(f.p).sub(J.p).normalize(), dt * 14 * (1 - dd / 2.2));
-        if (dd < 6) for (let kA = 0; kA < ARMS.length; kA++) { const n = Math.round(ARMS[kA].n); for (let j = 2; j < n; j += 2) { const q = (kA * AN + j) * 3; if (Math.abs(AX[q] - f.p.x) < .75 && Math.abs(AX[q + 1] - f.p.y) < .75 && Math.abs(AX[q + 2] - f.p.z) < 1.2) { const c = FILMS[ARMS[kA].film].col; if (!f.dyed || !f.col.equals(c)) { if (!f.dyed) { G.colored++; if (G.colored % 10 === 0) say(`${G.colored} fish wear your films' colours`); } f.dyed = true; f.col.copy(c); buzz(3); } } } }   // a film tentacle dyes the fish it touches f.v.multiplyScalar(Math.pow(.3, dt)); f.p.addScaledVector(f.v, dt); _b.copy(f.v).normalize();
+        if (dd < 6) for (let kA = 0; kA < ARMS.length; kA++) { const n = Math.round(ARMS[kA].n); for (let j = 2; j < n; j += 2) { const q = (kA * AN + j) * 3; if (Math.abs(AX[q] - f.p.x) < .75 && Math.abs(AX[q + 1] - f.p.y) < .75 && Math.abs(AX[q + 2] - f.p.z) < 1.2) { const c = FILMS[ARMS[kA].film].col; if (!f.dyed || !f.col.equals(c)) { if (!f.dyed) { G.colored++; if (G.colored % 10 === 0) say(`${G.colored} fish wear your films' colours`); } f.dyed = true; f.col.copy(c); buzz(3); } } } }   /* a film tentacle dyes the fish it touches */ f.v.multiplyScalar(Math.pow(.3, dt)); f.p.addScaledVector(f.v, dt); _b.copy(f.v).normalize();
         const br = f.dyed ? 1.1 : .9, fk = f.flash && RT - f.flash.t < .9 ? 1 - (RT - f.flash.t) / .9 : 0, fc = fk ? f.col.clone().lerp(f.flash.col, fk) : f.col; for (let q = 0; q < 3; q++) { a.set([f.p.x - _b.x * q * .16, f.p.y - _b.y * q * .16, f.p.z - _b.z * q * .16], (i * 3 + q) * 3); kk[i * 3 + q] = q; ca.set([fc.r * br * (1 + fk), fc.g * br * (1 + fk), fc.b * br * (1 + fk)], (i * 3 + q) * 3); } }); fishPts.geometry.attributes.position.needsUpdate = true; fishPts.geometry.attributes.aK.needsUpdate = true; fishPts.geometry.attributes.aCol.needsUpdate = true; }
     if (combPts) { const a = combPts.geometry.attributes.position.array; COMB.forEach((c, ci) => { c.t += dt; c.u += dt * L.current * .85; if (c.u < J.u - 25) c.u += 110; W(c.u + Math.sin(c.t * .3) * 1.5, c.w + Math.sin(c.t * .21) * 1, c.z, c.p); combLocal.forEach((l, i) => a.set([c.p.x + l[0], c.p.y + l[1], c.p.z + l[2]], (ci * 200 + i) * 3));
         if (playing && c.p.distanceTo(J.p) < 1.6 && !c.used) { c.used = true; J.glow = 1; say('a comb jelly: your reach grows'); AU.tone(2400, 1, .03); } }); combPts.geometry.attributes.position.needsUpdate = true; }
     if (shrPts) { const a = shrPts.geometry.attributes.position.array; SHR.forEach((s, i) => { const home = W(s.home + Math.sin(s.o[0] + T * .2) * 3, -BAND + 1.2 + Math.sin(s.o[1] + T * .3) * 1, -1); if (!s.init) { s.p.copy(home); s.init = true; }
         if (s.p.distanceTo(J.p) < 4.5 && s.scare <= 0) { scareShrimp(J.p); } s.scare = Math.max(0, s.scare - dt); s.v.addScaledVector(home.sub(s.p), dt * (s.scare > 0 ? .2 : 1.4)); s.v.multiplyScalar(Math.pow(.15, dt)); s.p.addScaledVector(s.v, dt); if (s.scare > .8) PUSH.push({p: s.p.clone(), r: 2, k: 5});
-        _b.copy(s.v).normalize(); for (let q = 0; q < 2; q++) a.set([s.p.x - _b.x * q * .09, s.p.y - _b.y * q * .09, s.p.z], (i * 2 + q) * 3); if (s.home < J.u - 30) s.home += LEN * .4; }); shrPts.geometry.attributes.position.needsUpdate = true; }
+        _b.copy(s.v).normalize(); for (let q = 0; q < 2; q++) a.set([s.p.x - _b.x * q * .09, s.p.y - _b.y * q * .09, s.p.z], (i * 2 + q) * 3); if (s.home < J.u - 30) s.home += L.sea ? 90 : LEN * .4; }); shrPts.geometry.attributes.position.needsUpdate = true; }
     if (RAY) { RAY.u += dt * (L.current * 1.25); if (RAY.u < J.u - 25 || RAY.u > J.u + 60) RAY.u = J.u + 45; RAY.w = BAND * .45 + Math.sin(T * .17) * BAND * .3; const prevR = RAY.p.clone(); W(RAY.u, RAY.w, -.5, RAY.p); RAY.v.copy(RAY.p).sub(prevR).divideScalar(Math.max(dt, 1e-4));
       RAY.m.position.copy(RAY.p); RAY.m.lookAt(_a.copy(RAY.p).add(RAY.v)); RAY.m.rotateZ(Math.PI / 2 * 0); RAY.m.material.uniforms.uTime.value = T; PUSH.push({p: RAY.p.clone(), r: 5, k: 3, vx: RAY.v.x * .5, vy: RAY.v.y * .5});
       if (playing && RAY.p.distanceTo(J.p) < 6 && J.u < RAY.u) { if (J.slip <= 0) { say('slipstream: the ray carries you'); buzz(10); } J.slip = 1.2; } }
-    if (ANG) stepAngler(dt); stepDoodles(dt); stepSpecks(dt); stepReticle();
+    if (ANG) stepAngler(dt); if (PR) for (const e of PR.step(dt, RT, T, playing)) onPred(e); if (MK.rec && RT > MK.until) { try { MK.rec.stop(); } catch (e) {} MK.rec = null; } drawGuide(); stepDoodles(dt); stepSpecks(dt); stepReticle();
     // snow
     { const cx = camera.position.x, cy = camera.position.y, cur = W(L.current, 0, 0).sub(W(0, 0, 0)).multiplyScalar(.6);
       for (let i = 0; i < NSN; i++) { const p = sn[i]; for (const u of PUSH) { const dx = cx + p.x - u.p.x, dy = cy + p.y - u.p.y, dz = p.z - u.p.z, d2 = dx * dx + dy * dy + dz * dz; if (d2 < u.r * u.r) { const dd = Math.sqrt(d2) + .01, kk = (1 - dd / u.r) * u.k * dt; p.vx += (dx / dd + (u.vx || 0)) * kk; p.vy += (dy / dd + (u.vy || 0)) * kk; } }
@@ -515,7 +547,7 @@ export async function play(L, ALL) {
         if (p.x > 22) p.x -= 44; if (p.x < -22) p.x += 44; if (p.y > 15) p.y -= 30; if (p.y < -15) p.y += 30; snP[i * 3] = cx + p.x; snP[i * 3 + 1] = cy + p.y; snP[i * 3 + 2] = p.z; snA[i] = Math.min(1, p.s + Math.hypot(p.vx, p.vy) * .3); }
       G.lcx = camera.position.x; G.lcy = camera.position.y; snG.attributes.position.needsUpdate = true; snG.attributes.aS.needsUpdate = true; PUSH.length = 0; }
     // buried films come up when you swim low and fast over them
-    if (L.films.layout === 'buried' && playing) { const fast = Math.hypot(J.vu, J.vw) > 2.4, low = J.w < -BAND + 3; if (low) PUSH.push({p: J.p.clone().add(new THREE.Vector3(0, -1, 0)), r: 3, k: fast ? 6 : 2});
+    if (SP_BURIED && playing) { const fast = Math.hypot(J.vu, J.vw) > 2.4, low = J.w < -BAND + 3; if (low) PUSH.push({p: J.p.clone().add(new THREE.Vector3(0, -1, 0)), r: 3, k: fast ? 6 : 2});
       for (const s of SP) if (s.buried && !s.up && s.pos && s.pos.distanceTo(J.p) < 3.6 && fast && low) unearth(s); }
     // pulse ring
     if (PULSE) { const ringR = PULSE.R * Math.min(1, (RT - PULSE.t0) / 1.2), blue = new THREE.Color(.35, .75, 1), red = new THREE.Color(1, .35, .25); PULSE.pings = PULSE.pings || 0;   // radar Doppler: approaching flashes blue and pings higher, receding red and lower
@@ -524,13 +556,15 @@ export async function play(L, ALL) {
       for (const f of FISH) hit(f, f.p, f.v.x, f.v.y); for (const s of SP) if (s.doodle && s.pos) { const v = W(s.vu || 0, s.vw || 0, 0).sub(W(0, 0, 0)); hit(s, s.pos, v.x, v.y); } }
     if (PULSE) { const u = (RT - PULSE.t0) / 1.2; if (u > 1) { PULSE = null; pulseMat.uniforms.uA.value = 0; } else { pulseMat.uniforms.uR.value = PULSE.R * u; pulseMat.uniforms.uA.value = (1 - u) * (PULSE.on ? .9 : .5); pulseMat.uniforms.uC.value.copy(PULSE.c); } }
     // goal, end
-    if (playing) { const era = L.pick?.by === 'decade' ? (SP.reduce((m, x) => !m || Math.abs(x.u - J.u) < Math.abs(m.u - J.u) ? x : m, null)) : null; $('goal').textContent = `${era ? (FILMS[era.film].dec || '') + 's · ' : ''}${L.goal.label} · ${goalN()} / ${L.goal.n}${J.mem < 100 ? ` · membrane ${Math.round(J.mem)}%` : ''}`; if (J.u >= LEN || J.mem <= 0) arrive(); }
-    if (G.state === 'end') reelStep();
+    if (playing) { const era = L.pick?.by === 'decade' ? (SP.reduce((m, x) => !m || Math.abs(x.u - J.u) < Math.abs(m.u - J.u) ? x : m, null)) : null; $('goal').textContent = `${era ? (FILMS[era.film].dec || '') + 's · ' : ''}${goalN() >= L.goal.n ? '★ ' : ''}${L.goal.label} · ${goalN()} / ${L.goal.n} · arms ${ARMS.length}/${NAR}${J.mem < 100 ? ` · membrane ${Math.round(J.mem)}%` : ''}`;
+      if (!G.metSaid && goalN() >= L.goal.n) { G.metSaid = 1; say(`★ ${L.goal.label}: done. The film is won; reach the end to seal it in its jar`, 2.5); AU.tone(784, 2, .06); AU.tone(1175, 2.4, .04); buzz([20, 40, 20, 40, 60]); }
+      if (!G.heavySaid && ARMS.length >= 6) { G.heavySaid = 1; say('heavy: a full jelly swims slower (a jelly digests fast, but not that fast)', 1); } if (J.u >= LEN || J.mem <= 0) arrive(); }
+
     // uniforms
     const ps = innerHeight * renderer.getPixelRatio(), us = ps * .5 / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
     splat.uniforms.uTime.value = T; splat.uniforms.uScale.value = us; splat.uniforms.uJ.value.copy(J.p); splat.uniforms.uJv.value.copy(J.pv).multiplyScalar(.15); splat.uniforms.uBeat.value = 1 - AU.phase();
     snM.uniforms.uScale.value = us; snM.uniforms.uHigh.value = AU.high(); pulseMat.uniforms.uScale.value = us; if (surfMat) { surfMat.uniforms.uScale.value = us; surfMat.uniforms.uTime.value = T; }
-    for (const m of [fishPts, dlPts, spkPts, combPts, shrPts, RAY && RAY.m, ANG && ANG.mb, ANG && ANG.mg, ANG && ANG.lure]) if (m) { m.material.uniforms.uScale.value = us; if (m.material.uniforms.uTime) m.material.uniforms.uTime.value = T; }
+    for (const m of [fishPts, dlPts, spkPts, combPts, shrPts, RAY && RAY.m, ANG && ANG.mb, ANG && ANG.mg, ANG && ANG.lure, ...(PR ? PR.meshes : [])]) if (m) { m.material.uniforms.uScale.value = us; if (m.material.uniforms.uTime) m.material.uniforms.uTime.value = T; }
     const bu = bellM.uniforms; bu.uPulse.value = J.ph; bu.uTime.value = T; bu.uGlow.value = J.glow + (1 - AU.phase()) * .15; bu.uHurt.value = J.hurt; bu.uFray.value = 1 - J.mem / 100; bu.uScale.value = ps * .0095;
     AU.speed(Math.hypot(J.vu, J.vw)); params.needsUpdate = true;
     if (RT - (G.sayT ?? -9) > 3.2) $('say').style.opacity = 0;
@@ -545,28 +579,77 @@ export async function play(L, ALL) {
     const toJ = _a.copy(J.p).sub(A.pos), dist = toJ.length(), k = A.t % 2.4; A.pulse = (k < .12 || (k > .3 && k < .42)) ? 1 : A.pulse * Math.pow(.001, dt);
     if (A.st === 'patrol') { A.pos.lerp(home, 1 - Math.pow(.4, dt)); A.reveal += (.05 - A.reveal) * dt; A.rise += ((L.floorAngler ? 0 : 1) - A.rise) * dt; if (G.state === 'play' && !A.cool && dist < 15) { A.st = 'warn'; A.t = 0; say('the lure pulses twice: swim away'); scareShrimp(A.pos); } }
     else if (A.st === 'warn') { A.reveal += (1 - A.reveal) * dt; A.rise += (1 - A.rise) * dt * 1.5; A.pos.lerp(home, 1 - Math.pow(.5, dt)); if (A.pulse > .99 && !A.pinged) { A.pinged = true; AU.tone(1250, .25, .07); buzz(16); } if (A.pulse < .5) A.pinged = false; if (A.t > 4.6) { A.st = dist < 13 ? 'lunge' : 'patrol'; A.t = 0; if (A.st === 'patrol') A.cool = 5; } }
-    else if (A.st === 'lunge') { A.pos.addScaledVector(toJ.clone().normalize(), dt * (9.5 + 2 * Math.min(1, A.t))); A.dir.lerp(toJ.clone().normalize(), dt * 7).normalize(); if (dist < 2.4) { A.st = 'patrol'; A.cool = 6; J.mem = Math.max(0, J.mem - 34); J.hurt = 1; J.stun = 1.1; chomp(); if (J.mem <= 0) { G.eaten = true; say('swallowed: the dark keeps you, but not your frames', 3); } else say(`the angler bit: membrane ${Math.round(J.mem)}%, your frames are safe`); buzz([60, 40, 120]); AU.tone(48, 1.2, .25); AU.crunch(); } else if (A.t > 3) { A.st = 'patrol'; A.cool = 5; } }
+    else if (A.st === 'lunge') { A.pos.addScaledVector(toJ.clone().normalize(), dt * (9.5 + 2 * Math.min(1, A.t))); A.dir.lerp(toJ.clone().normalize(), dt * 7).normalize(); if (dist < 2.4) { A.st = 'patrol'; A.cool = 6; J.mem = Math.max(0, J.mem - 34); J.hurt = 1; J.stun = 1.1; chomp(); const lostA = TRAILER ? null : loseArm('the angler'); mkRec('the angler', 2.5); if (J.mem <= 0) { G.eaten = true; G.eatenBy = 'the angler'; say('swallowed: the dark keeps you', 3); } else say(lostA ? `the angler bit off an arm: ${FILMS[lostA.film].title} is gone · membrane ${Math.round(J.mem)}%` : `the angler bit: membrane ${Math.round(J.mem)}%`); buzz([60, 40, 120]); AU.tone(48, 1.2, .25); AU.crunch(); } else if (A.t > 3) { A.st = 'patrol'; A.cool = 5; } }
     if (A.st !== 'lunge') A.dir.lerp(toJ.clone().normalize(), dt * .8).normalize();
     PUSH.push({p: A.pos.clone(), r: 4.5, k: 4}); A.grp.position.copy(A.pos); A.grp.lookAt(_b.copy(A.pos).add(A.dir)); A.grp.updateMatrixWorld(); A.mb.material.uniforms.uReveal.value = A.mg.material.uniforms.uReveal.value = A.reveal;
     const lp = A.grp.localToWorld(new THREE.Vector3(0, 1.7, 3.1)); A.lure.geometry.attributes.position.array.set([lp.x, lp.y, lp.z]); A.lure.geometry.attributes.aK.array[0] = A.pulse * (A.st === 'patrol' ? .35 : 1); A.lure.geometry.attributes.position.needsUpdate = true; A.lure.geometry.attributes.aK.needsUpdate = true;
-    if (A.u < J.u - 40) A.u += LEN * .35; }
-  function goalN() { const g = L.goal.type; if (g === 'color') return G.colored; if (g === 'doodles') return G.doodles || 0; if (g === 'specks') return G.specks || 0; if (g === 'decades') return new Set(CUT.map(c => FILMS[c.film].dec).filter(Boolean)).size; if (g === 'hues') return new Set(CUT.map(c => Math.floor(FILMS[c.film].hue / 45))).size; return g === 'wake' ? G.wake : g === 'pairs' ? G.pairsDone : g === 'watch' ? G.watchDone : g === 'halo' ? G.halo : g === 'order' ? G.orderN : g === 'unearth' ? G.unearth : CUT.length; }
+    if (A.u < J.u - 40) A.u += L.sea ? 130 : LEN * .35; }
+  function goalN() { const g = L.goal.type; if (g === 'color') return G.colored; if (g === 'doodles') return G.doodles || 0; if (g === 'specks') return G.specks || 0; if (g === 'decades') return new Set(CUT.map(c => FILMS[c.film].dec).filter(Boolean)).size; if (g === 'hues') return new Set(CUT.map(c => Math.floor(FILMS[c.film].hue / 45))).size; if (g === 'regions') return G.regs.size; return g === 'wake' ? G.wake : g === 'pairs' ? G.pairsDone : g === 'watch' ? G.watchDone : g === 'halo' ? G.halo : g === 'order' ? G.orderN : g === 'unearth' ? G.unearth : CUT.length; }
   // ------------------------------------------------ the end: the reel plays behind the account; tap to swim again, swipe for the next drift
   const REEL = {i: 0, t0: 0, b: 0};
-  function arrive() { G.state = 'end'; G.endT = performance.now(); if (AUTO) setTimeout(() => { const i = ALL.findIndex(x => x.id === L.id), nx = ALL[(i + 1) % ALL.length]; if (nx) { const q = new URLSearchParams(location.search); q.set('v', nx.id); location.search = q.toString(); } }, 6500); endWatch(); AU.focus(1); buzz([30, 60, 30]); const met = goalN() >= L.goal.n, secs = Math.round(RT - G.t0);
-    $('card').style.display = 'flex'; $('card').style.opacity = 1; $('hud').style.opacity = 0;
-    $('card').innerHTML = `<div class="k">${G.eaten ? 'SWALLOWED' : J.mem <= 0 ? 'CARRIED UP' : DIR === 'up' ? 'THE SURFACE' : DIR === 'down' ? 'THE FLOOR OF THE DARK' : 'THE END OF THE DRIFT'}</div><h1>${L.title}</h1>
-      <p style="font-style:normal">${met ? '★ ' : ''}${L.goal.label}: ${goalN()} / ${L.goal.n}. ${CUT.length} frame${CUT.length === 1 ? '' : 's'} from ${ARMS.length} film${ARMS.length === 1 ? '' : 's'} in ${Math.floor(secs / 60)} min ${secs % 60} s${G.pulses ? ` · ${G.pulses} pulses` : ''}.</p>
-      <ol>${CUT.slice(0, 12).map(c => `<li>${FILMS[c.film].title} · ${stamp(c.film, c.fi)}</li>`).join('')}</ol>
-      <div class="go">TAP TO SWIM AGAIN · SWIPE ← FOR THE NEXT DRIFT · SWIPE → FOR ALL DRIFTS</div>`;
-    REEL.i = 0; REEL.t0 = RT; if (CUT.length) loadClip(VB(0), CUT[0].film, CUT[0].fi); }
+  function arrive() { G.state = 'end'; G.endT = performance.now(); if (AUTO) setTimeout(() => { const i = ALL.findIndex(x => x.id === L.id), nx = ALL[(i + 1) % ALL.length]; if (nx) { const q = new URLSearchParams(location.search); q.set('v', nx.id); q.delete('at'); location.search = q.toString(); } }, 6500); endWatch(); AU.focus(1); buzz([30, 60, 30]);
+    if (MK.rec) { try { MK.rec.stop(); } catch (e) {} MK.rec = null; } $('say').style.opacity = 0; G.sayT = -99;
+    const met = goalN() >= L.goal.n, dead = G.eaten || J.mem <= 0, kept = CUT.filter(c => !c.lost), secs = kept.reduce((a, c) => a + Math.max(.4, c.dur), 0), took = G.lost.filter(x => x.by !== 'let go'), stars = dead ? 0 : (met ? 1 : 0) + (took.length ? 0 : 1) + (J.mem >= 70 ? 1 : 0);
+    const where = DIR === 'up' ? 'the surface' : DIR === 'down' ? 'the floor of the dark' : 'the end of the drift', film = `${kept.length} clip${kept.length === 1 ? '' : 's'}, ${secs.toFixed(1)} s`;
+    const verdict = dead ? {k: 'LOST', cls: 'lost', stars: 0, line: `${G.eatenBy ? G.eatenBy[0].toUpperCase() + G.eatenBy.slice(1) : 'The water'} took you before ${where}. What you held is below (${film}); the jar stays open. ${L.goal.label}: ${goalN()} / ${L.goal.n}.`}
+      : met ? {k: 'WON', cls: 'won', stars, line: `You reached ${where}. ${L.goal.label}: ${goalN()} / ${L.goal.n}. You won the film you made, ${film}, sealed in its jar${took.length ? `; ${took.length} arm${took.length > 1 ? 's' : ''} lost to the hunters` : ''}.`}
+      : {k: 'SURVIVED', cls: 'survived', stars, line: `You reached ${where}, but ${L.goal.label}: only ${goalN()} / ${L.goal.n}. The film is yours (${film}); the jar seals when the goal is met.`};
+    if (met && !dead && !AUTO) try { const S = JSON.parse(localStorage.getItem('cj-sealed') || '{}'); if (!S[L.id] || S[L.id].stars <= stars) S[L.id] = {stars, secs: +secs.toFixed(1), clips: kept.length, t: Date.now()}; localStorage.setItem('cj-sealed', JSON.stringify(S)); } catch (e) {}
+    const nx = ALL[(ALL.indexOf(L) + 1) % ALL.length];
+    $('card').style.display = 'flex'; $('card').style.opacity = 1; $('card').style.justifyContent = 'flex-start'; $('card').style.paddingTop = 'max(4vh, env(safe-area-inset-top))'; $('card').style.overflow = 'auto'; $('hud').style.opacity = 0; $('guide').style.opacity = 0;
+    $('card').innerHTML = `<div class="k">${dead ? 'TAKEN' : where.toUpperCase()} · ${Math.floor((RT - G.t0) / 60)} min ${Math.round(RT - G.t0) % 60} s${G.pulses ? ` · ${G.pulses} pulses` : ''}</div><h1>${L.title}</h1><div id="edit"></div>`;
+    for (const c of CUT) { const f = FILMS[c.film]; for (let i = 0; i < Math.min(40, Math.ceil(Math.max(.4, c.dur) * fps(f)) + 1); i++) drawFrame(null, c.film, c.fi + i, 0, 0); }   // fetch the frames of the cut
+    G.editor = mountEditor($('edit'), {cut: CUT, FILMS, drawFrame, fps, stamp, verdict, making: MK.clips.slice(), title: L.title, slug: L.id,
+      go: `TAP THE WATER TO SWIM AGAIN · SWIPE ← ${nx ? nx.title.toUpperCase() : 'NEXT'}${SEA ? ` · SWIPE ↑ SWIM ON INTO ${SEA.title.toUpperCase()}` : ''} · SWIPE → ALL DRIFTS`});
+    hide(VROW); }
   const VB = i => i % 2;   // blocks 0 and 1 are the reel's double buffer
   function reelStep() { if (!CUT.length) { hide(VROW); return; } const len = AU.bpm() ? Math.max(1.2, 2 * 60 / AU.bpm()) : 1.6, it = CUT[REEL.i % CUT.length], t = RT - REEL.t0;
     if (t > len) { REEL.i++; REEL.t0 = RT; const nx = CUT[REEL.i % CUT.length]; loadClip(VB(REEL.i), nx.film, nx.fi); }
     const F = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 2).negate(), R = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0), p = camera.position.clone().addScaledVector(F, 6).addScaledVector(R, innerWidth > innerHeight ? 2.2 : 0);
     row(VROW, 0, p.x, p.y, p.z, 2.1); row(VROW, 1, VB(REEL.i), 1.4, (RT - REEL.t0) * fps(FILMS[it.film]) % BLOCK, 1.5); row(VROW, 2, 0, .45, 0, 0); row(VROW, 3, 0, 0, 0, .25); row(VROW, 4, 1.6, 1.1, 0, 0); }
-  window.__drift = () => ({state: G.state, u: J.u, w: J.w, len: LEN, goal: goalN(), n: L.goal.n, cut: CUT.length, films: ARMS.length, mem: J.mem, watch: !!G.watch, angler: ANG && ANG.st, spots: SP.length, active: SP.filter(s => s.slot >= 0).length});
-  if (DEBUG) window.__dd = {ANG, SCR, FILMS, dlSample, J, G, SP, CHAIN, ARMS, CUT, camera, filmAt, capture, startWatch, endWatch, pulse, THREE, visible};
+  // ------------------------------------------------ the hunters (sea.js): each takes an arm, the stings or the membrane
+  var PR = Q.has('nopred') ? null : makePredators({THREE, scene, L: {...L, predators: predatorsFor(L)}, W, J, BAND, current: L.current, regionAt}); if (PR && !PR.list.length) PR = null;
+  function onPred(e) { const p = e.p, sp = p.sp;
+    if (e.type === 'warn') { say(sp.diver ? `${p.name} ${sp.warn}` : sp.warn, .8); AU.tone(sp.gulp ? 55 : 170, sp.gulp ? 3 : .9, sp.gulp ? .12 : .06); buzz(sp.gulp ? [40, 40, 80] : 14); return; }
+    if (e.type !== 'bite' || TRAILER) return; mkRec(p.name, 2.5);
+    if (sp.steal === 'sting') { G.noSting = RT + 9; J.hurt = .6; say(`${p.name} stole your stinging cells: no pulse for a while`); AU.tone(300, .8, .05); buzz([20, 30, 20]); return; }
+    const gone = []; for (let i = 0; i < sp.arms; i++) { const A = loseArm(p.name); if (!A) break; gone.push(FILMS[A.film].title); if (sp.steal === 'arm') p.held.push(A.film); }
+    J.mem = Math.max(0, J.mem - sp.dmg); J.hurt = 1; J.stun = .8; chomp(); AU.crunch(); AU.tone(52, 1.1, .2); buzz([60, 40, 120]);
+    const head = sp.diver ? `${p.name} ${sp.bit}` : sp.bit;
+    if (J.mem <= 0) { G.eaten = true; G.eatenBy = p.name; say(`${p.name} ate you`, 3); }
+    else say(gone.length ? `${head} ${gone.length > 1 ? gone.length + ' arms' : 'an arm'}: ${gone.join(', ')} ${gone.length > 1 ? 'are' : 'is'} gone from your film${sp.steal === 'arm' ? ' (sting it to win it back)' : ''}` : `${p.name} bit: membrane ${Math.round(J.mem)}%`, 1); }
+  // the making of: the water recorded from the moment you take a film, or are bitten, for a few seconds
+  var MK = {rec: null, until: 0, clips: [], stream: null};
+  function mkRec(label, secs) { if (AUTO || Q.has('norec') || !window.MediaRecorder || !cv.captureStream) return; if (MK.rec) { MK.until = Math.max(MK.until, RT + secs); if (!MK.cur.labels.includes(label)) MK.cur.labels.push(label); return; } if (MK.clips.length >= 12) return;
+    const mt = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm', 'video/mp4'].find(m => MediaRecorder.isTypeSupported(m)); if (!mt) return;
+    try { MK.stream = MK.stream || cv.captureStream(24); const ch = [], cur = {labels: [label], url: ''}; MK.rec = new MediaRecorder(MK.stream, {mimeType: mt, videoBitsPerSecond: 1.6e6}); MK.cur = cur; MK.until = RT + secs;
+      MK.rec.ondataavailable = e => e.data.size && ch.push(e.data); MK.rec.onstop = () => { cur.url = URL.createObjectURL(new Blob(ch, {type: mt})); MK.clips.push(cur); if (G.editor) G.editor.addMaking(cur); }; MK.rec.start(); } catch (e) { MK.rec = null; } }
+  // frames for the editor's monitor, drawn straight from the sources
+  const imgNow = url => { let e = IMG.get(url); if (!e) { withImg(url, () => {}); e = IMG.get(url); } return e && e.ok ? e.im : null; };
+  const cover = (g, im, sx, sy, sw, sh, w, h) => { const k = Math.max(w / sw, h / sh), dw = sw * k, dh = sh * k; g.drawImage(im, sx, sy, sw, sh, (w - dw) / 2, (h - dh) / 2, dw, dh); };
+  function drawFrame(g, film, fi, w, h) { const f = FILMS[film]; if (!f) return false;
+    if (f.kind === 'doodle') { if (!g) return true; const c = drawKey(f.d, fi); g.drawImage(c, 0, 0, w, h); return true; }
+    const im = imgNow(f.kind === 'sm' ? frameURL(f, fi) : f.url); if (!im || !g) return !!im;
+    if (f.kind === 'sm') cover(g, im, 0, 0, im.width, im.height, w, h); else if (f.kind === 'strip') { const k = ((fi % 8) + 8) % 8; cover(g, im, k * im.width / 8, 0, im.width / 8, im.height, w, h); } else cover(g, im, 0, 0, im.width, im.height, w, h); return true; }
+  // the guide: where the films are, where the hunters are, how far the water runs (and its regions)
+  const gd = $('guide'), gx = gd.getContext('2d');
+  function drawGuide() { const Wd = innerWidth, Ht = innerHeight; if (gd.width !== Wd || gd.height !== Ht) { gd.width = Wd; gd.height = Ht; } gx.clearRect(0, 0, Wd, Ht); if (G.state !== 'play' || CINE.on) return;
+    const x0 = Math.max(16, Wd * .18), x1 = Wd - x0, y = Ht - Math.max(10, Ht * .018) - 4, ux = u => x0 + (x1 - x0) * THREE.MathUtils.clamp(u / LEN, 0, 1);
+    gx.strokeStyle = 'rgba(207,221,232,.22)'; gx.lineWidth = 1; gx.beginPath(); gx.moveTo(x0, y); gx.lineTo(x1, y); gx.stroke();
+    if (REG.length > 1) { gx.font = "300 10px 'JetBrains Mono', monospace"; gx.textAlign = 'left'; const cur = regionAt(J.u); for (const Rg of REG) { const a = ux(Rg.u0); gx.fillStyle = Rg === cur ? 'rgba(240,163,90,.9)' : 'rgba(207,221,232,.35)'; gx.fillRect(a, y - 4, 1, 8); if (Rg === cur || (ux(Rg.u1) - a > 70)) gx.fillText(G.regs.has(Rg.id) ? '★ ' + Rg.title : Rg.title, a + 3, y - 7); } }
+    gx.fillStyle = 'rgba(207,221,232,.5)'; for (const s of SP) if (!s.bad && !s.gone && (s.budget > 0) && !s.caught && !s.taken) gx.fillRect(ux(s.u) - .5, y - 1, 1.5, 3);
+    if (PR) for (const p of PR.list) if (p.m.visible) { gx.fillStyle = p.st === 'hunt' || p.st === 'mark' || p.st === 'dive' ? '#ff5a45' : 'rgba(255,110,90,.45)'; gx.beginPath(); gx.arc(ux(p.u), y + (p.w / BAND) * -4, 2.6, 0, 7); gx.fill(); }
+    gx.fillStyle = '#f0a35a'; gx.beginPath(); gx.arc(ux(J.u), y, 4, 0, 7); gx.fill();
+    // edge markers: the nearest films ahead (amber), the hunters (red, named)
+    const mark = (P, col, label, r) => { _a.copy(P).project(camera); let sx = (_a.x * .5 + .5) * Wd, sy = (-_a.y * .5 + .5) * Ht; const behind = _a.z > 1; if (behind) { sx = Wd - sx; sy = Ht - sy; } const m = 26, on = !behind && sx > m && sx < Wd - m && sy > m && sy < Ht - m;
+      if (on) { if (!label) return; gx.strokeStyle = col; gx.lineWidth = 1.4; gx.beginPath(); gx.arc(sx, sy, r, 0, 7); gx.stroke(); gx.fillStyle = col; gx.font = "300 11px 'JetBrains Mono', monospace"; gx.textAlign = 'center'; gx.fillText(label, sx, sy - r - 6); return; }
+      const cx = Wd / 2, cy = Ht / 2, dx = sx - cx, dy = sy - cy, k = Math.min((Wd / 2 - m) / Math.abs(dx || 1e-3), (Ht / 2 - m) / Math.abs(dy || 1e-3)), ex = cx + dx * k, ey = cy + dy * k, an = Math.atan2(dy, dx);
+      gx.save(); gx.translate(ex, ey); gx.rotate(an); gx.fillStyle = col; gx.beginPath(); gx.moveTo(9, 0); gx.lineTo(-5, -6); gx.lineTo(-2, 0); gx.lineTo(-5, 6); gx.closePath(); gx.fill(); gx.restore(); if (label) { gx.fillStyle = col; gx.font = "300 11px 'JetBrains Mono', monospace"; gx.textAlign = ex < cx ? 'left' : 'right'; gx.fillText(label, ex + (ex < cx ? 14 : -14), ey + 4); } };
+    const ahead = SP.filter(s => !s.bad && !s.gone && s.budget > 0 && !s.caught && visible(s) && s.u > J.u - 4 && s.u < J.u + 60).sort((a, b) => Math.hypot(a.u - J.u, a.w - J.w) - Math.hypot(b.u - J.u, b.w - J.w)).slice(0, 3);
+    for (const s of ahead) mark(s.pos || W(s.u, s.w, s.z || 0), 'rgba(240,163,90,.75)', '', 0);
+    if (PR) for (const p of PR.list) { if (!p.m.visible) continue; const hunting = p.st === 'hunt' || p.st === 'mark' || p.st === 'dive', dd = p.pos.distanceTo(J.p); if (hunting || dd < 22) mark(p.pos, hunting ? '#ff5a45' : 'rgba(255,110,90,.5)', hunting ? p.name.replace(/^an? /, '') : '', 18); } }
+  window.__drift = () => ({state: G.state, u: J.u, w: J.w, len: LEN, goal: goalN(), n: L.goal.n, cut: CUT.length, films: ARMS.length, arms: ARMS.length, lost: G.lost.length, preds: PR ? PR.list.map(p => p.key + ':' + p.st) : [], regs: G.regs.size, mem: J.mem, watch: !!G.watch, angler: ANG && ANG.st, spots: SP.length, active: SP.filter(s => s.slot >= 0).length});
+  if (DEBUG) window.__dd = {PR, MK, arrive, loseArm, REG, onPred, ANG, SCR, FILMS, dlSample, J, G, SP, CHAIN, ARMS, CUT, camera, filmAt, capture, startWatch, endWatch, pulse, THREE, visible};
   if (AUTO) setTimeout(() => { if (G.state === 'card') begin(); }, 1400);
   requestAnimationFrame(frame);
 }

@@ -275,3 +275,6 @@ How the shots are chosen and cut:
 - **v2's wall** now deals films from a shuffled deck, so none repeats until all have been shown.
 
 **Every version** has a jar on the index (v7 down to v1), filled with a frame-stepped recording of it swimming (`play/ver-v*.mp4`).
+
+## The sea round: hunters, arms, the cutting room, the seas
+See SCION_SEA.md. Hunters (sea.js) take arms, and with them clips; holding a film records a clip as long as the hold; eight arms at most, and a full jelly lets go of its weakest arm and swims heavy. The end of every level is a cutting room (editor.js): the verdict (WON / SURVIVED / LOST, three stars), the film on a monitor with a timeline you can recut and save, and the making-of recorded from the water. Three seas join each family's levels as regions: The Open Sea, The Lab Sea, The Archive Sea. A guide strip and edge arrows show films and hunters; the camera pulls back with speed and opens out when you are hunted.
