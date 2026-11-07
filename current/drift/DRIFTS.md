@@ -278,3 +278,6 @@ How the shots are chosen and cut:
 
 ## The sea round: hunters, arms, the cutting room, the seas
 See SCION_SEA.md. Hunters (sea.js) take arms, and with them clips; holding a film records a clip as long as the hold; eight arms at most, and a full jelly lets go of its weakest arm and swims heavy. The end of every level is a cutting room (editor.js): the verdict (WON / SURVIVED / LOST, three stars), the film on a monitor with a timeline you can recut and save, and the making-of recorded from the water. Three seas join each family's levels as regions: The Open Sea, The Lab Sea, The Archive Sea. A guide strip and edge arrows show films and hunters; the camera pulls back with speed and opens out when you are hunted.
+
+## Taxa: thirteen species, fourteen verbs, one life
+See SCION_TAXA.md. The audit found 86 levels with one jellyfish and 70 of them the same game; now every level is a species (body: speed, reach, arms, sting, colour) playing a mechanic (one verb, three steps), the archive levels re-laid by their cineosis type, films dealt from a deck with no repeats and each drift its own share, a briefing card and idle nudges, and the 13 chapters of a jelly's life whose clips gather into one film (reel.html).

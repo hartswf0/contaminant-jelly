@@ -3,6 +3,7 @@
 // dir: the way the current carries you (right, up, down). band: half-height of the open water you can swim in.
 // layers: silhouette strips {kind, side (-1 below/left, 1 above/right), z (depth; negative is behind the play plane), glow (0..1 bulbs)}.
 // every drift and archive level has its jar (labels/jars/*.svg): the mascot jelly on the label; on the index the level's video plays in it
+import {TAXA, HERO, BY_TYPE, BY_SUB, MECH} from './taxa.js';
 const JARS = ['ascent', 'pairs', 'lure', 'surface', 'halo', 'rayrun', 'slices', 'caves', 'bloom', 'descent', 'silt', 'doodles', 'menagerie', 'bolas', 'strata', 'spectrum'];
 export const LEVELS = [
   {id: 'ascent', predators: ['seabird', 'mola'], title: 'Ascent', source: 'design_v2', video: '../fal/design_v2_720.mp4', song: 'nightbus-08', start: 8.27,
@@ -69,6 +70,18 @@ const TYPEHUE = {perception: 190, affection: 330, impulse: 20, action: 45, refle
 const hsl = (h, s, l) => { const k = n => (n + h / 30) % 12, a = s * Math.min(l, 1 - l), f = n => l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1)); return '#' + [f(0), f(8), f(4)].map(x => Math.round(x * 255).toString(16).padStart(2, '0')).join(''); };
 const LAYS = [[{kind: 'reef', side: -1, z: -8, glow: .6}, {kind: 'kelp', side: 1, z: -18, glow: .2}], [{kind: 'ruin', side: -1, z: -10, glow: .5}, {kind: 'cave', side: 1, z: -6, glow: .2}], [{kind: 'mussels', side: -1, z: -6, glow: .1}, {kind: 'cave', side: 1, z: -14, glow: .1}], [{kind: 'kelp', side: -1, z: -12, glow: .3}, {kind: 'kelp', side: 1, z: -12, glow: .3}], [{kind: 'dunes', side: -1, z: -4, glow: 0}, {kind: 'reef', side: -1, z: -18, glow: .5}]];
 LEVELS.forEach(l => { if (JARS.includes(l.id)) l.jar = 'jars/' + l.id; });
+// every drift is the hero of one chapter: its species, and a share of the films dealt to it first so no two drifts open on the same videos
+LEVELS.forEach((l, k) => { l.species = Object.keys(HERO).find(sp => HERO[sp] === l.id) || 'aurelia'; l.dealK = k; l.dealN = LEVELS.length; });
+// the archive levels were all one game (films in a line, take frames); now each takes the verb of its species, laid out for the size of its pool
+const GOALS = {buried: n => ({type: 'unearth', n: Math.min(5, Math.ceil(n * .4)), label: 'stir the silt: uncover the buried films'}), tiers: n => ({type: 'wake', n: Math.min(14, Math.ceil(n * .6)), label: 'wake the sleeping films'}),
+  giant: n => ({type: 'watch', n: Math.min(3, Math.max(1, Math.floor(n / 4))), label: 'hold on films to watch them (4 s each)'}), pairs: n => ({type: 'pairs', n: Math.min(4, Math.max(1, Math.floor(n / 4))), label: 'take both films of a pair'}),
+  caves: n => ({type: 'frames', n: Math.min(6, Math.ceil(n * .4)), label: 'choose a passage and take its films'}), scatter: n => ({type: 'frames', n: Math.min(10, Math.ceil(n * .5)), label: 'sweep up the films in reach'}),
+  stream: n => ({type: 'frames', n: Math.min(8, Math.ceil(n * .4)), label: 'take films at speed'}), halo: n => ({type: 'halo', n: 5, label: 'take frames from the ring under the surface'}),
+  dark: n => ({type: 'frames', n: Math.min(6, Math.ceil(n * .4)), label: 'pulse to find films in the dark'}), rewind: n => ({type: 'rewind', n: Math.min(5, Math.max(2, n - 2)), label: 'take films going back in time, each older than the last'})};
+export function relay(l, sp, n) { const m = TAXA[sp].mech === 'chain' ? 'rewind' : TAXA[sp].mech, ev = {tiers: 8, pairs: 14, giant: 9, halo: 9, rewind: 12}[m] || 9;
+  const len = m === 'tiers' || m === 'pairs' ? n / 2 * ev + 34 : m === 'halo' ? Math.max(0, n - 8) * ev + 60 : m === 'rewind' ? 60 + n * 12 : n * ev + 34;
+  l.species = sp; l.films = {layout: m, every: ev}; l.len = Math.round(Math.min(700, Math.max(120, len))); l.goal = GOALS[m](n); if (m === 'halo' || m === 'tiers') l.surface = true; if (m === 'dark') { l.dark = true; l.creatures = ['angler']; l.dir = 'down'; } if (m === 'buried') { l.startW = -4; l.creatures = ['shrimp', 'angler']; l.floorAngler = true; l.dir = 'right'; }
+  if (m === 'tiers' || m === 'halo') l.dir = 'up'; if (m === 'stream') l.current = 4; return l; }
 
 export function archiveLevels(C) {
   const out = [], fluid = true, specks = true;
@@ -85,7 +98,7 @@ export function archiveLevels(C) {
   for (const [id, title, match, line, song, fog] of [['crashlab', 'The Crash Lab', '', 'every Crash Lab film', 'event-04', '#1a1f26'], ['odyssey', 'Found Odyssey', '^(ep|found-odyssey)', 'the seven episodes and the drawn tests', 'siltwire-02', '#16202a'], ['handmade', 'Handmade', 'handmade|hand-butter|hybrid|wygwyl|physical', 'the hand-made films and cels', 'firstwintera-13', '#211c18']])
     out.push({id, kind: 'crashlab', match, title, source: 'bolas crash lab', song, start: null, dir: 'right', len: 260, current: 2, band: 9, fog, fogD: .028, films: {layout: 'list'}, bad: 0, layers: LAYS[out.length % 5], creatures: ['school', 'shrimp'], fluid, specks,
       goal: {type: 'frames', n: 8, label: `take ${line}`}, took: `Our own films from the Crash Lab (${line}), each its liveliest ten seconds, drifting as jelly-films.`});
-  out.forEach(l => { if (JARS.includes(l.id)) l.jar = 'jars/' + l.id; }); if (!C) return out;
+  out.forEach(l => { if (JARS.includes(l.id)) l.jar = 'jars/' + l.id; }); if (!C) { out.forEach(l => { l.species = {doodles: 'physalia', menagerie: 'velella', bolas: 'velella', crashlab: 'cyanea', odyssey: 'aurelia', handmade: 'cassiopea'}[l.id]; }); return out; }
   const decs = [...new Set(C.shots.filter(s => s.dec).map(s => s.dec))].sort();
   out.push({id: 'strata', kind: 'cineosis', title: 'Strata', source: 'cineosis-lab', pick: {by: 'decade'}, song: 'nightbus-14', start: null, dir: 'up', len: decs.length * 26, current: 1.8, band: 10, fog: '#2a2620', top: '#294f52', fogD: .026, films: {layout: 'list'}, bad: 0,
     layers: LAYS[3], creatures: ['school', 'comb'], fluid, specks, goal: {type: 'decades', n: 8, label: 'take a frame from as many decades as you can'},
@@ -109,5 +122,12 @@ export function archiveLevels(C) {
       fog: hsl(hue, .22, .13), top: hsl(hue, .3, .3), fogD: .028, films: {layout: 'list'}, bad: 0, layers: LAYS[i % 5], creatures: ['school', i % 2 ? 'comb' : 'shrimp'], surface: i % 3 === 1, fluid, specks, goal: {type: 'frames', n: Math.min(6, n), label: g.q || g.gloss || g.name},
       jar: `cineosis/sign-${String(g.n).padStart(2, '0')}-${g.sym.toLowerCase()}`, took: `${g.type || g.image}. ${g.gloss ? g.gloss[0].toUpperCase() + g.gloss.slice(1) + '.' : ''} ${n} shots in the archive carry this sign.`}); });
   out.forEach(l => { if (!l.jar && JARS.includes(l.id)) l.jar = 'jars/' + l.id; if (!l.jar && l.id.startsWith('sub-')) l.jar = 'jars/subjects'; });
+  const key = im => (im || '').toLowerCase().replace(/[^a-z]+/g, '-');
+  for (const l of out) { if (l.id === 'doodles') l.species = 'physalia'; else if (l.id === 'menagerie' || l.id === 'bolas') l.species = 'velella'; else if (l.id === 'strata') l.species = 'turritopsis'; else if (l.id === 'spectrum') l.species = 'mnemiopsis';
+    else if (l.id === 'crashlab') l.species = 'cyanea'; else if (l.id === 'odyssey') relay(l, 'aurelia', 14); else if (l.id === 'handmade') relay(l, 'cassiopea', 12);
+    else if (l.id.startsWith('sub-')) relay(l, BY_SUB[l.id.slice(4)] || 'aurelia', Math.min(26, C.shots.filter(s => s.sub === l.id.slice(4)).length));
+    else if (l.type) { const gs = C.signs.filter(g => g.image === l.pick.v); relay(l, BY_TYPE[key(l.pick.v)] || 'aurelia', C.shots.filter(s => gs.some(g => g.n === s.sign)).length); }
+    else if (l.sign) relay(l, BY_TYPE[key(l.sign.image)] || 'aurelia', C.shots.filter(s => s.sign === l.sign.n).length);
+    if (l.species && MECH[l.films.layout]) l.verb = (l.goal.type === 'watch' ? MECH.giant : MECH[l.films.layout]).verb; }
   return out;
 }

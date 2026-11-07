@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Your Film · jelly-films</title>
+<link rel="stylesheet" href="../../fonts/fonts.css">
+<style>
+:root{color-scheme:dark}body{margin:0;background:#020611;color:#e6edf3;font:300 16px/1.6 Jost,system-ui,sans-serif}a{color:#f0a35a;text-decoration:none}
+.wrap{max-width:1080px;margin:0 auto;padding:max(28px,env(safe-area-inset-top)) clamp(16px,5vw,60px) 10vh}
+.k{font:400 12px Anton,Impact,sans-serif;letter-spacing:.32em;color:#f0a35a}h1{margin:8px 0 0;font:200 clamp(44px,8vw,96px)/1 Jost,system-ui,sans-serif}
+.arc{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:26px}.arc a{display:block;padding:10px 12px;border:1px solid rgba(207,221,232,.18);border-radius:6px;color:#8293a4;font-size:13px;line-height:1.35}
+.arc a b{display:block;font:400 11px Anton,Impact,sans-serif;letter-spacing:.2em;color:#55687a}.arc a.done{border-color:#f0a35a;color:#e6edf3}.arc a.done b{color:#f0a35a}.arc a i{display:block;font-style:normal;color:#e6edf3;font-size:15px}
+.empty{margin-top:30px;color:#8293a4;max-width:560px}
+</style></head><body><div class="wrap">
+<div class="k">CONTAMINANT · THE LIFE OF A JELLY</div><h1>Your film</h1>
+<p id="line" style="color:#8293a4;max-width:620px">Every level you finish adds its clips here, as long as you held them, in the order of the chapters: one film made by one jelly across its life.</p>
+<div id="ed"></div><div class="arc" id="arc"></div>
+<p style="margin-top:40px;font-size:13px;color:#55687a"><a href="./">← the drifts</a> · <a href="../../">jelly-films</a></p></div>
+<script type="module">
+import {mountEditor, ED_CSS} from './editor.js';
+import {ARC, HERO} from './taxa.js';
+document.head.insertAdjacentHTML('beforeend', `<style>${ED_CSS}.ed{pointer-events:auto}</style>`);
+let R = [], S = {}; try { R = JSON.parse(localStorage.getItem('cj-reel') || '[]'); S = JSON.parse(localStorage.getItem('cj-sealed') || '{}'); } catch (e) {}
+const done = new Set(R.map(c => c.lv));
+document.getElementById('arc').innerHTML = ARC.map(a => `<a href="./?v=${HERO[a.id]}" class="${S[HERO[a.id]] ? 'done' : ''}"><b>CHAPTER ${a.ch}${S[HERO[a.id]] ? ' · ' + '★'.repeat(S[HERO[a.id]].stars) : ''}</b><i>${a.chapter}</i>${a.name}</a>`).join('');
+if (!R.length) document.getElementById('ed').innerHTML = '<p class="empty">Nothing yet. Finish a level (reach its end without being eaten) and what you held is kept here. <a href="./?v=silt">Begin with chapter 1 →</a></p>';
+else {
+  const FILMS = R.map(c => ({title: `${c.lt} · ${c.t}`, kind: c.k, pat: c.pat, n: c.n, fps: c.fps, url: c.url, year: c.y, st: c.st})), cut = R.map((c, i) => ({film: i, fi: c.fi, dur: c.dur}));
+  const IMG = new Map(), img = url => { let e = IMG.get(url); if (!e) { const im = new Image(); im.crossOrigin = 'anonymous'; e = {im, ok: false}; im.onload = () => e.ok = true; im.src = url; IMG.set(url, e); } return e.ok ? e.im : null; };
+  const cover = (g, im, sx, sy, sw, sh, w, h) => { const k = Math.max(w / sw, h / sh); g.drawImage(im, sx, sy, sw, sh, (w - sw * k) / 2, (h - sh * k) / 2, sw * k, sh * k); };
+  const drawFrame = (g, i, fi, w, h) => { const f = FILMS[i]; if (!f) return false; const url = f.kind === 'sm' ? `${f.pat}${String(((fi % f.n) + f.n) % f.n).padStart(3, '0')}.jpg` : f.url; if (!url) return false; const im = img(url); if (!im || !g) return !!im;
+    if (f.kind === 'strip') { const k = ((fi % 8) + 8) % 8; cover(g, im, k * im.width / 8, 0, im.width / 8, im.height, w, h); } else cover(g, im, 0, 0, im.width, im.height, w, h); return true; };
+  R.forEach((c, i) => { for (let k = 0; k < Math.min(30, Math.ceil(c.dur * c.fps) + 1); k++) drawFrame(null, i, c.fi + k); });
+  const secs = R.reduce((a, c) => a + c.dur, 0), levels = new Set(R.map(c => c.lv)).size;
+  mountEditor(document.getElementById('ed'), {cut, FILMS, drawFrame, fps: f => Math.min(10, f.fps || 8), stamp: (i, fi) => FILMS[i].st || '', title: 'The life of a jelly', slug: 'the-life-of-a-jelly', making: [], noMaking: true,
+    verdict: {k: `${R.length} CLIPS`, cls: 'won', stars: 0, line: `${secs.toFixed(1)} s from ${levels} level${levels === 1 ? '' : 's'} · ${Object.keys(S).length} jar${Object.keys(S).length === 1 ? '' : 's'} sealed of the 13 chapters.`}, go: ''});
+}
+</script></body></html>

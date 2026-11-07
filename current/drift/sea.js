@@ -110,7 +110,7 @@ export function predatorsFor(L) {
   if (L.predators) return L.predators; const out = [];
   if (L.surface) out.push('seabird'); if ((L.layers || []).some(l => l.kind === 'mussels' || l.kind === 'dunes')) out.push('crab'); if ((L.layers || []).some(l => l.kind === 'reef' && l.glow > .4)) out.push('nudibranch');
   const open = ['leatherback', 'mola', 'tuna', 'hawksbill', 'dinnerplate', 'salmon', 'sealion', 'trigger'], h = [...L.id].reduce((a, c) => a * 31 + c.charCodeAt(0) >>> 0, 7);
-  out.push(open[h % open.length]); if (L.len > 300) out.push(open[(h >> 3) % open.length]); return out;
+  out.push(open[h % open.length]); if (L.len > 300) out.push(open[(h >>> 3) % open.length]); return out;
 }
 
 // ---------------------------------------------------------------- the seas: one long water per family, its levels laid end to end as regions
@@ -127,7 +127,7 @@ export function seaLevels(LEVELS, ARCH, C) {
     seas.push({id: 'sea-crashlab', sea: true, kind: 'crashlab', match: '', title: 'The Lab Sea', source: 'bolas crash lab', song: 'event-04', start: null, dir: 'right', len: S.len, current: 2, band: 12, fog: '#1a1f26', fogD: .028, films: {layout: 'regions'}, regions: S.regions, bad: 0,
       layers: [{kind: 'reef', side: -1, z: -8, glow: .6}, {kind: 'cave', side: 1, z: -10, glow: .2}, {kind: 'mussels', side: -1, z: -18, glow: .1}], creatures: ['school', 'shrimp', 'comb'], fluid: true, specks: true,
       predators: pred(S.regions), goal: {type: 'regions', n: S.regions.length, label: 'take a film in every water of the lab'}, took: 'The Crash Lab films as one water: the Found Odyssey, the hand-made films, then the rest of the lab.'}); }
-  if (C) { const types = [...new Set(C.signs.map(g => g.image))], regs = types.map((ty, i) => ({id: 'type-' + ty.toLowerCase().replace(/[^a-z]+/g, '-'), title: ty, len: 150, films: {layout: 'list'}, image: ty, fog: ARCH.find(l => l.title === ty)?.fog || '#1c2423', top: ARCH.find(l => l.title === ty)?.top, preds: [['leatherback', 'mola', 'dinnerplate', 'hawksbill', 'tuna', 'salmon'][i % 6]]}));
+  if (C) { const types = [...new Set(C.signs.map(g => g.image))], regs = types.map((ty, i) => ({id: 'type-' + ty.toLowerCase().replace(/[^a-z]+/g, '-'), title: ty, len: 170, films: {...(ARCH.find(l => l.title === ty)?.films || {layout: 'list'}), every: Math.min(16, (ARCH.find(l => l.title === ty)?.films.every || 9) * 1.6)}, goal: ARCH.find(l => l.title === ty)?.goal, image: ty, fog: ARCH.find(l => l.title === ty)?.fog || '#1c2423', top: ARCH.find(l => l.title === ty)?.top, preds: [['leatherback', 'mola', 'dinnerplate', 'hawksbill', 'tuna', 'salmon'][i % 6]]}));
     let u = 0; regs.forEach(r => { r.u0 = u; r.u1 = u += r.len; });
     seas.push({id: 'sea-archive', sea: true, kind: 'cineosis', pick: {by: 'regions'}, title: 'The Archive Sea', source: 'cineosis-lab', song: 'daehoned-15', start: null, dir: 'right', len: u, current: 2.2, band: 12, fog: regs[0].fog, fogD: .028, films: {layout: 'regions'}, regions: regs, bad: 0,
       layers: [{kind: 'reef', side: -1, z: -8, glow: .6}, {kind: 'kelp', side: 1, z: -18, glow: .2}, {kind: 'ruin', side: -1, z: -24, glow: .4}], creatures: ['school', 'comb', 'shrimp'], fluid: true, specks: true,
