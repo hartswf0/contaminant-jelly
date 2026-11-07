@@ -83,6 +83,7 @@ import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+import {makeScreens, cinema} from './screens.js';
 const $ = id => document.getElementById(id), Q = new URLSearchParams(location.search), COARSE = matchMedia('(pointer: coarse)').matches, DEBUG = Q.has('debug');
 const SM = Q.get('sm') || 'https://hartswf0.github.io/secondhand-motion/';
 let FILMS = await (await fetch('films109.json')).json();
@@ -90,6 +91,7 @@ if (Q.get('films')) { const keep = Q.get('films').split(','); FILMS = FILMS.filt
 const MUSIC = await fetch('music.json').then(r => r.json()).catch(() => null);
 const S2G = await fetch('audio/song2game.json').then(r => r.ok ? r.json() : null).catch(() => null);
 const frameURL = (f, i) => `${SM}${f.dir}/f${String(((i % f.n) + f.n) % f.n).padStart(3, '0')}.jpg`;
+const scrSrc = (film, from) => { const f = FILMS[film]; return f ? {frames: i => frameURL(f, i), n: f.n, fps: fps(f), from: from || 0, loop: BLOCK} : null; };
 const fps = f => Math.min(10, f.fps || 8), stamp = (film, fi) => { const t = fi / fps(FILMS[film]); return `${Math.floor(t / 60)}:${(t % 60).toFixed(1).padStart(4, '0')}`; };
 const IMG = new Map();
 function img(url) { let e = IMG.get(url); if (e) return e; const im = new Image(); im.crossOrigin = 'anonymous'; e = {im, ok: false, cbs: []};
@@ -105,6 +107,8 @@ const renderer = new THREE.WebGLRenderer({canvas: $('gl'), antialias: false, pow
 renderer.setPixelRatio(Math.min(COARSE ? 1.25 : 1.6, devicePixelRatio || 1)); renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1;
 const FOG = new THREE.Color(0x0a1312), SURFC = new THREE.Color(0x1f4644), scene = new THREE.Scene(); scene.background = FOG.clone(); scene.fog = new THREE.FogExp2(FOG, .028);
 const camera = new THREE.PerspectiveCamera(55, 1, .05, 220);
+// screens (screens.js): a film that comes clear shows its real footage projected into the water; the farthest layer plays one film full and faint
+const SCN = makeScreens(THREE, scene, camera, {n: 3}), SCI = [], BACK = {}, CINE = cinema(['tag', 'state', 'map', 'say', 'lesson', 'song', 'top', 'ctl', 'dbg']);
 const composer = new EffectComposer(renderer); composer.addPass(new RenderPass(scene, camera));
 const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), .7, .55, .74); composer.addPass(bloom); composer.addPass(new OutputPass());
 function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); composer.setSize(w, h); bloom.setSize(w * .5, h * .5); camera.aspect = w / h; camera.updateProjectionMatrix(); }
@@ -535,7 +539,7 @@ function stepCast() { const ct = RT - CAST.t, k = ct < .3 ? ct / .3 : ct < .55 ?
   if (CAST.target && !CAST.hit && ct >= .3) { CAST.hit = true; capture(CAST.target); }
   for (let j = 0; j < NC; j++) { const r = CROW + j; if (k <= 0) { hide(r); continue; } const u = (j + 1) / NC * k; _p.copy(C.p).lerp(CAST.to, u); row(r, 0, _p.x, _p.y, _p.z, .12); row(r, 1, -1, 1, 0, .9); row(r, 2, 0, 0, 0, 0); row(r, 3, 0, 0, 0, 0); row(r, 4, 0, 0, 0, 0); }
   FLECK.forEach((f, j) => { const r = FROW + j, u = (RT - f.t) / .6; if (u < 0 || u > 1) { hide(r); return; } _p.copy(f.from).lerp(C.p, u * u * (3 - 2 * u)); row(r, 0, _p.x, _p.y, _p.z, .7 - .45 * u); row(r, 1, f.block, 1.3, f.slot, 1.2); row(r, 2, 0, .3, 0, 0); row(r, 3, 0, 0, 0, .6); row(r, 4, .3, 1.5, 0, .3); }); }
-function capture(t) { const fr = T * fps(FILMS[t.film]), slot = Math.floor(fr) % BLOCK, fi = t.from + slot, cid = `${t.key}:${fi}`;
+function capture(t) { BACK.taken = t.film; const fr = T * fps(FILMS[t.film]), slot = Math.floor(fr) % BLOCK, fi = t.from + slot, cid = `${t.key}:${fi}`;
   if (CLAIMS.has(cid) && CLAIMS.get(cid).id !== ME.id) { say('your partner already took that frame'); return; }
   const res = addFrame(t.film, fi, cid, t.key); if (!res) return; if (res === 'dup') { say('that frame is already in this arm: wait for another moment'); AU.whip(false); return; }
   t.o.budget--; const at = Date.now(); CLAIMS.set(cid, {at, id: ME.id}); NET.send({t: 'claim', cid, at, film: t.film, fi});
@@ -543,7 +547,7 @@ function capture(t) { const fr = T * fps(FILMS[t.film]), slot = Math.floor(fr) %
   C.glow = 1; slow = .35; AU.capture(t.film); buzz(res === 'new' ? [8, 24, 8, 24, 14] : [8, 20, 10]);
   const A = armOf(t.film); say(`${FILMS[t.film].title} · ${stamp(t.film, fi)} · ${res === 'new' ? 'a new arm' : `arm of ${A.frames.length} frames`}`); G.captures = (G.captures || 0) + 1; }
 // ------------------------------------------------------------------ write the rows
-function writeRows(dt) {
+function writeRows(dt) { SCI.length = 0;
   for (let i = 0; i < ND; i++) { const d = D[i], r = DROW + i; if (!d.live) { hide(r); continue; }
     if (d.pour > 0) { d.pour += dt / 1.1; if (d.pour >= 1) { d.live = false; if (d.block >= 0) { giveBlock(d.block); d.block = -1; } hide(r); continue; } }
     else { d.s += dt * curOf(d.s, d.side) * .7; if (d.s < C.s - 10 || d.s > C.s + 90) { d.live = false; giveBlock(d.block); d.block = -1; hide(r); continue; } }
@@ -551,13 +555,15 @@ function writeRows(dt) {
     cross(d.s, (d.side || 0) * offOf(d.s) + d.x + Math.cos(T * .4 + d.ph) * .3, d.y + Math.sin(T * .5 + d.ph) * .3, d.pos);
     const dist = d.pos.distanceTo(C.p), res = THREE.MathUtils.clamp(1 - (dist - 3) / 12, 0, 1), lit = C.lamp * THREE.MathUtils.smoothstep(16 - dist, 0, 10), ghost = [...GH.values()].some(g => g.p.distanceTo(d.pos) < 6) ? .4 : 0;
     d.res = res; const fade = Math.min(1, (T - d.born) / 1.5), fr = d.broken && Math.sin(T * 1.3 + d.ph) > .2 ? Math.floor(Math.random() * 8) : T * fps(FILMS[d.film]);   // interference: broken frame order, then clear
-    row(r, 0, d.pos.x, d.pos.y, d.pos.z, d.size * (1 + .1 * res)); row(r, 1, d.bad ? -1 : d.block, 1.35, fr, (d.bad ? .9 : 1.1 + .4 * lit + ghost) * fade);
+    row(r, 0, d.pos.x, d.pos.y, d.pos.z, d.size * (1 + .1 * res)); const dfoc = FOC && FOC.o === d ? FOC.k : 0; if (!d.bad && d.pour <= 0 && d.block >= 0) SCI.push({key: d, pos: d.pos, size: d.size, clear: Math.max(sm(.45, 1, res) * .7, lit * .9, dfoc), hold: dfoc, src: scrSrc(d.film, d.from), clock: T + d.ph});
+    row(r, 1, d.bad ? -1 : d.block, 1.35, fr, (d.bad ? .9 : 1.1 + .4 * lit + ghost) * fade * (1 - .85 * SCN.alpha(d)));
     row(r, 2, 0, d.bad ? .6 : .8, d.bad ? 1 : 0, d.pour); row(r, 3, C.p.x, C.p.y, C.p.z, 0); row(r, 4, d.bad ? 0 : .6 + .5 * res + .3 * lit, 1.9, 0, d.bad ? 0 : (1 - res) * .9);   // far: drifting flecks; near: a picture
     if (d.bad && G.state === 'play' && d.pour <= 0 && dist < d.size * .6 + .7) { d.live = false; C.jitter = .8; G.bad = (G.bad || 0) + 1; damage(12, 'interference: broken frames, nothing lost'); AU.crackle(2); buzz([20, 20, 40]); G.burst = RT; } }
   { const u = (RT - (G.burst ?? -9)) / 1.1; if (u >= 0 && u < 1) { row(XROW, 0, C.p.x, C.p.y, C.p.z, 2.4 * (.5 + u)); row(XROW, 1, -1, 1, 0, (1 - u) * 1.4); row(XROW, 2, 0, .5, 1, 0); row(XROW, 3, 0, 0, 0, 0); row(XROW, 4, 0, 0, 0, 1); } else hide(XROW); }
   S.forEach((sl, i) => { const r = SROW + i, sc = sl.ref; if (!sc || sl.block < 0) { hide(r); return; } screenPos(sc, sl.pos); const dist = sl.pos.distanceTo(C.p), dcam = sl.pos.distanceTo(camera.position);
     const near = 1 - THREE.MathUtils.clamp((dcam - 6) / 30, 0, 1), foc = FOC && FOC.o === sc ? FOC.k : 0, lit = C.lamp * THREE.MathUtils.smoothstep(18 - dist, 0, 10), dark = sc.kind === 'dark' ? Math.max(lit, sc.seen > RT - 6 ? .6 : .08) : 1, dim = sc.kind === 'dim' ? .5 : 1;
-    row(r, 0, sl.pos.x, sl.pos.y, sl.pos.z, sc.size * (1 + .15 * foc)); row(r, 1, sl.block, 1.4, T * fps(FILMS[sc.film]) * (IN.focus ? .5 : 1), Math.min(1, (T - sl.born) / 2) * (.4 + .9 * near + .6 * foc) * dark * dim);
+    row(r, 0, sl.pos.x, sl.pos.y, sl.pos.z, sc.size * (1 + .15 * foc)); SCI.push({key: sc, pos: sl.pos, size: sc.size, clear: Math.max(.6 * near * dark * dim * Math.min(1, (T - sl.born) / 2), foc), hold: foc, src: scrSrc(sc.film, sc.from), clock: T});
+    row(r, 1, sl.block, 1.4, T * fps(FILMS[sc.film]) * (IN.focus ? .5 : 1), Math.min(1, (T - sl.born) / 2) * (.4 + .9 * near + .6 * foc) * dark * dim * (1 - .85 * SCN.alpha(sc)));
     row(r, 2, 0, .45, 0, 0); row(r, 3, 0, 0, 0, sc.kind === 'dark' ? .8 : 0); row(r, 4, 1.25 + .4 * foc, 1.5 - .4 * foc, 0, .15 * (1 - foc)); });
   const nA = ARMS.length;
   for (let k = 0; k < NARM; k++) for (let j = 0; j < AN; j++) { const r = AROW + k * AN + j, A = ARMS[k]; if (!A || j >= Math.round(A.n)) { hide(r); continue; } const i = (k * AN + j) * 3, f = j / Math.max(1, A.n - 1), nf = Math.min(BLOCK, A.frames.length), age = nA > 1 ? (nA - 1 - k) / (nA - 1) : 0;
@@ -850,6 +856,8 @@ function frame(now) {
   if (RT - sayT > 3.4) $('say').style.opacity = 0;
   if (G.state === 'play') { const lv = levelOf(C.s, C.side); $('state').innerHTML = `${LEVELNAME[lv] || ''} · ${Math.floor(C.s)} / ${SURF} m<br>${ARMS.length} film${ARMS.length === 1 ? '' : 's'} · ${CUT.length} frame${CUT.length === 1 ? '' : 's'} · membrane ${Math.round(C.mem)}%${C.reach > 0 ? ' · long reach' : ''}${C.slip > 0 ? ' · slipstream' : ''}${GH.size ? ` · ${GH.size + 1} diving` : ''}`; drawMicro(); }
   else if (G.state !== 'title') $('state').innerHTML = '';
+  { if (BACK.taken !== undefined && BACK.taken !== BACK.f) { BACK.f = BACK.taken; BACK.until = RT + 30; } else if (BACK.f === undefined || RT > BACK.until) { BACK.f = (BACK.f === undefined ? Math.floor(Math.random() * FILMS.length) : BACK.f + 7) % FILMS.length; BACK.until = RT + 24; } BACK.taken = undefined;
+    SCN.update(G.state === 'play' || G.state === 'title' ? SCI : [], real, RT, scene.fog.color, scene.fog.density); SCN.backdrop(FILMS.length ? scrSrc(BACK.f, 0) : null, .13, RT * .6, scene.fog.color, real, 70); if (CINE.on && typeof retMat !== 'undefined') retMat.uniforms.uA.value = 0; }
   composer.render();
   const ft = performance.now() - t0; stat.frames.push(ft); if (stat.frames.length > 240) stat.frames.shift();
   if (DEBUG) { const s = stat.frames.slice().sort((a, b) => a - b), q = x => s[Math.floor(x * (s.length - 1))].toFixed(1); $('dbg').textContent = `s ${C.s.toFixed(1)} side ${C.side} lvl ${levelOf(C.s, C.side)} bell ${(bellFrac() * 100).toFixed(1)}% d ${camDist().toFixed(1)}\nangler ${ANG.st} · beat ${AU.beatPhase().toFixed(2)} bpm ${AU.bpm().toFixed(0)} · free ${freeBlocks.length}\nframe ms p50 ${q(.5)} p95 ${q(.95)}`; }

@@ -61,6 +61,7 @@ import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+import {makeScreens, cinema} from './screens.js';
 const $ = id => document.getElementById(id), Q = new URLSearchParams(location.search), COARSE = matchMedia('(pointer: coarse)').matches, DEBUG = Q.has('debug');
 const SM = Q.get('sm') || 'https://hartswf0.github.io/secondhand-motion/';
 let FILMS = await (await fetch('films109.json')).json();
@@ -80,6 +81,9 @@ const renderer = new THREE.WebGLRenderer({canvas: $('gl'), antialias: false, pow
 renderer.setPixelRatio(Math.min(COARSE ? 1.25 : 1.6, devicePixelRatio || 1)); renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = .95;
 const FOG = new THREE.Color(0x0c1514), scene = new THREE.Scene(); scene.background = FOG.clone(); scene.fog = new THREE.FogExp2(FOG, .05);
 const camera = new THREE.PerspectiveCamera(60, 1, .05, 160);
+// screens (screens.js): a film near the jelly shows its real footage projected into the water; the farthest layer plays one film full and faint. H hides all words (cinema).
+const SCN = makeScreens(THREE, scene, camera, {n: 3}), SCI = [], BACK = {}, CINE = cinema(['state', 'map', 'say', 'song', 'act', 'watch', 'save', 'dbg']), scrSm = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+const scrSrc = (film, from) => { const f = FILMS[film]; return f ? {frames: i => frameURL(f, i), n: f.n, fps: Math.min(10, f.fps || 8), from: from || 0, loop: 8} : null; };
 const composer = new EffectComposer(renderer); composer.addPass(new RenderPass(scene, camera));
 const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), .75, .6, .72); composer.addPass(bloom); composer.addPass(new OutputPass());
 function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); composer.setSize(w, h); bloom.setSize(w * .5, h * .5); camera.aspect = w / h; camera.updateProjectionMatrix(); }
@@ -367,12 +371,12 @@ function writeRows(dt) {
     else { d.s += dt * (.7 + 4 * laneBoost(d.s, d.x, d.y)); if (d.s < C.s - 8) { d.live = false; giveBlock(d.block); d.block = -1; continue; } }
     const {N, B, C: Cc} = frameAt(d.s); d.pos.copy(Cc).addScaledVector(N, d.y + Math.sin(T * .5 + d.ph) * .3).addScaledVector(B, d.x + Math.cos(T * .4 + d.ph) * .3);
     const fade = Math.min(1, (T - d.born) / 1.5), fr = (T * Math.min(10, FILMS[d.film].fps || 8)), to = d.to || C.p;
-    row(r, 0, d.pos.x, d.pos.y, d.pos.z, d.size); row(r, 1, d.bad ? -1 : (d.block >= 0 ? d.block : -1), 1.35, fr, (d.bad ? .9 : 1.25) * fade);
+    if (!d.bad && d.pour <= 0 && d.block >= 0) SCI.push({key: d, pos: d.pos, size: d.size, clear: scrSm(11, 3.5, d.pos.distanceTo(C.p)) * .85, src: scrSrc(d.film, d.from), clock: T + d.ph}); row(r, 0, d.pos.x, d.pos.y, d.pos.z, d.size); row(r, 1, d.bad ? -1 : (d.block >= 0 ? d.block : -1), 1.35, fr, (d.bad ? .9 : 1.25) * fade * (1 - .85 * SCN.alpha(d)));
     row(r, 2, 0, d.bad ? .6 : .9, d.bad ? 1 : 0, d.pour); row(r, 3, to.x, to.y, to.z, d.to ? .1 : 0); row(r, 4, d.bad ? 0 : .9, 1.9, 0, 0);
     if (d.pour <= 0 && G.state === 'play') { const dd = d.pos.distanceTo(C.p); if (dd < d.size * .6 + .8) { if (d.bad) drained(d); else drink(d); } } }
   for (let i = 0; i < NR; i++) { const f = RF[i], r = RROW + i; if (f.i < 0 || f.s < C.s - 10) placeReef(f);
     cross(f.s, f.x + Math.sin(T * .3 + i) * .2, f.y + Math.cos(T * .25 + i) * .2, f.pos); const dd = f.pos.distanceTo(camera.position), near = 1 - THREE.MathUtils.clamp((dd - 6) / 22, 0, 1);
-    row(r, 0, f.pos.x, f.pos.y, f.pos.z, f.size); row(r, 1, f.block, 1.4, T * Math.min(10, FILMS[f.film].fps || 8), Math.min(1, (T - f.born) / 2) * (.35 + 1.1 * near));
+    row(r, 0, f.pos.x, f.pos.y, f.pos.z, f.size); row(r, 1, f.block, 1.4, T * Math.min(10, FILMS[f.film].fps || 8), Math.min(1, (T - f.born) / 2) * (.35 + 1.1 * near) * (1 - .85 * SCN.alpha(f))); SCI.push({key: f, pos: f.pos, size: f.size, clear: .7 * near * near * Math.min(1, (T - f.born) / 2), src: scrSrc(f.film, f.from), clock: T + i});
     row(r, 2, 0, .5, 0, 0); row(r, 3, 0, 0, 0, 0); row(r, 4, 1.3, 1.5, 0, 0); }
   for (let ti = 0; ti < TN; ti++) { const t = tent[ti], cl = t.clip; if (cl) cl.fill = Math.min(1, cl.fill + dt * .8);
     for (let j = 0; j < TS; j++) { const r = WROW + ti * TS + j, i = (t.start + j) * 3, f = j / (TS - 1), on = cl && f <= cl.fill;
@@ -553,7 +557,7 @@ function drawMap() {
 // ------------------------------------------------------------------ loop
 let last = performance.now(), acc = 0, RT = 0; const DT = 1 / 120;
 function frame(now) {
-  requestAnimationFrame(frame); const real = Math.min(.05, (now - last) / 1000); last = now; RT += real; const t0 = performance.now();
+  requestAnimationFrame(frame); const real = Math.min(.05, (now - last) / 1000); last = now; RT += real; SCI.length = 0; const t0 = performance.now();
   slow = Math.max(0, slow - real); const scale = V.on && G.state !== 'end' ? .15 : 1 - .6 * Math.min(1, slow / .25); acc += real * scale;
   let n = 0; while (acc >= DT && n < 12) { T += DT; if (G.state === 'play' || G.state === 'end') stepCreature(DT); else { C.s += 1.5 * DT; C.ph += DT * .9; const {T: Tg, N, C: Cc} = frameAt(C.s); C.p.copy(Cc).addScaledVector(N, Math.sin(T * .5) * .5); C.heading.copy(Tg);
     C.q.setFromRotationMatrix(new THREE.Matrix4().lookAt(new THREE.Vector3(), Tg, N)).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2)); } stepTent(DT); acc -= DT; n++; } if (n === 12) acc = 0;
@@ -571,6 +575,8 @@ function frame(now) {
   const carried = tent.filter(t => t.clip).length;
   $('state').textContent = G.state === 'title' ? '' : `${Math.floor(C.s)} m · ${carried} / 8 carried${G.state === 'play' ? ` · the Source in ${Math.max(0, Math.ceil(END - C.s))} m` : ''}${GH.size ? ` · ${GH.size + 1} swimming` : ''}`;
   if (G.state !== 'title') drawMap();
+  { if (BACK.f === undefined || RT > BACK.until) { BACK.f = (BACK.f === undefined ? Math.floor(Math.random() * Math.max(1, FILMS.length)) : BACK.f + 7) % Math.max(1, FILMS.length); BACK.until = RT + 24; }
+    SCN.update(G.state === 'play' ? SCI : [], real, RT, scene.fog.color, scene.fog.density); SCN.backdrop(FILMS.length ? scrSrc(BACK.f, 0) : null, .13, RT * .6, scene.fog.color, real, 60); }
   composer.render();
   const ft = performance.now() - t0; stat.frames.push(ft); if (stat.frames.length > 240) stat.frames.shift();
   if (DEBUG) { const s = stat.frames.slice().sort((a, b) => a - b), q = x => s[Math.floor(x * (s.length - 1))].toFixed(1); $('dbg').textContent = `stretch ${(stat.resid * 100).toFixed(2)}% · clouds ${D.filter(d => d.live).length} · free blocks ${freeBlocks.length} · images ${IMG.size}\nangler ${A.state} · boost ${C.boost.toFixed(2)} · ghosts ${GH.size}\nframe ms p50 ${q(.5)} p95 ${q(.95)} p99 ${q(.99)}`; }
