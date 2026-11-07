@@ -1,0 +1,45 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg"><link rel="stylesheet" href="../fonts/fonts.css">
+<title>Jar Lab · jelly-films</title><meta name="description" content="Three ways to bottle a film: specimen, apothecary, preserve. Hover a jar and its film fills it, then its game.">
+<style>
+:root{--ink:#e6edf3;--dim:#8293a4;--faint:#55687a;--line:rgba(183,201,216,.22);--bg:#020611;--glow:#f0a35a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse 90% 60% at 50% 0,#0a1828,var(--bg) 70%) fixed,var(--bg);color:var(--ink);font:300 16px/1.6 Jost,system-ui,sans-serif;padding:8vh clamp(20px,6vw,80px) 10vh}
+a{color:inherit;text-decoration:none}.wm{font:400 13px/1 Anton,Impact,sans-serif;letter-spacing:.34em;color:var(--dim)}h1{margin:12px 0 0;font:200 clamp(44px,7vw,92px)/1 Jost,system-ui,sans-serif}
+.lede{max-width:620px;color:var(--dim);margin:16px 0 0}
+section{margin-top:12vh}.k{font:400 13px/1 Anton,Impact,sans-serif;letter-spacing:.3em;color:var(--glow)}h2{margin:10px 0 0;font:200 clamp(28px,3.6vw,46px)/1.1 Jost,system-ui,sans-serif}section p{margin:8px 0 0;color:var(--dim);max-width:640px}
+.shelf{display:grid;grid-template-columns:repeat(6,1fr);gap:26px;margin-top:36px;padding-bottom:26px;border-bottom:1px solid rgba(205,180,138,.35);position:relative}
+.shelf:after{content:"";position:absolute;left:-2%;right:-2%;bottom:-7px;height:6px;border-radius:3px;background:linear-gradient(#2a2017,#120d09)}
+.jar{display:block}.jar .cap{margin-top:8px;text-align:center}.jar .cap b{font:300 16px Jost,system-ui,sans-serif}.jar .cap i{display:block;font:300 11px 'JetBrains Mono',monospace;color:var(--faint);font-style:normal}
+.jar:hover .cap b{color:var(--glow)}
+@media (max-width:900px){.shelf{grid-template-columns:repeat(3,1fr)}}@media (max-width:520px){.shelf{grid-template-columns:repeat(2,1fr)}}
+</style></head>
+<body>
+<div class="wm">CONTAMINANT · JAR LAB</div><h1>three ways to bottle a film</h1>
+<p class="lede">Every jar is its own: its tint, its fill line, its tag, its number. The lid is a reel; the label says CONTAMINANT. Hover a jar and the film fills it, up to its line; then the game it became. Click to swim it.</p>
+<section><div class="k">A · SPECIMEN</div><h2>A tall lab jar, a typed kraft tag tied on with string</h2><p>Graduated glass, a little sediment of film flecks at the bottom, a signature in red ink.</p><div class="shelf" id="specimen"></div></section>
+<section><div class="k">B · APOTHECARY</div><h2>A round flask, a reel stopper, an enamel plaque</h2><p>The film swirls in the bulb; the plaque carries the wordmark, the name and the number.</p><div class="shelf" id="apothecary"></div></section>
+<section><div class="k">C · PRESERVE</div><h2>A preserving jar with CONTAMINANT pressed into the glass</h2><p>A reel for a lid, a hand-drawn fill line, a tag on twine with the batch number.</p><div class="shelf" id="preserve"></div></section>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="defs"></defs></svg>
+<script type="module">
+import {bottle, BOTTLE_CSS} from './jarlab.js';
+document.head.insertAdjacentHTML('beforeend', `<style>${BOTTLE_CSS}</style>`);
+// six levels, each with its own tint, lid and ink; the film it came from and the game it became
+const L = [
+  {id: 'ascent', name: 'Ascent', src: 'design_v2', film: '../current/fal/design_v2_720.mp4', poster: '../current/drift/thumbs/design_v2.jpg', tint: '#8fb3d6', lid: '#d79a3e', ink: '#1d2a4f', note: 'rises, wakes'},
+  {id: 'lure', name: 'Lure', src: 'design_v5', film: '../current/fal/design_v5_720.mp4', poster: '../current/drift/thumbs/design_v5.jpg', tint: '#3e8f9a', lid: '#b8452f', ink: '#1f1720', note: 'do not shake'},
+  {id: 'surface', name: 'Toward the Surface', src: 'design_v6', film: '../current/fal/design_v6_720.mp4', poster: '../current/drift/thumbs/design_v6.jpg', tint: '#7fb9c9', lid: '#6c8ea8', ink: '#16263a', note: 'hold to watch'},
+  {id: 'bloom', name: 'Bloom', src: 'nightbus 13', film: '../current/fal/song_nightbus-13.mp4', poster: '../current/drift/thumbs/song_nightbus-13.jpg', tint: '#c49ad6', lid: '#8c5aa8', ink: '#2a1736', note: 'opens slowly'},
+  {id: 'descent', name: 'The Long Descent', src: 'nightbus 14', film: '../current/fal/song_nightbus-14.mp4', poster: '../current/drift/thumbs/song_nightbus-14.jpg', tint: '#5d7ea6', lid: '#a37a4a', ink: '#141c2a', note: 'keep in the dark'},
+  {id: 'halo', name: 'Halo', src: 'neon butterfly', film: '../current/fal/song_neonbutterfly-02.mp4', poster: '../current/drift/thumbs/song_neonbutterfly-02.jpg', tint: '#e0b45a', lid: '#c98d2e', ink: '#2e2210', note: 'turns by itself'}];
+const defs = document.getElementById('defs');
+for (const kind of ['specimen', 'apothecary', 'preserve']) document.getElementById(kind).innerHTML = L.map((o, k) => { const b = bottle(kind, {...o, seed: k * 3 + kind.length, no: k + 1}); defs.insertAdjacentHTML('beforeend', b.defs);
+  return `<a class="jar" href="../current/drift/?v=${o.id}" data-film="${o.film}" data-game="../current/drift/play/${o.id}.mp4">${b.html}<div class="cap"><b>${o.name}</b><i>no. ${String(k + 1).padStart(2, '0')}</i></div></a>`; }).join('');
+// the poster frame sits in the liquid at rest; hover fills the jar with the film, then the game
+const live = (a, on) => { const bt = a.querySelector('.bt'), [f, g] = a.querySelectorAll('video'); clearTimeout(a._t); bt.classList.toggle('live', on); bt.classList.remove('game');
+  if (!on) { f.pause(); g.pause(); return; } if (!f.src) f.src = a.dataset.film; f.play().catch(() => {});
+  a._t = setTimeout(() => { if (!g.src) g.src = a.dataset.game; g.play().catch(() => {}); bt.classList.add('game'); }, 3400); };
+const jars = [...document.querySelectorAll('.jar')];
+if (matchMedia('(hover: hover)').matches) jars.forEach(a => { a.addEventListener('mouseenter', () => live(a, true)); a.addEventListener('mouseleave', () => live(a, false)); });
+else { let cur = null; const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { if (cur && cur !== e.target) live(cur, false); cur = e.target; live(cur, true); } else if (cur === e.target) { live(cur, false); cur = null; } }), {rootMargin: '-42% 0px -42% 0px'}); jars.forEach(a => io.observe(a)); }
+</script>
+</body></html>
