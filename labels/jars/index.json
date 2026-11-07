@@ -1,0 +1,170 @@
+[
+ {
+  "id": "ascent",
+  "symbol": "At",
+  "name": "Ascent",
+  "line": "DRIFT  /  DESIGN V2",
+  "alt": "Rise through galleries of sleeping films; brushing wakes them.",
+  "file": "ascent"
+ },
+ {
+  "id": "pairs",
+  "symbol": "Pa",
+  "name": "Pairs",
+  "line": "DRIFT  /  DESIGN V4",
+  "alt": "Every pair is a cut: take a frame from both.",
+  "file": "pairs"
+ },
+ {
+  "id": "lure",
+  "symbol": "Lu",
+  "name": "Lure",
+  "line": "DRIFT  /  DESIGN V5",
+  "alt": "The angler patrols, warns twice, lunges.",
+  "file": "lure"
+ },
+ {
+  "id": "surface",
+  "symbol": "Ts",
+  "name": "Toward the Surface",
+  "line": "DRIFT  /  DESIGN V6",
+  "alt": "The first film is enormous: stop and watch.",
+  "file": "surface"
+ },
+ {
+  "id": "halo",
+  "symbol": "Ha",
+  "name": "Halo",
+  "line": "DRIFT  /  NEON BUTTERFLY 02",
+  "alt": "The halo turns; take frames as it comes round.",
+  "file": "halo"
+ },
+ {
+  "id": "rayrun",
+  "symbol": "Rr",
+  "name": "Ray Run",
+  "line": "DRIFT  /  NIGHT BUS 03",
+  "alt": "Ride under the ray for a slipstream.",
+  "file": "rayrun"
+ },
+ {
+  "id": "slices",
+  "symbol": "Sl",
+  "name": "Slices",
+  "line": "DRIFT  /  NIGHT BUS 06",
+  "alt": "One film laid out in time; take its slices in order.",
+  "file": "slices"
+ },
+ {
+  "id": "caves",
+  "symbol": "Tc",
+  "name": "Twin Caves",
+  "line": "DRIFT  /  NIGHT BUS 08",
+  "alt": "A rock tongue splits the water into two caves.",
+  "file": "caves"
+ },
+ {
+  "id": "bloom",
+  "symbol": "Bm",
+  "name": "Bloom",
+  "line": "DRIFT  /  NIGHT BUS 13",
+  "alt": "Watching is the game: hold, and it blooms.",
+  "file": "bloom"
+ },
+ {
+  "id": "descent",
+  "symbol": "Ld",
+  "name": "The Long Descent",
+  "line": "DRIFT  /  NIGHT BUS 14",
+  "alt": "The light closes in; films show near you or when you pulse.",
+  "file": "descent"
+ },
+ {
+  "id": "silt",
+  "symbol": "Si",
+  "name": "Silt Bench",
+  "line": "DRIFT  /  NIGHT BUS 17",
+  "alt": "Films lie buried; swim low or pulse to stir them up.",
+  "file": "silt"
+ },
+ {
+  "id": "doodles",
+  "symbol": "Dd",
+  "name": "Secondhand Doodles",
+  "line": "ARCHIVE  /  86 DRAWINGS",
+  "alt": "Traced drawings swim as eels and schools.",
+  "file": "doodles"
+ },
+ {
+  "id": "menagerie",
+  "symbol": "Mn",
+  "name": "Menagerie",
+  "line": "ARCHIVE  /  86 CREATURES",
+  "alt": "All 86 drawings alive as creatures.",
+  "file": "menagerie"
+ },
+ {
+  "id": "bolas",
+  "symbol": "Bo",
+  "name": "Bolas",
+  "line": "ARCHIVE  /  321 PLANES",
+  "alt": "Drawn planes replayed along their own tracks.",
+  "file": "bolas"
+ },
+ {
+  "id": "strata",
+  "symbol": "St",
+  "name": "Strata",
+  "line": "ARCHIVE  /  1900S TO 2020S",
+  "alt": "The oldest footage at the floor, the newest at the surface.",
+  "file": "strata"
+ },
+ {
+  "id": "spectrum",
+  "symbol": "Sc",
+  "name": "Spectrum",
+  "line": "ARCHIVE  /  BY COLOUR",
+  "alt": "The archive sorted by its own colour.",
+  "file": "spectrum"
+ },
+ {
+  "id": "reel",
+  "symbol": "Fr",
+  "name": "Film-Reel Jelly",
+  "line": "BONUS  /  AFTERLIGHT",
+  "alt": "A 3D film-reel jellyfish of pixel flecks.",
+  "file": "reel"
+ },
+ {
+  "id": "sewer",
+  "symbol": "Sw",
+  "name": "Sentinel Timeworm",
+  "line": "BONUS  /  SEWER CONDUIT",
+  "alt": "A timeworm in the sewer conduit of lost video.",
+  "file": "sewer"
+ },
+ {
+  "id": "medusae",
+  "symbol": "Me",
+  "name": "Afterlight Medusae",
+  "line": "BONUS  /  12-REEL VOYAGE",
+  "alt": "An abyssal cinema tunnel, an anglerfish, twelve reels.",
+  "file": "medusae"
+ },
+ {
+  "id": "worms",
+  "symbol": "Rw",
+  "name": "Raw Doodle Worms",
+  "line": "BONUS  /  PERIODIC TABLE",
+  "alt": "Raw doodle worms swim the periodic table.",
+  "file": "worms"
+ },
+ {
+  "id": "subjects",
+  "symbol": "Su",
+  "name": "The Subjects",
+  "line": "ARCHIVE  /  PEOPLE TO CROWDS",
+  "alt": "People, machines, landscapes, animals, screens, crowds.",
+  "file": "subjects"
+ }
+]

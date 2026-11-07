@@ -1,0 +1,2278 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>AFTERLIGHT // MEDUSAE — Abyssal Cinema Tunnel, Anglerfish &amp; 12-Reel Voyage</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="vendor/three.r128.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
+      background: #05080b; color: #e2e8f0; font-family: 'Inter', sans-serif;
+      touch-action: none;
+    }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    #canvas-container {
+      position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1;
+      cursor: crosshair;
+    }
+    .hud-whisper {
+      transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      opacity: 0.88;
+    }
+    body.hud-idle .hud-whisper {
+      opacity: 0.22;
+    }
+    .hud-whisper:hover, .hud-whisper:focus-within {
+      opacity: 0.98 !important;
+    }
+    .zen-pill {
+      background: rgba(6, 10, 15, 0.62);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(250, 204, 21, 0.18);
+    }
+    .zen-sheet {
+      background: rgba(6, 10, 15, 0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(250, 204, 21, 0.28);
+    }
+    .zen-btn {
+      transition: all 0.14s ease;
+      border: 1px solid rgba(148, 163, 184, 0.20);
+      background: rgba(10, 16, 24, 0.68);
+      color: #cbd5e1;
+      letter-spacing: 0.06em;
+    }
+    .zen-btn:hover {
+      border-color: rgba(250, 204, 21, 0.75);
+      color: #fef08a;
+    }
+    .zen-btn:active { transform: scale(0.96); }
+    .zen-btn.active-toggle {
+      background: rgba(250, 204, 21, 0.18);
+      border-color: rgba(250, 204, 21, 0.85);
+      color: #fde047;
+    }
+    .zen-btn.alert-action {
+      background: rgba(225, 29, 72, 0.30);
+      border-color: rgba(251, 113, 133, 0.92);
+      color: #fda4af;
+    }
+    #capture-toast {
+      transition: opacity 0.32s ease, transform 0.32s ease;
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    #capture-toast.toast-visible {
+      opacity: 0.90;
+      transform: translateY(0);
+    }
+    input[type="range"] {
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 2px; background: rgba(148, 163, 184, 0.25);
+      border-radius: 999px; outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: #facc15; cursor: pointer;
+    }
+    .custom-scroll::-webkit-scrollbar { width: 3px; height: 3px; }
+    .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(250, 204, 21, 0.3); border-radius: 999px; }
+  </style>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+</head>
+<body class="relative w-full h-full overflow-hidden">
+
+  <!-- 3D WebGL Viewport (Pulled-Back Wide Framing Like 1000069009.jpg) -->
+  <div id="canvas-container" aria-label="Interactive 3D Abyssal Cinema Jellyfish Viewport"></div>
+
+  <!-- Top Whisper Bar: Goal Progress (0/12 Reel), Peers, Purity & Controls -->
+  <header class="hud-whisper fixed top-0 left-0 right-0 z-20 px-2.5 pt-2 pb-1 flex items-center justify-between gap-1.5 pointer-events-none">
+    <!-- Left: Clear 12-Reel Goal Progress, Tentacles Lit & Integrity -->
+    <div class="zen-pill rounded-full px-3 py-1 flex items-center gap-2.5 pointer-events-auto">
+      <span id="state-dot" class="w-1.5 h-1.5 rounded-full bg-amber-300"></span>
+      <span id="state-badge" class="mono text-[9px] uppercase tracking-widest text-amber-200">VOYAGE</span>
+      <span class="h-2.5 w-px bg-slate-700/70"></span>
+      <div class="flex items-center gap-1 mono text-[10px]" title="Captured Film Portals Toward 12-Reel End State">
+        <span class="text-slate-400 text-[9px]">REEL</span>
+        <span id="stat-captured" class="text-amber-300 font-semibold">0</span>
+        <span class="text-slate-500 text-[9px]">/12</span>
+        <span id="gold-cut-badge" class="text-[8px] text-amber-200 hidden ml-0.5">GOLD</span>
+        <span id="held-pill" class="hidden text-[9px] text-cyan-300">(<span id="stat-latched">0</span>)</span>
+      </div>
+      <span class="h-2.5 w-px bg-slate-700/70"></span>
+      <div class="flex items-center gap-1 mono text-[10px]" title="Illuminated Silver-White Tentacle Strands">
+        <span class="text-slate-400 text-[9px]">LIT</span>
+        <span id="stat-arms" class="text-white font-medium">1/12</span>
+      </div>
+      <span class="h-2.5 w-px bg-slate-700/70 hidden sm:inline"></span>
+      <div class="hidden sm:flex items-center gap-1 mono text-[10px]" title="Active Co-Op / Companion Swimmers">
+        <span class="text-slate-400 text-[9px]">PEERS</span>
+        <span id="stat-pixels" class="text-emerald-300">3</span>
+      </div>
+      <div class="flex items-center gap-1 ml-0.5" title="Light Integrity against Anglerfish & Red Hazards">
+        <div class="w-10 h-1 bg-slate-800 rounded-full overflow-hidden">
+          <div id="energy-bar-fill" class="h-full bg-amber-300 transition-all duration-200" style="width: 100%;"></div>
+        </div>
+        <span id="stat-energy-pct" class="mono text-[8px] text-slate-300">100%</span>
+      </div>
+    </div>
+
+    <!-- Center: 12-Slot Visual Reel Progress Dots -->
+    <div id="reel-strip-hud" class="zen-pill rounded-full px-2.5 py-1 hidden md:flex items-center gap-1 pointer-events-auto mono text-[8px]">
+      <span class="text-slate-400 uppercase mr-1">12 FILMS</span>
+      <div id="reel-slots" class="flex items-center gap-1"></div>
+    </div>
+
+    <!-- Right: Utility Buttons -->
+    <div class="flex items-center gap-1 pointer-events-auto mono text-[9px]">
+      <div class="zen-pill rounded-full px-2 py-1 hidden lg:flex items-center gap-1.5 text-slate-400">
+        <span><span id="stat-fps" class="text-slate-200">60</span>FPS</span>
+        <span>·</span>
+        <span id="stat-proj-fps" class="text-amber-200">24fps</span>
+        <span>·</span>
+        <span>GATE <span id="stat-sdf-dist" class="text-cyan-300">12</span></span>
+      </div>
+      <button id="btn-mode-shape" type="button" class="zen-btn rounded-full px-2.5 py-1 uppercase text-amber-200" title="Browse All 109 Archive Films">
+        109 CLIPS
+      </button>
+      <button id="btn-audio-toggle" type="button" class="zen-btn rounded-full px-2 py-1 uppercase">
+        <span id="audio-label">MUTE</span>
+      </button>
+      <button id="btn-lineage-modal" type="button" class="zen-btn rounded-full px-2 py-1 uppercase hidden sm:inline-block">
+        SPEC
+      </button>
+      <button id="btn-toggle-panel" type="button" class="zen-btn rounded-full px-2.5 py-1 uppercase">
+        <span id="panel-toggle-label">TUNE</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Surgical Micro-Minimap (Top-Right Radar: Shows You, Spotlight Portals, Peers, Anglerfish & End-Gate) -->
+  <div class="hud-whisper fixed top-11 right-2.5 z-20 pointer-events-auto flex flex-col items-end gap-1">
+    <div class="zen-pill rounded-xl p-1.5 flex flex-col items-center">
+      <div class="flex items-center justify-between w-full px-1 mb-0.5 mono text-[7px] text-slate-400 uppercase">
+        <span>RADAR</span>
+        <span id="minimap-depth-label" class="text-amber-300">0/12</span>
+      </div>
+      <canvas id="micro-minimap" width="68" height="96" class="rounded-lg bg-slate-950/80 border border-slate-800/90"></canvas>
+      <div class="flex items-center justify-between w-full px-0.5 mt-1 mono text-[6px] text-slate-400">
+        <span class="text-amber-300">●YOU</span>
+        <span class="text-slate-200">○FILM</span>
+        <span class="text-rose-400">▲ANGLER</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ephemeral Trace (Fades in 1.1s so it never covers the spotlight films) -->
+  <div class="fixed top-10 left-0 right-0 z-10 flex justify-center px-4 pointer-events-none">
+    <p id="capture-toast" class="mono text-[8px] tracking-widest uppercase text-amber-100/90 bg-slate-950/60 px-2.5 py-0.5 rounded-full border border-amber-400/20">
+      SWIM THROUGH SILVER SPOTLIGHT FILMS TO ILLUMINATE ALL 12 TENTACLES · BEWARE ANGLERFISH LURES
+    </p>
+  </div>
+
+  <!-- On-Screen Smooth Virtual Thumbstick (Bottom-Left for Effortless One-Thumb Mobile Control) -->
+  <div id="joystick-zone" class="hud-whisper fixed bottom-12 left-3 z-20 w-20 h-20 rounded-full zen-pill flex items-center justify-center pointer-events-auto touch-none" title="Drag thumbstick to steer smoothly">
+    <div class="w-14 h-14 rounded-full border border-slate-700/60 flex items-center justify-center relative">
+      <div id="joystick-knob" class="w-6 h-6 rounded-full bg-amber-300/80 shadow-[0_0_10px_rgba(250,204,21,0.5)] transition-transform duration-75"></div>
+    </div>
+  </div>
+
+  <!-- Bottom Whisper Operational Bar -->
+  <footer class="hud-whisper fixed bottom-2.5 left-0 right-0 z-20 px-3 flex items-center justify-center pointer-events-none">
+    <div class="zen-pill rounded-full p-0.5 flex items-center gap-1 pointer-events-auto mono text-[9px] uppercase">
+      <button id="btn-jet-pulse" type="button" class="zen-btn rounded-full px-2.5 py-1 font-medium" title="Graceful Forward Swim Stroke (Space)">
+        SWIM PULSE
+      </button>
+      <button id="btn-grapple-surge" type="button" class="zen-btn rounded-full px-2.5 py-1" title="Flare Tentacles to Absorb Nearby Film Light (E)">
+        ABSORB
+      </button>
+      <button id="btn-digest-now" type="button" class="zen-btn active-toggle rounded-full px-2.5 py-1 hidden">
+        SPLICE
+      </button>
+      <button id="btn-release-items" type="button" class="zen-btn rounded-full px-2.5 py-1 hidden">
+        RELEASE
+      </button>
+      <button id="btn-shockwave" type="button" class="zen-btn rounded-full px-2.5 py-1" title="Bioluminescent Flash to Repel Anglerfish Predators (F)">
+        FLASH
+      </button>
+      <button id="btn-autopilot" type="button" class="zen-btn rounded-full px-2.5 py-1">
+        AUTO <span id="autopilot-state" class="text-slate-400">OFF</span>
+      </button>
+      <button id="btn-camera-mode" type="button" class="zen-btn rounded-full px-2.5 py-1" title="Switch Camera Distance (Wide Cinema / Far / Profile)">
+        CAM: <span id="camera-mode-label">CINEMA</span>
+      </button>
+    </div>
+  </footer>
+
+  <!-- Clear End-State Modal: 12/12 Memory Reel Complete Screening -->
+  <div id="end-state-modal" class="fixed inset-0 z-50 bg-slate-950/88 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="zen-pill rounded-2xl max-w-lg w-full p-5 border border-amber-300/40 flex flex-col items-center text-center space-y-4">
+      <div class="mono text-[10px] uppercase tracking-widest text-amber-300">ARCHIVE PROJECTION COMPLETE // 12 OF 12 TENTACLES ILLUMINATED</div>
+      <h2 class="text-lg font-light tracking-wide text-white">THE MEMORY REEL IS WHOLE</h2>
+      <p class="text-xs text-slate-300 leading-relaxed">
+        All twelve tentacle strands now carry luminous silver-halide film frames through the abyssal tunnel. Your spliced sequence is preserved in the projector gate:
+      </p>
+      <div id="end-state-reel-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-1.5 w-full mono text-[9px]"></div>
+      <div class="flex items-center gap-2 pt-2">
+        <button id="btn-end-continue" type="button" class="zen-btn active-toggle rounded-full px-4 py-1.5 mono text-[10px] uppercase">
+          ENDLESS VOYAGE
+        </button>
+        <button id="btn-end-restart" type="button" class="zen-btn rounded-full px-4 py-1.5 mono text-[10px] uppercase">
+          NEW 12-REEL RUN
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 109 Archive Video Vault Drawer (Closed by Default) -->
+  <section id="film-archive-sheet" class="fixed inset-x-0 bottom-11 z-30 mx-auto max-w-2xl px-2.5 hidden">
+    <div class="zen-sheet rounded-2xl p-3 border border-amber-400/30 shadow-2xl">
+      <div class="flex flex-wrap items-center justify-between gap-2 pb-2 mb-2 border-b border-slate-800/80 mono text-[9px]">
+        <div class="flex items-center gap-2">
+          <span class="text-amber-300 uppercase tracking-widest font-semibold">ARCHIVE // 109 FILM VIGNETTES</span>
+          <span id="active-film-label" class="text-cyan-300">ACTIVE: SM-0004 GIRAFFE</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <input id="film-search-input" type="text" placeholder="Filter 109 films..." class="bg-slate-900/90 border border-slate-700 rounded-full px-2.5 py-0.5 text-[9px] text-slate-200 outline-none focus:border-amber-400 w-40" />
+          <button id="btn-close-films" type="button" class="zen-btn rounded-full px-2.5 py-0.5 text-[9px] uppercase">CLOSE</button>
+        </div>
+      </div>
+      <div id="film-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-1.5 max-h-48 overflow-y-auto custom-scroll mono text-[8px]"></div>
+    </div>
+  </section>
+
+  <!-- Collapsible Tuning Sheet (Closed by Default) -->
+  <aside id="control-panel" class="fixed inset-x-0 bottom-0 sm:inset-auto sm:top-11 sm:right-2 sm:bottom-11 sm:w-68 z-30 zen-sheet sm:rounded-2xl rounded-t-2xl p-3.5 flex flex-col justify-between max-h-[68vh] sm:max-h-none overflow-y-auto custom-scroll transition-transform duration-300 translate-y-full sm:translate-y-0 sm:translate-x-[120%]">
+    <div class="space-y-3">
+      <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+        <div class="flex items-center gap-2">
+          <span class="mono text-[10px] uppercase tracking-widest text-amber-300">SPECIES &amp; CAMERA</span>
+          <span id="species-tag" class="mono text-[9px] text-slate-400">Golden Medusa</span>
+        </div>
+        <button id="btn-close-panel" type="button" class="zen-btn rounded-full px-2.5 py-0.5 mono text-[9px] uppercase">
+          DONE
+        </button>
+      </div>
+
+      <!-- 1. Creature Species Selection -->
+      <div>
+        <div class="mono text-[9px] uppercase tracking-wider text-slate-400 mb-1">SPECIES MORPHOLOGY</div>
+        <div class="grid grid-cols-2 gap-1.5 mono text-[9px]">
+          <button id="preset-chrysaora" type="button" class="zen-btn active-toggle rounded-lg px-2 py-1.5 text-left">
+            <div class="font-medium">GOLDEN MEDUSA</div>
+            <div class="text-[8px] opacity-70">Silver-Tip Strands</div>
+          </button>
+          <button id="preset-aurelia" type="button" class="zen-btn rounded-lg px-2 py-1.5 text-left">
+            <div class="font-medium">COMB JELLY</div>
+            <div class="text-[8px] opacity-70">Beroe Ctenophore</div>
+          </button>
+          <button id="preset-medusae" type="button" class="zen-btn rounded-lg px-2 py-1.5 text-left">
+            <div class="font-medium">SENTINEL SQUID</div>
+            <div class="text-[8px] opacity-70">Red Optic Carapace</div>
+          </button>
+          <button id="preset-abyssal" type="button" class="zen-btn rounded-lg px-2 py-1.5 text-left">
+            <div class="font-medium">VAMPIRE SQUID</div>
+            <div class="text-[8px] opacity-70">Abyssal Biolume</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. Diagnostic & Multiplayer Layers -->
+      <div>
+        <div class="mono text-[9px] uppercase tracking-wider text-slate-400 mb-1">ECOLOGY &amp; LAYERS</div>
+        <div class="grid grid-cols-2 gap-1.5 mono text-[9px]">
+          <button id="toggle-verlet-net" type="button" class="zen-btn rounded-lg px-2 py-1.5 flex items-center justify-between">
+            <span>VERLET RIG</span>
+            <span class="state-ind text-slate-500">OFF</span>
+          </button>
+          <button id="toggle-sdf-field" type="button" class="zen-btn active-toggle rounded-lg px-2 py-1.5 flex items-center justify-between">
+            <span>TUNNEL MIST</span>
+            <span class="state-ind text-amber-300">ON</span>
+          </button>
+          <button id="toggle-spatial-grid" type="button" class="zen-btn rounded-lg px-2 py-1.5 flex items-center justify-between">
+            <span>HASH GRID</span>
+            <span class="state-ind text-slate-500">OFF</span>
+          </button>
+          <button id="toggle-capture-vectors" type="button" class="zen-btn active-toggle rounded-lg px-2 py-1.5 flex items-center justify-between">
+            <span>LIGHT RAYS</span>
+            <span class="state-ind text-amber-300">ON</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. Continuous Sliders -->
+      <div class="space-y-2">
+        <div class="mono text-[9px] uppercase tracking-wider text-slate-400">CAMERA DISTANCE &amp; STEERING</div>
+        <div>
+          <div class="flex justify-between mono text-[9px] mb-0.5">
+            <span class="text-slate-400">SWIM PACE</span>
+            <span id="val-pulse-freq" class="text-amber-300">1.00x</span>
+          </div>
+          <input id="slider-pulse-freq" type="range" min="0.4" max="2.0" step="0.05" value="1.00" />
+        </div>
+        <div>
+          <div class="flex justify-between mono text-[9px] mb-0.5">
+            <span class="text-slate-400">SOLVER DAMPING</span>
+            <span id="val-solver-iters" class="text-amber-300">7</span>
+          </div>
+          <input id="slider-solver-iters" type="range" min="3" max="12" step="1" value="7" />
+        </div>
+        <div>
+          <div class="flex justify-between mono text-[9px] mb-0.5">
+            <span class="text-slate-400">CAMERA DISTANCE</span>
+            <span id="val-grapple-pull" class="text-amber-300">14.0m</span>
+          </div>
+          <input id="slider-grapple-pull" type="range" min="9.0" max="22.0" step="0.5" value="14.0" />
+        </div>
+        <div>
+          <div class="flex justify-between mono text-[9px] mb-0.5">
+            <span class="text-slate-400">FOG ATMOSPHERE</span>
+            <span id="val-sdf-margin" class="text-amber-300">1.0x</span>
+          </div>
+          <input id="slider-sdf-margin" type="range" min="0.3" max="2.0" step="0.1" value="1.0" />
+        </div>
+      </div>
+
+      <!-- 4. Compact Telemetry -->
+      <div class="rounded-lg bg-slate-950/75 border border-slate-800/80 p-2 mono text-[9px] space-y-1 text-slate-400">
+        <div class="flex justify-between">
+          <span>NODES / CONSTRAINTS</span>
+          <span class="text-slate-200"><span id="stat-nodes">0</span> / <span id="stat-constraints">0</span></span>
+        </div>
+        <div class="flex justify-between">
+          <span>GRID CHECKS / SAVED</span>
+          <span class="text-slate-200"><span id="stat-checks">0</span> <span id="stat-naive-saved" class="text-amber-300">(-98%)</span></span>
+        </div>
+        <div class="flex justify-between">
+          <span>PORTALS / ANGLERS</span>
+          <span class="text-slate-200"><span id="prey-count-label">18</span> / <span id="stat-active-tethers">0</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pt-2.5 mt-2.5 border-t border-slate-800/80 flex gap-1.5 mono text-[9px]">
+      <button id="btn-spawn-prey" type="button" class="zen-btn flex-1 rounded-lg py-1.5 uppercase">
+        +LIGHT STRAND
+      </button>
+      <button id="btn-reset-sim" type="button" class="zen-btn flex-1 rounded-lg py-1.5 uppercase">
+        RESTART (0/12)
+      </button>
+    </div>
+  </aside>
+
+  <!-- Minimal Spec Modal -->
+  <div id="lineage-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="zen-pill rounded-2xl max-w-xl w-full max-h-[82vh] flex flex-col overflow-hidden border border-amber-400/30">
+      <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between mono text-xs">
+        <span class="text-amber-300 uppercase tracking-widest">GOLDEN RIVERBED // ABYSSAL CINEMA ARCHITECTURE</span>
+        <button id="btn-close-modal" type="button" class="zen-btn rounded-full px-3 py-1 text-[10px] uppercase">CLOSE</button>
+      </div>
+      <div class="p-4 overflow-y-auto custom-scroll space-y-3 text-xs leading-relaxed text-slate-300">
+        <div class="p-3 rounded-lg bg-slate-900/75 border border-slate-800">
+          <div class="mono text-[10px] uppercase text-amber-300 mb-1">1. PULLED-BACK WIDE FRAMING &amp; SILVER-TIP TENTACLE IGNITION</div>
+          <p>Matches the 24-frame contact sheet: the compact golden jellyfish swims in the lower-midground at a comfortable camera distance (<span class="mono">14m</span>) with 12 delicate tentacles hanging downward so they never clip the camera. Each captured spotlight film ignites one tentacle in radiant silver-white (<span class="mono">1/12 .. 12/12</span>).</p>
+        </div>
+        <div class="p-3 rounded-lg bg-slate-900/75 border border-slate-800">
+          <div class="mono text-[10px] uppercase text-amber-300 mb-1">2. ABYSSAL PREDATORS (ANGLERFISH) &amp; MULTIPLAYER PEER SWIMMERS</div>
+          <p>Deep-sea Anglerfish predators lurk in the tunnel mist dangling a deceptive bioluminescent esca lure before revealing their jaws. Companion jellyfish swimmers (and live multi-tab <span class="mono">BroadcastChannel</span> peers) glide alongside you.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener('load', function () {
+      // =========================================================================
+      // 0. AUTO-FADING WHISPER HUD & HAPTIC ENGINE
+      // =========================================================================
+      let hudIdleTimer = null;
+      let toastTimer = null;
+
+      function wakeHUD() {
+        document.body.classList.remove('hud-idle');
+        if (hudIdleTimer) clearTimeout(hudIdleTimer);
+        hudIdleTimer = setTimeout(() => {
+          const panelOpen = !document.getElementById('control-panel').classList.contains('translate-y-full');
+          const filmsOpen = !document.getElementById('film-archive-sheet').classList.contains('hidden');
+          const endOpen = !document.getElementById('end-state-modal').classList.contains('hidden');
+          if (!panelOpen && !filmsOpen && !endOpen) {
+            document.body.classList.add('hud-idle');
+          }
+        }, 1600);
+      }
+      wakeHUD();
+
+      function pulseHaptic(pattern) {
+        try {
+          if (navigator && typeof navigator.vibrate === 'function') {
+            navigator.vibrate(pattern);
+          }
+        } catch (e) {}
+      }
+
+      // =========================================================================
+      // 1. 109 ARCHIVE FILM VIGNETTES (SILVER-HALIDE SPOTLIGHT PORTALS)
+      // =========================================================================
+      const RAW_109_TITLES = [
+        ["SM-0004", "Giraffe walks past", 6, 33, "HORIZON", "MOTION"],
+        ["SM-0159", "Face & Hand at Window", 3, 36, "FACE", "HAND"],
+        ["SM-0058", "Horse by Ancient Barn", 4, 45, "HORIZON", "DOOR"],
+        ["SM-0059", "Butterfly in Spotlight", 3, 78, "WINGS", "GLOW"],
+        ["SM-0096", "Lighthouse Beam", 5, 48, "GLOW", "WATER"],
+        ["SM-0140", "Dolphin Leap", 5, 48, "WATER", "LEAP"],
+        ["SM-0084", "Canyon Dragon", 5, 48, "WINGS", "FLAME"],
+        ["SM-0147", "Submarine Periscope", 5, 26, "WATER", "LENS"],
+        ["SM-0060", "Bicycle Wheels", 5, 21, "MOTION", "WHEEL"],
+        ["SM-0056", "Cat in Shadow", 3, 62, "SHADOW", "FACE"],
+        ["SM-0054", "Dog on Beach", 4, 50, "MOTION", "HORIZON"],
+        ["SM-0055", "Duck on Pond", 6, 48, "WATER", "WINGS"],
+        ["SM-0057", "Giraffe II", 3, 17, "HORIZON", "NECK"],
+        ["SM-0062", "Helicopter Rotor", 4, 46, "ROTOR", "SKY"],
+        ["SM-0053", "Rabbit in Grass", 6, 52, "LEAP", "GRASS"],
+        ["SM-0061", "Windmill Blades", 4, 54, "ROTOR", "HORIZON"],
+        ["SM-0104", "Aircraft-carrier", 3, 50, "WATER", "HORIZON"],
+        ["SM-0093", "Alarm-clock", 4, 38, "TIME", "RING"],
+        ["SM-0082", "Ant Trail", 6, 25, "GRASS", "MOTION"],
+        ["SM-0102", "Broom Sweep", 3, 32, "SWEEP", "SHADOW"],
+        ["SM-0105", "Camera Shutter", 3, 37, "LENS", "GLOW"],
+        ["SM-0090", "Cello Bow", 4, 32, "STRING", "HAND"],
+        ["SM-0097", "Cloud Strata", 5, 62, "SKY", "GLOW"],
+        ["SM-0073", "Cow in Pasture", 3, 44, "GRASS", "HORIZON"],
+        ["SM-0085", "Crab Claw", 4, 36, "WATER", "CLAW"],
+        ["SM-0066", "Electric Fan", 3, 30, "ROTOR", "WIND"],
+        ["SM-0089", "Blooming Flower", 4, 40, "GRASS", "GLOW"],
+        ["SM-0068", "Flying-fish", 5, 42, "WATER", "WINGS"],
+        ["SM-0081", "Frog Leap", 4, 34, "LEAP", "WATER"],
+        ["SM-0099", "Guitar Chords", 3, 36, "STRING", "HAND"],
+        ["SM-0071", "Hurricane Eye", 6, 50, "WIND", "VORTEX"],
+        ["SM-0100", "Filament Bulb", 3, 32, "GLOW", "FILAMENT"],
+        ["SM-0087", "Lion Gaze", 4, 44, "FACE", "HORIZON"],
+        ["SM-0075", "Monkey Reach", 4, 40, "LEAP", "HAND"],
+        ["SM-0069", "Mosquito Wing", 3, 38, "WINGS", "MOTION"],
+        ["SM-0092", "Ocean Swell", 6, 60, "WATER", "HORIZON"],
+        ["SM-0103", "Paintbrush", 3, 34, "HAND", "STROKE"],
+        ["SM-0063", "Pig Trot", 3, 36, "GRASS", "MOTION"],
+        ["SM-0064", "Raccoon Mask", 4, 40, "SHADOW", "FACE"],
+        ["SM-0070", "Rain Curtain", 5, 48, "WATER", "SKY"],
+        ["SM-0095", "Rhinoceros", 4, 42, "HORIZON", "MOTION"],
+        ["SM-0079", "Roller-coaster", 5, 54, "MOTION", "LOOP"],
+        ["SM-0078", "Sailboat Tack", 5, 46, "WATER", "WIND"],
+        ["SM-0072", "See-saw Tilt", 3, 32, "TILT", "MOTION"],
+        ["SM-0094", "Shovel Earth", 3, 30, "HAND", "EARTH"],
+        ["SM-0080", "Skateboard", 4, 38, "WHEEL", "MOTION"],
+        ["SM-0098", "Snake Wave", 4, 44, "WAVE", "GRASS"],
+        ["SM-0086", "Speedboat Wake", 4, 42, "WATER", "MOTION"],
+        ["SM-0076", "Spider Web", 4, 38, "WEB", "SHADOW"],
+        ["SM-0088", "Swan Reflection", 5, 46, "WATER", "NECK"],
+        ["SM-0074", "Tiger Prowl", 4, 44, "LEAP", "SHADOW"],
+        ["SM-0067", "Tornado Funnel", 5, 52, "VORTEX", "WIND"],
+        ["SM-0065", "Tractor Furrow", 4, 40, "WHEEL", "EARTH"],
+        ["SM-0101", "Trumpet Bell", 3, 34, "HAND", "GLOW"],
+        ["SM-0083", "Highway Van", 4, 38, "WHEEL", "ROAD"],
+        ["SM-0137", "Ambulance Siren", 4, 40, "WHEEL", "GLOW"],
+        ["SM-0172", "Running Animal", 4, 42, "MOTION", "GRASS"],
+        ["SM-0183", "Falling Apple", 3, 28, "ORB", "EARTH"],
+        ["SM-0143", "Baseball Pitch", 3, 32, "ORB", "ARC"],
+        ["SM-0161", "Basketball Arc", 4, 36, "ORB", "ARC"],
+        ["SM-0151", "Night Bat", 4, 44, "WINGS", "SHADOW"],
+        ["SM-0146", "Binoculars", 3, 34, "LENS", "FACE"],
+        ["SM-0185", "Open Book", 3, 36, "PAGE", "HAND"],
+        ["SM-0139", "City Bus", 4, 42, "WHEEL", "ROAD"],
+        ["SM-0169", "Cannon Smoke", 4, 34, "ARC", "FLAME"],
+        ["SM-0144", "River Canoe", 4, 40, "WATER", "PADDLE"],
+        ["SM-0186", "Cell-phone Glow", 3, 30, "GLOW", "HAND"],
+        ["SM-0164", "Coffee-pot Steam", 3, 34, "STEAM", "SHADOW"],
+        ["SM-0152", "Diving-mask", 4, 38, "WATER", "LENS"],
+        ["SM-0153", "Open Doorway", 3, 34, "DOOR", "SHADOW"],
+        ["SM-0188", "Blinking Eye", 3, 36, "LENS", "FACE"],
+        ["SM-0163", "Portrait Face", 4, 40, "FACE", "SHADOW"],
+        ["SM-0141", "School of Fish", 5, 44, "WATER", "WAVE"],
+        ["SM-0148", "Flamingo Stride", 4, 40, "WATER", "NECK"],
+        ["SM-0162", "Frying-pan", 3, 32, "FLAME", "HAND"],
+        ["SM-0165", "Garden-hose", 4, 38, "WATER", "WAVE"],
+        ["SM-0150", "Hammer Strike", 3, 30, "HAND", "ARC"],
+        ["SM-0171", "Tilted Hat", 3, 30, "FACE", "WIND"],
+        ["SM-0168", "Visor Helmet", 3, 32, "FACE", "LENS"],
+        ["SM-0167", "Hourglass Sand", 4, 42, "TIME", "SAND"],
+        ["SM-0166", "Ice-cream Cone", 3, 30, "ORB", "HAND"],
+        ["SM-0156", "Tall Ladder", 3, 36, "STEPS", "SKY"],
+        ["SM-0189", "Night Lantern", 4, 40, "GLOW", "SHADOW"],
+        ["SM-0138", "Reef Lobster", 4, 38, "WATER", "CLAW"],
+        ["SM-0174", "Spiral Lollipop", 3, 30, "ORB", "SPIRAL"],
+        ["SM-0187", "Folded Map", 3, 56, "HORIZON", "PATH"],
+        ["SM-0154", "Mermaid Tail", 4, 38, "WATER", "WAVE"],
+        ["SM-0173", "Microwave", 4, 38, "GLOW", "DOOR"],
+        ["SM-0175", "Warm Mug", 3, 44, "STEAM", "HAND"],
+        ["SM-0157", "Palm-tree", 3, 37, "WIND", "HORIZON"],
+        ["SM-0176", "Pencil Sketch", 2, 44, "HAND", "STROKE"],
+        ["SM-0091", "Penguin Dive", 4, 44, "WATER", "MOTION"],
+        ["SM-0149", "Pickup-truck", 4, 62, "WHEEL", "ROAD"],
+        ["SM-0170", "Popsicle Drip", 4, 26, "ORB", "WATER"],
+        ["SM-0158", "Winding River", 4, 49, "WATER", "PATH"],
+        ["SM-0182", "Layered Sandwich", 3, 38, "LAYERS", "HAND"],
+        ["SM-0077", "Grazing Sheep", 4, 38, "GRASS", "CLOUD"],
+        ["SM-0178", "Sleeping-bag", 4, 50, "SHADOW", "REST"],
+        ["SM-0177", "Evening Star", 3, 50, "GLOW", "SKY"],
+        ["SM-0179", "Warm Stove", 3, 38, "FLAME", "GLOW"],
+        ["SM-0181", "Shining Tooth", 2, 26, "FACE", "GLOW"],
+        ["SM-0191", "Traffic-light", 4, 44, "GLOW", "ROAD"],
+        ["SM-0142", "Night Train", 4, 50, "WHEEL", "MOTION"],
+        ["SM-0160", "Open Umbrella", 4, 38, "RAIN", "WIND"],
+        ["SM-0184", "Flower Vase", 2, 38, "FLOWER", "SHADOW"],
+        ["SM-0145", "Spoked Wheel", 4, 26, "WHEEL", "ROTOR"],
+        ["SM-0180", "Wine-bottle", 4, 32, "GLASS", "WATER"],
+        ["SM-0190", "Wine-glass", 3, 26, "GLASS", "GLOW"],
+        ["SM-0155", "Yoga Pose", 4, 38, "BALANCE", "MOTION"]
+      ];
+
+      const ARCHIVE_FILMS = RAW_109_TITLES.map((row, idx) => ({
+        id: idx,
+        code: row[0],
+        title: row[1],
+        planes: row[2],
+        frames: row[3],
+        features: [row[4], row[5]]
+      }));
+
+      let activeBellFilm = ARCHIVE_FILMS[0];
+      const splicedReel = [];
+      const GOAL_CUTS = 12;
+
+      // Procedural Silver-Halide Spotlight Vignette Generator (Matching 1000069009.jpg!)
+      // Renders dual/binocular spotlight masks containing recognizable monochrome figures:
+      // Row 1 of 1000069009.jpg: A face + raised hand with 5 fingers in a dual spotlight
+      // Row 2 of 1000069009.jpg: A grazing horse/giraffe in front of a barn in a dual spotlight
+      // Row 3 of 1000069009.jpg: Standing figures in a soft vertical spotlight
+      function sampleVignetteLuminance(filmId, u, v, t) {
+        // Dual binocular spotlight mask (two overlapping soft circles at u=0.34 and u=0.66)
+        const dL = Math.hypot((u - 0.34) * 1.15, v - 0.50);
+        const dR = Math.hypot((u - 0.66) * 1.15, v - 0.50);
+        const spotMask = Math.max(
+          Math.exp(-Math.pow(dL / 0.32, 2.8)),
+          Math.exp(-Math.pow(dR / 0.32, 2.8))
+        );
+        if (spotMask < 0.04) return 0.0;
+
+        const mode = filmId % 4;
+        let sceneVal = 0.25;
+        if (mode === 0) {
+          // Row 1 of 1000069009.jpg: Portrait Face on left (u~0.32) + Open Hand on right (u~0.68)
+          const faceOval = Math.hypot((u - 0.32) * 1.35, v - 0.52);
+          const face = faceOval < 0.22 ? (0.85 - faceOval * 1.6) : 0.15;
+          const eyes = (Math.abs(v - 0.56) < 0.025 && Math.abs(Math.abs(u - 0.32) - 0.055) < 0.025) ? -0.55 : 0.0;
+          // Raised hand silhouette at u~0.68
+          const hx = u - 0.68 - 0.02 * Math.sin(t * 2.0);
+          const hy = v - 0.48;
+          const palm = Math.hypot(hx * 1.4, hy * 1.2) < 0.11;
+          const fingers = hy > 0.04 && hy < 0.24 && Math.abs(hx) < 0.12 && Math.sin(hx * 85.0) > 0.1;
+          const hand = (palm || fingers) ? -0.65 : 0.72;
+          sceneVal = (u < 0.5) ? (face + eyes) : hand;
+        } else if (mode === 1) {
+          // Row 2 of 1000069009.jpg: Horse / Giraffe walking past a Barn in dual spotlight
+          const horizon = (v < 0.32) ? 0.22 : 0.78;
+          const barn = (u > 0.44 && u < 0.62 && v > 0.32 && v < 0.68) ? 0.18 : horizon;
+          const animX = 0.32 + 0.08 * Math.sin(t * 1.8);
+          const body = (Math.abs(u - animX) < 0.09 && Math.abs(v - 0.40) < 0.06);
+          const neck = (Math.abs(u - (animX - 0.07) + (v - 0.42) * 0.4) < 0.035 && v > 0.40 && v < 0.62);
+          const legs = (Math.abs(Math.abs(u - animX) - 0.05) < 0.02 && v > 0.24 && v <= 0.40);
+          sceneVal = (body || neck || legs) ? 0.12 : barn;
+        } else if (mode === 2) {
+          // Row 3 of 1000069009.jpg: Standing figures emerging into light
+          const figX = 0.38 + 0.04 * Math.cos(t * 1.5);
+          const head = Math.hypot(u - figX, v - 0.68) < 0.055;
+          const torso = Math.abs(u - figX) < 0.075 && v > 0.32 && v < 0.62;
+          sceneVal = (head || torso) ? 0.92 : 0.24;
+        } else {
+          // Sailboat / Birds in mist
+          const wing = Math.abs(v - 0.52 - Math.abs(u - 0.5) * Math.sin(t * 4.0) * 0.35) < 0.045;
+          sceneVal = wing ? 0.95 : 0.28;
+        }
+        return Math.max(0.0, Math.min(1.0, sceneVal * spotMask));
+      }
+
+      // =========================================================================
+      // 2. HARMONIC SOUND ENGINE (WebAudio)
+      // =========================================================================
+      const SoundEngine = {
+        ctx: null,
+        muted: true,
+        droneGain: null,
+        init() {
+          if (this.ctx) return;
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (!AudioCtx) return;
+          this.ctx = new AudioCtx();
+          const osc = this.ctx.createOscillator();
+          const lfo = this.ctx.createOscillator();
+          const lfoGain = this.ctx.createGain();
+          this.droneGain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = 55;
+          lfo.frequency.value = 0.14;
+          lfoGain.gain.value = 4;
+          this.droneGain.gain.value = 0.0;
+          lfo.connect(lfoGain);
+          lfoGain.connect(osc.frequency);
+          osc.connect(this.droneGain);
+          this.droneGain.connect(this.ctx.destination);
+          osc.start();
+          lfo.start();
+        },
+        toggle() {
+          this.init();
+          if (!this.ctx) return false;
+          if (this.ctx.state === 'suspended') this.ctx.resume();
+          this.muted = !this.muted;
+          this.droneGain.gain.setTargetAtTime(this.muted ? 0.0 : 0.04, this.ctx.currentTime, 0.2);
+          return !this.muted;
+        },
+        playTone(fStart, fEnd, dur, type, vol) {
+          if (this.muted || !this.ctx) return;
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const g = this.ctx.createGain();
+          osc.type = type || 'sine';
+          osc.frequency.setValueAtTime(fStart, now);
+          osc.frequency.exponentialRampToValueAtTime(fEnd, now + dur);
+          g.gain.setValueAtTime(vol || 0.045, now);
+          g.gain.exponentialRampToValueAtTime(0.0008, now + dur);
+          osc.connect(g);
+          g.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + dur + 0.02);
+        },
+        playPulse() { this.playTone(98, 44, 0.32, 'sine', 0.06); },
+        playIlluminate(idx) {
+          const pentatonic = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99, 880.00, 1046.50, 1174.66];
+          const f = pentatonic[idx % pentatonic.length];
+          this.playTone(f, f * 1.5, 0.42, 'sine', 0.055);
+        },
+        playEndGate() {
+          [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+            setTimeout(() => this.playTone(f, f * 1.005, 0.65, 'sine', 0.05), i * 55);
+          });
+        },
+        playAnglerWarn() { this.playTone(135, 52, 0.35, 'sawtooth', 0.05); }
+      };
+
+      // =========================================================================
+      // 3. SPECIES MORPHOLOGY PRESETS
+      // =========================================================================
+      const PRESETS = {
+        chrysaora: {
+          name: 'Golden Medusa',
+          bellColor: new THREE.Color(0xf59e0b),
+          rimColor: new THREE.Color(0xfef08a),
+          unlitStrand: new THREE.Color(0xb45309),
+          litStrand: new THREE.Color(0xffffff), // Radiant silver-white lit tips from 1000069009.jpg!
+          fogColor: 0x05090d
+        },
+        aurelia: {
+          name: 'Beroe Comb Jelly',
+          bellColor: new THREE.Color(0x06b6d4),
+          rimColor: new THREE.Color(0x67e8f9),
+          unlitStrand: new THREE.Color(0x0e7490),
+          litStrand: new THREE.Color(0xe0f2fe),
+          fogColor: 0x03080e
+        },
+        medusae: {
+          name: 'Sentinel Squid',
+          bellColor: new THREE.Color(0x3b82f6),
+          rimColor: new THREE.Color(0xf43f5e),
+          unlitStrand: new THREE.Color(0x1d4ed8),
+          litStrand: new THREE.Color(0xfde047),
+          fogColor: 0x04060c
+        },
+        abyssal: {
+          name: 'Vampire Squid',
+          bellColor: new THREE.Color(0xec4899),
+          rimColor: new THREE.Color(0xc084fc),
+          unlitStrand: new THREE.Color(0x831843),
+          litStrand: new THREE.Color(0xfdf4ff),
+          fogColor: 0x060309
+        }
+      };
+      let currentPreset = PRESETS.chrysaora;
+
+      // =========================================================================
+      // 4. THREE.JS SCENE & WIDE PULLED-BACK CAMERA (MATCHING 1000069009.jpg!)
+      // =========================================================================
+      const container = document.getElementById('canvas-container');
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(currentPreset.fogColor);
+      scene.fog = new THREE.FogExp2(currentPreset.fogColor, 0.022);
+
+      // Pulled-back camera at Z = +14.0 looking down the dark tunnel so the compact
+      // golden jellyfish at Z = 0 is framed cleanly and NEVER touches the lens!
+      const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.5, 140);
+      camera.position.set(0, 0.6, 14.0);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(renderer.domElement);
+
+      const ambientLight = new THREE.AmbientLight(0x1e293b, 0.9);
+      scene.add(ambientLight);
+      const jellyLight = new THREE.PointLight(0xfde047, 1.8, 18);
+      scene.add(jellyLight);
+
+      const bellUniforms = {
+        uTime: { value: 0 },
+        uPulsePhase: { value: 0 },
+        uBellColor: { value: currentPreset.bellColor.clone() },
+        uRimColor: { value: currentPreset.rimColor.clone() },
+        uContam: { value: 0.0 }
+      };
+
+      // Delicate Golden Filigreed Medusa Umbrella Shader (Non-Blowout Controlled Opacity!)
+      const bellMaterial = new THREE.ShaderMaterial({
+        uniforms: bellUniforms,
+        vertexShader: `
+          varying vec3 vNormal;
+          varying vec3 vViewPos;
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            vNormal = normalize(normalMatrix * normal);
+            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+            vViewPos = -mvPosition.xyz;
+            gl_Position = projectionMatrix * mvPosition;
+          }
+        `,
+        fragmentShader: `
+          uniform float uTime;
+          uniform float uPulsePhase;
+          uniform vec3 uBellColor;
+          uniform vec3 uRimColor;
+          uniform float uContam;
+          varying vec3 vNormal;
+          varying vec3 vViewPos;
+          varying vec2 vUv;
+
+          void main() {
+            vec3 N = normalize(vNormal);
+            vec3 V = normalize(vViewPos);
+            float fresnel = pow(1.0 - abs(dot(N, V)), 1.8);
+            float angle = vUv.x * 6.2831853;
+            float radial = vUv.y;
+
+            // Delicate 16-rib golden umbrella striations like 1000069009.jpg
+            float ribs = smoothstep(0.55, 0.96, 0.5 + 0.5 * cos(angle * 16.0));
+            float innerRing = exp(-pow((radial - 0.35) / 0.12, 2.0));
+            float rimGlow = smoothstep(0.80, 1.0, radial);
+
+            vec3 col = mix(uBellColor * 0.75, uRimColor, fresnel * 0.7 + innerRing * 0.5);
+            col += uRimColor * ribs * 0.38;
+            col = mix(col, vec3(0.95, 0.18, 0.25), uContam * 0.7);
+
+            // Controlled alpha (capped at 0.78) so it stays crisp and never blows out to white!
+            float alpha = clamp(0.22 + fresnel * 0.38 + ribs * 0.18 + rimGlow * 0.20, 0.16, 0.78);
+            gl_FragColor = vec4(col, alpha);
+          }
+        `,
+        transparent: true,
+        side: THREE.DoubleSide,
+        depthWrite: false
+      });
+
+      // =========================================================================
+      // 5. SUBTLE ABYSSAL TUNNEL RIBS (DARK MISTY CONDUIT FROM 1000069009.jpg)
+      // =========================================================================
+      const TUBE_RADIUS = 6.2;
+      const TUBE_Z_FAR = -54.0;
+      const TUBE_Z_NEAR = 8.0;
+      const TUBE_SPAN = TUBE_Z_NEAR - TUBE_Z_FAR;
+
+      function getTunnelCenter(z, t) {
+        const d = Math.max(0, -z);
+        const s = Math.min(1.0, d / 16.0);
+        return {
+          cx: Math.sin(z * 0.055 + t * 0.32) * 1.8 * s,
+          cy: Math.cos(z * 0.045 + t * 0.26) * 1.2 * s
+        };
+      }
+
+      const tubeEnvGroup = new THREE.Group();
+      const NUM_ARCHES = 14;
+      const sewerArches = [];
+      for (let i = 0; i < NUM_ARCHES; i++) {
+        const pts = [];
+        for (let p = 0; p <= 44; p++) {
+          const a = (p / 44) * Math.PI * 2;
+          pts.push(new THREE.Vector3(Math.cos(a) * TUBE_RADIUS, Math.sin(a) * TUBE_RADIUS, 0));
+        }
+        const geo = new THREE.BufferGeometry().setFromPoints(pts);
+        const mat = new THREE.LineBasicMaterial({
+          color: 0x1e293b,
+          transparent: true,
+          opacity: 0.22
+        });
+        const line = new THREE.Line(geo, mat);
+        sewerArches.push({ line, baseOffset: (i / NUM_ARCHES) * TUBE_SPAN });
+        tubeEnvGroup.add(line);
+      }
+      scene.add(tubeEnvGroup);
+
+      // =========================================================================
+      // 6. COMPACT GOLDEN MEDUSA WITH 12 DOWNWARD-HANGING TENTACLES (1000069009.jpg)
+      // =========================================================================
+      // Look at 1000069009.jpg:
+      // - The jellyfish bell is compact (radius = 0.82m, height = 0.58m).
+      // - Its 12 delicate tentacles hang DOWNWARD (-Y) and slightly backward (+Z <= 1.2m),
+      //   so they NEVER come near the camera at Z = +14.0!
+      // - As you collect films (1..12), tentacle #k ignites in radiant silver-white along its lower half!
+      const MAX_NODES = 600;
+      const posX = new Float32Array(MAX_NODES);
+      const posY = new Float32Array(MAX_NODES);
+      const posZ = new Float32Array(MAX_NODES);
+      const prevX = new Float32Array(MAX_NODES);
+      const prevY = new Float32Array(MAX_NODES);
+      const prevZ = new Float32Array(MAX_NODES);
+      const invMass = new Float32Array(MAX_NODES);
+      const nodeRole = new Uint8Array(MAX_NODES); // 0=Apex, 1=Bell, 2=Margin, 3=Tentacle
+
+      const bellRestX = new Float32Array(MAX_NODES);
+      const bellRestY = new Float32Array(MAX_NODES);
+      const bellRestZ = new Float32Array(MAX_NODES);
+      const bellRingIdx = new Uint8Array(MAX_NODES);
+
+      const constraintsA = [];
+      const constraintsB = [];
+      const constraintsRest = [];
+      const constraintsStiff = [];
+
+      let nodeCount = 0;
+      function addNode(x, y, z, w, role) {
+        const id = nodeCount++;
+        posX[id] = prevX[id] = x;
+        posY[id] = prevY[id] = y;
+        posZ[id] = prevZ[id] = z;
+        invMass[id] = w;
+        nodeRole[id] = role;
+        return id;
+      }
+
+      function addConstraint(a, b, stiff, customLen) {
+        const dx = posX[a] - posX[b];
+        const dy = posY[a] - posY[b];
+        const dz = posZ[a] - posZ[b];
+        const len = customLen !== undefined ? customLen : Math.sqrt(dx * dx + dy * dx + dy * dy + dz * dz);
+        constraintsA.push(a);
+        constraintsB.push(b);
+        constraintsRest.push(Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.01);
+        if (customLen !== undefined) constraintsRest[constraintsRest.length - 1] = customLen;
+        constraintsStiff.push(stiff);
+      }
+
+      const BELL_RINGS = 5;
+      const BELL_SEGMENTS = 24;
+      const BELL_RADIUS = 0.82; // Compact, graceful scale matching 1000069009.jpg!
+      const BELL_HEIGHT = 0.56;
+
+      const NUM_TENTACLES = 12; // 12 primary tentacles corresponding to the 12 films of the Memory Reel!
+      const TENTACLE_NODES = 14;
+      const TENTACLE_SEG_LEN = 0.165; // Total length ~ 2.1m hanging gracefully below the bell
+
+      let apexNode = 0;
+      const bellGrid = [];
+      const tentacleChains = []; // 12 chains, each has { chain: [...], isLit: boolean, litIntensity: 0..1 }
+
+      function buildCompactGoldenMedusa(ox, oy, oz) {
+        nodeCount = 0;
+        constraintsA.length = 0;
+        constraintsB.length = 0;
+        constraintsRest.length = 0;
+        constraintsStiff.length = 0;
+        bellGrid.length = 0;
+        tentacleChains.length = 0;
+
+        // Umbrella Apex (slightly tilted forward -18 deg so bell dome faces upward-forward like 1000069009.jpg)
+        apexNode = addNode(ox, oy + BELL_HEIGHT * 0.5, oz, 0.25, 0);
+
+        for (let r = 1; r <= BELL_RINGS; r++) {
+          const u = r / BELL_RINGS;
+          const phi = u * (Math.PI * 0.54);
+          const rad = Math.sin(phi) * BELL_RADIUS;
+          const yOff = (Math.cos(phi) - 0.5) * BELL_HEIGHT;
+          const ringArr = [];
+          const isMargin = (r === BELL_RINGS);
+
+          for (let s = 0; s < BELL_SEGMENTS; s++) {
+            const theta = (s / BELL_SEGMENTS) * Math.PI * 2;
+            const lx = Math.cos(theta) * rad;
+            const ly = yOff - Math.sin(theta) * rad * 0.18; // Slight forward pitch
+            const lz = Math.sin(theta) * rad * 0.92;
+            const nid = addNode(ox + lx, oy + ly, oz + lz, isMargin ? 0.75 : 0.55, isMargin ? 2 : 1);
+            bellRestX[nid] = lx;
+            bellRestY[nid] = ly;
+            bellRestZ[nid] = lz;
+            bellRingIdx[nid] = r;
+            ringArr.push(nid);
+          }
+          bellGrid.push(ringArr);
+        }
+
+        for (let r = 0; r < BELL_RINGS; r++) {
+          const ring = bellGrid[r];
+          for (let s = 0; s < BELL_SEGMENTS; s++) {
+            const curr = ring[s];
+            const next = ring[(s + 1) % BELL_SEGMENTS];
+            addConstraint(curr, next, 0.92);
+            if (r === 0) {
+              addConstraint(apexNode, curr, 0.95);
+            } else {
+              addConstraint(bellGrid[r - 1][s], curr, 0.92);
+            }
+          }
+        }
+
+        // 12 Delicate Downward-Trailing Tentacles (one for each of the 12 Memory Reel films!)
+        const marginRing = bellGrid[BELL_RINGS - 1];
+        for (let t = 0; t < NUM_TENTACLES; t++) {
+          const segIdx = (t * 2) % BELL_SEGMENTS;
+          const rootNode = marginRing[segIdx];
+          const rx = posX[rootNode];
+          const ry = posY[rootNode];
+          const rz = posZ[rootNode];
+          const theta = (segIdx / BELL_SEGMENTS) * Math.PI * 2;
+
+          const chain = [rootNode];
+          for (let k = 1; k < TENTACLE_NODES; k++) {
+            const u = k / TENTACLE_NODES;
+            // Hang predominantly DOWNWARD (-Y) with a delicate outward S-swirl (exactly like 1000069009.jpg!)
+            const nx = rx + Math.cos(theta + u * 0.9) * (u * 0.24);
+            const ny = ry - k * TENTACLE_SEG_LEN;
+            const nz = rz + Math.sin(theta + u * 0.9) * (u * 0.24) + u * 0.28;
+            const nid = addNode(nx, ny, nz, 0.85 + u * 0.45, 3);
+            chain.push(nid);
+            addConstraint(chain[k - 1], nid, 0.95, TENTACLE_SEG_LEN);
+            if (k >= 2) addConstraint(chain[k - 2], nid, 0.42, TENTACLE_SEG_LEN * 1.94);
+          }
+
+          tentacleChains.push({
+            chain: chain,
+            isLit: t === 0, // Start with Strand #1 lit so the user sees the silver-tip effect immediately!
+            litIntensity: t === 0 ? 1.0 : 0.0
+          });
+        }
+      }
+
+      buildCompactGoldenMedusa(0, -0.5, 0);
+
+      // =========================================================================
+      // 7. THREE.JS MESHES: COMPACT GOLDEN BELL + 12 DELICATE TENTACLE TUBES
+      // =========================================================================
+      const bellGeo = new THREE.BufferGeometry();
+      const bellVertCount = (BELL_RINGS + 1) * (BELL_SEGMENTS + 1);
+      const bellPositions = new Float32Array(bellVertCount * 3);
+      const bellUvs = new Float32Array(bellVertCount * 2);
+      const bellIndices = [];
+
+      for (let r = 0; r <= BELL_RINGS; r++) {
+        for (let s = 0; s <= BELL_SEGMENTS; s++) {
+          const idx = r * (BELL_SEGMENTS + 1) + s;
+          bellUvs[idx * 2] = s / BELL_SEGMENTS;
+          bellUvs[idx * 2 + 1] = r / BELL_RINGS;
+          if (r < BELL_RINGS && s < BELL_SEGMENTS) {
+            const a = r * (BELL_SEGMENTS + 1) + s;
+            const b = a + 1;
+            const c = (r + 1) * (BELL_SEGMENTS + 1) + s;
+            const d = c + 1;
+            bellIndices.push(a, c, b, b, c, d);
+          }
+        }
+      }
+      bellGeo.setAttribute('position', new THREE.BufferAttribute(bellPositions, 3));
+      bellGeo.setAttribute('uv', new THREE.BufferAttribute(bellUvs, 2));
+      bellGeo.setIndex(bellIndices);
+      const bellMesh = new THREE.Mesh(bellGeo, bellMaterial);
+      scene.add(bellMesh);
+
+      // 12 Delicate Tapered Tentacle Tubes (Radius 0.032m -> 0.008m so they never look bulky or block the view!)
+      const TENT_RAD_SEGS = 5;
+      const vertsPerTent = TENTACLE_NODES * TENT_RAD_SEGS;
+      const totalTentVerts = NUM_TENTACLES * vertsPerTent;
+      const tentPos = new Float32Array(totalTentVerts * 3);
+      const tentCol = new Float32Array(totalTentVerts * 3);
+      const tentIndices = [];
+
+      for (let t = 0; t < NUM_TENTACLES; t++) {
+        const vBase = t * vertsPerTent;
+        for (let k = 0; k < TENTACLE_NODES - 1; k++) {
+          for (let c = 0; c < TENT_RAD_SEGS; c++) {
+            const nextC = (c + 1) % TENT_RAD_SEGS;
+            const r0 = vBase + k * TENT_RAD_SEGS;
+            const r1 = vBase + (k + 1) * TENT_RAD_SEGS;
+            tentIndices.push(r0 + c, r1 + c, r0 + nextC, r0 + nextC, r1 + c, r1 + nextC);
+          }
+        }
+      }
+      const tentGeo = new THREE.BufferGeometry();
+      tentGeo.setAttribute('position', new THREE.BufferAttribute(tentPos, 3));
+      tentGeo.setAttribute('color', new THREE.BufferAttribute(tentCol, 3));
+      tentGeo.setIndex(tentIndices);
+      const tentMat = new THREE.MeshBasicMaterial({
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.88,
+        side: THREE.DoubleSide
+      });
+      const tentMesh = new THREE.Mesh(tentGeo, tentMat);
+      scene.add(tentMesh);
+
+      // Optional Verlet Rig Overlay
+      const constraintLinePositions = new Float32Array(constraintsA.length * 6);
+      const constraintLineGeo = new THREE.BufferGeometry();
+      constraintLineGeo.setAttribute('position', new THREE.BufferAttribute(constraintLinePositions, 3));
+      const constraintLines = new THREE.LineSegments(constraintLineGeo, new THREE.LineBasicMaterial({
+        color: 0xfacc15, transparent: true, opacity: 0.25
+      }));
+      constraintLines.visible = false;
+      scene.add(constraintLines);
+
+      // =========================================================================
+      // 8. SPOTLIGHT FILM PORTALS (1000069009.jpg), ANGLERFISH PREDATORS & PEER SWIMMERS
+      // =========================================================================
+      const streamEntities = [];
+      const entityGroup = new THREE.Group();
+      scene.add(entityGroup);
+
+      // A. Spotlight Film Vignette Portal (Matches the soft dual-spotlight black & white film projections in 1000069009.jpg!)
+      function createSpotlightFilmPortal(filmDef) {
+        const group = new THREE.Group();
+        const cols = 20, rows = 14;
+        const count = cols * rows;
+        const pos = new Float32Array(count * 3);
+        const col = new Float32Array(count * 3);
+
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const idx = r * cols + c;
+            const u = c / (cols - 1);
+            const v = r / (rows - 1);
+            const lum = sampleVignetteLuminance(filmDef.id, u, v, 0);
+            pos[idx * 3]     = (u - 0.5) * 2.5;
+            pos[idx * 3 + 1] = (v - 0.5) * 1.75;
+            pos[idx * 3 + 2] = lum * 0.12;
+            col[idx * 3]     = lum * 0.92;
+            col[idx * 3 + 1] = lum * 0.95;
+            col[idx * 3 + 2] = lum * 0.98;
+          }
+        }
+        const pGeo = new THREE.BufferGeometry();
+        pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        pGeo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+        const pMat = new THREE.PointsMaterial({
+          size: 0.14,
+          vertexColors: true,
+          transparent: true,
+          opacity: 0.85,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
+        });
+        group.add(new THREE.Points(pGeo, pMat));
+        return { group, pGeo, pMat, cols, rows };
+      }
+
+      // B. Deep-Sea Anglerfish Predator (`Melanocetus`) with Deceptive Glowing Esca Bait Lure & Red Jaws!
+      function createAnglerfishPredator() {
+        const group = new THREE.Group();
+        // Dark bulbous anglerfish body (hidden in fog until close)
+        const bodyGeo = new THREE.SphereGeometry(0.62, 12, 10);
+        bodyGeo.scale(1.1, 0.9, 1.35);
+        const bodyMat = new THREE.MeshBasicMaterial({ color: 0x0f070a });
+        group.add(new THREE.Mesh(bodyGeo, bodyMat));
+
+        // Red glowing predator eyes & needle-tooth jaw rim (illuminates red when player is near, like row 4 of 1000069009.jpg!)
+        const jawPts = [];
+        for (let i = 0; i <= 16; i++) {
+          const a = (i / 16) * Math.PI * 2;
+          const spike = (i % 2 === 0) ? 0.45 : 0.32;
+          jawPts.push(new THREE.Vector3(Math.cos(a) * spike, Math.sin(a) * spike * 0.7 - 0.1, 0.65));
+        }
+        const jawMat = new THREE.LineBasicMaterial({ color: 0xf43f5e, transparent: true, opacity: 0.75 });
+        group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(jawPts), jawMat));
+
+        // Red ambient hazard cloud around the Anglerfish
+        const redCloudMat = new THREE.MeshBasicMaterial({
+          color: 0xe11d48,
+          transparent: true,
+          opacity: 0.22,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
+        });
+        const redCloud = new THREE.Mesh(new THREE.SphereGeometry(1.35, 12, 12), redCloudMat);
+        group.add(redCloud);
+
+        // Dangling Illicium Stalk + Glowing Esca Lure Bait Orb in front of jaws!
+        const stalkPts = [
+          new THREE.Vector3(0, 0.45, 0.2),
+          new THREE.Vector3(0, 0.78, 0.65),
+          new THREE.Vector3(0, 0.55, 1.05)
+        ];
+        group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(stalkPts), new THREE.LineBasicMaterial({ color: 0x64748b })));
+        const lureOrb = new THREE.Mesh(
+          new THREE.SphereGeometry(0.14, 10, 10),
+          new THREE.MeshBasicMaterial({ color: 0xfef08a, blending: THREE.AdditiveBlending })
+        );
+        lureOrb.position.set(0, 0.55, 1.05);
+        group.add(lureOrb);
+
+        return { group, redCloud, redCloudMat, lureOrb, jawMat };
+      }
+
+      let nextCatalogFilmIdx = 1;
+
+      function spawnTunnelPortalsAndAnglers(numPortals, numAnglers) {
+        const total = numPortals + numAnglers;
+        for (let i = 0; i < total; i++) {
+          const isAngler = i >= numPortals;
+          const z = TUBE_Z_FAR + (i / total) * TUBE_SPAN;
+          const { cx, cy } = getTunnelCenter(z, 0);
+          const angle = (i * 1.65) % (Math.PI * 2);
+          const rad = isAngler ? (1.0 + (i % 3) * 0.9) : (1.2 + (i % 3) * 0.85);
+          const px = cx + Math.cos(angle) * rad;
+          const py = cy + Math.sin(angle) * rad * 0.75;
+
+          let mesh, filmDef = null, portalObj = null, anglerObj = null;
+          if (!isAngler) {
+            filmDef = ARCHIVE_FILMS[(nextCatalogFilmIdx++) % ARCHIVE_FILMS.length];
+            portalObj = createSpotlightFilmPortal(filmDef);
+            mesh = portalObj.group;
+          } else {
+            anglerObj = createAnglerfishPredator();
+            mesh = anglerObj.group;
+          }
+          mesh.position.set(px, py, z);
+          entityGroup.add(mesh);
+
+          streamEntities.push({
+            kind: isAngler ? 'contaminant' : 'element',
+            filmDef: filmDef,
+            portalObj: portalObj,
+            anglerObj: anglerObj,
+            angle: angle,
+            rad: rad,
+            x: px, y: py, z: z,
+            flowSpeed: isAngler ? 5.2 : 4.8,
+            excite: 0.0,
+            playHead: Math.random() * 10,
+            state: 'free',
+            mesh: mesh
+          });
+        }
+        updateEntityCountUI();
+      }
+
+      spawnTunnelPortalsAndAnglers(14, 5);
+
+      // C. Companion Sea Creatures & Multiplayer Peer Jellyfish Swimmers (`BroadcastChannel` + AI Flock)
+      const peerSwimmers = [];
+      const peerGroup = new THREE.Group();
+      scene.add(peerGroup);
+
+      function createCompanionCreature(colorHex, offsetX, offsetY, offsetZ, label) {
+        const g = new THREE.Group();
+        const domeGeo = new THREE.SphereGeometry(0.42, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.58);
+        const domeMat = new THREE.MeshBasicMaterial({
+          color: colorHex,
+          transparent: true,
+          opacity: 0.52,
+          wireframe: true
+        });
+        g.add(new THREE.Mesh(domeGeo, domeMat));
+
+        // 6 delicate trailing strands per companion creature
+        for (let s = 0; s < 6; s++) {
+          const a = (s / 6) * Math.PI * 2;
+          const pts = [
+            new THREE.Vector3(Math.cos(a) * 0.35, 0, Math.sin(a) * 0.35),
+            new THREE.Vector3(Math.cos(a) * 0.42, -0.55, Math.sin(a) * 0.42),
+            new THREE.Vector3(Math.cos(a) * 0.30, -1.15, Math.sin(a) * 0.30)
+          ];
+          const l = new THREE.Line(
+            new THREE.BufferGeometry().setFromPoints(pts),
+            new THREE.LineBasicMaterial({ color: colorHex, transparent: true, opacity: 0.45 })
+          );
+          g.add(l);
+        }
+        g.position.set(offsetX, offsetY, offsetZ);
+        peerGroup.add(g);
+        peerSwimmers.push({
+          mesh: g,
+          x: offsetX, y: offsetY, z: offsetZ,
+          baseX: offsetX, baseY: offsetY, baseZ: offsetZ,
+          phase: Math.random() * Math.PI * 2,
+          label: label,
+          isRemoteTab: false
+        });
+      }
+
+      createCompanionCreature(0x38bdf8, -2.4, 0.8, -3.5, 'Peer-Aurelia');
+      createCompanionCreature(0x34d399,  2.5, -0.6, -5.8, 'Peer-Beroe');
+
+      // Live Multi-Tab Multiplayer Sync via BroadcastChannel
+      let mpChannel = null;
+      try {
+        if (typeof BroadcastChannel !== 'undefined') {
+          mpChannel = new BroadcastChannel('abyssal_jelly_mp_v1');
+          mpChannel.onmessage = (ev) => {
+            if (ev.data && ev.data.type === 'pos') {
+              let remotePeer = peerSwimmers.find((p) => p.isRemoteTab);
+              if (!remotePeer) {
+                createCompanionCreature(0xf472b6, ev.data.x, ev.data.y, -1.5, 'Live-Tab-Peer');
+                remotePeer = peerSwimmers[peerSwimmers.length - 1];
+                remotePeer.isRemoteTab = true;
+                document.getElementById('stat-pixels').textContent = peerSwimmers.length + 1;
+              }
+              remotePeer.baseX = ev.data.x;
+              remotePeer.baseY = ev.data.y;
+            }
+          };
+        }
+      } catch (e) {}
+
+      // D. Golden Sun Projector End-Gate (Materializes when 12/12 Tentacles are Illuminated!)
+      const endGateGroup = new THREE.Group();
+      const gateRingGeo = new THREE.RingGeometry(1.8, 2.35, 48);
+      const gateRingMat = new THREE.MeshBasicMaterial({
+        color: 0xfef08a,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.85,
+        blending: THREE.AdditiveBlending
+      });
+      endGateGroup.add(new THREE.Mesh(gateRingGeo, gateRingMat));
+      endGateGroup.position.set(0, 0, -32);
+      endGateGroup.visible = false;
+      scene.add(endGateGroup);
+
+      // Subtle Ambient Marine Dust
+      const SNOW_COUNT = 380;
+      const snowPos = new Float32Array(SNOW_COUNT * 3);
+      for (let i = 0; i < SNOW_COUNT; i++) {
+        snowPos[i * 3]     = (Math.random() - 0.5) * 11;
+        snowPos[i * 3 + 1] = (Math.random() - 0.5) * 8;
+        snowPos[i * 3 + 2] = TUBE_Z_FAR + Math.random() * TUBE_SPAN;
+      }
+      const snowGeo = new THREE.BufferGeometry();
+      snowGeo.setAttribute('position', new THREE.BufferAttribute(snowPos, 3));
+      const snowPoints = new THREE.Points(snowGeo, new THREE.PointsMaterial({
+        color: 0x94a3b8, size: 0.065, transparent: true, opacity: 0.35
+      }));
+      scene.add(snowPoints);
+
+      // Light Absorption Tether Rays
+      const MAX_TETHERS = 64;
+      const tetherPositions = new Float32Array(MAX_TETHERS * 6);
+      const tetherGeo = new THREE.BufferGeometry();
+      tetherGeo.setAttribute('position', new THREE.BufferAttribute(tetherPositions, 3));
+      const tetherLines = new THREE.LineSegments(tetherGeo, new THREE.LineBasicMaterial({
+        color: 0xfef08a, transparent: true, opacity: 0.65, blending: THREE.AdditiveBlending
+      }));
+      scene.add(tetherLines);
+
+      // Optional Spatial Hash Grid Visualizer
+      const CELL_SIZE = 1.25;
+      const spatialBuckets = new Map();
+      let spatialChecksPerFrame = 0;
+      const gridVisLines = new THREE.LineSegments(
+        new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(120 * 24 * 3), 3)),
+        new THREE.LineBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.22 })
+      );
+      gridVisLines.visible = false;
+      scene.add(gridVisLines);
+
+      function hashCell(cx, cy, cz) {
+        return ((cx * 73856093) ^ (cy * 19349663) ^ (cz * 83492791));
+      }
+
+      // =========================================================================
+      // 9. EFFORTLESS DAMPED STEERING, ON-SCREEN THUMBSTICK & 12-REEL END STATE
+      // =========================================================================
+      const targetPos = new THREE.Vector3(0, -0.3, 0);
+      const simConfig = {
+        pulseFreq: 1.00,
+        solverIterations: 7,
+        cameraDist: 14.0,
+        fogDensityMult: 1.0,
+        autoHunt: false,
+        cameraMode: 'cinema', // 'cinema' (14m Wide 1000069009.jpg view) | 'far' (18.5m) | 'side' (Profile)
+        showVerletNet: false,
+        showSDF: true,
+        showSpatialGrid: false,
+        showCaptureVectors: true,
+        grappleSurgeTimer: 0,
+        jetBoostTimer: 0,
+        capturedTotal: 0,
+        litStrandsCount: 1,
+        integrity: 100,
+        contaminantFlash: 0,
+        endGateActive: false,
+        endModalShown: false,
+        opState: 'VOYAGE'
+      };
+
+      function showEphemeralToast(msg, stateLabel) {
+        const el = document.getElementById('capture-toast');
+        if (el) {
+          el.textContent = msg;
+          el.classList.add('toast-visible');
+          if (toastTimer) clearTimeout(toastTimer);
+          toastTimer = setTimeout(() => {
+            el.classList.remove('toast-visible');
+          }, 1250);
+        }
+        if (stateLabel) {
+          document.getElementById('state-badge').textContent = stateLabel;
+        }
+      }
+
+      function renderReelStripHUD() {
+        const containerEl = document.getElementById('reel-slots');
+        if (!containerEl) return;
+        containerEl.innerHTML = '';
+        for (let i = 0; i < GOAL_CUTS; i++) {
+          const dot = document.createElement('span');
+          const isLit = i < simConfig.litStrandsCount;
+          dot.className = isLit
+            ? 'w-2 h-2 rounded-full bg-white shadow-[0_0_6px_#fff]'
+            : 'w-2 h-2 rounded-full bg-slate-800 border border-slate-600';
+          if (splicedReel[i]) dot.title = splicedReel[i].code + ' · ' + splicedReel[i].title;
+          containerEl.appendChild(dot);
+        }
+        document.getElementById('stat-arms').textContent = simConfig.litStrandsCount + '/12';
+        document.getElementById('stat-captured').textContent = Math.min(GOAL_CUTS, simConfig.capturedTotal);
+        document.getElementById('minimap-depth-label').textContent = Math.min(GOAL_CUTS, simConfig.litStrandsCount) + '/12';
+        const gateRem = Math.max(0, GOAL_CUTS - simConfig.litStrandsCount);
+        const sdfEl = document.getElementById('stat-sdf-dist');
+        if (sdfEl) sdfEl.textContent = gateRem === 0 ? 'OPEN' : gateRem + ' LEFT';
+      }
+
+      function illuminateNextTentacleAndSaveFilm(filmDef) {
+        splicedReel.push(filmDef);
+        activeBellFilm = filmDef;
+        simConfig.capturedTotal++;
+        document.getElementById('active-film-label').textContent = 'ACTIVE: ' + filmDef.code + ' ' + filmDef.title.toUpperCase();
+
+        // Ignite the next unlit tentacle in radiant silver-white (matching frames 13-24 of 1000069009.jpg!)
+        if (simConfig.litStrandsCount < NUM_TENTACLES) {
+          tentacleChains[simConfig.litStrandsCount].isLit = true;
+          simConfig.litStrandsCount++;
+        }
+        simConfig.integrity = Math.min(100, simConfig.integrity + 8);
+        SoundEngine.playIlluminate(simConfig.litStrandsCount);
+        pulseHaptic([10, 20]);
+        renderReelStripHUD();
+
+        if (simConfig.litStrandsCount >= GOAL_CUTS && !simConfig.endGateActive) {
+          simConfig.endGateActive = true;
+          endGateGroup.position.set(0, 0, -24);
+          endGateGroup.visible = true;
+          SoundEngine.playEndGate();
+          showEphemeralToast('ALL 12 TENTACLES ILLUMINATED · SWIM INTO THE GOLDEN SUN PROJECTOR GATE AHEAD', 'GATE OPEN');
+        } else {
+          showEphemeralToast('ABSORBED [' + filmDef.code + ' ' + filmDef.title.toUpperCase() + '] · STRAND ' + simConfig.litStrandsCount + '/12 LIT', 'ABSORB');
+        }
+      }
+
+      function triggerEndStateScreening() {
+        simConfig.endModalShown = true;
+        SoundEngine.playEndGate();
+        pulseHaptic([20, 40, 30, 50]);
+        const grid = document.getElementById('end-state-reel-grid');
+        if (grid) {
+          grid.innerHTML = '';
+          for (let i = 0; i < GOAL_CUTS; i++) {
+            const f = splicedReel[i] || ARCHIVE_FILMS[i];
+            const card = document.createElement('div');
+            card.className = 'p-2 rounded-lg bg-slate-900/90 border border-amber-300/40 text-left';
+            card.innerHTML =
+              '<div class="text-amber-300 font-semibold">#' + (i + 1) + ' ' + f.code + '</div>' +
+              '<div class="text-slate-200 truncate text-[8px]">' + f.title + '</div>' +
+              '<div class="text-slate-400 text-[7px] mt-0.5">' + f.features.join(' · ') + '</div>';
+            grid.appendChild(card);
+          }
+        }
+        const modal = document.getElementById('end-state-modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+
+      document.getElementById('btn-end-continue').addEventListener('click', () => {
+        const modal = document.getElementById('end-state-modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        endGateGroup.visible = false;
+        wakeHUD();
+      });
+
+      document.getElementById('btn-end-restart').addEventListener('click', () => {
+        const modal = document.getElementById('end-state-modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        resetVoyage();
+      });
+
+      function populateFilmArchiveGrid(filterQuery) {
+        const grid = document.getElementById('film-grid');
+        if (!grid) return;
+        const q = (filterQuery || '').trim().toLowerCase();
+        grid.innerHTML = '';
+        ARCHIVE_FILMS.forEach((f) => {
+          if (q && !(f.code.toLowerCase().includes(q) || f.title.toLowerCase().includes(q) || f.features.join(' ').toLowerCase().includes(q))) {
+            return;
+          }
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          const isCurrent = f.id === activeBellFilm.id;
+          btn.className = 'zen-btn rounded-lg p-1.5 text-left flex flex-col justify-between ' + (isCurrent ? 'active-toggle' : '');
+          btn.innerHTML =
+            '<div class="font-semibold text-amber-200 truncate">' + f.code + ' · ' + f.title + '</div>' +
+            '<div class="text-[7px] text-slate-400">' + f.planes + 'P · ' + f.frames + 'f</div>' +
+            '<div class="text-[7px] text-cyan-300 mt-0.5">' + f.features.join(' · ') + '</div>';
+          btn.addEventListener('click', () => {
+            wakeHUD();
+            illuminateNextTentacleAndSaveFilm(f);
+            populateFilmArchiveGrid(document.getElementById('film-search-input').value);
+          });
+          grid.appendChild(btn);
+        });
+      }
+
+      populateFilmArchiveGrid('');
+      renderReelStripHUD();
+
+      document.getElementById('film-search-input').addEventListener('input', (e) => {
+        populateFilmArchiveGrid(e.target.value);
+      });
+
+      // SMOOTH DAMPED CONTROLS: Virtual Thumbstick + Direct Canvas Drag + Keyboard
+      const keys = { w: false, a: false, s: false, d: false };
+      let joyVec = { x: 0, y: 0, active: false };
+      const joyZone = document.getElementById('joystick-zone');
+      const joyKnob = document.getElementById('joystick-knob');
+
+      function handleJoystickMove(clientX, clientY) {
+        const rect = joyZone.getBoundingClientRect();
+        const cx = rect.left + rect.width * 0.5;
+        const cy = rect.top + rect.height * 0.5;
+        const maxR = rect.width * 0.42;
+        let dx = clientX - cx;
+        let dy = clientY - cy;
+        const d = Math.hypot(dx, dy);
+        if (d > maxR && d > 0) {
+          dx = (dx / d) * maxR;
+          dy = (dy / d) * maxR;
+        }
+        joyKnob.style.transform = `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px)`;
+        joyVec.x = dx / maxR;
+        joyVec.y = -dy / maxR;
+      }
+
+      joyZone.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        joyVec.active = true;
+        joyZone.setPointerCapture(e.pointerId);
+        handleJoystickMove(e.clientX, e.clientY);
+        wakeHUD();
+      });
+      joyZone.addEventListener('pointermove', (e) => {
+        if (joyVec.active) handleJoystickMove(e.clientX, e.clientY);
+      });
+      joyZone.addEventListener('pointerup', () => {
+        joyVec.active = false;
+        joyVec.x = 0; joyVec.y = 0;
+        joyKnob.style.transform = 'translate(0px, 0px)';
+      });
+
+      let isCanvasDragging = false;
+      function steerFromCanvas(clientX, clientY) {
+        const rect = renderer.domElement.getBoundingClientRect();
+        const nx = ((clientX - rect.left) / rect.width) * 2 - 1;
+        const ny = -((clientY - rect.top) / rect.height) * 2 + 1;
+        // Gentle, comfortable bounds so the jellyfish always stays well inside the frame!
+        targetPos.x = THREE.MathUtils.clamp(nx * 3.6, -3.6, 3.6);
+        targetPos.y = THREE.MathUtils.clamp(ny * 2.4 - 0.2, -2.4, 2.2);
+      }
+
+      renderer.domElement.addEventListener('pointerdown', (e) => {
+        isCanvasDragging = true;
+        steerFromCanvas(e.clientX, e.clientY);
+        wakeHUD();
+      });
+      window.addEventListener('pointermove', (e) => {
+        if (isCanvasDragging) steerFromCanvas(e.clientX, e.clientY);
+      });
+      window.addEventListener('pointerup', () => { isCanvasDragging = false; });
+
+      window.addEventListener('keydown', (e) => {
+        if (document.activeElement === document.getElementById('film-search-input')) return;
+        const k = e.key.toLowerCase();
+        if (k === 'w' || e.key === 'ArrowUp') keys.w = true;
+        if (k === 's' || e.key === 'ArrowDown') keys.s = true;
+        if (k === 'a' || e.key === 'ArrowLeft') keys.a = true;
+        if (k === 'd' || e.key === 'ArrowRight') keys.d = true;
+        if (e.code === 'Space') { e.preventDefault(); triggerSwimPulse(); }
+        if (k === 'e') triggerAbsorbReach();
+        if (k === 'f') triggerFlashRepel();
+      });
+      window.addEventListener('keyup', (e) => {
+        const k = e.key.toLowerCase();
+        if (k === 'w' || e.key === 'ArrowUp') keys.w = false;
+        if (k === 's' || e.key === 'ArrowDown') keys.s = false;
+        if (k === 'a' || e.key === 'ArrowLeft') keys.a = false;
+        if (k === 'd' || e.key === 'ArrowRight') keys.d = false;
+      });
+
+      function triggerSwimPulse() {
+        simConfig.jetBoostTimer = 0.55;
+        SoundEngine.playPulse();
+        pulseHaptic(10);
+        showEphemeralToast('SWIM PULSE · GLIDING THROUGH THE ARCHIVE TUNNEL', 'VOYAGE');
+      }
+
+      function triggerAbsorbReach() {
+        simConfig.grappleSurgeTimer = 2.0;
+        SoundEngine.playPulse();
+        pulseHaptic(12);
+        showEphemeralToast('TENTACLES FLARED · ABSORBING NEARBY FILM LIGHT', 'ABSORB');
+      }
+
+      function triggerFlashRepel() {
+        SoundEngine.playPulse();
+        pulseHaptic([20, 15, 20]);
+        let repelled = 0;
+        streamEntities.forEach((item) => {
+          if (item.kind === 'contaminant' && item.z > -18 && item.z < 4) {
+            item.z = TUBE_Z_FAR + Math.random() * 5.0;
+            repelled++;
+          }
+        });
+        simConfig.contaminantFlash = 0;
+        simConfig.integrity = Math.min(100, simConfig.integrity + 10);
+        showEphemeralToast(repelled > 0 ? 'BIOLUMINESCENT FLASH REPELLED ' + repelled + ' ANGLERFISH' : 'BIOLUMINESCENT FLASH', 'VOYAGE');
+      }
+
+      function resetVoyage() {
+        splicedReel.length = 0;
+        simConfig.capturedTotal = 0;
+        simConfig.litStrandsCount = 1;
+        simConfig.integrity = 100;
+        simConfig.endGateActive = false;
+        simConfig.endModalShown = false;
+        endGateGroup.visible = false;
+        buildCompactGoldenMedusa(0, -0.5, 0);
+        targetPos.set(0, -0.3, 0);
+        renderReelStripHUD();
+        showEphemeralToast('NEW 12-REEL VOYAGE STARTED', 'VOYAGE');
+      }
+
+      // =========================================================================
+      // 10. CORE PHYSICS: DAMPED MEDUSA SWIMMING + SPOTLIGHT PORTALS + ANGLERFISH
+      // =========================================================================
+      let simTime = 0;
+      let pulseCycle = 0;
+      let tunnelTravelOffset = 0;
+
+      function stepVerletPhysics(dt) {
+        simTime += dt;
+        const forwardSpeed = 6.2 * simConfig.pulseFreq * (simConfig.jetBoostTimer > 0 ? 1.45 : 1.0);
+        tunnelTravelOffset += dt * forwardSpeed;
+
+        if (simConfig.grappleSurgeTimer > 0) simConfig.grappleSurgeTimer = Math.max(0, simConfig.grappleSurgeTimer - dt);
+        if (simConfig.jetBoostTimer > 0) simConfig.jetBoostTimer = Math.max(0, simConfig.jetBoostTimer - dt);
+        if (simConfig.contaminantFlash > 0) simConfig.contaminantFlash = Math.max(0, simConfig.contaminantFlash - dt * 1.5);
+
+        // Apply thumbstick or keyboard input smoothly
+        const stepSpeed = 4.6 * dt;
+        if (joyVec.active) {
+          targetPos.x = THREE.MathUtils.clamp(targetPos.x + joyVec.x * stepSpeed * 1.4, -3.6, 3.6);
+          targetPos.y = THREE.MathUtils.clamp(targetPos.y + joyVec.y * stepSpeed * 1.4, -2.4, 2.2);
+        }
+        if (keys.w) targetPos.y = Math.min(2.2, targetPos.y + stepSpeed);
+        if (keys.s) targetPos.y = Math.max(-2.4, targetPos.y - stepSpeed);
+        if (keys.a) targetPos.x = Math.max(-3.6, targetPos.x - stepSpeed);
+        if (keys.d) targetPos.x = Math.min(3.6, targetPos.x + stepSpeed);
+
+        // Auto-Pilot: Smoothly steer through approaching Spotlight Film Portals while dodging Anglerfish!
+        if (simConfig.autoHunt) {
+          if (simConfig.endGateActive && endGateGroup.visible) {
+            targetPos.x += (0 - targetPos.x) * 2.5 * dt;
+            targetPos.y += (0 - targetPos.y) * 2.5 * dt;
+          } else {
+            let bestScore = Infinity;
+            let bestPortal = null;
+            for (let i = 0; i < streamEntities.length; i++) {
+              const it = streamEntities[i];
+              if (it.kind !== 'element' || it.z < -26 || it.z > 1.5) continue;
+              const d2 = Math.hypot(it.x - posX[apexNode], it.y - posY[apexNode]) + Math.abs(it.z) * 0.35;
+              if (d2 < bestScore) { bestScore = d2; bestPortal = it; }
+            }
+            if (bestPortal) {
+              let dx = bestPortal.x;
+              let dy = bestPortal.y;
+              for (let i = 0; i < streamEntities.length; i++) {
+                const c = streamEntities[i];
+                if (c.kind !== 'contaminant' || c.z < -14 || c.z > 2) continue;
+                const cdx = dx - c.x, cdy = dy - c.y;
+                const cd = Math.hypot(cdx, cdy);
+                if (cd < 2.8 && cd > 0.01) {
+                  dx += (cdx / cd) * 1.8;
+                  dy += (cdy / cd) * 1.8;
+                }
+              }
+              targetPos.x += (THREE.MathUtils.clamp(dx, -3.4, 3.4) - targetPos.x) * 2.6 * dt;
+              targetPos.y += (THREE.MathUtils.clamp(dy, -2.2, 2.0) - targetPos.y) * 2.6 * dt;
+            }
+          }
+        }
+
+        // Gentle, velocity-clamped apex movement so the jellyfish NEVER jerks or loses its shape!
+        const dxTarget = targetPos.x - posX[apexNode];
+        const dyTarget = (targetPos.y + BELL_HEIGHT * 0.5) - posY[apexNode];
+        const dzTarget = 0 - posZ[apexNode];
+        posX[apexNode] += THREE.MathUtils.clamp(dxTarget * 0.09, -0.12, 0.12);
+        posY[apexNode] += THREE.MathUtils.clamp(dyTarget * 0.09, -0.12, 0.12);
+        posZ[apexNode] += THREE.MathUtils.clamp(dzTarget * 0.09, -0.12, 0.12);
+
+        pulseCycle = (pulseCycle + dt * 1.15 * simConfig.pulseFreq) % 1.0;
+        bellUniforms.uTime.value = simTime;
+        bellUniforms.uPulsePhase.value = pulseCycle;
+        bellUniforms.uContam.value = simConfig.contaminantFlash;
+
+        const phaseRad = pulseCycle * Math.PI * 2;
+        const apexX = posX[apexNode];
+        const apexY = posY[apexNode];
+        const apexZ = posZ[apexNode];
+
+        // 2. Damped Verlet Step: Keep Tentacles Hanging Gracefully Downward (-Y) Like 1000069009.jpg!
+        const drag = 0.065; // Higher water damping for calm, hypnotic marine motion
+        const oneMinusDrag = 1.0 - drag;
+
+        for (let i = 0; i < nodeCount; i++) {
+          const vx = THREE.MathUtils.clamp((posX[i] - prevX[i]) * oneMinusDrag, -0.14, 0.14);
+          const vy = THREE.MathUtils.clamp((posY[i] - prevY[i]) * oneMinusDrag, -0.14, 0.14);
+          const vz = THREE.MathUtils.clamp((posZ[i] - prevZ[i]) * oneMinusDrag, -0.14, 0.14);
+          prevX[i] = posX[i];
+          prevY[i] = posY[i];
+          prevZ[i] = posZ[i];
+
+          const role = nodeRole[i];
+          let fx = 0, fy = 0, fz = 0;
+
+          if (role === 1 || role === 2) {
+            const rIdx = bellRingIdx[i];
+            const ringPhase = phaseRad - rIdx * 0.35;
+            const contract = 1.0 - (0.20 * (rIdx / BELL_RINGS)) * (0.5 + 0.5 * Math.sin(ringPhase));
+            const tx = apexX + bellRestX[i] * contract;
+            const ty = apexY - BELL_HEIGHT * 0.5 + bellRestY[i];
+            const tz = apexZ + bellRestZ[i] * contract;
+            fx += (tx - posX[i]) * 0.16;
+            fy += (ty - posY[i]) * 0.16;
+            fz += (tz - posZ[i]) * 0.16;
+          } else if (role === 3) {
+            // Downward gravity (-Y) + gentle backward current (+Z) + graceful sinusoidal sway
+            // This guarantees tentacles ALWAYS drape downward underneath the bell like 1000069009.jpg!
+            const sway = simTime * 2.4 - (apexY - posY[i]) * 1.8 + i * 0.3;
+            const flareMult = simConfig.grappleSurgeTimer > 0 ? 2.2 : 1.0;
+            const dxOut = posX[i] - apexX;
+            const dzOut = posZ[i] - apexZ;
+            const rOut = Math.hypot(dxOut, dzOut) || 1;
+            fx += (dxOut / rOut) * 0.0008 * flareMult + Math.sin(sway) * 0.0009;
+            fy -= 0.0038; // Strong downward drape
+            fz += 0.0009 + Math.cos(sway) * 0.0006;
+          }
+
+          posX[i] += vx + fx;
+          posY[i] += vy + fy;
+          posZ[i] += vz + fz;
+        }
+
+        // 3. Gauss-Seidel Distance & Bending Relaxation
+        const iters = simConfig.solverIterations;
+        const numC = constraintsA.length;
+        for (let iter = 0; iter < iters; iter++) {
+          for (let c = 0; c < numC; c++) {
+            const a = constraintsA[c];
+            const b = constraintsB[c];
+            const dx = posX[b] - posX[a];
+            const dy = posY[b] - posY[a];
+            const dz = posZ[b] - posZ[a];
+            const dist = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.0001;
+            const wA = invMass[a], wB = invMass[b];
+            const wSum = wA + wB;
+            if (wSum === 0) continue;
+            const diff = ((dist - constraintsRest[c]) / dist) * (constraintsStiff[c] / wSum);
+            posX[a] += dx * diff * wA;
+            posY[a] += dy * diff * wA;
+            posZ[a] += dz * diff * wA;
+            posX[b] -= dx * diff * wB;
+            posY[b] -= dy * diff * wB;
+            posZ[b] -= dz * diff * wB;
+          }
+        }
+
+        // 4. Advance Spotlight Film Portals & Anglerfish Predators Along +Z
+        const absorbRadius = simConfig.grappleSurgeTimer > 0 ? 2.4 : 1.75;
+        let activeAnglersNear = 0;
+
+        for (let p = 0; p < streamEntities.length; p++) {
+          const item = streamEntities[p];
+          item.z += item.flowSpeed * simConfig.pulseFreq * dt;
+          const { cx, cy } = getTunnelCenter(item.z, simTime);
+          item.x = cx + Math.cos(item.angle) * item.rad;
+          item.y = cy + Math.sin(item.angle) * item.rad * 0.72;
+
+          if (item.z > TUBE_Z_NEAR) {
+            item.z = TUBE_Z_FAR + (item.z - TUBE_Z_NEAR);
+            item.excite = 0;
+            if (item.kind === 'element') {
+              item.filmDef = ARCHIVE_FILMS[(nextCatalogFilmIdx++) % ARCHIVE_FILMS.length];
+            }
+          }
+
+          const distToJelly = Math.hypot(item.x - apexX, item.y - (apexY - 0.6), item.z - apexZ);
+
+          if (item.kind === 'element' && item.portalObj && item.filmDef) {
+            // Animate the Silver-Halide Dual-Spotlight Film Vignette!
+            const inRange = distToJelly < absorbRadius;
+            if (inRange) {
+              item.excite = Math.min(1.0, item.excite + dt * 3.5);
+              if (item.excite >= 0.55) {
+                illuminateNextTentacleAndSaveFilm(item.filmDef);
+                item.z = TUBE_Z_FAR + Math.random() * 3.0;
+                item.excite = 0;
+              }
+            } else {
+              item.excite = Math.max(0.0, item.excite - dt * 1.2);
+            }
+
+            item.playHead += dt * (1.2 + item.excite * 3.5);
+            const pObj = item.portalObj;
+            const pArr = pObj.pGeo.attributes.position.array;
+            const cArr = pObj.pGeo.attributes.color.array;
+            const cols = pObj.cols, rows = pObj.rows;
+            const boost = 1.0 + item.excite * 0.65;
+
+            for (let r = 0; r < rows; r++) {
+              for (let c = 0; c < cols; c++) {
+                const idx = r * cols + c;
+                const u = c / (cols - 1);
+                const v = r / (rows - 1);
+                const lum = sampleVignetteLuminance(item.filmDef.id, u, v, item.playHead);
+                pArr[idx * 3 + 2] = lum * (0.12 + item.excite * 0.25);
+                const val = Math.min(1.0, lum * boost);
+                cArr[idx * 3]     = val * 0.94;
+                cArr[idx * 3 + 1] = val * 0.96;
+                cArr[idx * 3 + 2] = val;
+              }
+            }
+            pObj.pGeo.attributes.position.needsUpdate = true;
+            pObj.pGeo.attributes.color.needsUpdate = true;
+          } else if (item.kind === 'contaminant' && item.anglerObj) {
+            // Deep-Sea Anglerfish Predator: bobs its lure and lunges slightly when close!
+            const lBob = Math.sin(simTime * 4.5 + p) * 0.12;
+            item.anglerObj.lureOrb.position.y = 0.55 + lBob;
+            const threat = Math.max(0, 1.0 - distToJelly / 6.5);
+            item.anglerObj.redCloudMat.opacity = 0.14 + threat * 0.38;
+
+            if (distToJelly < 1.35) {
+              activeAnglersNear++;
+              simConfig.integrity = Math.max(15, simConfig.integrity - 12);
+              simConfig.contaminantFlash = 1.0;
+              SoundEngine.playAnglerWarn();
+              pulseHaptic([35, 20, 35]);
+              item.z = TUBE_Z_FAR + Math.random() * 4.0;
+              showEphemeralToast('ANGLERFISH PREDATOR STRIKE · TAP FLASH TO REPEL', 'PREDATOR');
+            }
+          }
+
+          item.mesh.position.set(item.x, item.y, item.z);
+        }
+
+        // 5. Advance Companion / Multiplayer Peer Swimmers
+        peerSwimmers.forEach((peer, idx) => {
+          peer.phase += dt * 1.8;
+          if (!peer.isRemoteTab) {
+            peer.x = peer.baseX + Math.sin(peer.phase * 0.6 + idx) * 1.1;
+            peer.y = peer.baseY + Math.cos(peer.phase * 0.8 + idx) * 0.75;
+            peer.z = peer.baseZ + Math.sin(peer.phase * 0.4) * 1.5;
+          } else {
+            peer.x += (peer.baseX - peer.x) * 0.1;
+            peer.y += (peer.baseY - peer.y) * 0.1;
+          }
+          peer.mesh.position.set(peer.x, peer.y, peer.z);
+          const s = 1.0 + 0.12 * Math.sin(peer.phase * 2.0);
+          peer.mesh.scale.set(s, 1.0 / s, s);
+        });
+
+        if (mpChannel && Math.random() < 0.25) {
+          try { mpChannel.postMessage({ type: 'pos', x: apexX, y: apexY }); } catch (e) {}
+        }
+
+        // 6. Advance Golden Sun Projector End-Gate (if all 12 tentacles are lit!)
+        if (simConfig.endGateActive && endGateGroup.visible) {
+          endGateGroup.position.z += forwardSpeed * 0.65 * dt;
+          endGateGroup.rotation.z += dt * 0.8;
+          if (endGateGroup.position.z > -1.5 && !simConfig.endModalShown) {
+            triggerEndStateScreening();
+          }
+          if (endGateGroup.position.z > 6.0) {
+            endGateGroup.position.z = -28.0;
+          }
+        }
+
+        // 7. Advance Ambient Dust & Sewer Arches
+        const sArr = snowGeo.attributes.position.array;
+        for (let i = 0; i < SNOW_COUNT; i++) {
+          let sz = sArr[i * 3 + 2] + dt * forwardSpeed;
+          if (sz > TUBE_Z_NEAR) sz -= TUBE_SPAN;
+          sArr[i * 3 + 2] = sz;
+        }
+        snowGeo.attributes.position.needsUpdate = true;
+
+        if (simConfig.showSDF) {
+          for (let i = 0; i < NUM_ARCHES; i++) {
+            const arch = sewerArches[i];
+            const rz = TUBE_Z_FAR + ((arch.baseOffset + tunnelTravelOffset) % TUBE_SPAN);
+            const { cx, cy } = getTunnelCenter(rz, simTime);
+            arch.line.position.set(cx, cy, rz);
+          }
+        }
+
+        return activeAnglersNear;
+      }
+
+      // =========================================================================
+      // 11. SKINNING: DELICATE GOLDEN MEDUSA & SILVER-WHITE LIT TENTACLES (1000069009.jpg)
+      // =========================================================================
+      function updateMeshesAndMinimap() {
+        // 1. Update Compact Golden Umbrella Mesh
+        const bPos = bellGeo.attributes.position.array;
+        for (let r = 0; r <= BELL_RINGS; r++) {
+          for (let s = 0; s <= BELL_SEGMENTS; s++) {
+            const vIdx = (r * (BELL_SEGMENTS + 1) + s) * 3;
+            const segMod = s % BELL_SEGMENTS;
+            const nid = (r === 0) ? apexNode : bellGrid[r - 1][segMod];
+            bPos[vIdx]     = posX[nid];
+            bPos[vIdx + 1] = posY[nid];
+            bPos[vIdx + 2] = posZ[nid];
+          }
+        }
+        bellGeo.attributes.position.needsUpdate = true;
+        bellGeo.computeVertexNormals();
+
+        // 2. Sweep 12 Delicate Downward-Trailing Tentacles (Silver-White Ignition on Lit Strands!)
+        const unlitC = currentPreset.unlitStrand;
+        const bellC = currentPreset.bellColor;
+        const litC = currentPreset.litStrand;
+
+        for (let t = 0; t < NUM_TENTACLES; t++) {
+          const tObj = tentacleChains[t];
+          tObj.litIntensity += ((tObj.isLit ? 1.0 : 0.0) - tObj.litIntensity) * 0.08;
+          const chain = tObj.chain;
+          const vBase = t * vertsPerTent;
+          let rx = 1, ry = 0, rz = 0;
+
+          for (let k = 0; k < TENTACLE_NODES; k++) {
+            const nid = chain[k];
+            const u = k / (TENTACLE_NODES - 1);
+            // Thin, delicate silhouette (0.028m at root -> 0.010m at tip, slightly brighter/wider on silver-lit tips)
+            const tipGlowWidth = tObj.litIntensity * Math.sin(u * Math.PI) * 0.014;
+            const radius = (1.0 - u * 0.65) * 0.026 + tipGlowWidth;
+
+            const prevId = chain[Math.max(0, k - 1)];
+            const nextId = chain[Math.min(TENTACLE_NODES - 1, k + 1)];
+            let tx = posX[nextId] - posX[prevId];
+            let ty = posY[nextId] - posY[prevId];
+            let tz = posZ[nextId] - posZ[prevId];
+            const tLen = Math.sqrt(tx * tx + ty * ty + tz * tz) || 1;
+            tx /= tLen; ty /= tLen; tz /= tLen;
+
+            const dotRT = rx * tx + ry * ty + rz * tz;
+            rx -= dotRT * tx; ry -= dotRT * ty; rz -= dotRT * tz;
+            const rLen = Math.sqrt(rx * rx + ry * ry + rz * rz);
+            if (rLen < 0.001) { rx = 1; ry = 0; rz = 0; }
+            else { rx /= rLen; ry /= rLen; rz /= rLen; }
+
+            const bx = ty * rz - tz * ry;
+            const by = tz * rx - tx * rz;
+            const bz = tx * ry - ty * rx;
+
+            // Upper tentacle is warm amber-gold; lower 65% ignites in bright silver-white when lit (1000069009.jpg rows 3-4)!
+            const silverMask = smoothstep(0.25, 0.75, u) * tObj.litIntensity;
+            const cr = THREE.MathUtils.lerp(THREE.MathUtils.lerp(bellC.r, unlitC.r, u), litC.r, silverMask);
+            const cg = THREE.MathUtils.lerp(THREE.MathUtils.lerp(bellC.g, unlitC.g, u), litC.g, silverMask);
+            const cb = THREE.MathUtils.lerp(THREE.MathUtils.lerp(bellC.b, unlitC.b, u), litC.b, silverMask);
+
+            for (let c = 0; c < TENT_RAD_SEGS; c++) {
+              const a = (c / TENT_RAD_SEGS) * Math.PI * 2;
+              const ca = Math.cos(a) * radius;
+              const sa = Math.sin(a) * radius;
+              const idx = (vBase + k * TENT_RAD_SEGS + c) * 3;
+              tentPos[idx]     = posX[nid] + rx * ca + bx * sa;
+              tentPos[idx + 1] = posY[nid] + ry * ca + by * sa;
+              tentPos[idx + 2] = posZ[nid] + rz * ca + bz * sa;
+              tentCol[idx]     = cr;
+              tentCol[idx + 1] = cg;
+              tentCol[idx + 2] = cb;
+            }
+          }
+        }
+        tentGeo.attributes.position.needsUpdate = true;
+        tentGeo.attributes.color.needsUpdate = true;
+
+        // 3. Optional Verlet Rig Wireframe
+        constraintLines.visible = simConfig.showVerletNet;
+        if (simConfig.showVerletNet) {
+          const cPos = constraintLineGeo.attributes.position.array;
+          for (let c = 0; c < constraintsA.length; c++) {
+            const a = constraintsA[c], b = constraintsB[c], base = c * 6;
+            cPos[base]     = posX[a]; cPos[base + 1] = posY[a]; cPos[base + 2] = posZ[a];
+            cPos[base + 3] = posX[b]; cPos[base + 4] = posY[b]; cPos[base + 5] = posZ[b];
+          }
+          constraintLineGeo.attributes.position.needsUpdate = true;
+        }
+
+        // 4. Light Absorption Rays when close to a Spotlight Film Portal
+        tetherLines.visible = simConfig.showCaptureVectors;
+        let activeTetherCount = 0;
+        const tetArr = tetherGeo.attributes.position.array;
+        if (simConfig.showCaptureVectors) {
+          for (let p = 0; p < streamEntities.length; p++) {
+            const it = streamEntities[p];
+            if (it.kind === 'element' && it.excite > 0.05 && activeTetherCount < MAX_TETHERS) {
+              const base = activeTetherCount * 6;
+              tetArr[base]     = posX[apexNode];
+              tetArr[base + 1] = posY[apexNode] - 0.5;
+              tetArr[base + 2] = posZ[apexNode];
+              tetArr[base + 3] = it.x;
+              tetArr[base + 4] = it.y;
+              tetArr[base + 5] = it.z;
+              activeTetherCount++;
+            }
+          }
+        }
+        tetherGeo.setDrawRange(0, activeTetherCount * 2);
+        if (simConfig.showCaptureVectors) tetherGeo.attributes.position.needsUpdate = true;
+
+        jellyLight.position.set(posX[apexNode], posY[apexNode], posZ[apexNode] + 1.0);
+
+        // 5. Render Surgical Micro-Minimap (68x96px Top-Right Radar)
+        drawMicroMinimap();
+
+        return activeTetherCount;
+      }
+
+      function smoothstep(edge0, edge1, x) {
+        const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
+        return t * t * (3 - 2 * t);
+      }
+
+      const minimapCanvas = document.getElementById('micro-minimap');
+      const mCtx = minimapCanvas.getContext('2d');
+
+      function drawMicroMinimap() {
+        const w = minimapCanvas.width;
+        const h = minimapCanvas.height;
+        mCtx.clearRect(0, 0, w, h);
+
+        // Tunnel side walls
+        mCtx.strokeStyle = 'rgba(148, 163, 184, 0.22)';
+        mCtx.lineWidth = 1;
+        mCtx.strokeRect(4, 4, w - 8, h - 8);
+
+        // Map Z in [-54 .. +8] to Y in [8 .. h-8], and X in [-5 .. +5] to X in [6 .. w-6]
+        function mapX(x) { return w * 0.5 + (x / 5.2) * (w * 0.42); }
+        function mapZ(z) { return h - 14 - ((-z) / 54.0) * (h - 24); }
+
+        // Draw End-Gate horizon line if active
+        if (simConfig.endGateActive && endGateGroup.visible) {
+          const gy = mapZ(endGateGroup.position.z);
+          mCtx.strokeStyle = '#fef08a';
+          mCtx.lineWidth = 2;
+          mCtx.beginPath();
+          mCtx.moveTo(6, gy);
+          mCtx.lineTo(w - 6, gy);
+          mCtx.stroke();
+        }
+
+        // Draw Film Portals (white/cyan dots) & Anglerfish Predators (red triangles)
+        for (let i = 0; i < streamEntities.length; i++) {
+          const it = streamEntities[i];
+          const mx = mapX(it.x);
+          const my = mapZ(it.z);
+          if (my < 4 || my > h - 4) continue;
+          if (it.kind === 'element') {
+            mCtx.fillStyle = it.excite > 0.1 ? '#fef08a' : 'rgba(226, 232, 240, 0.78)';
+            mCtx.beginPath();
+            mCtx.arc(mx, my, it.excite > 0.1 ? 3.0 : 2.0, 0, Math.PI * 2);
+            mCtx.fill();
+          } else {
+            mCtx.fillStyle = '#f43f5e';
+            mCtx.beginPath();
+            mCtx.moveTo(mx, my - 3);
+            mCtx.lineTo(mx - 2.6, my + 2.5);
+            mCtx.lineTo(mx + 2.6, my + 2.5);
+            mCtx.closePath();
+            mCtx.fill();
+          }
+        }
+
+        // Draw Companion / Multiplayer Peer Swimmers (emerald dots)
+        peerSwimmers.forEach((p) => {
+          const px = mapX(p.x);
+          const py = mapZ(p.z);
+          mCtx.fillStyle = '#34d399';
+          mCtx.beginPath();
+          mCtx.arc(px, py, 2.2, 0, Math.PI * 2);
+          mCtx.fill();
+        });
+
+        // Draw Player Golden Medusa (gold dot + subtle halo)
+        const jx = mapX(posX[apexNode]);
+        const jy = mapZ(posZ[apexNode]);
+        mCtx.fillStyle = '#facc15';
+        mCtx.beginPath();
+        mCtx.arc(jx, jy, 3.4, 0, Math.PI * 2);
+        mCtx.fill();
+      }
+
+      // =========================================================================
+      // 12. UI EVENT LISTENERS
+      // =========================================================================
+      function applySpeciesPreset(key) {
+        wakeHUD();
+        currentPreset = PRESETS[key];
+        bellUniforms.uBellColor.value.copy(currentPreset.bellColor);
+        bellUniforms.uRimColor.value.copy(currentPreset.rimColor);
+        scene.background.setHex(currentPreset.fogColor);
+        scene.fog.color.setHex(currentPreset.fogColor);
+        jellyLight.color.copy(currentPreset.rimColor);
+        document.getElementById('species-tag').textContent = currentPreset.name;
+
+        ['aurelia', 'chrysaora', 'medusae', 'abyssal'].forEach((k) => {
+          const btn = document.getElementById('preset-' + k);
+          if (btn) btn.classList.toggle('active-toggle', k === key);
+        });
+      }
+
+      document.getElementById('preset-aurelia').addEventListener('click', () => applySpeciesPreset('aurelia'));
+      document.getElementById('preset-chrysaora').addEventListener('click', () => applySpeciesPreset('chrysaora'));
+      document.getElementById('preset-medusae').addEventListener('click', () => applySpeciesPreset('medusae'));
+      document.getElementById('preset-abyssal').addEventListener('click', () => applySpeciesPreset('abyssal'));
+
+      function bindToggle(btnId, propKey) {
+        const btn = document.getElementById(btnId);
+        btn.addEventListener('click', () => {
+          wakeHUD();
+          simConfig[propKey] = !simConfig[propKey];
+          btn.classList.toggle('active-toggle', simConfig[propKey]);
+          const span = btn.querySelector('.state-ind');
+          if (span) {
+            span.textContent = simConfig[propKey] ? 'ON' : 'OFF';
+            span.className = simConfig[propKey] ? 'state-ind text-amber-300' : 'state-ind text-slate-500';
+          }
+          if (propKey === 'showSDF') tubeEnvGroup.visible = simConfig.showSDF;
+        });
+      }
+
+      bindToggle('toggle-verlet-net', 'showVerletNet');
+      bindToggle('toggle-sdf-field', 'showSDF');
+      bindToggle('toggle-spatial-grid', 'showSpatialGrid');
+      bindToggle('toggle-capture-vectors', 'showCaptureVectors');
+
+      document.getElementById('btn-spawn-prey').addEventListener('click', () => {
+        wakeHUD();
+        const nextF = ARCHIVE_FILMS[(nextCatalogFilmIdx++) % ARCHIVE_FILMS.length];
+        illuminateNextTentacleAndSaveFilm(nextF);
+      });
+      document.getElementById('btn-grapple-surge').addEventListener('click', () => { wakeHUD(); triggerAbsorbReach(); });
+      document.getElementById('btn-digest-now').addEventListener('click', () => { wakeHUD(); });
+      document.getElementById('btn-release-items').addEventListener('click', () => { wakeHUD(); });
+      document.getElementById('btn-shockwave').addEventListener('click', () => { wakeHUD(); triggerFlashRepel(); });
+      document.getElementById('btn-jet-pulse').addEventListener('click', () => { wakeHUD(); triggerSwimPulse(); });
+      document.getElementById('btn-reset-sim').addEventListener('click', () => { wakeHUD(); resetVoyage(); });
+
+      document.getElementById('btn-autopilot').addEventListener('click', () => {
+        wakeHUD();
+        simConfig.autoHunt = !simConfig.autoHunt;
+        const st = document.getElementById('autopilot-state');
+        st.textContent = simConfig.autoHunt ? 'ON' : 'OFF';
+        st.className = simConfig.autoHunt ? 'text-amber-300 font-medium' : 'text-slate-400';
+        document.getElementById('btn-autopilot').classList.toggle('active-toggle', simConfig.autoHunt);
+        showEphemeralToast(simConfig.autoHunt ? 'AUTO-VOYAGE · SEEKING FILM PORTALS & EVADING ANGLERFISH' : 'MANUAL STEERING', 'VOYAGE');
+      });
+
+      document.getElementById('btn-camera-mode').addEventListener('click', () => {
+        wakeHUD();
+        const modes = ['cinema', 'far', 'side'];
+        const labels = { cinema: 'CINEMA', far: 'FAR', side: 'SIDE' };
+        const idx = (modes.indexOf(simConfig.cameraMode) + 1) % modes.length;
+        simConfig.cameraMode = modes[idx];
+        document.getElementById('camera-mode-label').textContent = labels[simConfig.cameraMode];
+      });
+
+      document.getElementById('btn-audio-toggle').addEventListener('click', () => {
+        wakeHUD();
+        const isPlaying = SoundEngine.toggle();
+        document.getElementById('audio-label').textContent = isPlaying ? 'SOUND' : 'MUTE';
+        document.getElementById('btn-audio-toggle').classList.toggle('active-toggle', isPlaying);
+      });
+
+      const filmSheet = document.getElementById('film-archive-sheet');
+      const btnModeShape = document.getElementById('btn-mode-shape');
+      function toggleFilmSheet(force) {
+        const show = force !== undefined ? force : filmSheet.classList.contains('hidden');
+        filmSheet.classList.toggle('hidden', !show);
+        btnModeShape.classList.toggle('active-toggle', show);
+        if (show) populateFilmArchiveGrid(document.getElementById('film-search-input').value);
+        wakeHUD();
+      }
+      btnModeShape.addEventListener('click', () => toggleFilmSheet());
+      document.getElementById('btn-close-films').addEventListener('click', () => toggleFilmSheet(false));
+
+      const modal = document.getElementById('lineage-modal');
+      document.getElementById('btn-lineage-modal').addEventListener('click', () => {
+        wakeHUD();
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      });
+      document.getElementById('btn-close-modal').addEventListener('click', () => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      });
+
+      const controlPanel = document.getElementById('control-panel');
+      let panelOpen = false;
+      function setPanelOpen(open) {
+        panelOpen = open;
+        if (open) {
+          controlPanel.classList.remove('translate-y-full', 'sm:translate-x-[120%]');
+          controlPanel.classList.add('translate-y-0', 'sm:translate-x-0');
+        } else {
+          controlPanel.classList.add('translate-y-full', 'sm:translate-x-[120%]');
+          controlPanel.classList.remove('translate-y-0', 'sm:translate-x-0');
+        }
+        document.getElementById('panel-toggle-label').textContent = open ? 'CLOSE' : 'TUNE';
+        document.getElementById('btn-toggle-panel').classList.toggle('active-toggle', open);
+        wakeHUD();
+      }
+
+      document.getElementById('btn-toggle-panel').addEventListener('click', () => setPanelOpen(!panelOpen));
+      document.getElementById('btn-close-panel').addEventListener('click', () => setPanelOpen(false));
+
+      document.getElementById('slider-pulse-freq').addEventListener('input', (e) => {
+        simConfig.pulseFreq = parseFloat(e.target.value);
+        document.getElementById('val-pulse-freq').textContent = simConfig.pulseFreq.toFixed(2) + 'x';
+      });
+      document.getElementById('slider-solver-iters').addEventListener('input', (e) => {
+        simConfig.solverIterations = parseInt(e.target.value, 10);
+        document.getElementById('val-solver-iters').textContent = simConfig.solverIterations;
+      });
+      document.getElementById('slider-grapple-pull').addEventListener('input', (e) => {
+        simConfig.cameraDist = parseFloat(e.target.value);
+        document.getElementById('val-grapple-pull').textContent = simConfig.cameraDist.toFixed(1) + 'm';
+      });
+      document.getElementById('slider-sdf-margin').addEventListener('input', (e) => {
+        simConfig.fogDensityMult = parseFloat(e.target.value);
+        scene.fog.density = 0.022 * simConfig.fogDensityMult;
+        document.getElementById('val-sdf-margin').textContent = simConfig.fogDensityMult.toFixed(1) + 'x';
+      });
+
+      function updateEntityCountUI() {
+        const el = document.getElementById('prey-count-label');
+        if (el) el.textContent = streamEntities.length;
+      }
+
+      // =========================================================================
+      // 13. MAIN ANIMATION & PULLED-BACK CAMERA LOOP (MATCHING 1000069009.jpg)
+      // =========================================================================
+      let lastFrameTime = performance.now();
+      let fpsFrames = 0;
+      let fpsClock = performance.now();
+
+      function animate(now) {
+        requestAnimationFrame(animate);
+        const rawDt = Math.min(0.033, (now - lastFrameTime) / 1000);
+        lastFrameTime = now;
+
+        stepVerletPhysics(rawDt);
+        const activeTethers = updateMeshesAndMinimap();
+
+        const jx = posX[apexNode];
+        const jy = posY[apexNode] - 0.5;
+        const jz = posZ[apexNode];
+
+        if (simConfig.cameraMode === 'cinema') {
+          // Wide, pulled-back 1000069009.jpg framing: compact golden jellyfish in the midground,
+          // spotlight film vignettes emerging in the dark tunnel behind/around it!
+          const camX = jx * 0.45;
+          const camY = jy * 0.45 + 0.35;
+          const camZ = simConfig.cameraDist;
+          camera.position.x += (camX - camera.position.x) * 0.06;
+          camera.position.y += (camY - camera.position.y) * 0.06;
+          camera.position.z += (camZ - camera.position.z) * 0.06;
+          camera.lookAt(jx * 0.65, jy * 0.65 - 0.2, -10.0);
+        } else if (simConfig.cameraMode === 'far') {
+          camera.position.x += (jx * 0.3 - camera.position.x) * 0.05;
+          camera.position.y += (jy * 0.3 + 0.8 - camera.position.y) * 0.05;
+          camera.position.z += (19.0 - camera.position.z) * 0.05;
+          camera.lookAt(0, -0.3, -12.0);
+        } else {
+          camera.position.x += (jx + 9.5 - camera.position.x) * 0.06;
+          camera.position.y += (jy + 0.2 - camera.position.y) * 0.06;
+          camera.position.z += (jz + 3.5 - camera.position.z) * 0.06;
+          camera.lookAt(jx, jy - 0.5, jz - 1.0);
+        }
+
+        fpsFrames++;
+        if (now - fpsClock >= 250) {
+          const fps = Math.round((fpsFrames * 1000) / (now - fpsClock));
+          fpsFrames = 0;
+          fpsClock = now;
+
+          document.getElementById('stat-fps').textContent = fps;
+          document.getElementById('stat-nodes').textContent = (nodeCount + streamEntities.length).toLocaleString();
+          document.getElementById('stat-constraints').textContent = constraintsA.length.toLocaleString();
+          document.getElementById('stat-active-tethers').textContent = activeTethers;
+
+          const pct = Math.round(simConfig.integrity);
+          document.getElementById('stat-energy-pct').textContent = pct + '%';
+          const bar = document.getElementById('energy-bar-fill');
+          bar.style.width = pct + '%';
+          bar.className = pct < 50
+            ? 'h-full bg-rose-500 transition-all duration-200'
+            : 'h-full bg-amber-300 transition-all duration-200';
+        }
+
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener('resize', () => {
+        const w = container.clientWidth;
+        const h = container.clientHeight;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      });
+
+      window.__bonus = {THREE, scene, camera, renderer, streamEntities};   // contaminant-jelly: real footage, song and sound (bonus.js)
+      requestAnimationFrame(animate);
+    });
+  </script>
+<script src="bonus.js" data-song="nightbus-14" data-mode="entities"></script>
+</body>
+</html>

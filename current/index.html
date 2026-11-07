@@ -539,7 +539,7 @@ function stepCast() { const ct = RT - CAST.t, k = ct < .3 ? ct / .3 : ct < .55 ?
   if (CAST.target && !CAST.hit && ct >= .3) { CAST.hit = true; capture(CAST.target); }
   for (let j = 0; j < NC; j++) { const r = CROW + j; if (k <= 0) { hide(r); continue; } const u = (j + 1) / NC * k; _p.copy(C.p).lerp(CAST.to, u); row(r, 0, _p.x, _p.y, _p.z, .12); row(r, 1, -1, 1, 0, .9); row(r, 2, 0, 0, 0, 0); row(r, 3, 0, 0, 0, 0); row(r, 4, 0, 0, 0, 0); }
   FLECK.forEach((f, j) => { const r = FROW + j, u = (RT - f.t) / .6; if (u < 0 || u > 1) { hide(r); return; } _p.copy(f.from).lerp(C.p, u * u * (3 - 2 * u)); row(r, 0, _p.x, _p.y, _p.z, .7 - .45 * u); row(r, 1, f.block, 1.3, f.slot, 1.2); row(r, 2, 0, .3, 0, 0); row(r, 3, 0, 0, 0, .6); row(r, 4, .3, 1.5, 0, .3); }); }
-function capture(t) { BACK.taken = t.film; const fr = T * fps(FILMS[t.film]), slot = Math.floor(fr) % BLOCK, fi = t.from + slot, cid = `${t.key}:${fi}`;
+function capture(t) { BACK.taken = t.film; BACK.tt = RT; const fr = T * fps(FILMS[t.film]), slot = Math.floor(fr) % BLOCK, fi = t.from + slot, cid = `${t.key}:${fi}`;
   if (CLAIMS.has(cid) && CLAIMS.get(cid).id !== ME.id) { say('your partner already took that frame'); return; }
   const res = addFrame(t.film, fi, cid, t.key); if (!res) return; if (res === 'dup') { say('that frame is already in this arm: wait for another moment'); AU.whip(false); return; }
   t.o.budget--; const at = Date.now(); CLAIMS.set(cid, {at, id: ME.id}); NET.send({t: 'claim', cid, at, film: t.film, fi});
@@ -856,8 +856,10 @@ function frame(now) {
   if (RT - sayT > 3.4) $('say').style.opacity = 0;
   if (G.state === 'play') { const lv = levelOf(C.s, C.side); $('state').innerHTML = `${LEVELNAME[lv] || ''} · ${Math.floor(C.s)} / ${SURF} m<br>${ARMS.length} film${ARMS.length === 1 ? '' : 's'} · ${CUT.length} frame${CUT.length === 1 ? '' : 's'} · membrane ${Math.round(C.mem)}%${C.reach > 0 ? ' · long reach' : ''}${C.slip > 0 ? ' · slipstream' : ''}${GH.size ? ` · ${GH.size + 1} diving` : ''}`; drawMicro(); }
   else if (G.state !== 'title') $('state').innerHTML = '';
-  { if (BACK.taken !== undefined && BACK.taken !== BACK.f) { BACK.f = BACK.taken; BACK.until = RT + 30; } else if (BACK.f === undefined || RT > BACK.until) { BACK.f = (BACK.f === undefined ? Math.floor(Math.random() * FILMS.length) : BACK.f + 7) % FILMS.length; BACK.until = RT + 24; } BACK.taken = undefined;
-    SCN.update(G.state === 'play' || G.state === 'title' ? SCI : [], real, RT, scene.fog.color, scene.fog.density); SCN.backdrop(FILMS.length ? scrSrc(BACK.f, 0) : null, .13, RT * .6, scene.fog.color, real, 70); if (CINE.on && typeof retMat !== 'undefined') retMat.uniforms.uA.value = 0; }
+  { /* the back layer is black; it plays a film only while you focus on one, or as an echo after an Echo pulse or a cast */ let bf = null, ba = 0; const fo = FOC && FOC.o && FOC.o.film !== undefined && FOC.k > .05 ? FOC.o : null;
+    if (fo) { bf = fo.film; ba = .24 * FOC.k; } else if (BACK.taken !== undefined && RT - BACK.tt < 2.4) { const e = (RT - BACK.tt) / 2.4; bf = BACK.taken; ba = .2 * Math.min(1, e * 6) * (1 - e) * (1 - e); }
+    else if (C.echoT !== undefined && RT - C.echoT < 2.4) { const e = (RT - C.echoT) / 2.4; if (BACK.et !== C.echoT) { BACK.et = C.echoT; const n = D.filter(d => d.live && !d.bad && d.pos).sort((a, b) => a.pos.distanceTo(C.p) - b.pos.distanceTo(C.p))[0]; BACK.ef = n ? n.film : null; } bf = BACK.ef; ba = .22 * Math.min(1, e * 6) * (1 - e) * (1 - e); }
+    SCN.update(G.state === 'play' || G.state === 'title' ? SCI : [], real, RT, scene.fog.color, scene.fog.density); SCN.backdrop(bf !== null && bf !== undefined ? scrSrc(bf, 0) : null, ba, RT * .6, scene.fog.color, real, 70); if (CINE.on && typeof retMat !== 'undefined') retMat.uniforms.uA.value = 0; }
   composer.render();
   const ft = performance.now() - t0; stat.frames.push(ft); if (stat.frames.length > 240) stat.frames.shift();
   if (DEBUG) { const s = stat.frames.slice().sort((a, b) => a - b), q = x => s[Math.floor(x * (s.length - 1))].toFixed(1); $('dbg').textContent = `s ${C.s.toFixed(1)} side ${C.side} lvl ${levelOf(C.s, C.side)} bell ${(bellFrac() * 100).toFixed(1)}% d ${camDist().toFixed(1)}\nangler ${ANG.st} · beat ${AU.beatPhase().toFixed(2)} bpm ${AU.bpm().toFixed(0)} · free ${freeBlocks.length}\nframe ms p50 ${q(.5)} p95 ${q(.95)}`; }

@@ -3,7 +3,7 @@
 // Shared by the drifts and by v4, v5 and v6. A backdrop layer plays one film full and faint in the farthest dark water.
 //
 //   const SCN = makeScreens(THREE, scene, camera, {n: 3});
-//   each frame: SCN.update(items, real, RT, scene.fog.color, scene.fog.density);  SCN.backdrop(src, alpha, RT);
+//   each frame: SCN.update(items, real, RT, scene.fog.color, scene.fog.density);  SCN.backdrop(src, alpha, RT, water, real)  (only while a film is held, or as an echo after a pulse)
 //   item: {key, pos: Vector3, size, clear 0..1, hold 0..1, src, clock}
 //   src:  {frames: i => url, n, fps, from} | {strip: url} | {thumb: url} | {video: url} | {el: HTMLVideoElement}, plus bw
 export function makeScreens(THREE, scene, camera, opt = {}) {
@@ -57,7 +57,7 @@ export function makeScreens(THREE, scene, camera, opt = {}) {
       const B = back, cur = B[0]; if (src && (!cur.it || cur.it.key !== (src.video || src.strip || src.thumb || src.key))) { if (cur.it) { B.reverse(); } const S = B[0]; drop(S); S.it = {key: src.video || src.strip || src.thumb || src.key, src}; S.lastE = null; S.a = 0; }
       if (!src && B[0].it) B.reverse();
       camera.getWorldDirection(_v);
-      B.forEach((S, i) => { const want = i === 0 && src ? alpha : 0; S.a += (want - S.a) * Math.min(1, real * (want > S.a ? .5 : .9)); if (!S.it || S.a < .004) { S.m.visible = false; if (S.it && want === 0 && S.a < .004) { S.it = null; drop(S); } return; }
+      B.forEach((S, i) => { const want = i === 0 && src ? alpha : 0; S.a += (want - S.a) * Math.min(1, real * (want > S.a ? 2.4 : 3.2)); if (!S.it || S.a < .004) { S.m.visible = false; if (S.it && want === 0 && S.a < .004) { S.it = null; drop(S); } return; }
         const asp = paint(S, S.it.src, t, 320); if (!asp) { S.m.visible = false; return; } const vw = viewW(depth) * 1.25, vh = vw / camera.aspect, w = Math.max(vw, vh * asp), h = w / asp;
         S.m.position.copy(camera.position).addScaledVector(_v, depth); S.m.quaternion.copy(camera.quaternion); S.m.scale.set(w, h, 1);
         const U = S.mat.uniforms; U.uA.value = S.a; U.uT.value = t; U.uAsp.value = asp; U.uSat.value = S.it.src.bw ? 0 : .3; U.uWater.value.copy(water); S.m.visible = true; }); },
@@ -69,7 +69,7 @@ export function makeScreens(THREE, scene, camera, opt = {}) {
 // H toggles it, or a three-finger tap; ?cinema starts in it. Pass the ids of the elements to hide.
 export function cinema(ids, opt = {}) {
   const Q = new URLSearchParams(location.search); let on = Q.has('cinema') || Q.has('trailer');
-  const st = document.createElement('style'); st.textContent = `body.cinema ${ids.map(i => '#' + i).join(',body.cinema ')}{opacity:0!important;visibility:hidden!important}
+  const st = document.createElement('style'); st.textContent = `${ids.length ? `body.cinema ${ids.map(i => '#' + i).join(',body.cinema ')}{opacity:0!important;visibility:hidden!important}` : ''}
     .cine-v{position:fixed;inset:0;pointer-events:none;z-index:50;background:radial-gradient(ellipse 75% 70% at 50% 48%,transparent 55%,rgba(0,0,0,.55) 100%);opacity:.6;transition:opacity 1s}body.cinema .cine-v{opacity:1}
     .cine-g{position:fixed;inset:-50%;pointer-events:none;z-index:51;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");animation:cineg 1.2s steps(6) infinite}
     body.cinema .cine-g{opacity:.08}@keyframes cineg{0%{transform:translate(0,0)}20%{transform:translate(-4%,3%)}40%{transform:translate(3%,-5%)}60%{transform:translate(-6%,-2%)}80%{transform:translate(5%,4%)}100%{transform:translate(0,0)}}`;

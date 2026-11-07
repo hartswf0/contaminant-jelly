@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>RAW DOODLE WORMS × CINEOSIS-LAB PERIODIC TABLE</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --abyss: #010306;
+    }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--abyss);
+      color: #e2e8f0;
+      font-family: 'IBM Plex Mono', monospace;
+      touch-action: none;
+    }
+    #webgl-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+    }
+    .raw-pill {
+      background: rgba(2, 5, 10, 0.72);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      transition: all 0.14s ease;
+    }
+    .raw-pill:hover, .raw-pill.active-pill {
+      border-color: #facc15;
+      color: #fde047;
+      background: rgba(250, 204, 21, 0.14);
+    }
+    .cineosis-active {
+      border-color: #c084fc !important;
+      color: #e9d5ff !important;
+      background: rgba(192, 132, 252, 0.16) !important;
+    }
+    .custom-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(250, 204, 21, 0.35); border-radius: 99px; }
+  </style>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "../paeleo/scion/videotext/vendor/three.module.min.js"
+      }
+    }
+  </script>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+</head>
+<body>
+  <!-- 3D WebGL Ocean (100% Frameless Raw Doodles) -->
+  <div id="webgl-layer"></div>
+
+  <!-- Frameless Raw Crosshair Tick (No Box Edges!) -->
+  <div id="raw-target-tick" class="fixed z-10 pointer-events-none hidden" style="transform: translate(-50%, -50%);">
+    <div class="flex flex-col items-center">
+      <span id="tick-label" class="text-[10px] font-bold tracking-wider text-amber-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">SM-0004 · GIRAFFE</span>
+      <span id="tick-sub" class="text-[8px] text-emerald-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">RAW WORM</span>
+    </div>
+  </div>
+
+  <!-- TOP BAR: Edition Switcher (ONLY DOODLES vs. CINEOSIS-LAB 8 LEVELS) + Segmentation Filter + Audio -->
+  <header class="fixed top-2.5 left-3 right-3 z-20 flex flex-wrap items-center justify-between gap-1.5 pointer-events-none">
+    <!-- Left: Instant Switcher between Edition 1 (ONLY DOODLES) and Edition 2 (CINEOSIS-LAB) -->
+    <div class="flex items-center gap-1.5 pointer-events-auto flex-wrap">
+      <button id="btn-mode-doodles" type="button" class="raw-pill active-pill rounded-full px-3 py-1 text-[10px] font-bold">
+        1 · ONLY DOODLES (109 SM)
+      </button>
+      <button id="btn-mode-cineosis" type="button" class="raw-pill rounded-full px-3 py-1 text-[10px] font-bold">
+        2 · CINEOSIS-LAB (44 SIGNS · 8 LEVELS)
+      </button>
+
+      <!-- Segmentation Mode (Segment by Level / Color / Film Collection / Subject) -->
+      <select id="select-segment" class="raw-pill rounded-full px-2.5 py-1 text-[10px] text-cyan-300 outline-none">
+        <option value="level">SEGMENT: BY LEVEL / DEPTH</option>
+        <option value="color">SEGMENT: BY COLOR SPECTRUM</option>
+        <option value="film">SEGMENT: BY FILM / COLLECTION</option>
+        <option value="subject">SEGMENT: BY SUBJECT (ANIMAL/PERSON/WATER)</option>
+      </select>
+    </div>
+
+    <!-- Center: Current Cineosis Level / Doodle Telemetry -->
+    <div class="flex items-center gap-1.5 pointer-events-auto">
+      <button id="btn-open-periodic" type="button" class="raw-pill rounded-full px-3 py-1 text-[10px] flex items-center gap-2" title="Open 44-Sign Cineosis Periodic Table & 109 Doodle Index">
+        <span id="hud-level-dot" class="w-2 h-2 rounded-full bg-yellow-400"></span>
+        <span id="hud-level-name" class="font-bold text-amber-200">L1 · PERCEPTION (So/Lq/Ga)</span>
+        <span class="text-slate-500">|</span>
+        <span>ARMS <strong id="hud-arms-lit" class="text-emerald-400">4/12</strong></span>
+        <span class="text-slate-500">|</span>
+        <span>DYED <strong id="hud-dyed-fish" class="text-cyan-300">0/40</strong></span>
+      </button>
+    </div>
+
+    <!-- Right: VOLHOLLA 26-Song Pill -->
+    <div class="flex items-center gap-1.5 pointer-events-auto">
+      <button id="btn-open-songs" type="button" class="raw-pill rounded-full px-2.5 py-1 flex items-center gap-2">
+        <canvas id="spec-mini" width="40" height="14" class="rounded"></canvas>
+        <span id="hud-song-label" class="text-[10px] text-emerald-300 truncate max-w-[110px]">Gospel Under Water</span>
+      </button>
+      <button id="btn-mute" type="button" class="raw-pill rounded-full px-2.5 py-1 text-[10px] font-bold text-amber-200">SND</button>
+    </div>
+  </header>
+
+  <!-- FRAMELESS RAW DOODLE MONITOR (Bottom-Left: Pure transparent floating doodle preview, zero box borders!) -->
+  <aside class="fixed bottom-12 left-3 z-20 w-44 sm:w-52 pointer-events-none flex flex-col items-start">
+    <canvas id="raw-preview-canvas" width="220" height="165" class="w-full h-auto drop-shadow-[0_0_12px_rgba(0,0,0,0.95)]"></canvas>
+    <div class="flex items-center gap-2 px-1 pointer-events-auto">
+      <span id="preview-caption" class="text-[10px] font-bold text-amber-300">SM-0004 · Giraffe</span>
+      <button id="btn-splice-worm" type="button" class="raw-pill rounded-full px-2 py-0.5 text-[9px] font-bold text-emerald-300">+TENTACLE</button>
+    </div>
+  </aside>
+
+  <!-- BOTTOM-RIGHT TACTILE CONTROLS -->
+  <footer class="fixed bottom-2.5 right-3 z-20 flex items-center gap-1.5 pointer-events-auto flex-wrap justify-end">
+    <div class="raw-pill rounded-full px-2.5 py-1 flex items-center gap-1 text-[10px]">
+      <button id="btn-zoom-in" type="button" class="px-1 text-amber-300">+</button>
+      <span id="zoom-txt">15m</span>
+      <button id="btn-zoom-out" type="button" class="px-1 text-amber-300">&minus;</button>
+    </div>
+    <button id="btn-pulse" type="button" class="raw-pill active-pill rounded-full px-3 py-1.5 text-[10px] font-bold">
+      PULSE &amp; WHIP
+    </button>
+    <button id="btn-sonar" type="button" class="raw-pill rounded-full px-3 py-1.5 text-[10px] font-bold text-emerald-300">
+      SONAR DYE
+    </button>
+    <button id="btn-peek" type="button" class="raw-pill rounded-full px-2.5 py-1.5 text-[10px]">
+      PEEK
+    </button>
+    <button id="btn-table-modal" type="button" class="raw-pill rounded-full px-3 py-1.5 text-[10px] text-purple-300 font-bold">
+      PERIODIC TABLE
+    </button>
+  </footer>
+
+  <!-- CINEOSIS 44-SIGN PERIODIC TABLE & 8-LEVEL TELEPORTER MODAL -->
+  <div id="periodic-modal" class="fixed inset-0 z-30 hidden items-center justify-center bg-black/85 backdrop-blur-md p-3 sm:p-5">
+    <div class="raw-pill rounded-2xl max-w-5xl w-full p-4 border border-white/20 max-h-[90vh] flex flex-col">
+      <div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-white/10">
+        <div>
+          <div class="text-xs font-bold text-amber-300">CINEOSIS PERIODIC TABLE OF MOVING-IMAGE SIGNS (44 SIGNS · 8 LEVELS) &amp; 109 RAW DOODLES</div>
+          <div class="text-[10px] text-slate-400">Click any Level or Sign to jump to its current and light up a Tentacle with its raw doodle</div>
+        </div>
+        <button id="btn-close-periodic" type="button" class="raw-pill rounded-full px-3 py-1 text-[10px]">CLOSE (ESC)</button>
+      </div>
+
+      <!-- 8 Cineosis Levels Bar -->
+      <div id="levels-bar" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-1.5 my-3 text-[9px]"></div>
+
+      <!-- 44-Sign Periodic Table Grid (16 Columns x 3 Rows: Composition I, Composition II, Genesis) -->
+      <div class="overflow-y-auto custom-scroll pr-1 flex-1">
+        <div id="periodic-grid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-1.5 text-[9px]"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 26-SONG VOLHOLLA DRAWER -->
+  <aside id="songs-drawer" class="fixed top-0 right-0 bottom-0 z-30 w-80 raw-pill border-l border-white/15 p-3.5 transform translate-x-full transition-transform duration-300 flex flex-col">
+    <div class="flex items-center justify-between pb-2 border-b border-white/10">
+      <span class="text-xs font-bold text-emerald-300">26 VOLHOLLA SPECTROGRAM SONGS</span>
+      <button id="btn-close-songs" type="button" class="raw-pill rounded-full px-2.5 py-0.5 text-[10px]">CLOSE</button>
+    </div>
+    <div id="songs-list" class="flex-1 overflow-y-auto custom-scroll space-y-1 mt-2 pr-1 text-[10px]"></div>
+  </aside>
+
+  <script type="module">
+    import * as THREE from 'three';
+
+    // ============================================================================
+    // 1. THE 8 CINEOSIS LEVELS & 44 DELEUZIAN SIGNS (From cineosis-lab/periodic-table.html)
+    // ============================================================================
+    const CINEOSIS_8_LEVELS = [
+      { level: 1, code: '0', name: 'Perception · Zeroness', color: '#facc15', zCenter: -28, collection: 'cineosis', subject: 'water' },
+      { level: 2, code: '111', name: 'Affect · Firstness', color: '#fb7185', zCenter: -78, collection: 'wygwyl', subject: 'person' },
+      { level: 3, code: '211–222', name: 'Action · Secondness', color: '#fb923c', zCenter: -128, collection: 'odyssey', subject: 'animal' },
+      { level: 4, code: '311–322', name: 'Thought · Reflection', color: '#4ade80', zCenter: -178, collection: 'republic', subject: 'landscape' },
+      { level: 5, code: '331–333', name: 'Thought · Mental', color: '#38bdf8', zCenter: -228, collection: 'wargames', subject: 'hands' },
+      { level: 6, code: '0-T', name: 'Opsign & Sonsign', color: '#cbd5e1', zCenter: -278, collection: 'cineosis', subject: 'screen' },
+      { level: 7, code: '1–3', name: 'Time-Images Proper', color: '#c084fc', zCenter: -328, collection: 'norse', subject: 'pattern' },
+      { level: 8, code: '∞', name: 'Lectosign (Read-Image)', color: '#f472b6', zCenter: -378, collection: 'all', subject: 'diagram' }
+    ];
+
+    const CINEOSIS_44_SIGNS = [
+      // Level 1: Perception (Yellow #facc15)
+      { num: 1, sym: 'So', code: '0-1', name: 'Solid perception', row: 'Composition I', level: 1, color: '#facc15', doodle: 'giraffe', sm: 'SM-0004' },
+      { num: 2, sym: 'Lq', code: '0-2', name: 'Liquid perception', row: 'Composition II', level: 1, color: '#fde047', doodle: 'dolphin', sm: 'SM-0140' },
+      { num: 3, sym: 'Ga', code: '0-3', name: 'Gaseous perception', row: 'Genesis', level: 1, color: '#fef08a', doodle: 'butterfly', sm: 'SM-0059' },
+      // Level 2: Affect (Coral Pink #fb7185)
+      { num: 4, sym: 'Ic', code: '111-1', name: 'Icon (Face)', row: 'Composition I', level: 2, color: '#fb7185', doodle: 'face_hand', sm: 'SM-0159' },
+      { num: 5, sym: 'Dv', code: '111-2', name: 'Dividual', row: 'Composition II', level: 2, color: '#f43f5e', doodle: 'fish_school', sm: 'SM-0141' },
+      { num: 6, sym: 'As', code: '111-3', name: 'Any-space-whatever', row: 'Genesis', level: 2, color: '#fda4af', doodle: 'lighthouse', sm: 'SM-0096' },
+      // Level 3: Action — Impulse, Small, Large (Orange #fb923c)
+      { num: 7, sym: 'Sy', code: '211-1', name: 'Symptom', row: 'Composition I', level: 3, color: '#fb923c', doodle: 'dragon', sm: 'SM-0084' },
+      { num: 8, sym: 'Fe', code: '211-2', name: 'Fetish', row: 'Composition II', level: 3, color: '#f97316', doodle: 'cat', sm: 'SM-0056' },
+      { num: 9, sym: 'Or', code: '211-3', name: 'Originary world', row: 'Genesis', level: 3, color: '#fdba74', doodle: 'snake', sm: 'SM-0098' },
+      { num: 10, sym: 'Il', code: '221-1', name: 'Index of lack', row: 'Composition I', level: 3, color: '#f59e0b', doodle: 'horse', sm: 'SM-0058' },
+      { num: 11, sym: 'Ie', code: '221-2', name: 'Index of equivocity', row: 'Composition II', level: 3, color: '#d97706', doodle: 'rabbit', sm: 'SM-0053' },
+      { num: 12, sym: 'Ve', code: '221-3', name: 'Vector', row: 'Genesis', level: 3, color: '#fbbf24', doodle: 'bicycle', sm: 'SM-0060' },
+      { num: 13, sym: 'Mi', code: '222-1', name: 'Milieu', row: 'Composition I', level: 3, color: '#ea580c', doodle: 'duck', sm: 'SM-0055' },
+      { num: 14, sym: 'Bi', code: '222-2', name: 'Binomial', row: 'Composition II', level: 3, color: '#fb923c', doodle: 'giraffe', sm: 'SM-0057' },
+      { num: 15, sym: 'Im', code: '222-3', name: 'Imprint', row: 'Genesis', level: 3, color: '#fed7aa', doodle: 'face_hand', sm: 'SM-0105' },
+      // Level 4: Reflection — Attraction, Inversion, Discourse (Light Green #4ade80)
+      { num: 16, sym: 'Pl', code: '311-1', name: 'Plastic figure', row: 'Composition I', level: 4, color: '#4ade80', doodle: 'butterfly', sm: 'SM-0089' },
+      { num: 17, sym: 'Th', code: '311-2', name: 'Theatrical figure', row: 'Composition II', level: 4, color: '#22c55e', doodle: 'dancer', sm: 'SM-0155' },
+      { num: 18, sym: 'Ma', code: '311-3', name: 'Mise en abyme', row: 'Genesis', level: 4, color: '#86efac', doodle: 'rotor', sm: 'SM-0062' },
+      { num: 19, sym: 'Su', code: '321-1', name: 'Figure of the sublime', row: 'Composition I', level: 4, color: '#10b981', doodle: 'lighthouse', sm: 'SM-0097' },
+      { num: 20, sym: 'En', code: '321-2', name: 'Figure of enfeeblement', row: 'Composition II', level: 4, color: '#34d399', doodle: 'rabbit', sm: 'SM-0081' },
+      { num: 21, sym: 'Qu', code: '321-3', name: 'Quotidian', row: 'Genesis', level: 4, color: '#a7f3d0', doodle: 'bicycle', sm: 'SM-0080' },
+      { num: 22, sym: 'Ll', code: '322-1', name: 'Limit of large form', row: 'Composition I', level: 4, color: '#84cc16', doodle: 'horse', sm: 'SM-0073' },
+      { num: 23, sym: 'Ls', code: '322-2', name: 'Limit of small form', row: 'Composition II', level: 4, color: '#a3e635', doodle: 'cat', sm: 'SM-0064' },
+      { num: 24, sym: 'Xl', code: '322-3', name: 'Extreme limit', row: 'Genesis', level: 4, color: '#bef264', doodle: 'dragon', sm: 'SM-0074' },
+      // Level 5: Mental — Dream, Recollection, Relation (Light Blue / Teal #38bdf8)
+      { num: 25, sym: 'Rd', code: '331-1', name: 'Rich dream', row: 'Composition I', level: 5, color: '#38bdf8', doodle: 'butterfly', sm: 'SM-0069' },
+      { num: 26, sym: 'Rs', code: '331-2', name: 'Restrained dream', row: 'Composition II', level: 5, color: '#0ea5e9', doodle: 'dolphin', sm: 'SM-0068' },
+      { num: 27, sym: 'Mw', code: '331-3', name: 'Movement of world', row: 'Genesis', level: 5, color: '#7dd3fc', doodle: 'fish_school', sm: 'SM-0092' },
+      { num: 28, sym: 'Sd', code: '332-1', name: 'Strong destiny', row: 'Composition I', level: 5, color: '#2dd4bf', doodle: 'lighthouse', sm: 'SM-0078' },
+      { num: 29, sym: 'Wd', code: '332-2', name: 'Weak destiny', row: 'Composition II', level: 5, color: '#14b8a6', doodle: 'duck', sm: 'SM-0088' },
+      { num: 30, sym: 'Fp', code: '332-3', name: 'Forking paths', row: 'Genesis', level: 5, color: '#5eead4', doodle: 'snake', sm: 'SM-0158' },
+      { num: 31, sym: 'Mk', code: '333-1', name: 'Mark', row: 'Composition I', level: 5, color: '#60a5fa', doodle: 'face_hand', sm: 'SM-0099' },
+      { num: 32, sym: 'Dm', code: '333-2', name: 'Demark', row: 'Composition II', level: 5, color: '#3b82f6', doodle: 'rotor', sm: 'SM-0071' },
+      { num: 33, sym: 'Sb', code: '333-3', name: 'Symbol', row: 'Genesis', level: 5, color: '#93c5fd', doodle: 'giraffe', sm: 'SM-0087' },
+      // Level 6: Opsign & Sonsign (Silver #cbd5e1)
+      { num: 34, sym: 'Op', code: '0-Op', name: 'Opsign (Pure Optical)', row: 'Composition I', level: 6, color: '#e2e8f0', doodle: 'face_hand', sm: 'SM-0188' },
+      { num: 35, sym: 'Sn', code: '0-Sn', name: 'Sonsign (Pure Sound)', row: 'Composition II', level: 6, color: '#94a3b8', doodle: 'rotor', sm: 'SM-0101' },
+      // Level 7: Time-Images Proper — Hyalosign, Chronosign, Noosign (Lavender Purple #c084fc)
+      { num: 36, sym: 'Mf', code: '1-1', name: 'Mirrors face to face', row: 'Composition I', level: 7, color: '#c084fc', doodle: 'face_hand', sm: 'SM-0163' },
+      { num: 37, sym: 'Lo', code: '1-2', name: 'Limpid and opaque', row: 'Composition II', level: 7, color: '#a855f7', doodle: 'dolphin', sm: 'SM-0147' },
+      { num: 38, sym: 'Se', code: '1-3', name: 'Seed and environment', row: 'Genesis', level: 7, color: '#d8b4fe', doodle: 'giraffe', sm: 'SM-0157' },
+      { num: 39, sym: 'Pp', code: '2-1', name: 'Peaks of the present', row: 'Composition I', level: 7, color: '#818cf8', doodle: 'butterfly', sm: 'SM-0167' },
+      { num: 40, sym: 'Sp', code: '2-2', name: 'Sheets of the past', row: 'Composition II', level: 7, color: '#6366f1', doodle: 'horse', sm: 'SM-0142' },
+      { num: 41, sym: 'Pf', code: '2-3', name: 'Powers of the false', row: 'Genesis', level: 7, color: '#a5b4fc', doodle: 'dragon', sm: 'SM-0151' },
+      { num: 42, sym: 'Ba', code: '3-1', name: 'Bodies of attitude', row: 'Composition I', level: 7, color: '#e879f9', doodle: 'dancer', sm: 'SM-0154' },
+      { num: 43, sym: 'Bg', code: '3-2', name: 'Bodies of gest', row: 'Composition II', level: 7, color: '#d946ef', doodle: 'face_hand', sm: 'SM-0075' },
+      // Level 8: Lectosign (Magenta-Pink #f472b6)
+      { num: 44, sym: 'Le', code: '∞', name: 'Lectosign (Cinema of Brain)', row: 'Genesis', level: 8, color: '#f472b6', doodle: 'fish_school', sm: 'SM-0185' }
+    ];
+
+    // Optional live fetch hook for cineosis-lab/lab/lab-data.json
+    async function tryFetchCineosisLabData() {
+      try {
+        const res = await fetch('https://hartswf0.github.io/cineosis-lab/lab/lab-data.json', { mode: 'cors' });
+        if (res.ok) console.info('Loaded live cineosis-lab/lab/lab-data.json');
+      } catch (_) {}
+    }
+    tryFetchCineosisLabData();
+
+    // ============================================================================
+    // 2. 100% FRAMELESS RAW QUICK-DRAW DOODLE ENGINE ("no frame edges! Everything doodle raw")
+    //    - Zero background fill, zero rectangular border!
+    //    - Pure glowing hand-drawn vector strokes with multi-plane BEFLIX / Cineosis colors!
+    // ============================================================================
+    let activeEdition = 'doodles'; // 'doodles' (Secondhand Motion 109) or 'cineosis' (44 Periodic Signs)
+    let segmentMode = 'level';     // 'level', 'color', 'film', 'subject'
+
+    function drawFramelessRawDoodle(ctx, w, h, signItem, frameFloat) {
+      // 100% TRANSPARENT CLEAR — NO BACKGROUND RECTANGLE, NO FRAME EDGES!
+      ctx.clearRect(0, 0, w, h);
+      ctx.save();
+
+      const phase = (frameFloat % 33) / 33 * Math.PI * 2;
+      const baseColor = signItem.color || '#facc15';
+      const palette = [
+        baseColor,
+        '#38bdf8', // Sky cyan
+        '#22c55e', // Tree emerald
+        '#f59e0b', // Subject amber
+        '#f472b6', // Accent magenta
+        '#ffffff'  // Highlight core
+      ];
+
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.shadowColor = baseColor;
+      ctx.shadowBlur = 6;
+
+      // Helper for raw QuickDraw-style hand-jittered multi-stroke lines
+      const setStroke = (col, width = 3.8) => {
+        ctx.strokeStyle = col;
+        ctx.lineWidth = width;
+      };
+
+      const type = signItem.doodle;
+
+      // 1. Floating Raw Cloud / Wave / Context Strokes (Top & Bottom — No Box Edges!)
+      setStroke(palette[1], 3.0);
+      for (let c = 0; c < 2; c++) {
+        const cx = w * (0.28 + c * 0.42) + Math.sin(phase + c) * 10;
+        const cy = h * 0.18;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 11, Math.PI * 0.85, Math.PI * 2.05);
+        ctx.arc(cx + 14, cy - 2, 13, Math.PI * 0.9, Math.PI * 2.1);
+        ctx.stroke();
+      }
+
+      // 2. Main Raw Hand-Drawn QuickDraw Subject Strokes
+      setStroke(palette[0], 4.5);
+
+      if (type === 'giraffe') {
+        const gx = w * 0.42 + Math.sin(phase) * 9;
+        const gy = h * 0.62;
+        const swing = Math.sin(phase * 2) * 11;
+
+        // Savanna Tree Doodle behind giraffe (Emerald #22c55e)
+        setStroke(palette[2], 3.2);
+        ctx.beginPath();
+        ctx.moveTo(w * 0.30, h * 0.82);
+        ctx.lineTo(w * 0.30, h * 0.28);
+        ctx.moveTo(w * 0.30, h * 0.45);
+        ctx.lineTo(w * 0.16, h * 0.24);
+        ctx.moveTo(w * 0.30, h * 0.40);
+        ctx.lineTo(w * 0.44, h * 0.22);
+        ctx.stroke();
+
+        // Giraffe Body, Long Neck, Ears & 4 Walking Legs
+        setStroke(palette[0], 4.6);
+        ctx.beginPath();
+        ctx.moveTo(gx - 22, gy + 4);
+        ctx.lineTo(gx + 10, gy - 6);
+        ctx.lineTo(gx + 30, gy - 50);
+        ctx.lineTo(gx + 40, gy - 47);
+        ctx.lineTo(gx + 16, gy + 6);
+        ctx.closePath();
+        ctx.stroke();
+
+        // Internal cross-hatching doodle strokes (like BEFLIX grid belly)
+        setStroke(palette[5], 2.2);
+        ctx.beginPath();
+        ctx.moveTo(gx - 12, gy + 1); ctx.lineTo(gx + 10, gy + 1);
+        ctx.moveTo(gx - 8, gy - 3);  ctx.lineTo(gx + 12, gy - 3);
+        ctx.stroke();
+
+        // Legs
+        setStroke(palette[0], 4.2);
+        ctx.beginPath();
+        ctx.moveTo(gx - 18, gy + 5); ctx.lineTo(gx - 24 + swing, h * 0.88);
+        ctx.moveTo(gx - 9, gy + 5);  ctx.lineTo(gx - 9 - swing, h * 0.88);
+        ctx.moveTo(gx + 7, gy + 5);  ctx.lineTo(gx + 9 - swing, h * 0.88);
+        ctx.moveTo(gx + 14, gy + 5); ctx.lineTo(gx + 19 + swing, h * 0.88);
+        ctx.stroke();
+
+        // Young Giraffe Calf Doodle beside it
+        setStroke(palette[3], 3.4);
+        const cx = gx + 30, cy = gy + 10;
+        ctx.beginPath();
+        ctx.moveTo(cx - 9, cy + 3);
+        ctx.lineTo(cx + 6, cy - 2);
+        ctx.lineTo(cx + 16, cy - 24);
+        ctx.moveTo(cx - 7, cy + 3); ctx.lineTo(cx - 9 - swing * 0.6, h * 0.88);
+        ctx.moveTo(cx + 5, cy + 3); ctx.lineTo(cx + 8 + swing * 0.6, h * 0.88);
+        ctx.stroke();
+
+      } else if (type === 'butterfly') {
+        const bx = w * 0.5 + Math.cos(phase) * 12;
+        const by = h * 0.52 + Math.sin(phase * 2) * 9;
+        const flap = 0.32 + Math.abs(Math.sin(phase * 3)) * 0.68;
+        setStroke(palette[0], 4.4);
+        ctx.beginPath();
+        ctx.ellipse(bx - 22 * flap, by - 8, 26 * flap, 20, -0.3, 0, Math.PI * 2);
+        ctx.ellipse(bx + 22 * flap, by - 8, 26 * flap, 20, 0.3, 0, Math.PI * 2);
+        ctx.stroke();
+        setStroke(palette[4], 3.8);
+        ctx.beginPath();
+        ctx.ellipse(bx - 16 * flap, by + 14, 18 * flap, 15, 0.25, 0, Math.PI * 2);
+        ctx.ellipse(bx + 16 * flap, by + 14, 18 * flap, 15, -0.25, 0, Math.PI * 2);
+        ctx.stroke();
+        // Antennae
+        setStroke(palette[5], 2.8);
+        ctx.beginPath();
+        ctx.moveTo(bx, by + 22); ctx.lineTo(bx, by - 22);
+        ctx.moveTo(bx, by - 18); ctx.quadraticCurveTo(bx - 14, by - 36, bx - 22, by - 30);
+        ctx.moveTo(bx, by - 18); ctx.quadraticCurveTo(bx + 14, by - 36, bx + 22, by - 30);
+        ctx.stroke();
+
+      } else if (type === 'dolphin' || type === 'fish_school') {
+        for (let f = 0; f < 2; f++) {
+          const dx = w * (0.38 + f * 0.24) + Math.cos(phase + f * 1.4) * 14;
+          const dy = h * (0.46 + f * 0.18) + Math.sin(phase + f * 1.4) * 12;
+          setStroke(f === 0 ? palette[0] : palette[1], 4.2);
+          ctx.beginPath();
+          ctx.moveTo(dx + 28, dy);
+          ctx.quadraticCurveTo(dx, dy - 20, dx - 26, dy);
+          ctx.lineTo(dx - 38, dy - 12);
+          ctx.lineTo(dx - 32, dy);
+          ctx.lineTo(dx - 38, dy + 12);
+          ctx.lineTo(dx - 26, dy);
+          ctx.quadraticCurveTo(dx, dy + 16, dx + 28, dy);
+          ctx.stroke();
+        }
+      } else if (type === 'face_hand') {
+        const fx = w * 0.34, fy = h * 0.52;
+        setStroke(palette[0], 4.2);
+        ctx.beginPath();
+        ctx.ellipse(fx, fy, 23, 29, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        // Eyes & Mouth strokes
+        setStroke(palette[5], 3.2);
+        ctx.beginPath();
+        ctx.arc(fx - 8, fy - 4, 2.8, 0, Math.PI * 2);
+        ctx.arc(fx + 8, fy - 4, 2.8, 0, Math.PI * 2);
+        ctx.moveTo(fx, fy - 2); ctx.lineTo(fx - 2, fy + 6); ctx.lineTo(fx + 2, fy + 7);
+        ctx.moveTo(fx - 8, fy + 14); ctx.quadraticCurveTo(fx, fy + 18, fx + 8, fy + 14);
+        ctx.stroke();
+
+        // 5-Fingered Open Hand Doodle on Right
+        const hx = w * 0.70, hy = h * 0.58;
+        setStroke(palette[1], 3.8);
+        ctx.beginPath();
+        ctx.arc(hx, hy + 4, 12, 0, Math.PI * 2);
+        [-0.5, -0.25, 0, 0.25, 0.5].forEach((a, i) => {
+          ctx.moveTo(hx + (i - 2) * 4, hy - 4);
+          ctx.lineTo(hx + (i - 2) * 9 + Math.sin(phase + i) * 3, hy - 28);
+        });
+        ctx.stroke();
+
+      } else if (type === 'dragon' || type === 'snake') {
+        setStroke(palette[0], 4.8);
+        ctx.beginPath();
+        for (let s = 0; s <= 24; s++) {
+          const sx = w * 0.12 + (s / 24) * w * 0.76;
+          const sy = h * 0.54 + Math.sin(phase * 2 + s * 0.45) * 20;
+          if (s === 0) ctx.moveTo(sx, sy);
+          else ctx.lineTo(sx, sy);
+        }
+        ctx.stroke();
+        // Dragon wings
+        setStroke(palette[3], 3.4);
+        const wx = w * 0.48, wy = h * 0.50 + Math.sin(phase * 2) * 14;
+        ctx.beginPath();
+        ctx.moveTo(wx, wy); ctx.lineTo(wx - 22, wy - 28); ctx.lineTo(wx + 8, wy - 18);
+        ctx.stroke();
+
+      } else {
+        // Horse / Bicycle / Rotor / Dancer / Lighthouse raw doodle
+        const hx = w * 0.48 + Math.sin(phase) * 14;
+        const hy = h * 0.56;
+        const swing = Math.cos(phase * 2) * 12;
+        setStroke(palette[0], 4.4);
+        ctx.beginPath();
+        ctx.ellipse(hx, hy, 26, 13, 0, 0, Math.PI * 2);
+        ctx.moveTo(hx + 18, hy - 6); ctx.lineTo(hx + 32, hy - 28); ctx.lineTo(hx + 40, hy - 22);
+        ctx.moveTo(hx - 18, hy + 8); ctx.lineTo(hx - 24 + swing, h * 0.86);
+        ctx.moveTo(hx - 8, hy + 8);  ctx.lineTo(hx - 8 - swing, h * 0.86);
+        ctx.moveTo(hx + 10, hy + 8); ctx.lineTo(hx + 10 - swing, h * 0.86);
+        ctx.moveTo(hx + 18, hy + 8); ctx.lineTo(hx + 24 + swing, h * 0.86);
+        ctx.stroke();
+      }
+
+      // Floating frameless Sign Symbol or SM Code (No box!)
+      ctx.fillStyle = palette[0];
+      ctx.font = 'bold 13px "IBM Plex Mono", monospace';
+      const label = activeEdition === 'cineosis'
+        ? `[${signItem.sym}] ${signItem.code}`
+        : `${signItem.sm} · ${signItem.sym}`;
+      ctx.fillText(label, 12, 20);
+
+      ctx.restore();
+    }
+
+    // Create 12 Live Frameless Raw Doodle Canvases (covering all 8 Cineosis Levels & Doodle Types!)
+    const POOL_SIZE = 12;
+    const rawDoodlePool = Array.from({ length: POOL_SIZE }, (_, idx) => {
+      const signItem = CINEOSIS_44_SIGNS[(idx * 3) % CINEOSIS_44_SIGNS.length];
+      const canvas = document.createElement('canvas');
+      canvas.width = 220;
+      canvas.height = 165;
+      const ctx = canvas.getContext('2d');
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.minFilter = THREE.LinearFilter;
+      texture.magFilter = THREE.LinearFilter;
+      return { idx, signItem, canvas, ctx, texture };
+    });
+
+    // ============================================================================
+    // 3. THREE.JS SCENE: 100% FRAMELESS RAW DOODLE JELLYFISH, WORMS & FISH
+    // ============================================================================
+    const container = document.getElementById('webgl-layer');
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x010306);
+    scene.fog = new THREE.FogExp2(0x010306, 0.012);
+
+    const camera = new THREE.PerspectiveCamera(46, window.innerWidth / window.innerHeight, 0.2, 190);
+    scene.add(new THREE.AmbientLight(0x64748b, 1.2));
+    const swimmerLight = new THREE.PointLight(0xfacc15, 2.6, 32, 1.3);
+    scene.add(swimmerLight);
+
+    // ============================================================================
+    // 4. THE RAW-DOODLE JELLYFISH (Constructed from Hand-Drawn Multi-Stroke
+    //    Bell Ribs + Frameless Floating Doodle Crown + 12 Raw Doodle Tentacles!)
+    // ============================================================================
+    const swimmer = {
+      pos: new THREE.Vector3(0, 0.4, -12),
+      vel: new THREE.Vector3(0, 0, -0.04),
+      steerX: 0,
+      steerY: 0,
+      pulsePhase: 0,
+      whipBoost: 0,
+      sonarTimer: 0,
+      peeking: false,
+      peekYaw: 0,
+      camDist: 15.0,
+      targetCamDist: 15.0,
+      activeLevel: 1
+    };
+
+    const jellyGroup = new THREE.Group();
+    scene.add(jellyGroup);
+
+    // Build Jellyfish Bell out of 18 Raw Hand-Drawn Meridian Rib Strokes + 5 Latitudinal Sketch Rings (No solid box edges!)
+    const BELL_R = 1.05;
+    const bellStrokeGroup = new THREE.Group();
+    jellyGroup.add(bellStrokeGroup);
+    const bellRibMeshes = [];
+
+    for (let r = 0; r < 18; r++) {
+      const phi = (r / 18) * Math.PI * 2;
+      const pts = [];
+      for (let s = 0; s <= 14; s++) {
+        const theta = (s / 14) * Math.PI * 0.68;
+        const jitter = (Math.sin(r * 7 + s * 3) * 0.025);
+        pts.push(new THREE.Vector3(
+          Math.cos(phi) * Math.sin(theta) * (BELL_R + jitter),
+          Math.cos(theta) * (BELL_R * 0.88 + jitter),
+          Math.sin(phi) * Math.sin(theta) * (BELL_R + jitter)
+        ));
+      }
+      const geo = new THREE.BufferGeometry().setFromPoints(pts);
+      const orig = geo.attributes.position.array.slice();
+      const mat = new THREE.LineBasicMaterial({
+        color: r % 2 === 0 ? 0xfacc15 : 0x38bdf8,
+        transparent: true,
+        opacity: 0.92
+      });
+      const line = new THREE.Line(geo, mat);
+      bellStrokeGroup.add(line);
+      bellRibMeshes.push({ line, geo, orig, mat });
+    }
+
+    // Frameless Floating Doodle Core inside the Bell (Projects the currently active doodle with 0 edges!)
+    const bellDoodleMat = new THREE.MeshBasicMaterial({
+      map: rawDoodlePool[0].texture,
+      transparent: true,
+      alphaTest: 0.04,
+      depthWrite: false,
+      side: THREE.DoubleSide
+    });
+    const bellDoodleSprite = new THREE.Mesh(new THREE.PlaneGeometry(1.55, 1.15), bellDoodleMat);
+    bellDoodleSprite.position.set(0, 0.15, 0);
+    jellyGroup.add(bellDoodleSprite);
+
+    // 12 Frameless Raw-Doodle Tentacles
+    const TENTACLE_COUNT = 12;
+    const SEG_COUNT = 16;
+    const tentacles = [];
+    const tentaclesGroup = new THREE.Group();
+    scene.add(tentaclesGroup);
+    const rawSliceGeo = new THREE.PlaneGeometry(0.78, 0.58);
+
+    for (let t = 0; t < TENTACLE_COUNT; t++) {
+      const ang = (t / TENTACLE_COUNT) * Math.PI * 2;
+      const isLit = t < 4;
+      const slot = rawDoodlePool[t % rawDoodlePool.length];
+
+      const nodes = Array.from({ length: SEG_COUNT }, (_, s) => {
+        const p = swimmer.pos.clone().add(new THREE.Vector3(Math.cos(ang) * 0.65, -s * 0.27, Math.sin(ang) * 0.65));
+        return { pos: p.clone(), prev: p.clone() };
+      });
+
+      const linePos = new Float32Array(SEG_COUNT * 3);
+      const lineGeo = new THREE.BufferGeometry();
+      lineGeo.setAttribute('position', new THREE.BufferAttribute(linePos, 3));
+      const lineMat = new THREE.LineBasicMaterial({
+        color: new THREE.Color(isLit ? slot.signItem.color : '#334155'),
+        transparent: true,
+        opacity: isLit ? 0.95 : 0.25
+      });
+      const lineMesh = new THREE.Line(lineGeo, lineMat);
+      tentaclesGroup.add(lineMesh);
+
+      // Frameless Raw Doodle Slices along the Tentacle (NO border boxes, pure transparent strokes!)
+      const slices = [];
+      for (let s = 2; s < SEG_COUNT; s += 3) {
+        const sMat = new THREE.MeshBasicMaterial({
+          map: slot.texture,
+          transparent: true,
+          alphaTest: 0.04,
+          depthWrite: false,
+          opacity: isLit ? 0.98 : 0.0,
+          side: THREE.DoubleSide
+        });
+        const sMesh = new THREE.Mesh(rawSliceGeo, sMat);
+        tentaclesGroup.add(sMesh);
+        slices.push({ mesh: sMesh, mat: sMat, nodeIdx: s });
+      }
+
+      tentacles.push({ index: t, angle: ang, lit: isLit, slot, nodes, lineMesh, lineMat, slices });
+    }
+
+    function lightUpTentacleWithSlot(slot) {
+      let target = tentacles.find((t) => !t.lit);
+      if (!target) target = tentacles[Math.floor(Math.random() * tentacles.length)];
+      target.lit = true;
+      target.slot = slot;
+      target.lineMat.color.set(slot.signItem.color);
+      target.lineMat.opacity = 0.95;
+      target.slices.forEach((s) => {
+        s.mat.map = slot.texture;
+        s.mat.opacity = 0.98;
+        s.mat.needsUpdate = true;
+      });
+
+      // Also color the Jellyfish Bell ribs & core with this doodle!
+      bellDoodleMat.map = slot.texture;
+      bellDoodleMat.needsUpdate = true;
+      bellRibMeshes.forEach((rib, idx) => {
+        if (idx % 3 === 0) rib.mat.color.set(slot.signItem.color);
+      });
+
+      const litTotal = tentacles.filter((t) => t.lit).length;
+      document.getElementById('hud-arms-lit').textContent = `${litTotal}/${TENTACLE_COUNT}`;
+      audio.playChime(1.2);
+    }
+
+    // ============================================================================
+    // 5. 24 FRAMELESS RAW DOODLE WORMS IN THE WATER (Segmented by Level, Color,
+    //    Film Collection, or Subject — Zero Rectangular Frame Edges!)
+    // ============================================================================
+    const WORM_COUNT = 24;
+    const WORM_SLICES = 11;
+    const doodleWorms = [];
+    const wormsGroup = new THREE.Group();
+    scene.add(wormsGroup);
+
+    const wormPlaneGeo = new THREE.PlaneGeometry(3.4, 2.55);
+
+    for (let w = 0; w < WORM_COUNT; w++) {
+      const slot = rawDoodlePool[w % rawDoodlePool.length];
+      const sign = CINEOSIS_44_SIGNS[(w * 2) % CINEOSIS_44_SIGNS.length];
+
+      const slices = [];
+      for (let s = 0; s < WORM_SLICES; s++) {
+        // Pure frameless transparent doodle material — NO EdgesGeometry, NO box borders!
+        const mat = new THREE.MeshBasicMaterial({
+          map: slot.texture,
+          transparent: true,
+          alphaTest: 0.04,
+          depthWrite: false,
+          opacity: s === 0 ? 1.0 : (0.90 - s * 0.065),
+          side: THREE.DoubleSide
+        });
+        const mesh = new THREE.Mesh(wormPlaneGeo, mat);
+        mesh.scale.setScalar(1.0 - s * 0.05);
+        wormsGroup.add(mesh);
+        slices.push(mesh);
+      }
+
+      // Thin organic spine filament linking the raw doodle slices
+      const spinePos = new Float32Array(WORM_SLICES * 3);
+      const spineGeo = new THREE.BufferGeometry();
+      spineGeo.setAttribute('position', new THREE.BufferAttribute(spinePos, 3));
+      const spineMat = new THREE.LineBasicMaterial({
+        color: new THREE.Color(sign.color),
+        transparent: true,
+        opacity: 0.45
+      });
+      const spineLine = new THREE.Line(spineGeo, spineMat);
+      wormsGroup.add(spineLine);
+
+      doodleWorms.push({
+        id: w,
+        slot,
+        sign,
+        headPos: new THREE.Vector3(0, 0, -18 - w * 16),
+        targetAnchor: new THREE.Vector3((w % 2 === 0 ? -1 : 1) * 4.8, ((w % 3) - 1) * 2.2, -18 - w * 16),
+        slices,
+        spineLine,
+        phase: w * 0.85,
+        cooldown: 0
+      });
+    }
+
+    // Re-cluster the 24 Swimming Worms in 3D space whenever Segmentation Mode changes!
+    function applyArchiveSegmentation(mode) {
+      segmentMode = mode;
+      doodleWorms.forEach((w, idx) => {
+        const s = w.sign;
+        if (mode === 'level') {
+          // 8 Sequential Levels along Z (-15m to -395m) matching Cineosis Periodic Table
+          const lvl = CINEOSIS_8_LEVELS[(s.level - 1) % 8];
+          const localIdx = idx % 3;
+          w.targetAnchor.set(
+            (localIdx - 1) * 5.2 + (idx % 2 === 0 ? -1.5 : 1.5),
+            ((idx % 3) - 1) * 2.4,
+            lvl.zCenter - localIdx * 14
+          );
+        } else if (mode === 'color') {
+          // Chromatic Ring Tunnel: radial angle around the water determined by Hue/Level!
+          const ang = ((s.level - 1) / 8) * Math.PI * 2;
+          w.targetAnchor.set(
+            Math.cos(ang) * 6.8,
+            Math.sin(ang) * 4.6,
+            -20 - idx * 15
+          );
+        } else if (mode === 'film') {
+          // Clustered into 6 Film Collections (cineosis, wygwyl, odyssey, wargames, republic, norse)
+          const cluster = idx % 6;
+          w.targetAnchor.set(
+            ((cluster % 3) - 1) * 6.5,
+            (cluster < 3 ? 2.5 : -2.5),
+            -25 - cluster * 60 - (idx % 4) * 11
+          );
+        } else if (mode === 'subject') {
+          // Clustered by Subject Tag (animal, person, water, landscape, hands, rotor)
+          const lane = s.doodle === 'giraffe' || s.doodle === 'horse' ? -7.0
+            : (s.doodle === 'face_hand' ? 7.0 : 0.0);
+          w.targetAnchor.set(lane, ((idx % 3) - 1) * 2.6, -18 - idx * 15);
+        }
+      });
+    }
+    applyArchiveSegmentation('level');
+
+    // ============================================================================
+    // 6. 40 RAW-DOODLE SWIMMING FISH (100% Frameless Stroke Silhouettes that
+    //    Adopt the Color & Raw Doodle of Any Lit Tentacle That Touches Them!)
+    // ============================================================================
+    const FISH_COUNT = 40;
+    const fishes = [];
+    const fishGroup = new THREE.Group();
+    scene.add(fishGroup);
+
+    // Build a raw hand-drawn 2D/3D stroke fish geometry (No solid polygons or frame edges!)
+    function createRawStrokeFishGeometry() {
+      const pts = [];
+      const steps = 20;
+      // Upper contour from snout to tail fork
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        const z = -0.7 + t * 1.4;
+        const y = Math.sin(t * Math.PI) * 0.32 * (1 - t * 0.3);
+        pts.push(new THREE.Vector3(0, y, z));
+      }
+      // Tailfin V-stroke
+      pts.push(new THREE.Vector3(0, 0.36, 0.98));
+      pts.push(new THREE.Vector3(0, 0.0, 0.78));
+      pts.push(new THREE.Vector3(0, -0.36, 0.98));
+      // Lower contour back to snout
+      for (let i = steps; i >= 0; i--) {
+        const t = i / steps;
+        const z = -0.7 + t * 1.4;
+        const y = -Math.sin(t * Math.PI) * 0.28 * (1 - t * 0.3);
+        pts.push(new THREE.Vector3(0, y, z));
+      }
+      return new THREE.BufferGeometry().setFromPoints(pts);
+    }
+    const rawFishStrokeGeo = createRawStrokeFishGeometry();
+
+    let dyedFishCount = 0;
+
+    for (let f = 0; f < FISH_COUNT; f++) {
+      const root = new THREE.Group();
+      const strokeMat = new THREE.LineBasicMaterial({
+        color: 0x64748b, // Uncolored slate-grey raw stroke fish
+        transparent: true,
+        opacity: 0.78
+      });
+      // Two crossed stroke planes so the raw stroke fish reads from both front and side
+      const line1 = new THREE.Line(rawFishStrokeGeo, strokeMat);
+      const line2 = new THREE.Line(rawFishStrokeGeo, strokeMat);
+      line2.rotation.z = Math.PI / 2;
+      line2.scale.set(0.65, 0.65, 1.0);
+      root.add(line1);
+      root.add(line2);
+
+      // Frameless Raw Doodle Aura carried by the fish once dyed by a Tentacle!
+      const auraMat = new THREE.MeshBasicMaterial({
+        map: rawDoodlePool[0].texture,
+        transparent: true,
+        alphaTest: 0.04,
+        depthWrite: false,
+        opacity: 0.0,
+        side: THREE.DoubleSide
+      });
+      const auraMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.35, 1.0), auraMat);
+      auraMesh.position.set(0, 0.45, 0.2);
+      root.add(auraMesh);
+
+      const pos = new THREE.Vector3(
+        (Math.random() - 0.5) * 16,
+        (Math.random() - 0.5) * 8,
+        -10 - Math.random() * 380
+      );
+      root.position.copy(pos);
+      fishGroup.add(root);
+
+      fishes.push({
+        id: f,
+        root,
+        strokeMat,
+        auraMesh,
+        auraMat,
+        pos,
+        vel: new THREE.Vector3((Math.random() - 0.5) * 0.03, (Math.random() - 0.5) * 0.02, -0.045 - Math.random() * 0.03),
+        phase: f * 0.7,
+        dyedSlot: null,
+        contagionTimer: 0
+      });
+    }
+
+    function dyeFishWithSlot(fish, slot) {
+      if (fish.dyedSlot === slot) return;
+      const firstTime = fish.dyedSlot === null;
+      fish.dyedSlot = slot;
+      fish.contagionTimer = 2.0;
+
+      fish.strokeMat.color.set(slot.signItem.color);
+      fish.strokeMat.opacity = 1.0;
+
+      fish.auraMat.map = slot.texture;
+      fish.auraMat.opacity = 0.98;
+      fish.auraMat.needsUpdate = true;
+
+      if (firstTime) {
+        dyedFishCount++;
+        document.getElementById('hud-dyed-fish').textContent = `${dyedFishCount}/${FISH_COUNT}`;
+      }
+      audio.playChime(0.8 + (fish.id % 8) * 0.1);
+    }
+
+    // Sonar Dye Ring (Frameless glowing stroke ring)
+    const sonarPts = [];
+    for (let i = 0; i <= 64; i++) {
+      const a = (i / 64) * Math.PI * 2;
+      sonarPts.push(new THREE.Vector3(Math.cos(a), 0, Math.sin(a)));
+    }
+    const sonarLineMat = new THREE.LineBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0 });
+    const sonarLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints(sonarPts), sonarLineMat);
+    scene.add(sonarLine);
+
+    // ============================================================================
+    // 7. 26-TRACK VOLHOLLA AUDIO ENGINE (Crossfades by Cineosis Level!)
+    // ============================================================================
+    const VOLHOLLA_26 = [
+      { title: 'Gospel Under Water', album: 'SILT & WIRE', root: 73.42, scale: [0, 4, 7, 11, 14], tempo: 3.8 },
+      { title: 'Mountain Current Guitar Echo', album: 'SILT & WIRE', root: 82.41, scale: [0, 3, 7, 10, 14], tempo: 3.4 },
+      { title: 'Stay in the Current', album: 'SILT & WIRE', root: 65.41, scale: [0, 4, 7, 9, 14], tempo: 3.2 },
+      { title: 'Silt Bench', album: 'SILT & WIRE', root: 55.00, scale: [0, 3, 7, 10, 12], tempo: 4.6 },
+      { title: 'Cedar Tank Splash', album: 'D-A-E FILM', root: 73.42, scale: [0, 7, 9, 14, 16], tempo: 3.0 },
+      { title: 'Chicha Surf & Boreal Glitch', album: 'D-A-E FILM', root: 98.00, scale: [0, 3, 7, 10, 15], tempo: 2.5 },
+      { title: 'Preparation & Drift', album: 'D-A-E FILM', root: 65.41, scale: [0, 5, 7, 12, 16], tempo: 4.1 },
+      { title: 'Salvaged Room, Traveling Light', album: 'D-A-E FILM', root: 110.0, scale: [0, 4, 7, 11, 16], tempo: 2.8 },
+      { title: 'Salvaged Timber (Funk Fish)', album: 'D-A-E FILM', root: 73.42, scale: [0, 3, 5, 7, 10], tempo: 2.2 },
+      { title: 'Slide Carousel at Blue Hour', album: 'D-A-E FILM', root: 87.31, scale: [0, 4, 7, 11, 14], tempo: 3.6 },
+      { title: "The Geezer's Stride", album: 'D-A-E FILM', root: 73.42, scale: [0, 4, 7, 9, 12], tempo: 2.7 },
+      { title: 'Night Bus 03', album: 'NIGHT BUS', root: 61.74, scale: [0, 3, 7, 10, 14], tempo: 2.9 },
+      { title: 'Phosphor Waveform Log', album: 'NIGHT BUS', root: 65.41, scale: [0, 2, 7, 11, 14], tempo: 3.0 },
+      { title: 'Saltwater Static (Last Shanty)', album: 'NIGHT BUS', root: 58.27, scale: [0, 3, 7, 10, 12], tempo: 3.5 },
+      { title: 'Night Bus 13 (Bright Pop)', album: 'NIGHT BUS', root: 98.00, scale: [0, 4, 7, 9, 14], tempo: 2.4 },
+      { title: 'The Long Descent (Memory Rot)', album: 'NIGHT BUS', root: 49.00, scale: [0, 3, 7, 8, 12], tempo: 4.5 },
+      { title: 'The Wet Console', album: 'NIGHT BUS', root: 55.00, scale: [0, 5, 7, 10, 14], tempo: 3.6 },
+      { title: 'Catastrophic Elegance · Math Dance', album: 'NEON BUTTERFLY', root: 82.41, scale: [0, 2, 4, 7, 11], tempo: 2.4 },
+      { title: 'Neon Butterfly 18 (Ethereal)', album: 'NEON BUTTERFLY', root: 92.50, scale: [0, 4, 7, 11, 15], tempo: 3.9 },
+      { title: 'First Winter — Tizita', album: 'FIRST WINTER', root: 65.41, scale: [0, 2, 3, 7, 8], tempo: 4.2 },
+      { title: 'First Winter — Heart Is Stone', album: 'FIRST WINTER', root: 55.00, scale: [0, 3, 5, 7, 10], tempo: 4.4 },
+      { title: 'Go Home and Be Free', album: 'TWO BUTTONS', root: 73.42, scale: [0, 4, 7, 9, 12], tempo: 3.2 },
+      { title: 'Ritual of the Ash and Silt (1)', album: 'TWO BUTTONS', root: 46.25, scale: [0, 1, 5, 7, 8], tempo: 4.6 },
+      { title: 'Ritual of the Ash and Silt (2)', album: 'TWO BUTTONS', root: 43.65, scale: [0, 3, 6, 7, 10], tempo: 2.6 },
+      { title: 'Steel & Static — 2 AM Express', album: 'EVENT HORIZON', root: 51.91, scale: [0, 3, 7, 10, 14], tempo: 3.1 },
+      { title: 'Stratospheric Void Crossing', album: 'EVENT HORIZON', root: 36.71, scale: [0, 5, 7, 12, 15], tempo: 5.2 }
+    ];
+
+    class VolhollaSynth {
+      constructor() {
+        this.ctx = null;
+        this.analyser = null;
+        this.freqData = new Uint8Array(32);
+        this.enabled = true;
+        this.started = false;
+        this.idx = 0;
+        this.timer = 0;
+        this.step = 0;
+      }
+      init() {
+        if (this.started) {
+          if (this.ctx && this.ctx.state === 'suspended' && this.enabled) this.ctx.resume();
+          return;
+        }
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        this.ctx = new AC();
+        this.started = true;
+        this.master = this.ctx.createGain();
+        this.master.gain.value = 0.44;
+        this.analyser = this.ctx.createAnalyser();
+        this.analyser.fftSize = 64;
+        this.freqData = new Uint8Array(this.analyser.frequencyBinCount);
+
+        this.delay = this.ctx.createDelay(1.5);
+        this.delay.delayTime.value = 0.36;
+        const fb = this.ctx.createGain();
+        fb.gain.value = 0.52;
+        const flt = this.ctx.createBiquadFilter();
+        flt.type = 'lowpass';
+        flt.frequency.value = 640;
+        this.delay.connect(flt);
+        flt.connect(fb);
+        fb.connect(this.delay);
+        flt.connect(this.analyser);
+
+        const len = this.ctx.sampleRate * 2;
+        const buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
+        const d = buf.getChannelData(0);
+        let last = 0;
+        for (let i = 0; i < len; i++) {
+          last = (last + 0.02 * (Math.random() * 2 - 1)) / 1.02;
+          d[i] = last * 2.4;
+        }
+        const src = this.ctx.createBufferSource();
+        src.buffer = buf;
+        src.loop = true;
+        this.hydro = this.ctx.createBiquadFilter();
+        this.hydro.type = 'lowpass';
+        this.hydro.frequency.value = 140;
+        const hg = this.ctx.createGain();
+        hg.gain.value = 0.26;
+        src.connect(this.hydro);
+        this.hydro.connect(hg);
+        hg.connect(this.analyser);
+        src.start(0);
+
+        this.analyser.connect(this.master);
+        this.master.connect(this.ctx.destination);
+        this.playChord();
+      }
+      select(i) {
+        this.idx = ((i % VOLHOLLA_26.length) + VOLHOLLA_26.length) % VOLHOLLA_26.length;
+        document.getElementById('hud-song-label').textContent = VOLHOLLA_26[this.idx].title;
+        if (this.started) this.playChord();
+      }
+      playChord() {
+        if (!this.ctx || !this.enabled) return;
+        const s = VOLHOLLA_26[this.idx];
+        const now = this.ctx.currentTime;
+        for (let i = 0; i < 3; i++) {
+          const t0 = now + i * 0.26;
+          const deg = s.scale[(this.step + i * 2) % s.scale.length];
+          const freq = s.root * (i === 0 ? 1 : 2) * Math.pow(2, deg / 12);
+          const osc = this.ctx.createOscillator();
+          const g = this.ctx.createGain();
+          osc.type = i === 0 ? 'sine' : 'triangle';
+          osc.frequency.setValueAtTime(freq, t0);
+          g.gain.setValueAtTime(0.0001, t0);
+          g.gain.linearRampToValueAtTime(i === 0 ? 0.13 : 0.06, t0 + 0.05);
+          g.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.05);
+          osc.connect(g);
+          g.connect(this.analyser);
+          if (i > 0) g.connect(this.delay);
+          osc.start(t0);
+          osc.stop(t0 + 1.1);
+        }
+        this.step++;
+      }
+      playChime(mult = 1.0) {
+        this.init();
+        try { if (navigator.vibrate) navigator.vibrate(14); } catch (_) {}
+        if (!this.ctx || !this.enabled) return;
+        const s = VOLHOLLA_26[this.idx];
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const g = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(s.root * 4 * mult, now);
+        g.gain.setValueAtTime(0.001, now);
+        g.gain.linearRampToValueAtTime(0.085, now + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
+        osc.connect(g);
+        g.connect(this.delay);
+        g.connect(this.analyser);
+        osc.start(now);
+        osc.stop(now + 0.55);
+      }
+      update(dt, speed) {
+        if (this.started && this.ctx && this.enabled) {
+          this.hydro.frequency.setTargetAtTime(125 + speed * 620, this.ctx.currentTime, 0.12);
+          this.timer += dt;
+          if (this.timer >= VOLHOLLA_26[this.idx].tempo * 0.6) {
+            this.timer = 0;
+            this.playChord();
+          }
+          this.analyser.getByteFrequencyData(this.freqData);
+        } else {
+          for (let i = 0; i < 32; i++) {
+            this.freqData[i] = 75 + Math.sin(performance.now() * 0.004 + i * 0.4) * 50;
+          }
+        }
+      }
+    }
+    const audio = new VolhollaSynth();
+
+    // Populate 26-Song List & 44-Sign Periodic Table Grid
+    const songsListEl = document.getElementById('songs-list');
+    VOLHOLLA_26.forEach((s, i) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'raw-pill w-full p-2 rounded text-left flex justify-between';
+      b.innerHTML = `<span class="truncate">${String(i + 1).padStart(2, '0')} · ${s.title}</span><span class="text-slate-400 ml-1">${s.album}</span>`;
+      b.addEventListener('click', () => { audio.init(); audio.select(i); });
+      songsListEl.appendChild(b);
+    });
+
+    const levelsBarEl = document.getElementById('levels-bar');
+    CINEOSIS_8_LEVELS.forEach((lvl) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'raw-pill p-2 rounded-lg text-left border-l-4';
+      b.style.borderLeftColor = lvl.color;
+      b.innerHTML = `<div class="font-bold" style="color:${lvl.color}">L${lvl.level} · ${lvl.code}</div><div class="text-slate-300 truncate">${lvl.name}</div>`;
+      b.addEventListener('click', () => {
+        swimmer.pos.set(0, 0.4, lvl.zCenter + 12);
+        swimmer.vel.set(0, 0, -0.04);
+        audio.select((lvl.level - 1) * 3);
+        document.getElementById('periodic-modal').classList.add('hidden');
+        document.getElementById('periodic-modal').classList.remove('flex');
+      });
+      levelsBarEl.appendChild(b);
+    });
+
+    const periodicGridEl = document.getElementById('periodic-grid');
+    CINEOSIS_44_SIGNS.forEach((sign, idx) => {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'raw-pill p-2 rounded-lg text-left hover:scale-[1.02] transition';
+      card.style.borderColor = `${sign.color}66`;
+      card.innerHTML = `
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-bold" style="color:${sign.color}">${sign.sym}</span>
+          <span class="text-[8px] text-slate-400">#${sign.num} · ${sign.code}</span>
+        </div>
+        <div class="text-[10px] text-slate-100 font-medium truncate mt-0.5">${sign.name}</div>
+        <div class="text-[8px] text-slate-400 truncate">${sign.sm} · ${sign.row}</div>
+      `;
+      card.addEventListener('click', () => {
+        const slot = rawDoodlePool[idx % rawDoodlePool.length];
+        slot.signItem = sign;
+        lightUpTentacleWithSlot(slot);
+        const lvl = CINEOSIS_8_LEVELS[(sign.level - 1) % 8];
+        swimmer.pos.set(0, 0.4, lvl.zCenter + 10);
+        document.getElementById('periodic-modal').classList.add('hidden');
+        document.getElementById('periodic-modal').classList.remove('flex');
+      });
+      periodicGridEl.appendChild(card);
+    });
+
+    // ============================================================================
+    // 8. EDITION SWITCHER & CONTROLS (Supports ?mode=cineosis or ?mode=doodles URL param!)
+    // ============================================================================
+    const btnModeDoodles = document.getElementById('btn-mode-doodles');
+    const btnModeCineosis = document.getElementById('btn-mode-cineosis');
+
+    function setEdition(mode) {
+      activeEdition = mode;
+      btnModeDoodles.classList.toggle('active-pill', mode === 'doodles');
+      btnModeCineosis.classList.toggle('cineosis-active', mode === 'cineosis');
+    }
+    btnModeDoodles.addEventListener('click', () => setEdition('doodles'));
+    btnModeCineosis.addEventListener('click', () => setEdition('cineosis'));
+
+    if (window.location.search.includes('cineosis')) {
+      setEdition('cineosis');
+    }
+
+    document.getElementById('select-segment').addEventListener('change', (e) => {
+      applyArchiveSegmentation(e.target.value);
+    });
+
+    function triggerPulseWhip() {
+      audio.init();
+      audio.playChime(0.65);
+      swimmer.whipBoost = 1.0;
+      swimmer.vel.y = Math.min(0.068, swimmer.vel.y + 0.034);
+      swimmer.vel.z = Math.max(-0.15, swimmer.vel.z - 0.042);
+    }
+
+    function triggerSonarDye() {
+      audio.init();
+      swimmer.sonarTimer = 1.35;
+      sonarLine.position.copy(swimmer.pos);
+      const activeSlot = tentacles.find((t) => t.lit)?.slot || rawDoodlePool[0];
+      sonarLineMat.color.set(activeSlot.signItem.color);
+
+      const nearest = findNearestWorm();
+      if (nearest && nearest.dist < 18.5) {
+        lightUpTentacleWithSlot(nearest.worm.slot);
+      }
+      fishes.forEach((f) => {
+        if (f.pos.distanceTo(swimmer.pos) < 15.0) {
+          dyeFishWithSlot(f, activeSlot);
+        }
+      });
+    }
+
+    document.getElementById('btn-pulse').addEventListener('click', triggerPulseWhip);
+    document.getElementById('btn-sonar').addEventListener('click', triggerSonarDye);
+    document.getElementById('btn-peek').addEventListener('click', (e) => {
+      swimmer.peeking = !swimmer.peeking;
+      e.currentTarget.classList.toggle('active-pill', swimmer.peeking);
+    });
+    document.getElementById('btn-splice-worm').addEventListener('click', () => {
+      const n = findNearestWorm();
+      if (n) lightUpTentacleWithSlot(n.worm.slot);
+    });
+
+    document.getElementById('btn-zoom-in').addEventListener('click', () => {
+      swimmer.targetCamDist = THREE.MathUtils.clamp(swimmer.targetCamDist - 2.5, 7.5, 26.0);
+      document.getElementById('zoom-txt').textContent = `${Math.round(swimmer.targetCamDist)}m`;
+    });
+    document.getElementById('btn-zoom-out').addEventListener('click', () => {
+      swimmer.targetCamDist = THREE.MathUtils.clamp(swimmer.targetCamDist + 2.5, 7.5, 26.0);
+      document.getElementById('zoom-txt').textContent = `${Math.round(swimmer.targetCamDist)}m`;
+    });
+
+    const periodicModal = document.getElementById('periodic-modal');
+    const togglePeriodicModal = () => {
+      const hide = !periodicModal.classList.contains('hidden');
+      periodicModal.classList.toggle('hidden', hide);
+      periodicModal.classList.toggle('flex', !hide);
+    };
+    document.getElementById('btn-open-periodic').addEventListener('click', togglePeriodicModal);
+    document.getElementById('btn-table-modal').addEventListener('click', togglePeriodicModal);
+    document.getElementById('btn-close-periodic').addEventListener('click', togglePeriodicModal);
+
+    const songsDrawer = document.getElementById('songs-drawer');
+    document.getElementById('btn-open-songs').addEventListener('click', () => songsDrawer.classList.toggle('translate-x-full'));
+    document.getElementById('btn-close-songs').addEventListener('click', () => songsDrawer.classList.add('translate-x-full'));
+    document.getElementById('btn-mute').addEventListener('click', (e) => {
+      audio.init();
+      audio.enabled = !audio.enabled;
+      if (audio.master && audio.ctx) audio.master.gain.setTargetAtTime(audio.enabled ? 0.44 : 0, audio.ctx.currentTime, 0.08);
+      e.currentTarget.textContent = audio.enabled ? 'SND' : 'OFF';
+    });
+
+    // Pointer & Pinch Input
+    const pts = new Map();
+    let pDist0 = null, pCam0 = 15.0;
+    renderer.domElement.addEventListener('pointerdown', (e) => {
+      audio.init();
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pts.size === 2) {
+        const a = Array.from(pts.values());
+        pDist0 = Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y);
+        pCam0 = swimmer.targetCamDist;
+      }
+    });
+    window.addEventListener('pointermove', (e) => {
+      if (!pts.has(e.pointerId)) return;
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pts.size === 2) {
+        const a = Array.from(pts.values());
+        const d = Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y);
+        if (pDist0 && pDist0 > 12) {
+          swimmer.targetCamDist = THREE.MathUtils.clamp(pCam0 * (pDist0 / Math.max(20, d)), 7.5, 26.0);
+          document.getElementById('zoom-txt').textContent = `${Math.round(swimmer.targetCamDist)}m`;
+        }
+        return;
+      }
+      const nx = (e.clientX / window.innerWidth) * 2 - 1;
+      const ny = -((e.clientY / window.innerHeight) * 2 - 1);
+      swimmer.steerX = Math.abs(nx) < 0.05 ? 0 : nx;
+      swimmer.steerY = Math.abs(ny) < 0.05 ? 0 : ny;
+    });
+    const clearPtr = (e) => {
+      pts.delete(e.pointerId);
+      if (pts.size === 0) { swimmer.steerX = 0; swimmer.steerY = 0; }
+    };
+    window.addEventListener('pointerup', clearPtr);
+    window.addEventListener('pointercancel', clearPtr);
+    window.addEventListener('wheel', (e) => {
+      swimmer.targetCamDist = THREE.MathUtils.clamp(swimmer.targetCamDist + e.deltaY * 0.012, 7.5, 26.0);
+      document.getElementById('zoom-txt').textContent = `${Math.round(swimmer.targetCamDist)}m`;
+    }, { passive: true });
+
+    const keys = new Set();
+    window.addEventListener('keydown', (e) => {
+      keys.add(e.code);
+      if (e.code === 'Space') triggerPulseWhip();
+      else if (e.code === 'KeyR') triggerSonarDye();
+      else if (e.code === 'KeyV') document.getElementById('btn-peek').click();
+      else if (e.code === 'KeyM' || e.code === 'KeyP') togglePeriodicModal();
+      else if (e.code === 'Escape') {
+        periodicModal.classList.add('hidden');
+        periodicModal.classList.remove('flex');
+      }
+    });
+    window.addEventListener('keyup', (e) => keys.delete(e.code));
+
+    function findNearestWorm() {
+      let best = null, bestDist = Infinity;
+      doodleWorms.forEach((worm) => {
+        const d = worm.headPos.distanceTo(swimmer.pos);
+        if (d < bestDist) { bestDist = d; best = { worm, dist: d }; }
+      });
+      return best;
+    }
+
+    // ============================================================================
+    // 9. MAIN SIMULATION LOOP (100% FRAMELESS RAW DOODLES + CINEOSIS 8 LEVELS)
+    // ============================================================================
+    const clock = new THREE.Clock();
+    const rawPreviewCtx = document.getElementById('raw-preview-canvas').getContext('2d');
+    const specMiniCtx = document.getElementById('spec-mini').getContext('2d');
+    const projVec = new THREE.Vector3();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const dt = Math.min(clock.getDelta(), 0.05);
+      const elapsed = clock.getElapsedTime();
+      const frameFloat = elapsed * 12;
+
+      audio.update(dt, swimmer.vel.length());
+
+      // 1. Render all 12 Frameless Raw Doodle Canvases (Zero borders, zero background boxes!)
+      rawDoodlePool.forEach((slot, idx) => {
+        (window.__realDoodle || drawFramelessRawDoodle)(slot.ctx, slot.canvas.width, slot.canvas.height, slot.signItem, frameFloat + idx * 2.5, idx);   // contaminant-jelly: the real secondhand doodles (bonus.js)
+        slot.texture.needsUpdate = true;
+      });
+
+      // 2. Evaluate Current Cineosis Level (1..8) by Depth Z
+      const depthM = Math.abs(swimmer.pos.z);
+      const lvlIdx = THREE.MathUtils.clamp(Math.floor(depthM / 50), 0, 7);
+      const curLvl = CINEOSIS_8_LEVELS[lvlIdx];
+      if (swimmer.activeLevel !== curLvl.level) {
+        swimmer.activeLevel = curLvl.level;
+        document.getElementById('hud-level-dot').style.backgroundColor = curLvl.color;
+        document.getElementById('hud-level-name').textContent = `L${curLvl.level} · ${curLvl.name}`;
+        swimmerLight.color.set(curLvl.color);
+        audio.select((curLvl.level - 1) * 3);
+      }
+
+      // 3. Heavy Overdamped Deep-Water Physics + Sinking Gravity
+      swimmer.pulsePhase += dt * 0.64 * Math.PI * 2;
+      swimmer.whipBoost = Math.max(0, swimmer.whipBoost - dt * 1.5);
+      const thrust = Math.max(0, Math.sin(swimmer.pulsePhase)) * 0.0044 + swimmer.whipBoost * 0.0068;
+
+      let kx = 0, ky = 0, kz = 0;
+      if (keys.has('KeyA') || keys.has('ArrowLeft')) kx -= 1;
+      if (keys.has('KeyD') || keys.has('ArrowRight')) kx += 1;
+      if (keys.has('KeyW') || keys.has('ArrowUp')) { ky += 0.6; kz -= 1; }
+      if (keys.has('KeyS') || keys.has('ArrowDown')) { ky -= 0.6; kz += 0.7; }
+
+      swimmer.vel.x += THREE.MathUtils.clamp(swimmer.steerX + kx, -1, 1) * 0.0050;
+      swimmer.vel.y += THREE.MathUtils.clamp(swimmer.steerY + ky, -1, 1) * 0.0044 + thrust * 0.85 - 0.0030;
+      swimmer.vel.z += -0.0028 - thrust * 1.05 + kz * 0.0038;
+
+      swimmer.vel.multiplyScalar(Math.exp(-2.0 * dt));
+      swimmer.pos.add(swimmer.vel);
+      swimmer.pos.x = THREE.MathUtils.clamp(swimmer.pos.x, -14, 14);
+      swimmer.pos.y = THREE.MathUtils.clamp(swimmer.pos.y, -7, 7);
+      if (swimmer.pos.z < -410) swimmer.pos.z = -12;
+      if (swimmer.pos.z > -2) swimmer.pos.z = -2;
+
+      // Update Raw-Doodle Jellyfish Bell Ribs
+      jellyGroup.position.copy(swimmer.pos);
+      jellyGroup.rotation.x = THREE.MathUtils.lerp(jellyGroup.rotation.x, -0.20 + swimmer.vel.z * 1.4, 0.08);
+      jellyGroup.rotation.z = THREE.MathUtils.lerp(jellyGroup.rotation.z, -swimmer.vel.x * 2.4, 0.08);
+      swimmerLight.position.copy(swimmer.pos);
+
+      const contract = Math.sin(swimmer.pulsePhase) * 0.15 + swimmer.whipBoost * 0.22;
+      bellRibMeshes.forEach((rib) => {
+        const arr = rib.geo.attributes.position.array;
+        const orig = rib.orig;
+        for (let i = 0; i < arr.length; i += 3) {
+          const ox = orig[i], oy = orig[i + 1], oz = orig[i + 2];
+          const rim = THREE.MathUtils.clamp(1.0 - oy / BELL_R, 0, 1.2);
+          const sc = 1.0 - contract * rim * 0.44;
+          arr[i] = ox * sc;
+          arr[i + 1] = oy * (1.0 + contract * 0.16);
+          arr[i + 2] = oz * sc;
+        }
+        rib.geo.attributes.position.needsUpdate = true;
+      });
+      bellDoodleSprite.lookAt(camera.position);
+
+      // 4. Update the 24 Frameless Raw Doodle Worms
+      doodleWorms.forEach((worm) => {
+        worm.cooldown = Math.max(0, worm.cooldown - dt);
+        worm.headPos.x = THREE.MathUtils.lerp(worm.headPos.x, worm.targetAnchor.x + Math.sin(elapsed * 1.2 + worm.phase) * 1.9, 0.06);
+        worm.headPos.y = THREE.MathUtils.lerp(worm.headPos.y, worm.targetAnchor.y + Math.cos(elapsed * 0.95 + worm.phase) * 1.2, 0.06);
+        worm.headPos.z = THREE.MathUtils.lerp(worm.headPos.z, worm.targetAnchor.z, 0.06);
+
+        const sArr = worm.spineLine.geometry.attributes.position.array;
+        worm.slices.forEach((slice, sIdx) => {
+          const lag = sIdx * 0.34;
+          const sx = worm.targetAnchor.x + Math.sin(elapsed * 1.2 + worm.phase - lag) * 1.9;
+          const sy = worm.targetAnchor.y + Math.cos(elapsed * 0.95 + worm.phase - lag) * 1.2;
+          const sz = worm.headPos.z - sIdx * 0.95;
+          slice.position.set(sx, sy, sz);
+          slice.rotation.z = Math.sin(elapsed * 1.4 - lag) * 0.12;
+          sArr[sIdx * 3] = sx;
+          sArr[sIdx * 3 + 1] = sy;
+          sArr[sIdx * 3 + 2] = sz;
+        });
+        worm.spineLine.geometry.attributes.position.needsUpdate = true;
+
+        // Catching a Doodle Worm lights up a Film Tentacle!
+        if (worm.cooldown <= 0 && worm.headPos.distanceTo(swimmer.pos) < 4.8) {
+          worm.cooldown = 4.0;
+          lightUpTentacleWithSlot(worm.slot);
+        }
+      });
+
+      // 5. Update 12 Raw-Doodle Tentacles
+      tentacles.forEach((tent) => {
+        const anchor = swimmer.pos.clone().add(
+          new THREE.Vector3(Math.cos(tent.angle) * BELL_R * 0.68, -0.18, Math.sin(tent.angle) * BELL_R * 0.68)
+        );
+        tent.nodes[0].pos.copy(anchor);
+        const whip = 1.0 + swimmer.whipBoost * 2.8;
+
+        for (let s = 1; s < SEG_COUNT; s++) {
+          const n = tent.nodes[s];
+          const vx = (n.pos.x - n.prev.x) * 0.82;
+          const vy = (n.pos.y - n.prev.y) * 0.82;
+          const vz = (n.pos.z - n.prev.z) * 0.82;
+          n.prev.copy(n.pos);
+          n.pos.x += vx + Math.cos(tent.angle + elapsed * 2.2 - s * 0.35) * 0.012 * whip;
+          n.pos.y += vy - 0.0044;
+          n.pos.z += vz + Math.sin(tent.angle + elapsed * 2.2 - s * 0.35) * 0.012 * whip + 0.0014;
+        }
+
+        for (let it = 0; it < 4; it++) {
+          tent.nodes[0].pos.copy(anchor);
+          for (let s = 0; s < SEG_COUNT - 1; s++) {
+            const a = tent.nodes[s].pos, b = tent.nodes[s + 1].pos;
+            const dx = b.x - a.x, dy = b.y - a.y, dz = b.z - a.z;
+            const d = Math.hypot(dx, dy, dz) || 0.0001;
+            const diff = (d - 0.27) / d;
+            if (s === 0) { b.x -= dx * diff; b.y -= dy * diff; b.z -= dz * diff; }
+            else {
+              a.x += dx * diff * 0.5; a.y += dy * diff * 0.5; a.z += dz * diff * 0.5;
+              b.x -= dx * diff * 0.5; b.y -= dy * diff * 0.5; b.z -= dz * diff * 0.5;
+            }
+          }
+        }
+
+        const lArr = tent.lineMesh.geometry.attributes.position.array;
+        for (let s = 0; s < SEG_COUNT; s++) {
+          const p = tent.nodes[s].pos;
+          lArr[s * 3] = p.x; lArr[s * 3 + 1] = p.y; lArr[s * 3 + 2] = p.z;
+        }
+        tent.lineMesh.geometry.attributes.position.needsUpdate = true;
+
+        tent.slices.forEach((s) => {
+          s.mesh.position.copy(tent.nodes[s.nodeIdx].pos);
+          s.mesh.lookAt(camera.position);
+        });
+      });
+
+      // 6. Update 40 Raw-Stroke Fish & Tentacle-to-Fish Contagion!
+      fishes.forEach((fish) => {
+        fish.pos.add(fish.vel);
+        fish.pos.x += Math.sin(elapsed * 2.1 + fish.phase) * 0.024;
+        fish.pos.y += Math.cos(elapsed * 1.7 + fish.phase) * 0.018;
+
+        if (fish.pos.z > swimmer.pos.z + 16) {
+          fish.pos.z = swimmer.pos.z - 55 - Math.random() * 45;
+          fish.pos.x = swimmer.pos.x + (Math.random() - 0.5) * 15;
+          fish.pos.y = swimmer.pos.y + (Math.random() - 0.5) * 8;
+        } else if (fish.pos.z < swimmer.pos.z - 95) {
+          fish.pos.z = swimmer.pos.z - 12 - Math.random() * 28;
+        }
+
+        fish.pos.x += (swimmer.pos.x - fish.pos.x) * 0.003;
+        fish.pos.y += (swimmer.pos.y - fish.pos.y) * 0.003;
+
+        fish.root.position.copy(fish.pos);
+        fish.root.rotation.y = Math.sin(elapsed * 6.5 + fish.phase) * 0.22;
+        fish.auraMesh.lookAt(camera.position);
+
+        // Check if any Lit Tentacle node hits this fish
+        tentacles.forEach((tent) => {
+          if (!tent.lit) return;
+          for (let s = 2; s < SEG_COUNT; s += 2) {
+            if (tent.nodes[s].pos.distanceToSquared(fish.pos) < 3.8) {
+              dyeFishWithSlot(fish, tent.slot);
+              break;
+            }
+          }
+        });
+
+        // School Contagion: Newly dyed fish spread their raw doodle color to neighbors!
+        if (fish.dyedSlot && fish.contagionTimer > 0) {
+          fish.contagionTimer = Math.max(0, fish.contagionTimer - dt);
+          fishes.forEach((other) => {
+            if (other !== fish && !other.dyedSlot && other.pos.distanceToSquared(fish.pos) < 4.2) {
+              dyeFishWithSlot(other, fish.dyedSlot);
+            }
+          });
+        }
+      });
+
+      // Sonar Ring
+      if (swimmer.sonarTimer > 0) {
+        swimmer.sonarTimer = Math.max(0, swimmer.sonarTimer - dt);
+        const p = 1.0 - swimmer.sonarTimer / 1.35;
+        sonarLine.scale.setScalar(1.0 + p * 18.0);
+        sonarLineMat.opacity = (1.0 - p) * 0.85;
+      } else {
+        sonarLineMat.opacity = 0;
+      }
+
+      // 7. Update Frameless Floating Doodle Preview & Target Tick
+      const nearest = findNearestWorm();
+      const tickEl = document.getElementById('raw-target-tick');
+      if (nearest) {
+        const { worm, dist } = nearest;
+        rawPreviewCtx.clearRect(0, 0, 220, 165);
+        rawPreviewCtx.drawImage(worm.slot.canvas, 0, 0);
+        const sign = worm.slot.signItem;
+        document.getElementById('preview-caption').textContent = activeEdition === 'cineosis'
+          ? `[${sign.sym}] ${sign.name}`
+          : `${sign.sm} · ${sign.doodle.toUpperCase()}`;
+
+        projVec.copy(worm.headPos).project(camera);
+        if (dist < 25 && projVec.z < 1.0) {
+          tickEl.classList.remove('hidden');
+          tickEl.style.left = `${(projVec.x * 0.5 + 0.5) * window.innerWidth}px`;
+          tickEl.style.top = `${(-projVec.y * 0.5 + 0.5) * window.innerHeight - 42}px`;
+          document.getElementById('tick-label').textContent = activeEdition === 'cineosis'
+            ? `[${sign.sym}] ${sign.name.toUpperCase()}`
+            : `${sign.sm} · ${sign.doodle.toUpperCase()}`;
+          document.getElementById('tick-sub').textContent = `L${sign.level} · ${dist.toFixed(1)}m`;
+        } else {
+          tickEl.classList.add('hidden');
+        }
+      }
+
+      // 8. Camera Framing
+      swimmer.camDist = THREE.MathUtils.lerp(swimmer.camDist, swimmer.targetCamDist, 0.1);
+      swimmer.peekYaw = THREE.MathUtils.lerp(swimmer.peekYaw, swimmer.peeking ? 0.65 : 0.0, 0.08);
+      camera.position.lerp(
+        new THREE.Vector3(
+          swimmer.pos.x + Math.sin(swimmer.peekYaw) * swimmer.camDist,
+          swimmer.pos.y + 1.2,
+          swimmer.pos.z + Math.cos(swimmer.peekYaw) * swimmer.camDist
+        ),
+        0.09
+      );
+      const lookT = new THREE.Vector3(swimmer.pos.x, swimmer.pos.y, swimmer.pos.z - 6.5);
+      if (nearest && nearest.dist < 16) lookT.lerp(nearest.worm.headPos, 0.30);
+      camera.lookAt(lookT);
+
+      // Mini Spectrogram
+      specMiniCtx.clearRect(0, 0, 40, 14);
+      for (let i = 0; i < 10; i++) {
+        const h = Math.max(2, (audio.freqData[i * 2] / 255) * 13);
+        specMiniCtx.fillStyle = i < 4 ? '#facc15' : '#4ade80';
+        specMiniCtx.fillRect(i * 4, 14 - h, 2.6, h);
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    window.__bonus = {THREE, scene, camera, renderer, doodleWorms, rawDoodlePool};   // contaminant-jelly: real footage, song and sound (bonus.js)
+    animate();
+  </script>
+<script src="bonus.js" data-song="nightbus-17" data-mode="worms"></script>
+</body>
+</html>

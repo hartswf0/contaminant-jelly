@@ -12,7 +12,7 @@ export async function play(L, ALL) {
   document.body.className = 'game';
   document.body.innerHTML = `<canvas id="gl"></canvas><div class="ui" id="dark"></div><div class="ui" id="flash"></div><div class="ui" id="tag"></div>
     <div class="ui" id="hud"><div><b>${L.title.toUpperCase()}</b> · <span id="goal"></span></div><div id="song"></div></div><div class="ui" id="say"></div><div class="ui" id="hint"></div><div class="ui" id="dbg"></div>
-    <div class="ui" id="card"><div class="k">${L.kind ? 'FROM THE ARCHIVE · ' : 'A DRIFT FROM '}${L.source.replace('_', ' ').toUpperCase()}</div><h1>${L.title}</h1><p>${L.took}</p><p style="font-style:normal;font-size:14px;color:var(--dim)">Goal: ${L.goal.label}.</p><div class="go">TOUCH THE WATER TO BEGIN</div></div>`;
+    <div class="ui" id="card">${L.jar ? `<img class="jarimg" src="../../labels/${L.jar}.svg" alt="">` : ""}<div class="k">${L.kind ? 'FROM THE ARCHIVE · ' : 'A DRIFT FROM '}${L.source.replace('_', ' ').toUpperCase()}</div><h1>${L.title}</h1><p>${L.took}</p><p style="font-style:normal;font-size:14px;color:var(--dim)">Goal: ${L.goal.label}.</p><div class="go">TOUCH THE WATER TO BEGIN</div></div>`;
   const SM = Q.get('sm') || 'https://hartswf0.github.io/secondhand-motion/';
   let FILMS = await (await fetch('../films109.json')).json();
   if (Q.get('films')) { const keep = Q.get('films').split(','); FILMS = FILMS.filter(f => keep.includes(f.slug)); }
@@ -405,12 +405,11 @@ export async function play(L, ALL) {
     if (G.state !== 'end') for (const s of SP) { if (!s.pos || s.doodle || s.bad || s.gone || (s.slot < 0 && s !== W0)) continue; const watching = s === W0, f = FILMS[s.film]; if (!watching && (!visible(s) || (s.clear || 0) < .18)) continue;
       const src = srcOf(f, s); if (!src) continue; items.push({key: s, pos: s.p || s.pos, size: s.size, clear: watching ? 1 : s.clear, hold: watching ? Math.min(1, (RT - G.watch.t0) / .6) : 0, src, clock: watching ? RT - G.watch.t0 + (s.i || 0) : T + (s.i || 0) * 1.7}); }
     SCN.update(items, real, RT, scene.fog.color, scene.fog.density);
-    // the back layer: the film you last took or watched, else the archive turning over every ~24 s
-    if (!BACK.list) BACK.list = FILMS.map((f, i) => i).filter(i => srcOf(FILMS[i])).sort((a, b) => (FILMS[b].clip ? 1 : 0) - (FILMS[a].clip ? 1 : 0) || Math.random() - .5);
-    if (BACK.list.length && (BACK.f === undefined || RT > BACK.until)) { BACK.f = BACK.list[(BACK.k = (BACK.k ?? -1) + 1) % BACK.list.length]; BACK.until = RT + 24; }
-    if (G.backFilm !== undefined && G.backFilm !== BACK.shown) { BACK.f = G.backFilm; BACK.until = RT + 30; }
-    BACK.shown = BACK.f; const bf = BACK.f !== undefined ? FILMS[BACK.f] : null, bsrc = bf && L.back !== false ? srcOf(bf) : null; if (bsrc) bsrc.el = null;   // the back layer plays silently on its own
-    SCN.backdrop(bsrc, (L.dark ? .14 : .22) * (G.state === 'end' ? .5 : 1), RT * .6, scene.fog.color, real, 70); }
+    // the back layer is black. It shows a film only while you hold one (that film, full and faint behind everything), or as an echo after a pulse (the nearest film the ring lit)
+    let bsrc = null, ba = 0; if (G.watch && W0 && W0.film !== undefined) { bsrc = srcOf(FILMS[W0.film]); ba = .26 * Math.min(1, (RT - G.watch.t0) / .5); }
+    else if (G.pulseT !== undefined && RT - G.pulseT < 2.2) { if (BACK.pt !== G.pulseT) { BACK.pt = G.pulseT; const n = SP.filter(x => x.pos && x.slot >= 0 && !x.bad && !x.doodle).sort((a, b) => a.pos.distanceTo(J.p) - b.pos.distanceTo(J.p))[0]; BACK.f = n ? n.film : undefined; }
+      if (BACK.f !== undefined) { bsrc = srcOf(FILMS[BACK.f]); const e = (RT - G.pulseT) / 2.2; ba = .24 * Math.min(1, e * 6) * (1 - e) * (1 - e); } }
+    if (bsrc) bsrc.el = null; SCN.backdrop(L.back === false ? null : bsrc, ba * (L.dark ? .7 : 1), RT * .6, scene.fog.color, real, 70); }
   const BACK = {};
   function frame(now) { requestAnimationFrame(frame); const real = Math.max(0, Math.min(.05, (now - last) / 1000)); /* the first rAF stamp can precede setup */ last = now; RT += real; const ws = G.watch && !L.fluid ? .12 : 1, dt = real * ws; T += dt;
     const playing = G.state === 'play';

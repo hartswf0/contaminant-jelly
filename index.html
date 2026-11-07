@@ -1,155 +1,151 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8">
 <link rel="icon" type="image/svg+xml" href="favicon.svg"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Contaminant · Jelly-Films</title><meta name="description" content="A jellyfish of celluloid swims an archive of jelly-films. Every drift beside the film it came from; every version; the lab.">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+<title>Contaminant · Jelly-Films</title><meta name="description" content="Each video becomes a game. Hover a jar to see its film, click to play the drift it became.">
+<link rel="stylesheet" href="fonts/fonts.css">
 <style>
-:root{--ink:#efe6d4;--dim:#a9b3ad;--gold:#f2c27a;--line:rgba(239,230,212,.16);--bg:#05090a;--deep:#081113;--serif:"Cormorant Garamond",Georgia,"Times New Roman",serif;--sans:system-ui,"Helvetica Neue",Arial,sans-serif}
-*{box-sizing:border-box}html{background:var(--bg);scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--sans);overflow-x:hidden}
-a{color:inherit}
-.cap{font:500 11px var(--sans);letter-spacing:.32em;text-transform:uppercase;color:var(--dim)}
-/* the hero: our own film, the jelly beside a face, playing full in the dark water */
-.hero{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(20px,4vw,44px) max(16px,4vw);isolation:isolate;overflow:hidden}
-.hero video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;filter:saturate(.85) contrast(1.05)}
-.hero:after{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse 80% 70% at 62% 45%,transparent 30%,rgba(5,9,10,.75) 100%),linear-gradient(180deg,rgba(5,9,10,.55),transparent 30%,transparent 62%,var(--bg))}
-.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
-h1{margin:0;font:400 clamp(34px,6.4vw,84px)/.95 var(--serif);letter-spacing:.16em}h1 i{display:block;letter-spacing:.06em;font-size:.62em;margin-top:.18em;color:var(--ink)}
-.idx{font:italic 500 clamp(17px,1.8vw,21px) var(--serif);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:3px}
-.marks{position:absolute;inset:0;z-index:0;pointer-events:none}.mark{position:absolute;pointer-events:auto;text-decoration:none;font:500 11px var(--sans);letter-spacing:.3em;text-transform:uppercase;color:var(--ink);opacity:.82;padding:6px 0 6px 18px;text-shadow:0 0 12px #000}
-.mark:before{content:"";position:absolute;left:0;top:50%;width:11px;height:11px;margin-top:-6px;background:linear-gradient(var(--ink),var(--ink)) center/1px 100% no-repeat,linear-gradient(var(--ink),var(--ink)) center/100% 1px no-repeat;opacity:.7}.mark:hover{opacity:1;color:var(--gold)}
-.foot{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
-.play{font:italic 500 clamp(26px,3.2vw,40px) var(--serif);text-decoration:none;border-bottom:1px solid rgba(239,230,212,.5);padding-bottom:6px}.play:hover{color:var(--gold);border-color:var(--gold)}
-.how{max-width:420px;color:var(--dim);font:italic 17px/1.45 var(--serif);text-align:right;text-shadow:0 0 10px #000}
-/* depth gauge */
-.gauge{position:fixed;right:max(10px,1.4vw);top:16vh;bottom:16vh;width:44px;z-index:20;pointer-events:none;font:10px var(--sans);color:var(--dim)}
-.gauge:before{content:"";position:absolute;right:0;top:0;bottom:0;width:1px;background:var(--line)}.gauge span{position:absolute;right:6px;transform:translateY(-50%);white-space:nowrap;opacity:.7}.gauge span:after{content:"";position:absolute;right:-6px;top:50%;width:5px;height:1px;background:var(--dim)}
-.gauge b{position:absolute;right:-3px;width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold);transform:translateY(-50%);transition:top .2s}
-/* sections */
-main{padding:0 max(16px,4vw) 12vh;max-width:1440px;margin:0 auto}section{padding-top:13vh}
-.sh{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:14px}
-h2{margin:0;font:italic 400 clamp(30px,4.4vw,56px)/1.05 var(--serif)}h2 .n{font-style:normal;letter-spacing:.14em;font-size:.58em;margin-right:.5em;color:var(--dim)}
-.sh nav{display:flex;gap:18px;font:italic 18px var(--serif);color:var(--dim)}.sh nav a{text-decoration:none}.sh nav a:hover{color:var(--gold)}
-.lede{max-width:640px;color:var(--dim);font:italic 19px/1.5 var(--serif);margin:14px 0 0}
-/* film → drift rows */
-.colh{display:grid;grid-template-columns:minmax(220px,1fr) 1.25fr 1.75fr;gap:22px;margin-top:22px}.colh .cap:first-child{visibility:hidden}
-.pair{display:grid;grid-template-columns:minmax(220px,1fr) 1.25fr 1.75fr;gap:22px;align-items:center;padding:20px 0;border-bottom:1px solid var(--line);text-decoration:none;color:inherit}
-.pair h3{margin:0;font:400 clamp(21px,2vw,27px)/1.2 var(--serif)}.pair h3 em{font-style:normal;color:var(--gold)}.pair p{margin:8px 0 0;color:var(--dim);font:italic 16.5px/1.45 var(--serif)}
-.fr{position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:2px;background:var(--deep)}.fr video,.fr img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.fr.watch{filter:grayscale(.85) sepia(.25) contrast(1.08);box-shadow:inset 0 0 0 1px rgba(239,230,212,.1)}
-.fr.watch:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 10px,rgba(0,0,0,.35) 10px 11px) left/14px 100% no-repeat,repeating-linear-gradient(90deg,transparent 0 10px,rgba(0,0,0,.35) 10px 11px) right/14px 100% no-repeat,radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.5))}
-.fr.playv{-webkit-mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent)}
-.pair .mobcap{display:none}
-/* cards */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:26px 22px;margin-top:26px}
-.card{display:block;text-decoration:none;color:inherit}.card .fr{-webkit-mask-image:radial-gradient(ellipse 72% 70% at 50% 50%,#000 45%,transparent 100%);mask-image:radial-gradient(ellipse 72% 70% at 50% 50%,#000 45%,transparent 100%)}
-.card .fr img,.card .fr video{transition:transform 1.2s,opacity .5s;opacity:.85}.card:hover .fr img,.card:hover .fr video{transform:scale(1.04);opacity:1}
-.card small{display:block;margin-top:10px}.card b{display:block;font:400 23px/1.2 var(--serif);margin-top:2px}.card b em{font-style:normal;color:var(--gold)}.card span{display:block;color:var(--dim);font:italic 16px/1.4 var(--serif);margin-top:3px}
-.list{list-style:none;margin:22px 0 0;padding:0;max-width:900px}.list li{display:flex;gap:18px;flex-wrap:wrap;align-items:baseline;border-bottom:1px solid var(--line);padding:11px 0}
-.list a{font:400 20px var(--serif);text-decoration:none;min-width:13em}.list a:hover{color:var(--gold)}.list span{flex:1;min-width:14em;color:var(--dim);font-size:14px}
-footer{margin-top:14vh;padding-top:18px;border-top:1px solid var(--line);color:var(--dim);font-size:13px;max-width:760px}footer a{color:var(--gold)}
-@media (max-width:820px){.colh{display:none}.pair{grid-template-columns:1fr 1fr;gap:10px 12px}.pair>div:first-child{grid-column:1/-1}.pair .mobcap{display:block;margin-bottom:6px}
-  .marks{display:none}.how{text-align:left}.gauge{display:none}}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+:root{--paper:#efe1c6;--ink:#1c2a6b;--red:#cf3a2b;--dim:#6d6352;--water:#061113;--mono:'Courier Prime','Courier New',monospace;--cond:Anton,Impact,'Arial Narrow',sans-serif;--serif:'Cormorant Garamond',Georgia,serif}
+*{box-sizing:border-box}html{background:var(--paper);scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 var(--mono);overflow-x:hidden}
+a{color:inherit}a:focus-visible{outline:3px solid var(--red);outline-offset:4px}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:40;opacity:.5;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='p'%3E%3CfeTurbulence baseFrequency='.75' numOctaves='3' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .45  0 0 0 0 .33  0 0 0 0 .18  0 0 0 .2 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23p)'/%3E%3C/svg%3E")}
+/* REST: the title, printed once, then one invitation */
+.land{position:relative;height:100svh}.land #ttl{position:absolute;inset:0 0 clamp(72px,11vh,110px) 0}.land{background:var(--paper)}
+.cta{position:absolute;left:0;right:0;bottom:max(18px,3.4vh);display:flex;justify-content:center;gap:28px;align-items:baseline;opacity:0;transition:opacity .6s;z-index:2}.cta.on{opacity:1}
+.cta .go{font:400 clamp(22px,3.2vmin,34px)/1 var(--cond);letter-spacing:.06em;text-decoration:none;background:var(--ink);color:var(--paper);padding:.5em .9em .45em}.cta .go:hover{background:var(--red)}
+.cta .tr{font:700 15px var(--mono);text-decoration:none;border-bottom:2px solid currentColor}.cta .tr:hover{color:var(--red)}
+.skip{position:absolute;right:16px;top:14px;z-index:3;font:700 13px var(--mono);background:none;border:0;color:var(--dim);cursor:pointer;padding:6px}.skip[hidden]{display:none}
+/* the shelf */
+main{max-width:1320px;margin:0 auto;padding:0 max(16px,4vw)}
+.sec{padding:16vh 0 4vh}.sec h2{margin:0;font:400 clamp(34px,6vw,76px)/.95 var(--cond);letter-spacing:.02em}.sec h2 small{display:block;font:700 clamp(14px,1.4vw,17px)/1.4 var(--mono);letter-spacing:0;margin-top:12px;color:var(--dim);max-width:640px}
+.rule{height:10px;background:var(--ink);width:min(420px,60%);margin:18px 0 0}
+.shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:34px 26px;margin-top:40px}
+.jar{position:relative;display:block;text-decoration:none;color:var(--ink)}.jar .lab{position:relative;aspect-ratio:320/350}
+.jar img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.jar video{position:absolute;left:23.5%;top:40.6%;width:53%;height:23.4%;object-fit:cover;opacity:0;transition:opacity .45s;mix-blend-mode:multiply;filter:grayscale(1) contrast(1.35) brightness(1.08) sepia(.35);
+  -webkit-mask-image:radial-gradient(ellipse 54% 60% at 50% 50%,#000 70%,transparent 100%);mask-image:radial-gradient(ellipse 54% 60% at 50% 50%,#000 70%,transparent 100%)}
+.jar.live video.on{opacity:.92}.jar.live img{transform:translateY(-2%) rotate(-1.5deg)}
+.jar .cap{display:flex;justify-content:space-between;gap:10px;margin-top:10px;font:700 14px/1.3 var(--mono)}.jar .cap b{font:400 21px/1 var(--cond);letter-spacing:.03em}.jar .cap i{font-style:normal;color:var(--dim)}
+.jar .now{position:absolute;left:50%;transform:translateX(-50%);top:4%;font:700 11px var(--mono);background:var(--paper);padding:2px 6px;opacity:0;transition:opacity .3s}.jar.live .now{opacity:1}
+/* the periodic table: jars laid out by column and row */
+.pt{display:grid;grid-template-columns:repeat(16,1fr);gap:6px;margin-top:34px}.pt a,.tj a{display:block;transition:transform .25s cubic-bezier(.2,.7,.2,1);position:relative;z-index:1}.pt img,.tj img{display:block;width:100%;height:auto}
+.pt a:hover,.pt a:focus-visible{transform:scale(1.9);z-index:5}.tj{display:grid;grid-template-columns:repeat(8,1fr);gap:14px;margin-top:26px}.tj a:hover,.tj a:focus-visible{transform:scale(1.25);z-index:5}
+.read{min-height:3.2em;margin:18px 0 0;max-width:820px;font:700 14.5px/1.5 var(--mono)}.read b{font:400 22px var(--cond);letter-spacing:.03em;margin-right:8px;color:var(--red)}
+@media (max-width:860px){.pt{grid-template-columns:repeat(6,1fr)}.pt a{grid-column:auto!important;grid-row:auto!important}.pt a:hover{transform:scale(1.15)}.tj{grid-template-columns:repeat(4,1fr)}}
+/* the way: one video becoming one game, told as you scroll */
+.way{position:relative;margin-top:30px}.stage{position:sticky;top:0;height:100svh;display:grid;place-items:center;overflow:hidden;pointer-events:none}
+.stage .frame{position:relative;width:min(86vw,1000px);aspect-ratio:16/9;background:var(--water);overflow:hidden;box-shadow:0 30px 80px -30px rgba(28,42,107,.5)}
+.stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .8s}.stage video.on{opacity:1}
+.stage .film{filter:grayscale(.7) sepia(.3) contrast(1.08)}.stage .bub{position:absolute;inset:0;opacity:0;transition:opacity .5s;background:radial-gradient(circle at 20% 80%,rgba(255,255,255,.5) 0 3px,transparent 4px),radial-gradient(circle at 70% 60%,rgba(255,255,255,.4) 0 5px,transparent 6px),radial-gradient(circle at 45% 30%,rgba(255,255,255,.35) 0 2px,transparent 3px)}
+.stage .tag{position:absolute;left:0;bottom:-44px;font:700 14px var(--mono);color:var(--ink)}
+.stage .par{position:absolute;width:min(22vw,230px);right:max(2vw,calc(50vw - 640px));top:12vh;transform:rotate(4deg);filter:drop-shadow(0 16px 22px rgba(0,0,0,.35));will-change:transform}
+.steps{position:relative;margin-top:-100svh;pointer-events:none}.step{height:100svh;display:flex;align-items:flex-end;padding-bottom:9vh}
+.step p{pointer-events:auto;max-width:430px;background:var(--paper);padding:16px 18px;margin:0;font:700 15px/1.5 var(--mono);box-shadow:6px 6px 0 var(--ink)}.step p b{display:block;font:400 26px/1 var(--cond);letter-spacing:.03em;margin-bottom:6px}
+.step p a{color:var(--red)}
+/* index of everything else: plain */
+.list{list-style:none;margin:34px 0 0;padding:0;max-width:880px;columns:2 340px;column-gap:40px}.list li{break-inside:avoid;padding:10px 0;border-top:2px solid var(--ink)}
+.list a{font:400 22px/1.1 var(--cond);letter-spacing:.03em;text-decoration:none}.list a:hover{color:var(--red)}.list span{display:block;font-size:13.5px;color:var(--dim);margin-top:3px}
+/* into the water */
+.water{margin-top:18vh;background:linear-gradient(var(--paper),var(--water) 22vh);color:#efe1c6;padding:28vh max(16px,4vw) 10vh;text-align:center}
+.water video{width:min(92vw,1100px);aspect-ratio:16/9;background:#000;display:block;margin:0 auto}
+.water h2{font:400 clamp(30px,5vw,60px)/1 var(--cond);margin:0 0 6px;letter-spacing:.03em}.water p{margin:0 auto 26px;max-width:560px;color:#bfb39a}
+.water .go{display:inline-block;margin-top:30px;font:400 28px/1 var(--cond);letter-spacing:.06em;text-decoration:none;background:var(--paper);color:var(--water);padding:.55em 1em .45em}.water .go:hover{background:var(--red);color:var(--paper)}
+footer{font-size:12.5px;color:#8f856f;margin-top:8vh}footer a{color:#efe1c6}
+@media (max-width:700px){.shelf{grid-template-columns:1fr 1fr;gap:24px 14px}.jar .cap{flex-direction:column;gap:2px}.jar .cap b{font-size:18px}.stage .par{display:none}.cta{flex-direction:column;align-items:center;gap:12px}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.jar img,.stage video{transition:none}}
 </style></head>
 <body>
-<header class="hero" id="top">
-  <video autoplay muted loop playsinline preload="auto" poster="current/drift/thumbs/design_v6.jpg" src="current/fal/design_v6_720.mp4"></video>
-  <div class="top"><div><div class="cap" style="margin-bottom:18px">A film journal of source-to-play pairings</div><h1>CONTAMINANT<i>jelly-films</i></h1></div><a class="idx" href="#index">Index</a></div>
-  <div class="marks">
-    <a class="mark" href="current/drift/?v=menagerie" style="left:9%;top:36%">Drawn creatures</a>
-    <a class="mark" href="current/drift/?v=strata" style="left:63%;top:22%">Archive strata</a>
-    <a class="mark" href="current/drift/?v=lure" style="left:8%;top:62%">Predators &amp; currents</a>
-    <a class="mark" href="current/drift/?v=bolas" style="left:55%;top:58%">Bolas</a>
-    <a class="mark" href="#versions" style="left:78%;top:46%">Versions &amp; tools</a>
-  </div>
-  <div class="foot"><div><a class="play" href="current/drift/">Play The Drifts ↗</a><div style="margin-top:14px"><a class="idx" href="current/drift/play/trailer.mp4">Watch the trailer: film and game, dissolving into each other</a></div></div>
-    <p class="how">A small amber jellyfish of celluloid swims an archive. Far off, the films are clouds of light; come near, light them or pulse, and they clear into what they show.</p></div>
-</header>
-<div class="gauge" aria-hidden="true"><span style="top:0">0 m</span><span style="top:30%">−200 m</span><span style="top:62%">−800 m</span><span style="top:100%">−1,800 m</span><b id="gb" style="top:0"></b></div>
-
-<main id="index">
-<section id="pairs">
-  <div class="sh"><h2>From film to drift</h2><nav><a href="#drifts">Drifts</a><span>/</span><a href="#versions">Versions</a><span>/</span><a href="#lab">Lab</a></nav></div>
-  <p class="lede">Eleven videos, eleven games. Each video was read for what it does, and what it does became a rule you can play. Watch on the left, play on the right: the right column is the game itself, recorded in cinema mode.</p>
-  <div class="colh"><span class="cap">.</span><span class="cap">Watch</span><span class="cap">Play</span></div>
-  <div id="rows"></div>
-</section>
-
-<section id="drifts">
-  <div class="sh"><h2><span class="n">01 /</span>The Drifts</h2><nav><a href="current/drift/">All drifts</a><span>/</span><a href="current/drift/?v=ascent&amp;trailer">Trailer mode</a></nav></div>
-  <p class="lede">Open water, seen from the side. No buttons: hold the water to swim, tap a jelly-film to take it, hold on it to see it clearly, double-tap to pulse. Press H (or tap with three fingers) to hide every word on the screen.</p>
-  <div class="grid" id="eps"></div>
-</section>
-
-<section id="versions">
-  <div class="sh"><h2><span class="n">02 /</span>Every Version</h2><nav><a href="#lab">The Lab ↓</a></nav></div>
-  <p class="lede">Each one is kept playable, newest first. From v4 on, films near the jelly come clear as their real footage, and the farthest water plays one film full and faint.</p>
-  <div class="grid">
-    <a class="card" href="current/"><div class="fr"><img loading="lazy" src="index-thumbs/v6.jpg" alt=""></div><small class="cap">Version 6</small><b>The Branching Archive</b><span>Forks in the archive; cast, focus, outrun the angler; surface with a cut you can share. Solo or together.</span></a>
-    <a class="card" href="current/v5.html"><div class="fr"><img loading="lazy" src="index-thumbs/v5.jpg" alt=""></div><small class="cap">Version 5</small><b>The Dive to the Source</b><span>A golden jelly dives 605 m of drowned tunnel.</span></a>
-    <a class="card" href="current/v4.html"><div class="fr"><img loading="lazy" src="index-thumbs/v4.jpg" alt=""></div><small class="cap">Version 4</small><b>Never a Frame</b><span>Films as clouds of gaussian light; a tentacle becomes a time worm.</span></a>
-    <a class="card" href="current/v3.html"><div class="fr"><img loading="lazy" src="index-thumbs/v3.jpg" alt=""></div><small class="cap">Version 3</small><b>The Sewers of Internet Video</b><span>Save clips from fog-choked sewers; avoid the corrupted ones.</span></a>
-    <a class="card" href="current/v2.html"><div class="fr"><img loading="lazy" src="index-thumbs/v2.jpg" alt=""></div><small class="cap">Version 2</small><b>The Rising Tube</b><span>Rise through a tube of the archive’s 109 films, clear and playing.</span></a>
-    <a class="card" href="current/v1.html"><div class="fr"><img loading="lazy" src="index-thumbs/v1.jpg" alt=""></div><small class="cap">Version 1</small><b>The Current</b><span>The first: arms catch frames; the censor’s red ink clouds the bell.</span></a>
-  </div>
-</section>
-
-<section id="lab">
-  <div class="sh"><h2><span class="n">03 /</span>The Lab</h2></div>
-  <p class="lede">The first jelly tools, the sound, the notes and instructions, and the archives everything is made from.</p>
-  <div class="grid">
-    <a class="card" href="paeleo/scion/videotext/maker.html"><div class="fr"><img loading="lazy" src="index-thumbs/maker.jpg" alt=""></div><small class="cap">Tool</small><b>Memory Maker</b><span>Inside each jelly of images a film runs only as fast as you swim.</span></a>
-    <a class="card" href="paeleo/scion/contaminant.html?play=1"><div class="fr"><img loading="lazy" src="index-thumbs/swim.jpg" alt=""></div><small class="cap">Game</small><b>The Swim Game</b><span>Carry matching frames to the sun; keep out of the censor’s beam.</span></a>
-    <a class="card" href="paeleo/scion/videotext/editor.html"><div class="fr"><img loading="lazy" src="index-thumbs/editor.jpg" alt=""></div><small class="cap">Tool</small><b>The Editor</b><span>Write a cut as a sentence of shared features.</span></a>
-    <a class="card" href="paeleo/scion/contaminant.html"><div class="fr"><img loading="lazy" src="index-thumbs/films.jpg" alt=""></div><small class="cap">Films</small><b>The Films</b><span>Hot cinema cuts, cool cinema contaminates.</span></a>
-    <a class="card" href="current/audio/spectrograms_picks.jpg"><div class="fr"><img loading="lazy" src="current/audio/spectrograms_picks.jpg" alt=""></div><small class="cap">Sound</small><b>The songs, seen</b><span>VOLHOLLA spectrograms: beat, bass, brightness. The bell pulses on the beat.</span></a>
-    <a class="card" href="current/fal/songs_sheet.jpg"><div class="fr"><img loading="lazy" src="current/fal/songs_sheet.jpg" alt=""></div><small class="cap">Contact sheet</small><b>Song videos</b><span>Seven song videos, frame by frame.</span></a>
-  </div>
-  <ul class="list">
-    <li><a href="current/drift/DRIFTS.md">DRIFTS.md</a><span>Video → game translations; archive levels; jelly-films, screens, radar, the angler, cinema and trailer modes.</span></li>
-    <li><a href="current/NOTES.md">NOTES.md</a><span>The Branching Archive, v6.</span></li>
-    <li><a href="current/SONG2GAME.md">SONG2GAME.md</a><span>How the songs map onto levels, with matched starts.</span></li>
-    <li><a href="current/SCION_BRANCHING_ARCHIVE.md">SCION · Branching Archive</a><span>System instruction for v6.</span></li>
-    <li><a href="current/SCION_LUDIC_BRANCHING_ARCHIVE.md">SCION · Ludic Engine</a><span>Mechanics, powerups, length and goals.</span></li>
-    <li><a href="current/SCION_GOLDEN_RIVERBED.md">SCION · Golden Riverbed</a><span>Creatures, currents, minimap, multiplayer.</span></li>
-    <li><a href="current/SCION_INTERFACE_THINKING_MACHINE.md">SCION · Interface</a><span>Reticles in place of buttons.</span></li>
-    <li><a href="current/SCION_VOID_SURFACE.md">SCION · Void Surface</a><span>v5.</span></li>
-    <li><a href="current/SCION_NEVER_A_FRAME.md">SCION · Never a Frame</a><span>v4.</span></li>
-    <li><a href="current/SCION_STRAND_PHYSICS.md">SCION · Strand Physics</a><span>Arms and tentacles.</span></li>
-    <li><a href="current/NOTES_v5.md">Notes v5 · v4 · v3 · v2 · v1</a><span><a href="current/NOTES_v4.md" style="font-size:14px;min-width:0">v4</a> · <a href="current/NOTES_v3.md" style="font-size:14px;min-width:0">v3</a> · <a href="current/NOTES_v2.md" style="font-size:14px;min-width:0">v2</a> · <a href="current/NOTES_v1.md" style="font-size:14px;min-width:0">v1</a></span></li>
-    <li><a href="https://hartswf0.github.io/secondhand-motion/">secondhand-motion</a><span>86 traced subjects, 1,777 drawn keys: the doodles.</span></li>
-    <li><a href="https://hartswf0.github.io/cineosis-lab/periodic-table.html">cineosis-lab</a><span>45 signs, 809 shots, clips with sound: the cineosis levels.</span></li>
-    <li><a href="https://github.com/hartswf0/bolas">bolas</a><span>The drawn worms’ planes and tracks, and the PAELEO / SCION source.</span></li>
-  </ul>
-</section>
-<footer>Archive frames are public domain; rights are recorded under <code>paeleo/handmade/*/assets.json</code>. Music by VOLHOLLA. The design and song videos are generated; everything in the Play column is the game. <a href="#top">Back to the surface ↑</a></footer>
+<header class="land"><div id="ttl" role="img" aria-label="Contaminant jelly-films. When the jelly turns red, keep out of the water."></div>
+  <button class="skip" id="skip">skip ›</button>
+  <div class="cta" id="cta"><a class="go" href="current/drift/">PLAY THE DRIFTS</a><a class="tr" href="#water">watch the trailer</a></div></header>
+<main>
+<section class="sec" id="shelf"><h2>ELEVEN VIDEOS, ELEVEN GAMES<small>Each jar holds a video and the game it became. Hover a jar: the film plays in it, then the game. Click to swim it.</small></h2><div class="rule"></div>
+  <div class="shelf" id="jars"></div></section>
+<section class="sec" id="archive"><h2>FROM THE ARCHIVE<small>Levels built straight from the archives: traced doodles, drawn worms, eighty years of footage sorted by time and by colour, and one level for every sign of the periodic table.</small></h2><div class="rule"></div>
+  <div class="shelf" id="arch"></div></section>
+<section class="sec" id="bonusS"><h2>BONUS<small>Four sketches from the same water: a film-reel jelly, a timeworm in the sewer of lost video, a 12-reel voyage of medusae, raw doodle worms. Each now carries real footage from the archives and a VOLHOLLA song.</small></h2><div class="rule"></div>
+  <div class="shelf" id="bonus"></div></section>
+<section class="sec" id="table"><h2>THE PERIODIC TABLE OF CINEOSIS<small>Forty-five signs the lab reads in moving images, one jar and one level each; below them, the sixteen types. Hover a jar to read its question; click to swim it.</small></h2><div class="rule"></div>
+  <div class="pt" id="pt"></div><p class="read" id="read" aria-live="polite">&nbsp;</p><div class="tj" id="tj"></div></section>
+<section class="sec" id="way"><h2>VIDEO TO GAME<small>How one video becomes one game: Lure, from the generated film to the drift you can play, to the reel it returns to.</small></h2><div class="rule"></div></section>
 </main>
-<script>
-const P = [
-  ['ascent', 'design_v2', 'Galleries of frames', 'Ascent', 'Tier after tier of small frames around a rising jelly becomes a climb through sleeping films that wake as you brush them.'],
-  ['pairs', 'design_v4', 'A face and a hand', 'Pairs', 'Soft ovals arriving two by two become cuts: take a frame from both halves of each pair.'],
-  ['lure', 'design_v5', 'An angler with a lure', 'Lure', 'A fork, an anglerfish and a school become a patrol in the low water: two pulses of warning, then the lunge.'],
-  ['surface', 'design_v6', 'A face beside a tiny jelly', 'Toward the Surface', 'The enormous first film is the point: stop, hold, and watch it toward the pale surface.'],
-  ['halo', 'song_neonbutterfly-02', 'A ring of films', 'Halo', 'Films orbiting under the surface become a turning halo; take frames as it comes round.'],
-  ['rayrun', 'song_nightbus-03', 'A ray overhead', 'Ray Run', 'A great ray and its wake become a slipstream of light and pressure; films stream past.'],
-  ['slices', 'song_nightbus-06', 'A chain of slices', 'Slices', 'A diagonal chain of film slices becomes one film laid out in time, taken in order.'],
-  ['caves', 'song_nightbus-08', 'Two cave mouths', 'Twin Caves', 'Two mouths of sparkling dust become an upper and a lower cave split by a tongue of rock.'],
-  ['bloom', 'song_nightbus-13', 'Films in bloom', 'Bloom', 'Small films blooming around a rising jelly become the game of watching: hold, and it opens.'],
-  ['descent', 'song_nightbus-14', 'Sinking to a point', 'The Long Descent', 'A jelly shrinking into the void becomes closing light: films show only near you, or when you pulse.'],
-  ['silt', 'song_nightbus-17', 'An angler in silt', 'Silt Bench', 'An anglerfish rising from the floor becomes buried films; swim low, or pulse, to stir them up.']];
-const EP = [['doodles', 'Episode 1', 'Secondhand Doodles', 'Traced drawings swim as eels and schools; catch one and its tentacle dyes the fish.'], ['menagerie', 'Episode 2', 'Menagerie', 'All 86 drawings alive as creatures, curious or shy.'],
-  ['bolas', 'Episode 3', 'Bolas', '321 drawn planes, each replayed along its own track. Capture them.'], ['strata', 'Episode 4', 'Strata', 'Rise from 1900s footage at the floor to the 2020s at the surface.'],
-  ['spectrum', 'Episode 5', 'Spectrum', 'The archive sorted by its own colour; the water takes the hue.'], ['sign-29', 'Periodic table', 'One sign', 'Forty-five levels, one per cineosis sign; the sign’s question is the goal.'],
-  ['rayrun', 'Episode 6', 'Ray Run', 'Ride the ray’s wake at speed.'], ['descent', 'Episode 7', 'The Long Descent', 'Sink into the dark; pulse to see.']];
-const vsrc = id => id.startsWith('design') ? `current/fal/${id}_720.mp4` : `current/fal/${id}.mp4`, play = id => `current/drift/play/${id}`;
-const vid = (src, poster) => `<video muted loop playsinline preload="none" poster="${poster}" data-src="${src}"></video>`;
-document.getElementById('rows').innerHTML = P.map(([id, v, from, to, line]) => `<a class="pair" href="current/drift/?v=${id}"><div><h3>${from} → <em>${to}</em></h3><p>${line}</p></div>
-  <div><span class="cap mobcap">Watch</span><div class="fr watch">${vid(vsrc(v), `current/drift/thumbs/${v}.jpg`)}</div></div><div><span class="cap mobcap">Play</span><div class="fr playv">${vid(play(id) + '.mp4', play(id) + '.jpg')}</div></div></a>`).join('');
-document.getElementById('eps').innerHTML = EP.map(([id, ep, t, s]) => `<a class="card" href="current/drift/?v=${id}"><div class="fr">${vid(play(id) + '.mp4', play(id) + '.jpg')}</div><small class="cap">${ep}</small><b>${t}</b><span>${s}</span></a>`).join('');
-// videos load and play only while on screen
-const io = new IntersectionObserver(es => es.forEach(e => { const v = e.target; if (e.isIntersecting) { if (!v.src && v.dataset.src) v.src = v.dataset.src; v.play().catch(() => {}); } else v.pause(); }), {rootMargin: '120px 0px', threshold: .15});
-document.querySelectorAll('video[data-src]').forEach(v => io.observe(v));
-// the depth gauge follows the scroll
-const gb = document.getElementById('gb'); const g = () => { const k = scrollY / Math.max(1, document.documentElement.scrollHeight - innerHeight); gb.style.top = (k * 100).toFixed(1) + '%'; }; addEventListener('scroll', g, {passive: true}); g();
+<div class="way"><div class="stage" aria-hidden="true"><div class="frame"><video class="film" muted loop playsinline preload="none" data-src="current/fal/design_v5_720.mp4" data-k="0"></video><video muted loop playsinline preload="none" data-src="current/drift/play/lure.mp4" data-k="2"></video><div class="bub" data-k="1"></div><div class="tag" id="wtag">the video</div></div><img class="par" src="labels/jars/lure.svg" alt=""></div>
+  <div class="steps">
+    <div class="step" data-s="0" style="padding-left:max(16px,4vw)"><p><b>1 · THE VIDEO</b>A generated film: a fork in dark water, an anglerfish, its lure, a school turning away. No game yet, only something that happens.</p></div>
+    <div class="step" data-s="1" style="justify-content:flex-end;padding-right:max(16px,4vw)"><p><b>2 · WHAT IT DOES</b>Read the film for its verbs. The light invites. The angler waits behind it. Two pulses come before the strike.</p></div>
+    <div class="step" data-s="2" style="padding-left:max(16px,4vw)"><p><b>3 · THE RULE</b>One in four specks of light is a lure. The angler patrols, warns twice, lunges. Take eight frames without being bitten.</p></div>
+    <div class="step" data-s="3" style="justify-content:flex-end;padding-right:max(16px,4vw)"><p><b>4 · THE DRIFT</b>The rule, played: open water seen from the side, films that clear as you near them, no buttons. <a href="current/drift/?v=lure">Swim it ↗</a></p></div>
+    <div class="step" data-s="4" style="padding-left:max(16px,4vw)"><p><b>5 · BACK TO THE REEL</b>The game plays itself in trailer mode, without words, and its recording is cut back in with the films it came from.</p></div>
+  </div></div>
+<main>
+<section class="sec" id="more"><h2>EVERY VERSION · THE LAB<small>Seven versions, oldest still playable, and the tools and notes behind them.</small></h2><div class="rule"></div>
+  <ul class="list">
+    <li><a href="current/drift/">The Drifts · v7</a><span>Open water, gestures only. Press H to hide every word; add ?trailer and it swims itself.</span></li>
+    <li><a href="current/">The Branching Archive · v6</a><span>Forks, the angler, the screening room; alone or together.</span></li>
+    <li><a href="current/v5.html">The Dive to the Source · v5</a><span>605 m of drowned tunnel.</span></li>
+    <li><a href="current/v4.html">Never a Frame · v4</a><span>Films as clouds of light; time worms.</span></li>
+    <li><a href="current/v3.html">The Sewers of Internet Video · v3</a><span>Save clips; avoid the corrupted.</span></li>
+    <li><a href="current/v2.html">The Rising Tube · v2</a><span>109 films, clear and playing.</span></li>
+    <li><a href="current/v1.html">The Current · v1</a><span>The censor’s red ink.</span></li>
+    <li><a href="paeleo/scion/videotext/maker.html">Memory Maker</a><span>A film runs only as fast as you swim.</span></li>
+    <li><a href="paeleo/scion/contaminant.html?play=1">The Swim Game</a><span>Carry frames to the sun.</span></li>
+    <li><a href="paeleo/scion/videotext/editor.html">The Editor</a><span>A cut as a sentence of features.</span></li>
+    <li><a href="paeleo/scion/contaminant.html">The Films</a><span>Hot cinema cuts; cool cinema contaminates.</span></li>
+    <li><a href="current/drift/DRIFTS.md">DRIFTS.md</a><span>Every translation, rule and measurement.</span></li>
+    <li><a href="current/SCION_VOID_INDEX.md">SCION · Void Index</a><span>Why this page shows so little.</span></li>
+    <li><a href="current/SONG2GAME.md">Song to game</a><span>The VOLHOLLA songs, their beats and levels.</span></li>
+    <li><a href="title.html">The title sequence</a><span>The label, printed on the beat.</span></li>
+    <li><a href="https://github.com/hartswf0/contaminant-jelly">Source</a><span>Everything here, and the archives it draws on.</span></li>
+  </ul></section>
+</main>
+<section class="water" id="water"><h2>RETURN TO THE REEL</h2><p>The trailer: the generated films and the games they became, cut together so you cannot tell which is which. Scored by VOLHOLLA.</p>
+  <video controls playsinline preload="none" poster="current/drift/play/trailer.jpg" src="current/drift/play/trailer.mp4"></video>
+  <a class="go" href="current/drift/">PLAY THE DRIFTS</a>
+  <footer>Archive frames are public domain; rights recorded under <code>paeleo/handmade/*/assets.json</code>. The design and song videos are generated; the gameplay is recorded from the game. <a href="#">Back to the label ↑</a></footer></section>
+<script type="module">
+import {mountTitle} from './title.js';
+// REST: the label prints itself once; skip, scroll or a key finishes it; then the one invitation
+const T = mountTitle(document.getElementById('ttl'), {mode: 'intro'}), cta = document.getElementById('cta'), skip = document.getElementById('skip');
+const done = () => { T.finish(); cta.classList.add('on'); skip.hidden = true; };
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches; document.fonts.ready.then(() => { if (reduce) done(); else { T.play(); setTimeout(done, T.dur * 1000); } });
+skip.onclick = done; addEventListener('keydown', done, {once: true}); addEventListener('scroll', () => { if (scrollY > 40) done(); }, {passive: true});
+// the shelf: each jar holds its film and its game
+const J = [['ascent', 'design_v2_720', 'Ascent', 'galleries of frames'], ['pairs', 'design_v4_720', 'Pairs', 'a face and a hand'], ['lure', 'design_v5_720', 'Lure', 'an angler with a lure'], ['surface', 'design_v6_720', 'Toward the Surface', 'a face by a tiny jelly'],
+  ['halo', 'song_neonbutterfly-02', 'Halo', 'a ring of films'], ['rayrun', 'song_nightbus-03', 'Ray Run', 'a ray overhead'], ['slices', 'song_nightbus-06', 'Slices', 'a chain of slices'], ['caves', 'song_nightbus-08', 'Twin Caves', 'two cave mouths'],
+  ['bloom', 'song_nightbus-13', 'Bloom', 'films in bloom'], ['descent', 'song_nightbus-14', 'The Long Descent', 'sinking to a point'], ['silt', 'song_nightbus-17', 'Silt Bench', 'an angler in silt']];
+const A = [['doodles', 'Doodles', 'traced drawings'], ['menagerie', 'Menagerie', '86 creatures'], ['bolas', 'Bolas', 'drawn worms'], ['strata', 'Strata', '1900s to 2020s'], ['spectrum', 'Spectrum', 'sorted by colour']];
+const vs = v => `current/fal/${v}.mp4`, pl = id => `current/drift/play/${id}.mp4`;
+const card = (id, title, from, film, k, href, jar, game) => `<a class="jar" href="${href || 'current/drift/?v=' + id}" data-film="${film ? (film.includes('/') ? film : vs(film)) : ''}" data-game="${game === undefined ? pl(id) : game}"><div class="lab"><img loading="lazy" src="labels/jars/${jar || id}.svg" alt="${title}">
+  <video class="f" muted loop playsinline preload="none"></video><video class="g" muted loop playsinline preload="none"></video><span class="now">${film ? 'the film' : 'the game'}</span></div><div class="cap"><b>${title}</b><i>${from}</i></div></a>`;
+document.getElementById('jars').innerHTML = J.map(([id, v, t, f], k) => card(id, t, f, v, k)).join('');
+document.getElementById('arch').innerHTML = A.map(([id, t, f], k) => card(id, t, f, null, k + 2)).join('') + card('sub-person', 'The Subjects', 'people to crowds', null, 9, null, 'subjects', '');
+// bonus pieces: the four sketches, given real footage, songs and sound; hover plays the footage they now carry
+const BON = [['reel', 'Film-Reel Jelly', 'afterlight · a 3D reel', 'bonus/reel.html', 'current/drift/play/bonus-reel.mp4'], ['sewer', 'Sentinel Timeworm', 'the sewer of lost video', 'bonus/sewer.html', 'current/drift/play/bonus-sewer.mp4'],
+  ['medusae', 'Afterlight Medusae', 'a 12-reel voyage', 'bonus/medusae.html', 'current/drift/play/bonus-medusae.mp4'], ['worms', 'Raw Doodle Worms', 'the periodic table', 'bonus/worms.html', 'current/drift/play/bonus-worms.mp4']];
+document.getElementById('bonus').innerHTML = BON.map(([id, t, f, h, g], k) => card(id, t, f, null, k, h, id, g)).join('');
+// live: the film plays in the jar, then dissolves into the game; leaving stops it. Touch screens: the jar nearest the centre plays.
+const live = (a, on) => { const [f, g] = a.querySelectorAll('video'), now = a.querySelector('.now'); clearTimeout(a._t); a.classList.toggle('live', on);
+  if (!on) { f.classList.remove('on'); g.classList.remove('on'); f.pause(); g.pause(); return; }
+  const game = () => { if (!a.dataset.game) return; if (!g.src) g.src = a.dataset.game; g.currentTime = 0; g.play().catch(() => {}); g.classList.add('on'); f.classList.remove('on'); now.textContent = 'the game'; a._t = setTimeout(film, 5200); };
+  const film = () => { if (!a.dataset.film) { if (!a.dataset.game) return; return game(); } if (!f.src) f.src = a.dataset.film; f.play().catch(() => {}); f.classList.add('on'); g.classList.remove('on'); now.textContent = 'the film'; a._t = setTimeout(game, 3000); };
+  film(); };
+const jars = [...document.querySelectorAll('.jar')];
+if (matchMedia('(hover: hover)').matches) jars.forEach(a => { a.addEventListener('mouseenter', () => live(a, true)); a.addEventListener('mouseleave', () => live(a, false)); a.addEventListener('focus', () => live(a, true)); a.addEventListener('blur', () => live(a, false)); });
+else { let cur = null; const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && e.intersectionRatio > .7) { if (cur && cur !== e.target) live(cur, false); cur = e.target; live(cur, true); } else if (cur === e.target && e.intersectionRatio < .4) { live(cur, false); cur = null; } }), {threshold: [.4, .7], rootMargin: '-25% 0px -25% 0px'}); jars.forEach(a => io.observe(a)); }
+// the periodic table: built from the archive data; a jar's question shows beside the table while it is in hand
+const TJ = ['01-perception', '02-affection', '03-impulse', '04-action-small', '05-action-large', '06-attraction', '07-inversion', '08-discourse', '09-dream', '10-recollection', '11-relation', '12-opsign-sonsign', '13-hyalosign', '14-chronosign', '15-noosign', '16-lectosign'];
+const pt = document.getElementById('pt'), read = document.getElementById('read'), tj = document.getElementById('tj');
+const say = (b, t) => { read.innerHTML = b ? `<b>${b}</b>${t}` : '&nbsp;'; };
+new IntersectionObserver((es, o) => { if (!es.some(e => e.isIntersecting)) return; o.disconnect(); fetch('labels/cineosis/index.json').then(r => r.json()).then(IX => fetch('current/drift/data/cineosis.json').then(r => r.json()).then(C => {
+  const byN = Object.fromEntries(C.signs.map(g => [g.n, g])), cnt = n => C.shots.filter(x => x.sign === n).length;
+  pt.innerHTML = IX.filter(j => j.kind === 'sign').map(j => { const g = byN[j.id] || {}; return `<a href="current/drift/?v=sign-${j.id}" style="grid-column:${(g.col ?? 0) + 1};grid-row:${(g.row ?? 0) + 1}" data-b="${j.symbol} · ${j.name}" data-t="${(j.question || '').replace(/"/g, '&quot;')} (${cnt(j.id)} shots)"><img loading="lazy" src="labels/cineosis/${j.file}.svg" alt="${j.symbol} ${j.name}"></a>`; }).join('');
+  tj.innerHTML = IX.filter(j => j.kind === 'type').map(j => `<a href="current/drift/?v=type-${j.file.slice(8)}" data-b="${j.name}" data-t="Swim the whole type: every shot of its signs."><img loading="lazy" src="labels/cineosis/${j.file}.svg" alt="${j.name}"></a>`).join('');
+  [...pt.children, ...tj.children].forEach(a => { const on = () => say(a.dataset.b, a.dataset.t), off = () => say(); a.addEventListener('mouseenter', on); a.addEventListener('focus', on); a.addEventListener('mouseleave', off); a.addEventListener('blur', off); });
+})).catch(() => { pt.innerHTML = '<a href="current/drift/">Open the periodic table in the drifts ↗</a>'; }); }, {rootMargin: '600px'}).observe(pt);
+// the way: the sticky frame changes with the step in view; the label drifts slower than the page (parallax)
+const vids = [...document.querySelectorAll('.stage video')], bub = document.querySelector('.stage .bub'), tag = document.getElementById('wtag'), par = document.querySelector('.stage .par'), way = document.querySelector('.way');
+const TAGS = ['the video · design_v5', 'what it does · the lure, the wait, two pulses', 'the rule · one speck in four is a lure', 'the drift · recorded in trailer mode', 'back to the reel'];
+const show = s => { const k = s <= 1 ? 0 : 2; vids.forEach(v => { const on = +v.dataset.k === k; if (on) { if (!v.src) v.src = v.dataset.src; v.play().catch(() => {}); } else v.pause(); v.classList.toggle('on', on); }); bub.style.opacity = s === 1 || s === 2 ? .9 : 0; tag.textContent = TAGS[s]; };
+const sio = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) show(+e.target.dataset.s); }), {threshold: .55}); document.querySelectorAll('.step').forEach(st => sio.observe(st));
+const pr = () => { const r = way.getBoundingClientRect(), k = -r.top / Math.max(1, r.height); par.style.transform = `translateY(${(k * 60).toFixed(1)}vh) rotate(${4 - k * 8}deg)`; };
+if (!reduce) addEventListener('scroll', pr, {passive: true});
 </script>
 </body></html>

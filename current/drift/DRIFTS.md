@@ -198,3 +198,37 @@ v2 was legible for the same reason: real image planes.
 
   Gameplay clips for the index were recorded from it frame by frame at 24 fps: `play/<id>.mp4`, 640×360, 5 s.
 - **Fix:** holding the water to swim had stopped working in the drifts. A `//` comment had swallowed that line; it is restored.
+
+## Jars, bonus pieces, the trailer
+**Jars** (`labels/`). Every piece has one SVG jar in the hand of the periodic table (`labels/cineosis/*.svg`): the same body, lid, reel, film strip and CONTAMINANT label.
+- **The periodic table:** 45 sign jars and 16 type jars.
+- **New jars** (`labels/jars/*.svg`, from `labels/make_jars.py`): 11 drifts, 5 archive levels, the subjects, and the 4 bonus pieces.
+  - The new jars carry no periodic symbol. Their label is a window holding a cartoon of the mascot jelly, its own character for each (`labels/cartoons.py`). Lure is terrified, with a sweat drop and the lure's light close by. Pairs is two jellies holding tentacles. Ray Run surfs the wake. The Long Descent sleeps as it sinks. Bloom has heart eyes. The Medusae queen wears a crown.
+  - On the index, the jar's film and then its game play inside that label window.
+- **Two-tone prints** of every jar live in `black/` and `white/`: dark inks go to the ink, light inks to a mid grey, the label paper to paper.
+- The game's intro card shows the level's jar.
+- Your printed posters are kept in `labels/posters/`.
+
+**Bonus pieces** (`bonus/`): the four sketches.
+- `reel.html` (Film-Reel Jelly), `sewer.html` (Sentinel Timeworm), `medusae.html` (Afterlight Medusae), `worms.html` (Raw Doodle Worms).
+- Each exposes `window.__bonus`. `bonus/bonus.js` then gives them real footage through the shared screens:
+  - films named after the 109 secondhand titles play those films' own frames (102 match by title);
+  - everything else plays one of the **145 cineosis clips the drifts have never used** (`bonus/footage.json`);
+  - the worms' "raw doodles" are now the real traced secondhand drawings, cycling through their keys.
+- As a film's footage clears, the sketch's stand-in (pixel plates, portals) fades out.
+- **Sound:**
+  - one VOLHOLLA song each: *The Fragile Iron Ghost*, *Phosphor Waveform Log*, *The Long Descent*, *The Wet Console*;
+  - it fades in on the first touch and ducks while a film is held clear;
+  - a glass ping and a burst of bubbles when a film clears, and a reel whir while it stays clear.
+- H toggles cinema mode.
+- three.js is now loaded from the repo (`bonus/vendor/three.r128.min.js`; `paeleo/.../three.module.min.js` for the worms), not from a CDN.
+
+**The trailer** (`current/drift/play/trailer.mp4`): 73 s, 960×540, h264 yuv420p plus AAC, 5.3 MB. The last one was yuv444p, which is why it played as corrupted on phones.
+- **Structure:** the printed title floods out of the jar into the water. Then each of the 11 generated films plays 4 beats and gives way to its drift's gameplay for 4 beats. The end card returns to the reel.
+- **Transitions:** film→game is hidden under rising bubbles; game→next film opens through a radar ring.
+- **One look:** a single grade, grain and vignette over both, so they read as one world.
+- **Music:** *Saltwater Static (The Last Shanty)*, cut on its 95.7 bpm beat.
+
+**Recordings** (`current/drift/play/*.mp4`, 960×540, 6 s): frame-stepped at 24 fps in trailer mode, with a shot list per drift (`rec3.js`: Lure's lunge, holds in Toward the Surface and Bloom, pulses in the dark levels).
+
+**The back layer** in every game is black. It plays a film only while one is held or focused, or as an echo for about 2 s after a pulse, Echo, cast or drink.

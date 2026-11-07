@@ -2,6 +2,8 @@
 // Shared engine: drift/index.html. Open water with depth layers, never a tube; no buttons; films only as clouds of flecks.
 // dir: the way the current carries you (right, up, down). band: half-height of the open water you can swim in.
 // layers: silhouette strips {kind, side (-1 below/left, 1 above/right), z (depth; negative is behind the play plane), glow (0..1 bulbs)}.
+// every drift and archive level has its jar (labels/jars/*.svg): the mascot jelly on the label; on the index the level's video plays in it
+const JARS = ['ascent', 'pairs', 'lure', 'surface', 'halo', 'rayrun', 'slices', 'caves', 'bloom', 'descent', 'silt', 'doodles', 'menagerie', 'bolas', 'strata', 'spectrum'];
 export const LEVELS = [
   {id: 'ascent', title: 'Ascent', source: 'design_v2', video: '../fal/design_v2_720.mp4', song: 'nightbus-08', start: 8.27,
     dir: 'up', len: 230, current: 1.6, band: 9, fog: '#2a241c', top: '#5a4c38', fogD: .03, films: {layout: 'tiers', every: 7}, bad: .04,
@@ -66,6 +68,8 @@ const SONGS = ['siltwire-02', 'siltwire-06', 'siltwire-10', 'siltwire-15', 'daeh
 const TYPEHUE = {perception: 190, affection: 330, impulse: 20, action: 45, reflection: 270, mental: 150, time: 210, sound: 100, read: 60};
 const hsl = (h, s, l) => { const k = n => (n + h / 30) % 12, a = s * Math.min(l, 1 - l), f = n => l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1)); return '#' + [f(0), f(8), f(4)].map(x => Math.round(x * 255).toString(16).padStart(2, '0')).join(''); };
 const LAYS = [[{kind: 'reef', side: -1, z: -8, glow: .6}, {kind: 'kelp', side: 1, z: -18, glow: .2}], [{kind: 'ruin', side: -1, z: -10, glow: .5}, {kind: 'cave', side: 1, z: -6, glow: .2}], [{kind: 'mussels', side: -1, z: -6, glow: .1}, {kind: 'cave', side: 1, z: -14, glow: .1}], [{kind: 'kelp', side: -1, z: -12, glow: .3}, {kind: 'kelp', side: 1, z: -12, glow: .3}], [{kind: 'dunes', side: -1, z: -4, glow: 0}, {kind: 'reef', side: -1, z: -18, glow: .5}]];
+LEVELS.forEach(l => { if (JARS.includes(l.id)) l.jar = 'jars/' + l.id; });
+
 export function archiveLevels(C) {
   const out = [], fluid = true, specks = true;
   out.push({id: 'doodles', kind: 'doodle', title: 'Secondhand Doodles', source: 'secondhand-motion', song: 'daehoned-05', start: null, dir: 'right', len: 300, current: 2.2, band: 9, fog: '#1b2524', fogD: .028, films: {layout: 'doodles', every: 8}, bad: 0,
@@ -77,7 +81,7 @@ export function archiveLevels(C) {
   out.push({id: 'bolas', kind: 'doodle', data: 'bolas', title: 'Bolas Planes', source: 'bolas', song: 'daehoned-19', start: null, dir: 'right', len: 520, current: 1.6, band: 10, fog: '#1f2624', fogD: .026, films: {layout: 'menagerie'}, bad: 0,
     layers: LAYS[4].concat([{kind: 'reef', side: 1, z: -16, glow: .4}]), creatures: ['school'], fluid, specks, goal: {type: 'doodles', n: 24, label: 'catch the drawn planes as they replay their motion'},
     took: 'The bolas depth-worm drawings: 321 drawn planes from 109 second-hand shots (a walking giraffe, its young, the grass in front), each in its tracked colour, replaying the motion it had in its shot as it swims.'});
-  if (!C) return out;
+  out.forEach(l => { if (JARS.includes(l.id)) l.jar = 'jars/' + l.id; }); if (!C) return out;
   const decs = [...new Set(C.shots.filter(s => s.dec).map(s => s.dec))].sort();
   out.push({id: 'strata', kind: 'cineosis', title: 'Strata', source: 'cineosis-lab', pick: {by: 'decade'}, song: 'nightbus-14', start: null, dir: 'up', len: decs.length * 26, current: 1.8, band: 10, fog: '#2a2620', top: '#294f52', fogD: .026, films: {layout: 'list'}, bad: 0,
     layers: LAYS[3], creatures: ['school', 'comb'], fluid, specks, goal: {type: 'decades', n: 8, label: 'take a frame from as many decades as you can'},
@@ -93,9 +97,13 @@ export function archiveLevels(C) {
     out.push({id: 'type-' + ty.toLowerCase().replace(/[^a-z]+/g, '-'), kind: 'cineosis', title: ty, source: 'cineosis-lab', pick: {by: 'image', v: ty}, song: SONGS[(i + 3) % SONGS.length], start: null, dir: ['right', 'up', 'down'][i % 3], len: 60 + n * 12, current: 2, band: 9,
       fog: hsl(hue, .2, .13), top: hsl(hue, .28, .3), fogD: .028, films: {layout: 'list'}, bad: 0, layers: LAYS[(i + 2) % 5], creatures: ['school', 'comb'], surface: i % 3 === 1, fluid, specks, goal: {type: 'frames', n: Math.min(10, n), label: `take ${ty.toLowerCase()}-images: ${gs.map(g => g.sym).join(' ')}`},
       took: `One level for the ${ty} type: every shot the lab read as ${gs.map(g => g.name).join(', ')}.`, type: true}); });
+  // the printed jars of the periodic table (labels/cineosis/*.svg): one per sign, one per type
+  const TJ = ['01-perception', '02-affection', '03-impulse', '04-action-small', '05-action-large', '06-attraction', '07-inversion', '08-discourse', '09-dream', '10-recollection', '11-relation', '12-opsign-sonsign', '13-hyalosign', '14-chronosign', '15-noosign', '16-lectosign'];
+  out.forEach(l => { if (l.type) { const f = TJ.find(t => t.slice(3) === l.id.slice(5)); if (f) l.jar = 'cineosis/type-' + f; } });
   C.signs.forEach((g, i) => { const dom = (g.dom || '').toLowerCase(), hue = Object.entries(TYPEHUE).find(([k]) => dom.includes(k) || (g.image || '').toLowerCase().includes(k))?.[1] ?? (i * 37) % 360, n = C.shots.filter(s => s.sign === g.n).length;
     out.push({id: 'sign-' + g.n, kind: 'cineosis', sign: g, title: `${g.sym} · ${g.name}`, source: 'cineosis-lab', pick: {by: 'sign', v: g.n}, song: SONGS[i % SONGS.length], start: null, dir: ['right', 'up', 'down'][i % 3], len: 60 + n * 16, current: 1.8, band: 9,
       fog: hsl(hue, .22, .13), top: hsl(hue, .3, .3), fogD: .028, films: {layout: 'list'}, bad: 0, layers: LAYS[i % 5], creatures: ['school', i % 2 ? 'comb' : 'shrimp'], surface: i % 3 === 1, fluid, specks, goal: {type: 'frames', n: Math.min(6, n), label: g.q || g.gloss || g.name},
-      took: `${g.type || g.image}. ${g.gloss ? g.gloss[0].toUpperCase() + g.gloss.slice(1) + '.' : ''} ${n} shots in the archive carry this sign.`}); });
+      jar: `cineosis/sign-${String(g.n).padStart(2, '0')}-${g.sym.toLowerCase()}`, took: `${g.type || g.image}. ${g.gloss ? g.gloss[0].toUpperCase() + g.gloss.slice(1) + '.' : ''} ${n} shots in the archive carry this sign.`}); });
+  out.forEach(l => { if (!l.jar && JARS.includes(l.id)) l.jar = 'jars/' + l.id; if (!l.jar && l.id.startsWith('sub-')) l.jar = 'jars/subjects'; });
   return out;
 }

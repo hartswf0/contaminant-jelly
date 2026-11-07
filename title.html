@@ -1,0 +1,12 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="favicon.svg"><link rel="stylesheet" href="fonts/fonts.css">
+<title>Contaminant · Title</title><meta name="description" content="The Contaminant jelly-films title sequence: a letterpress label printed on the beat. ?mode=outro for the end card, ?flood to pour into the water, ?seek=seconds to hold a frame.">
+<style>html,body{margin:0;height:100%;background:#000}#t{position:fixed;inset:0}</style></head>
+<body><div id="t"></div>
+<script type="module">
+import {mountTitle} from './title.js';
+const Q = new URLSearchParams(location.search), T = mountTitle(document.getElementById('t'), {mode: Q.get('mode') || 'intro', flood: Q.has('flood')});
+window.__title = T; await document.fonts.ready;
+if (Q.has('seek')) T.seek(+Q.get('seek')); else T.play();
+document.addEventListener('click', () => { T.seek(0); T.play(); });
+</script></body></html>

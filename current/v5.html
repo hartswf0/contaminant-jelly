@@ -359,7 +359,7 @@ function giveWorm(film, from, block, how) {
   if (caught.length === 2) setTimeout(() => say(COARSE ? 'pinch to pull back · two fingers to peek around you' : 'scroll to pull back · right-drag (or Z / X) to peek around you', 2), 3200);
   if (!V.on) taste(t.clip);
 }
-function drink(d) { d.pour = .001; d.to = null; const b = d.block; d.block = -1; giveWorm(d.film, d.from, b, 'cloud'); NET.send({t: 'drink', key: d.key}); }
+function drink(d) { BACK.echo = {film: d.film, t: RT}; d.pour = .001; d.to = null; const b = d.block; d.block = -1; giveWorm(d.film, d.from, b, 'cloud'); NET.send({t: 'drink', key: d.key}); }
 function drained(d) { d.live = false; ST.bad++; C.hurt = 1; slow = .3; flash(); AU.noise(.6, .18, 2400); AU.tone(70, .6, .2, 'sawtooth'); buzz([40, 30, 90]);
   if (loseWorms(1)) say('corrupted: it drained a worm'); else say('corrupted'); }
 function loseWorms(n) { let k = 0; for (let i = 0; i < n; i++) { const t = tent.filter(t => t.clip).sort((a, b) => b.clip.t0 - a.clip.t0)[0]; if (!t) break; giveBlock(t.clip.block); t.clip = null; k++; } return k; }
@@ -575,8 +575,9 @@ function frame(now) {
   const carried = tent.filter(t => t.clip).length;
   $('state').textContent = G.state === 'title' ? '' : `${Math.floor(C.s)} m · ${carried} / 8 carried${G.state === 'play' ? ` · the Source in ${Math.max(0, Math.ceil(END - C.s))} m` : ''}${GH.size ? ` · ${GH.size + 1} swimming` : ''}`;
   if (G.state !== 'title') drawMap();
-  { if (BACK.f === undefined || RT > BACK.until) { BACK.f = (BACK.f === undefined ? Math.floor(Math.random() * Math.max(1, FILMS.length)) : BACK.f + 7) % Math.max(1, FILMS.length); BACK.until = RT + 24; }
-    SCN.update(G.state === 'play' ? SCI : [], real, RT, scene.fog.color, scene.fog.density); SCN.backdrop(FILMS.length ? scrSrc(BACK.f, 0) : null, .13, RT * .6, scene.fog.color, real, 60); }
+  { /* the back layer is black; it plays a film only while you watch, or as an echo when you drink one */ let bf = null, ba = 0; const c = V.on && V.list.length ? V.list[V.i % V.list.length] : null;
+    if (c) { bf = c.film; ba = .24; } else if (BACK.echo && RT - BACK.echo.t < 2.4) { const e = (RT - BACK.echo.t) / 2.4; bf = BACK.echo.film; ba = .22 * Math.min(1, e * 6) * (1 - e) * (1 - e); }
+    SCN.update(G.state === 'play' ? SCI : [], real, RT, scene.fog.color, scene.fog.density); SCN.backdrop(bf !== null ? scrSrc(bf, c ? c.fi || 0 : 0) : null, ba, RT * .6, scene.fog.color, real, 60); }
   composer.render();
   const ft = performance.now() - t0; stat.frames.push(ft); if (stat.frames.length > 240) stat.frames.shift();
   if (DEBUG) { const s = stat.frames.slice().sort((a, b) => a - b), q = x => s[Math.floor(x * (s.length - 1))].toFixed(1); $('dbg').textContent = `stretch ${(stat.resid * 100).toFixed(2)}% · clouds ${D.filter(d => d.live).length} · free blocks ${freeBlocks.length} · images ${IMG.size}\nangler ${A.state} · boost ${C.boost.toFixed(2)} · ghosts ${GH.size}\nframe ms p50 ${q(.5)} p95 ${q(.95)} p99 ${q(.99)}`; }

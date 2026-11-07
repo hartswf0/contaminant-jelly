@@ -1,0 +1,2888 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>SENTINEL // TIMEWORM — Sewer Conduit of Lost Video</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="vendor/three.r128.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
+      background: #020508; color: #e2e8f0; font-family: 'Inter', sans-serif;
+      touch-action: none;
+    }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    #canvas-container {
+      position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1;
+      cursor: crosshair;
+    }
+    /* Fast auto-fading whisper HUD so nothing blocks the sewer fog or films */
+    .hud-whisper {
+      transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+      opacity: 0.85;
+    }
+    body.hud-idle .hud-whisper {
+      opacity: 0.12;
+    }
+    .hud-whisper:hover, .hud-whisper:focus-within {
+      opacity: 0.96 !important;
+    }
+    .zen-pill {
+      background: rgba(3, 8, 14, 0.54);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(250, 204, 21, 0.16);
+    }
+    .zen-sheet {
+      background: rgba(3, 8, 14, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(250, 204, 21, 0.28);
+    }
+    .zen-btn {
+      transition: all 0.12s ease;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(7, 14, 22, 0.62);
+      color: #cbd5e1;
+      letter-spacing: 0.06em;
+    }
+    .zen-btn:hover {
+      border-color: rgba(250, 204, 21, 0.72);
+      color: #fef08a;
+    }
+    .zen-btn:active { transform: scale(0.95); }
+    .zen-btn.active-toggle {
+      background: rgba(250, 204, 21, 0.18);
+      border-color: rgba(250, 204, 21, 0.85);
+      color: #fde047;
+    }
+    .zen-btn.alert-action {
+      background: rgba(225, 29, 72, 0.30);
+      border-color: rgba(251, 113, 133, 0.92);
+      color: #fda4af;
+    }
+    #capture-toast {
+      transition: opacity 0.28s ease, transform 0.28s ease;
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    #capture-toast.toast-visible {
+      opacity: 0.90;
+      transform: translateY(0);
+    }
+    input[type="range"] {
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 2px; background: rgba(148, 163, 184, 0.24);
+      border-radius: 999px; outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: #facc15; cursor: pointer;
+    }
+    .custom-scroll::-webkit-scrollbar { width: 3px; height: 3px; }
+    .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(250, 204, 21, 0.3); border-radius: 999px; }
+  </style>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+</head>
+<body class="relative w-full h-full overflow-hidden">
+
+  <!-- 3D WebGL Viewport (100% Open Center) -->
+  <div id="canvas-container" aria-label="Interactive 3D Sentinel Timeworm Sewer Conduit Viewport"></div>
+
+  <!-- Top Whisper Bar: Auto-Fades to 12% Opacity in 1.1s -->
+  <header class="hud-whisper fixed top-0 left-0 right-0 z-20 px-2.5 pt-2 pb-1 flex items-center justify-between gap-1.5 pointer-events-none">
+    <!-- Left: State, Timeworms Grown, Saved Clips & Pixels -->
+    <div class="zen-pill rounded-full px-2.5 py-1 flex items-center gap-2 pointer-events-auto">
+      <span id="state-dot" class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+      <span id="state-badge" class="mono text-[9px] uppercase tracking-widest text-amber-300">GLIDE</span>
+      <span class="h-2.5 w-px bg-slate-700/70"></span>
+      <div class="flex items-center gap-1 mono text-[10px]" title="Active Timeworm Tentacles (Every Saved Clip Grows a New Timeworm)">
+        <span class="text-slate-400 text-[9px]">WORMS</span>
+        <span id="stat-arms" class="text-amber-300 font-semibold">6</span>
+      </div>
+      <span class="h-2.5 w-px bg-slate-700/70"></span>
+      <div class="flex items-center gap-1 mono text-[10px]" title="Clips Saved from the Sewer Depths">
+        <span class="text-slate-400 text-[9px]">SAVED</span>
+        <span id="stat-captured" class="text-white font-medium">0</span>
+        <span id="gold-cut-badge" class="text-[8px] text-amber-300 hidden">GOLD</span>
+        <span id="held-pill" class="hidden text-[9px] text-cyan-300">(<span id="stat-latched">0</span>)</span>
+      </div>
+      <span class="h-2.5 w-px bg-slate-700/70"></span>
+      <div class="flex items-center gap-1 mono text-[10px]" title="Code Flecks & Video Pixels Harvested">
+        <span class="text-slate-400 text-[9px]">PX</span>
+        <span id="stat-pixels" class="text-cyan-300">320</span>
+      </div>
+      <div class="hidden sm:flex items-center gap-1 ml-1" title="Signal Clarity against Contaminant Videos">
+        <div class="w-8 h-1 bg-slate-800 rounded-full overflow-hidden">
+          <div id="energy-bar-fill" class="h-full bg-amber-400 transition-all duration-200" style="width: 100%;"></div>
+        </div>
+        <span id="stat-energy-pct" class="mono text-[8px] text-slate-400">100%</span>
+      </div>
+    </div>
+
+    <!-- Center: Live Spliced Timeworm Reel Strip -->
+    <div id="reel-strip-hud" class="zen-pill rounded-full px-2 py-0.5 hidden md:flex items-center gap-1 pointer-events-auto mono text-[8px]">
+      <span class="text-slate-500 uppercase">VAULT</span>
+      <div id="reel-slots" class="flex items-center gap-1"></div>
+    </div>
+
+    <!-- Right: Compact Triggers -->
+    <div class="flex items-center gap-1 pointer-events-auto mono text-[9px]">
+      <div class="zen-pill rounded-full px-2 py-1 hidden lg:flex items-center gap-1.5 text-slate-400">
+        <span><span id="stat-fps" class="text-slate-200">60</span>FPS</span>
+        <span>·</span>
+        <span id="stat-proj-fps" class="text-amber-300">24fps</span>
+        <span>·</span>
+        <span>Z<span id="stat-sdf-dist" class="text-cyan-300">-45m</span></span>
+      </div>
+      <button id="btn-mode-shape" type="button" class="zen-btn rounded-full px-2.5 py-1 uppercase text-amber-200" title="Browse All 109 Archive Films & Saved Vault">
+        109 CLIPS
+      </button>
+      <button id="btn-audio-toggle" type="button" class="zen-btn rounded-full px-2 py-1 uppercase">
+        <span id="audio-label">MUTE</span>
+      </button>
+      <button id="btn-lineage-modal" type="button" class="zen-btn rounded-full px-2 py-1 uppercase hidden sm:inline-block">
+        SPEC
+      </button>
+      <button id="btn-toggle-panel" type="button" class="zen-btn rounded-full px-2.5 py-1 uppercase">
+        <span id="panel-toggle-label">TUNE</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Ephemeral Trace (Disappears in 1.1s so it never blocks the films) -->
+  <div class="fixed top-9 left-0 right-0 z-10 flex justify-center px-4 pointer-events-none">
+    <p id="capture-toast" class="mono text-[8px] tracking-widest uppercase text-amber-100/90 bg-slate-950/60 px-2.5 py-0.5 rounded-full border border-amber-400/20">
+      MOVE POINTER OR DRAG TO STEER · BRUSH SIDE CLIPS WITH TIMEWORMS · AVOID RED CONTAMINANTS
+    </p>
+  </div>
+
+  <!-- Bottom Whisper Bar: Direct Flight, Spirit Pass-Through & Timeworm Whip -->
+  <footer class="hud-whisper fixed bottom-2.5 left-0 right-0 z-20 px-3 flex items-center justify-center pointer-events-none">
+    <div class="zen-pill rounded-full p-0.5 flex items-center gap-1 pointer-events-auto mono text-[9px] uppercase">
+      <button id="btn-jet-pulse" type="button" class="zen-btn rounded-full px-2.5 py-1 font-medium" title="Golden Energy Squid Pass-Through Surge (Space)">
+        SPIRIT SURGE
+      </button>
+      <button id="btn-grapple-surge" type="button" class="zen-btn rounded-full px-2.5 py-1" title="Whip Timeworm Tentacles Outward to Brush Sewer Wall Clips (E)">
+        WHIP WORMS
+      </button>
+      <button id="btn-digest-now" type="button" class="zen-btn active-toggle rounded-full px-2.5 py-1 hidden">
+        SPLICE
+      </button>
+      <button id="btn-release-items" type="button" class="zen-btn rounded-full px-2.5 py-1 hidden">
+        RELEASE
+      </button>
+      <button id="btn-shockwave" type="button" class="zen-btn rounded-full px-2.5 py-1" title="EMP Blast to Deactivate Red Contaminant Videos (F)">
+        EMP PURGE
+      </button>
+      <button id="btn-autopilot" type="button" class="zen-btn rounded-full px-2.5 py-1">
+        AUTO <span id="autopilot-state" class="text-slate-400">OFF</span>
+      </button>
+      <button id="btn-camera-mode" type="button" class="zen-btn rounded-full px-2.5 py-1" title="Cycle Cinematic Camera (Chase / Side Glide / Spirit Close)">
+        CAM: <span id="camera-mode-label">CHASE</span>
+      </button>
+    </div>
+  </footer>
+
+  <!-- 109 Archive Video Vault Drawer (Closed by Default) -->
+  <section id="film-archive-sheet" class="fixed inset-x-0 bottom-11 z-30 mx-auto max-w-2xl px-2.5 hidden">
+    <div class="zen-sheet rounded-2xl p-3 border border-amber-400/30 shadow-2xl">
+      <div class="flex flex-wrap items-center justify-between gap-2 pb-2 mb-2 border-b border-slate-800/80 mono text-[9px]">
+        <div class="flex items-center gap-2">
+          <span class="text-amber-300 uppercase tracking-widest font-semibold">SEWER ARCHIVE // 109 LOST VIDEO CLIPS</span>
+          <span id="active-film-label" class="text-cyan-300">SOURCE: SM-0004 GIRAFFE</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <input id="film-search-input" type="text" placeholder="Filter 109 clips (giraffe, dragon, submarine)..." class="bg-slate-900/90 border border-slate-700 rounded-full px-2.5 py-0.5 text-[9px] text-slate-200 outline-none focus:border-amber-400 w-44" />
+          <button id="btn-close-films" type="button" class="zen-btn rounded-full px-2.5 py-0.5 text-[9px] uppercase">CLOSE</button>
+        </div>
+      </div>
+      <div id="film-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-1.5 max-h-48 overflow-y-auto custom-scroll mono text-[8px]"></div>
+    </div>
+  </section>
+
+  <!-- Collapsible Tuning Sheet (Closed by Default) -->
+  <aside id="control-panel" class="fixed inset-x-0 bottom-0 sm:inset-auto sm:top-11 sm:right-2 sm:bottom-11 sm:w-68 z-30 zen-sheet sm:rounded-2xl rounded-t-2xl p-3.5 flex flex-col justify-between max-h-[68vh] sm:max-h-none overflow-y-auto custom-scroll transition-transform duration-300 translate-y-full sm:translate-y-0 sm:translate-x-[120%]">
+    <div class="space-y-3">
+      <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+        <div class="flex items-center gap-2">
+          <span class="mono text-[10px] uppercase tracking-widest text-amber-300">SENTINEL &amp; FOG PIPELINE</span>
+          <span id="species-tag" class="mono text-[9px] text-slate-400">Golden Energy Squid</span>
+        </div>
+        <button id="btn-close-panel" type="button" class="zen-btn rounded-full px-2.5 py-0.5 mono text-[9px] uppercase">
+          DONE
+        </button>
+      </div>
+
+      <!-- 1. Reality Color Code & Sentinel Modes (Matrix Revolutions 3-Layer Color Code) -->
+      <div>
+        <div class="mono text-[9px] uppercase tracking-wider text-slate-400 mb-1">VISUAL REALITY LAYER</div>
+        <div class="grid grid-cols-2 gap-1.5 mono text-[9px]">
+          <button id="preset-chrysaora" type="button" class="zen-btn active-toggle rounded-lg px-2 py-1.5 text-left">
+            <div class="font-medium">SOURCE GOLD</div>
+            <div class="text-[8px] opacity-70">Spirit Energy Squid</div>
+          </button>
+          <button id="preset-medusae" type="button" class="zen-btn rounded-lg px-2 py-1.5 text-left">
+            <div class="font-medium">ZION SEWER</div>
+            <div class="text-[8px] opacity-70">Cold Blue + Red Eyes</div>
+          </button>
+          <button id="preset-aurelia" type="button" class="zen-btn rounded-lg px-2 py-1.5 text-left">
+            <div class="font-medium">RIG RAINBOW</div>
+            <div class="text-[8px] opacity-70">ESC Maya Timeworms</div>
+          </button>
+          <button id="preset-abyssal" type="button" class="zen-btn rounded-lg px-2 py-1.5 text-left">
+            <div class="font-medium">MATRIX CODE</div>
+            <div class="text-[8px] opacity-70">Phosphor Green</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. Compositing & Epistemic Layers -->
+      <div>
+        <div class="mono text-[9px] uppercase tracking-wider text-slate-400 mb-1">COMPOSITING PASSES</div>
+        <div class="grid grid-cols-2 gap-1.5 mono text-[9px]">
+          <button id="toggle-verlet-net" type="button" class="zen-btn rounded-lg px-2 py-1.5 flex items-center justify-between">
+            <span>IK / VERLET RIG</span>
+            <span class="state-ind text-slate-500">OFF</span>
+          </button>
+          <button id="toggle-sdf-field" type="button" class="zen-btn active-toggle rounded-lg px-2 py-1.5 flex items-center justify-between">
+            <span>SEWER RIBS</span>
+            <span class="state-ind text-amber-300">ON</span>
+          </button>
+          <button id="toggle-spatial-grid" type="button" class="zen-btn rounded-lg px-2 py-1.5 flex items-center justify-between">
+            <span>BOIDS / GRID</span>
+            <span class="state-ind text-slate-500">OFF</span>
+          </button>
+          <button id="toggle-capture-vectors" type="button" class="zen-btn active-toggle rounded-lg px-2 py-1.5 flex items-center justify-between">
+            <span>SPLICE RAYS</span>
+            <span class="state-ind text-amber-300">ON</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. Continuous Sliders -->
+      <div class="space-y-2">
+        <div class="mono text-[9px] uppercase tracking-wider text-slate-400">PROPULSION &amp; Z-DEPTH FOG</div>
+        <div>
+          <div class="flex justify-between mono text-[9px] mb-0.5">
+            <span class="text-slate-400">FLIGHT SPEED</span>
+            <span id="val-pulse-freq" class="text-amber-300">1.35x</span>
+          </div>
+          <input id="slider-pulse-freq" type="range" min="0.5" max="2.5" step="0.05" value="1.35" />
+        </div>
+        <div>
+          <div class="flex justify-between mono text-[9px] mb-0.5">
+            <span class="text-slate-400">TIMEWORM DRAG PASSES</span>
+            <span id="val-solver-iters" class="text-amber-300">7</span>
+          </div>
+          <input id="slider-solver-iters" type="range" min="3" max="12" step="1" value="7" />
+        </div>
+        <div>
+          <div class="flex justify-between mono text-[9px] mb-0.5">
+            <span class="text-slate-400">TIMEWORM REACH</span>
+            <span id="val-grapple-pull" class="text-amber-300">2.2x</span>
+          </div>
+          <input id="slider-grapple-pull" type="range" min="0.2" max="3.5" step="0.1" value="2.2" />
+        </div>
+        <div>
+          <div class="flex justify-between mono text-[9px] mb-0.5">
+            <span class="text-slate-400">Z-DEPTH FOG DENSITY</span>
+            <span id="val-sdf-margin" class="text-amber-300">1.0x</span>
+          </div>
+          <input id="slider-sdf-margin" type="range" min="0.3" max="2.2" step="0.1" value="1.0" />
+        </div>
+      </div>
+
+      <!-- 4. Compact Telemetry -->
+      <div class="rounded-lg bg-slate-950/75 border border-slate-800/80 p-2 mono text-[9px] space-y-1 text-slate-400">
+        <div class="flex justify-between">
+          <span>NODES / CONSTRAINTS</span>
+          <span class="text-slate-200"><span id="stat-nodes">0</span> / <span id="stat-constraints">0</span></span>
+        </div>
+        <div class="flex justify-between">
+          <span>GRID CHECKS / SAVED</span>
+          <span class="text-slate-200"><span id="stat-checks">0</span> <span id="stat-naive-saved" class="text-amber-300">(-98%)</span></span>
+        </div>
+        <div class="flex justify-between">
+          <span>TUNNEL CLIPS / LINKS</span>
+          <span class="text-slate-200"><span id="prey-count-label">28</span> / <span id="stat-active-tethers">0</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pt-2.5 mt-2.5 border-t border-slate-800/80 flex gap-1.5 mono text-[9px]">
+      <button id="btn-spawn-prey" type="button" class="zen-btn flex-1 rounded-lg py-1.5 uppercase">
+        +GROW TIMEWORM
+      </button>
+      <button id="btn-reset-sim" type="button" class="zen-btn flex-1 rounded-lg py-1.5 uppercase">
+        RESTORE (6 WORMS)
+      </button>
+    </div>
+  </aside>
+
+  <!-- Minimal Spec Modal -->
+  <div id="lineage-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="zen-pill rounded-2xl max-w-xl w-full max-h-[82vh] flex flex-col overflow-hidden border border-amber-400/30">
+      <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between mono text-xs">
+        <span class="text-amber-300 uppercase tracking-widest">SENTINEL ENERGY-SQUID × TIMEWORM SEWER SPEC</span>
+        <button id="btn-close-modal" type="button" class="zen-btn rounded-full px-3 py-1 text-[10px] uppercase">CLOSE</button>
+      </div>
+      <div class="p-4 overflow-y-auto custom-scroll space-y-3 text-xs leading-relaxed text-slate-300">
+        <div class="p-3 rounded-lg bg-slate-900/75 border border-slate-800">
+          <div class="mono text-[10px] uppercase text-amber-300 mb-1">1. GOLDEN ENERGY SQUID &amp; X-RAY NERVOUS SYSTEM</div>
+          <p>Models the Sentinel-Jellyfish with both a dark biomechanical carapace (studded with 14 glowing red optical sensors and 8 ventral mechanical grasper claws) and an internal 1,600-point fiery golden nervous system. Triggering <span class="mono">SPIRIT SURGE</span> dissolves the metal hull into pure golden Source energy so you can pass unscathed through hazards.</p>
+        </div>
+        <div class="p-3 rounded-lg bg-slate-900/75 border border-slate-800">
+          <div class="mono text-[10px] uppercase text-amber-300 mb-1">2. SEGMENTED TIMEWORM TENTACLES &amp; DELAYED WHIP INERTIA</div>
+          <p>Trailing behind the head along <span class="mono">+Z</span> are segmented Timeworm chains. When you steer across the tunnel cross-section, Verlet drag and Inverse-Kinematics inertia cause the Timeworms to ripple backward in a delayed, whip-like S-wave. Every saved video clip from the depths spawns a new Timeworm tentacle carrying that clip's frames.</p>
+        </div>
+        <div class="p-3 rounded-lg bg-slate-900/75 border border-slate-800">
+          <div class="mono text-[10px] uppercase text-amber-300 mb-1">3. Z-DEPTH SEWER FOG &amp; RED OPTIC BLEED</div>
+          <p>Distant tunnel ribs and video plates are swallowed by deep Z-depth exponential fog, while the glowing red optical sensors of Contaminant Videos bleed through the distant haze long before their hulls appear.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener('load', function () {
+      // =========================================================================
+      // 0. FAST AUTO-FADING WHISPER HUD & HAPTIC ENGINE
+      // =========================================================================
+      let hudIdleTimer = null;
+      let toastTimer = null;
+
+      function wakeHUD() {
+        document.body.classList.remove('hud-idle');
+        if (hudIdleTimer) clearTimeout(hudIdleTimer);
+        hudIdleTimer = setTimeout(() => {
+          const panelOpen = !document.getElementById('control-panel').classList.contains('translate-y-full');
+          const filmsOpen = !document.getElementById('film-archive-sheet').classList.contains('hidden');
+          if (!panelOpen && !filmsOpen) {
+            document.body.classList.add('hud-idle');
+          }
+        }, 1200);
+      }
+      wakeHUD();
+
+      function pulseHaptic(pattern) {
+        try {
+          if (navigator && typeof navigator.vibrate === 'function') {
+            navigator.vibrate(pattern);
+          }
+        } catch (e) {}
+      }
+
+      // =========================================================================
+      // 1. 109 LOST ARCHIVE VIDEO CLIPS (ICARO-PRO + AFTERLIGHT)
+      // =========================================================================
+      const RAW_109_TITLES = [
+        ["SM-0004", "Giraffe walks past", 6, 33, "HORIZON", "MOTION"],
+        ["SM-0060", "Bicycle", 5, 21, "MOTION", "WHEEL"],
+        ["SM-0059", "Butterfly", 3, 78, "WINGS", "GLOW"],
+        ["SM-0056", "Cat", 3, 62, "SHADOW", "FACE"],
+        ["SM-0054", "Dog", 4, 50, "MOTION", "HORIZON"],
+        ["SM-0055", "Duck", 6, 48, "WATER", "WINGS"],
+        ["SM-0057", "Giraffe II", 3, 17, "HORIZON", "NECK"],
+        ["SM-0062", "Helicopter", 4, 46, "ROTOR", "SKY"],
+        ["SM-0058", "Horse", 4, 45, "MOTION", "HORIZON"],
+        ["SM-0053", "Rabbit", 6, 52, "LEAP", "GRASS"],
+        ["SM-0061", "Windmill", 4, 54, "ROTOR", "HORIZON"],
+        ["SM-0104", "Aircraft-carrier", 3, 50, "WATER", "HORIZON"],
+        ["SM-0093", "Alarm-clock", 4, 38, "TIME", "RING"],
+        ["SM-0082", "Ant", 6, 25, "GRASS", "MOTION"],
+        ["SM-0102", "Broom", 3, 32, "SWEEP", "SHADOW"],
+        ["SM-0105", "Camera", 3, 37, "LENS", "GLOW"],
+        ["SM-0090", "Cello", 4, 32, "STRING", "HAND"],
+        ["SM-0097", "Cloud", 5, 62, "SKY", "GLOW"],
+        ["SM-0073", "Cow", 3, 44, "GRASS", "HORIZON"],
+        ["SM-0085", "Crab", 4, 36, "WATER", "CLAW"],
+        ["SM-0084", "Dragon", 5, 48, "WINGS", "FLAME"],
+        ["SM-0066", "Fan", 3, 30, "ROTOR", "WIND"],
+        ["SM-0089", "Flower", 4, 40, "GRASS", "GLOW"],
+        ["SM-0068", "Flying-fish", 5, 42, "WATER", "WINGS"],
+        ["SM-0081", "Frog", 4, 34, "LEAP", "WATER"],
+        ["SM-0099", "Guitar", 3, 36, "STRING", "HAND"],
+        ["SM-0071", "Hurricane", 6, 50, "WIND", "VORTEX"],
+        ["SM-0100", "Light-bulb", 3, 32, "GLOW", "FILAMENT"],
+        ["SM-0096", "Lighthouse", 5, 48, "GLOW", "WATER"],
+        ["SM-0087", "Lion", 4, 44, "FACE", "HORIZON"],
+        ["SM-0075", "Monkey", 4, 40, "LEAP", "HAND"],
+        ["SM-0069", "Mosquito", 3, 38, "WINGS", "MOTION"],
+        ["SM-0092", "Ocean", 6, 60, "WATER", "HORIZON"],
+        ["SM-0103", "Paintbrush", 3, 34, "HAND", "STROKE"],
+        ["SM-0063", "Pig", 3, 36, "GRASS", "MOTION"],
+        ["SM-0064", "Raccoon", 4, 40, "SHADOW", "FACE"],
+        ["SM-0070", "Rain", 5, 48, "WATER", "SKY"],
+        ["SM-0095", "Rhinoceros", 4, 42, "HORIZON", "MOTION"],
+        ["SM-0079", "Roller-coaster", 5, 54, "MOTION", "LOOP"],
+        ["SM-0078", "Sailboat", 5, 46, "WATER", "WIND"],
+        ["SM-0072", "See-saw", 3, 32, "TILT", "MOTION"],
+        ["SM-0094", "Shovel", 3, 30, "HAND", "EARTH"],
+        ["SM-0080", "Skateboard", 4, 38, "WHEEL", "MOTION"],
+        ["SM-0098", "Snake", 4, 44, "WAVE", "GRASS"],
+        ["SM-0086", "Speedboat", 4, 42, "WATER", "MOTION"],
+        ["SM-0076", "Spider", 4, 38, "WEB", "SHADOW"],
+        ["SM-0088", "Swan", 5, 46, "WATER", "NECK"],
+        ["SM-0074", "Tiger", 4, 44, "LEAP", "SHADOW"],
+        ["SM-0067", "Tornado", 5, 52, "VORTEX", "WIND"],
+        ["SM-0065", "Tractor", 4, 40, "WHEEL", "EARTH"],
+        ["SM-0101", "Trumpet", 3, 34, "HAND", "GLOW"],
+        ["SM-0083", "Van", 4, 38, "WHEEL", "ROAD"],
+        ["SM-0137", "Ambulance", 4, 40, "WHEEL", "GLOW"],
+        ["SM-0172", "Animal", 4, 42, "MOTION", "GRASS"],
+        ["SM-0183", "Apple", 3, 28, "ORB", "EARTH"],
+        ["SM-0143", "Baseball", 3, 32, "ORB", "ARC"],
+        ["SM-0161", "Basketball", 4, 36, "ORB", "ARC"],
+        ["SM-0151", "Bat", 4, 44, "WINGS", "SHADOW"],
+        ["SM-0146", "Binoculars", 3, 34, "LENS", "FACE"],
+        ["SM-0185", "Book", 3, 36, "PAGE", "HAND"],
+        ["SM-0139", "Bus", 4, 42, "WHEEL", "ROAD"],
+        ["SM-0169", "Cannon", 4, 34, "ARC", "FLAME"],
+        ["SM-0144", "Canoe", 4, 40, "WATER", "PADDLE"],
+        ["SM-0186", "Cell-phone", 3, 30, "GLOW", "HAND"],
+        ["SM-0164", "Coffee-pot", 3, 34, "STEAM", "SHADOW"],
+        ["SM-0152", "Diving-mask", 4, 38, "WATER", "LENS"],
+        ["SM-0140", "Dolphin", 5, 48, "WATER", "LEAP"],
+        ["SM-0153", "Door", 3, 34, "DOOR", "SHADOW"],
+        ["SM-0188", "Eye", 3, 36, "LENS", "FACE"],
+        ["SM-0163", "Face", 4, 40, "FACE", "SHADOW"],
+        ["SM-0141", "Fish", 5, 44, "WATER", "WAVE"],
+        ["SM-0148", "Flamingo", 4, 40, "WATER", "NECK"],
+        ["SM-0162", "Frying-pan", 3, 32, "FLAME", "HAND"],
+        ["SM-0165", "Garden-hose", 4, 38, "WATER", "WAVE"],
+        ["SM-0150", "Hammer", 3, 30, "HAND", "ARC"],
+        ["SM-0159", "Hand", 3, 36, "HAND", "FACE"],
+        ["SM-0171", "Hat", 3, 30, "FACE", "WIND"],
+        ["SM-0168", "Helmet", 3, 32, "FACE", "LENS"],
+        ["SM-0167", "Hourglass", 4, 42, "TIME", "SAND"],
+        ["SM-0166", "Ice-cream", 3, 30, "ORB", "HAND"],
+        ["SM-0156", "Ladder", 3, 36, "STEPS", "SKY"],
+        ["SM-0189", "Lantern", 4, 40, "GLOW", "SHADOW"],
+        ["SM-0138", "Lobster", 4, 38, "WATER", "CLAW"],
+        ["SM-0174", "Lollipop", 3, 30, "ORB", "SPIRAL"],
+        ["SM-0187", "Map", 3, 56, "HORIZON", "PATH"],
+        ["SM-0154", "Mermaid", 4, 38, "WATER", "WAVE"],
+        ["SM-0173", "Microwave", 4, 38, "GLOW", "DOOR"],
+        ["SM-0175", "Mug", 3, 44, "STEAM", "HAND"],
+        ["SM-0157", "Palm-tree", 3, 37, "WIND", "HORIZON"],
+        ["SM-0176", "Pencil", 2, 44, "HAND", "STROKE"],
+        ["SM-0091", "Penguin", 4, 44, "WATER", "MOTION"],
+        ["SM-0149", "Pickup-truck", 4, 62, "WHEEL", "ROAD"],
+        ["SM-0170", "Popsicle", 4, 26, "ORB", "WATER"],
+        ["SM-0158", "River", 4, 49, "WATER", "PATH"],
+        ["SM-0182", "Sandwich", 3, 38, "LAYERS", "HAND"],
+        ["SM-0077", "Sheep", 4, 38, "GRASS", "CLOUD"],
+        ["SM-0178", "Sleeping-bag", 4, 50, "SHADOW", "REST"],
+        ["SM-0177", "Star", 3, 50, "GLOW", "SKY"],
+        ["SM-0179", "Stove", 3, 38, "FLAME", "GLOW"],
+        ["SM-0147", "Submarine", 5, 26, "WATER", "LENS"],
+        ["SM-0181", "Tooth", 2, 26, "FACE", "GLOW"],
+        ["SM-0191", "Traffic-light", 4, 44, "GLOW", "ROAD"],
+        ["SM-0142", "Train", 4, 50, "WHEEL", "MOTION"],
+        ["SM-0160", "Umbrella", 4, 38, "RAIN", "WIND"],
+        ["SM-0184", "Vase", 2, 38, "FLOWER", "SHADOW"],
+        ["SM-0145", "Wheel", 4, 26, "WHEEL", "ROTOR"],
+        ["SM-0180", "Wine-bottle", 4, 32, "GLASS", "WATER"],
+        ["SM-0190", "Wine-glass", 3, 26, "GLASS", "GLOW"],
+        ["SM-0155", "Yoga", 4, 38, "BALANCE", "MOTION"]
+      ];
+
+      const SHELL_PALETTE = [
+        0xfbbf24, // Radiant Source Gold
+        0x38bdf8, // Sewer Conduit Cyan
+        0xf43f5e, // Sentinel Optic Crimson
+        0x22c55e, // Matrix Phosphor Green
+        0xa855f7, // Rig Violet
+        0xf97316  // Afterlight Amber
+      ];
+      const SHELL_DEPTHS = [1.2, 2.0, 2.5, 3.0, 6.0, 10.0];
+
+      const ARCHIVE_FILMS = RAW_109_TITLES.map((row, idx) => {
+        const shellIdx = idx % 6;
+        return {
+          id: idx,
+          code: row[0],
+          title: row[1],
+          planes: row[2],
+          frames: row[3],
+          features: [row[4], row[5]],
+          shellZ: SHELL_DEPTHS[shellIdx],
+          col: SHELL_PALETTE[shellIdx],
+          accent: SHELL_PALETTE[(shellIdx + 1) % 6]
+        };
+      });
+
+      let activeBellFilm = ARCHIVE_FILMS[0];
+      const splicedReel = [ARCHIVE_FILMS[0]];
+
+      function sampleFilmPattern(filmId, u, v, t) {
+        const cx = u - 0.5;
+        const cy = v - 0.5;
+        const r = Math.sqrt(cx * cx + cy * cy);
+        const mode = filmId % 8;
+        if (filmId === 0 || mode === 0) {
+          const ground = (v < 0.18) ? 0.85 : 0.0;
+          const strideX = ((u - t * 0.22) % 1.0 + 1.0) % 1.0 - 0.5;
+          const neck = Math.abs(strideX - (v - 0.35) * 0.38) < 0.055 && v > 0.25 && v < 0.78 ? 0.98 : 0.0;
+          const body = Math.abs(strideX + 0.08) < 0.14 && Math.abs(v - 0.34) < 0.08 ? 0.95 : 0.0;
+          const legs = (Math.abs(strideX + 0.16 + 0.04 * Math.sin(t * 6.0)) < 0.035 || Math.abs(strideX - 0.02 - 0.04 * Math.sin(t * 6.0)) < 0.035) && v >= 0.14 && v <= 0.34 ? 0.9 : 0.0;
+          return Math.min(1.0, ground + neck + body + legs);
+        } else if (mode === 1) {
+          const spoke = Math.abs(Math.sin(Math.atan2(cy, cx) * 6.0 - t * 4.5)) > 0.82 && r < 0.38 ? 0.9 : 0.0;
+          const rim = Math.abs(r - 0.36) < 0.05 ? 0.95 : 0.0;
+          return Math.min(1.0, spoke + rim);
+        } else if (mode === 2) {
+          const flap = Math.sin(t * 5.0) * 0.25;
+          const wingY = Math.abs(cy - Math.abs(cx) * flap);
+          return (wingY < 0.22 * (1.0 - Math.abs(cx)) && Math.abs(cx) < 0.42) ? 0.95 : 0.12;
+        } else if (mode === 3) {
+          const wave = 0.28 + 0.08 * Math.sin(u * 10.0 - t * 3.5);
+          const water = Math.abs(v - wave) < 0.06 ? 0.9 : 0.0;
+          const sail = (Math.abs(cx - 0.08 * Math.sin(t * 1.5)) < (0.75 - v) * 0.32 && v > 0.30 && v < 0.78) ? 0.95 : 0.0;
+          return Math.min(1.0, water + sail);
+        } else if (mode === 4) {
+          const beam = Math.abs(Math.atan2(cy, cx) - Math.sin(t * 2.2) * 0.7) < 0.25 ? 0.88 : 0.0;
+          const tower = Math.abs(cx) < 0.08 && v < 0.55 ? 0.95 : 0.0;
+          return Math.min(1.0, beam + tower);
+        } else if (mode === 5) {
+          return 0.5 + 0.5 * Math.sin(r * 20.0 - t * 4.8 + Math.atan2(cy, cx) * 3.0);
+        } else if (mode === 6) {
+          return (Math.abs(cx) < 0.20 && cy < 0.25 ? 0.95 : 0.1) + (Math.abs(Math.abs(cx) - Math.abs(cy)) < 0.06 ? 0.75 : 0.0);
+        } else {
+          return (Math.abs(r - 0.34) < 0.06 || r < 0.14 + 0.04 * Math.sin(t * 3.0)) ? 0.95 : 0.14;
+        }
+      }
+
+      // =========================================================================
+      // 2. SUBTERRANEAN SEWER & GOLDEN SOURCE SOUND ENGINE (WebAudio)
+      // =========================================================================
+      const SoundEngine = {
+        ctx: null,
+        muted: true,
+        droneGain: null,
+        lastSprocketTime: 0,
+        lastBrushTime: 0,
+        init() {
+          if (this.ctx) return;
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (!AudioCtx) return;
+          this.ctx = new AudioCtx();
+          const osc = this.ctx.createOscillator();
+          const lfo = this.ctx.createOscillator();
+          const lfoGain = this.ctx.createGain();
+          this.droneGain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = 48;
+          lfo.frequency.value = 0.14;
+          lfoGain.gain.value = 5;
+          this.droneGain.gain.value = 0.0;
+          lfo.connect(lfoGain);
+          lfoGain.connect(osc.frequency);
+          osc.connect(this.droneGain);
+          this.droneGain.connect(this.ctx.destination);
+          osc.start();
+          lfo.start();
+        },
+        toggle() {
+          this.init();
+          if (!this.ctx) return false;
+          if (this.ctx.state === 'suspended') this.ctx.resume();
+          this.muted = !this.muted;
+          this.droneGain.gain.setTargetAtTime(this.muted ? 0.0 : 0.045, this.ctx.currentTime, 0.2);
+          return !this.muted;
+        },
+        playTone(fStart, fEnd, dur, type, vol) {
+          if (this.muted || !this.ctx) return;
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const g = this.ctx.createGain();
+          osc.type = type || 'sine';
+          osc.frequency.setValueAtTime(fStart, now);
+          osc.frequency.exponentialRampToValueAtTime(fEnd, now + dur);
+          g.gain.setValueAtTime(vol || 0.05, now);
+          g.gain.exponentialRampToValueAtTime(0.0008, now + dur);
+          osc.connect(g);
+          g.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + dur + 0.02);
+        },
+        tickProjector(swimSpeedRatio) {
+          if (this.muted || !this.ctx) return;
+          const now = this.ctx.currentTime;
+          const interval = Math.max(0.045, 0.22 - swimSpeedRatio * 0.14);
+          if (now - this.lastSprocketTime >= interval) {
+            this.lastSprocketTime = now;
+            this.playTone(1100, 320, 0.011, 'triangle', 0.010);
+          }
+        },
+        playBrushShimmer(pitchIdx) {
+          if (this.muted || !this.ctx) return;
+          const now = this.ctx.currentTime;
+          if (now - this.lastBrushTime < 0.08) return;
+          this.lastBrushTime = now;
+          const scale = [329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99];
+          const f = scale[pitchIdx % scale.length];
+          this.playTone(f, f * 1.25, 0.09, 'sine', 0.032);
+        },
+        playSpiritSurge() {
+          [220, 330, 440, 659.25, 880].forEach((f, i) => {
+            setTimeout(() => this.playTone(f, f * 1.05, 0.45, 'sine', 0.045), i * 32);
+          });
+        },
+        playWhip() { this.playTone(280, 660, 0.18, 'sine', 0.055); },
+        playArmGrow() {
+          [392.0, 523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+            setTimeout(() => this.playTone(f, f * 1.01, 0.35, 'sine', 0.048), i * 38);
+          });
+        },
+        playHazard() { this.playTone(145, 58, 0.32, 'sawtooth', 0.055); }
+      };
+
+      // =========================================================================
+      // 3. REALITY LAYER PRESETS (Wachowski / Gaeta 3-Layer Color Code)
+      // =========================================================================
+      // 1. Source Gold (Radiant Golden Energy Squid — Matrix Revolutions Spirit Sight)
+      // 2. Zion Sewer (Cold Blue/Green Industrial Fog + Red Optic Sensors)
+      // 3. Rig Rainbow (ESC Entertainment Maya Segmented Timeworm Rig)
+      // 4. Matrix Code (Phosphor Green Code Stream)
+      const PRESETS = {
+        chrysaora: {
+          name: 'Source Gold Spirit',
+          spiritDissolve: 0.88,
+          rainbowMode: 0.0,
+          coreColor: new THREE.Color(0xd97706),
+          rimColor: new THREE.Color(0xfef08a),
+          pulseColor: new THREE.Color(0xfde047),
+          eyeColor: new THREE.Color(0xffedd5),
+          strandColor: new THREE.Color(0xf59e0b),
+          fogColor: 0x050301
+        },
+        medusae: {
+          name: 'Zion Sewer Sentinel',
+          spiritDissolve: 0.22,
+          rainbowMode: 0.0,
+          coreColor: new THREE.Color(0x1e3a5f),
+          rimColor: new THREE.Color(0x38bdf8),
+          pulseColor: new THREE.Color(0xff1e42),
+          eyeColor: new THREE.Color(0xff1133),
+          strandColor: new THREE.Color(0x334155),
+          fogColor: 0x020709
+        },
+        aurelia: {
+          name: 'ESC Rainbow Timeworm',
+          spiritDissolve: 0.45,
+          rainbowMode: 1.0,
+          coreColor: new THREE.Color(0x0ea5e9),
+          rimColor: new THREE.Color(0xfacc15),
+          pulseColor: new THREE.Color(0x67e8f9),
+          eyeColor: new THREE.Color(0xf43f5e),
+          strandColor: new THREE.Color(0x38bdf8),
+          fogColor: 0x02050a
+        },
+        abyssal: {
+          name: 'Matrix Code Stream',
+          spiritDissolve: 0.65,
+          rainbowMode: 0.0,
+          coreColor: new THREE.Color(0x059669),
+          rimColor: new THREE.Color(0x6ee7b7),
+          pulseColor: new THREE.Color(0x34d399),
+          eyeColor: new THREE.Color(0xa7f3d0),
+          strandColor: new THREE.Color(0x10b981),
+          fogColor: 0x010804
+        }
+      };
+      let currentPreset = PRESETS.chrysaora;
+
+      // =========================================================================
+      // 4. THREE.JS SCENE, DEEP Z-DEPTH FOG & COMPOSITING SHADERS
+      // =========================================================================
+      const container = document.getElementById('canvas-container');
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(currentPreset.fogColor);
+      // Heavy atmospheric sewer Z-depth falloff ("The Swallow Effect")
+      scene.fog = new THREE.FogExp2(currentPreset.fogColor, 0.028);
+
+      const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 120);
+      camera.position.set(0, 1.4, 8.8);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(renderer.domElement);
+
+      const ambientLight = new THREE.AmbientLight(0x162436, 1.1);
+      scene.add(ambientLight);
+      const jellyLight = new THREE.PointLight(0xfde047, 2.8, 28);
+      scene.add(jellyLight);
+
+      const bellUniforms = {
+        uTime: { value: 0 },
+        uFilmPhase: { value: 0 },
+        uPulsePhase: { value: 0 },
+        uEnergy: { value: 1.0 },
+        uSpiritDissolve: { value: currentPreset.spiritDissolve }, // 0=Armored Sewer Metal, 1=Golden Energy Squid X-Ray
+        uContam: { value: 0.0 },
+        uCoreColor: { value: currentPreset.coreColor.clone() },
+        uRimColor: { value: currentPreset.rimColor.clone() },
+        uPulseColor: { value: currentPreset.pulseColor.clone() },
+        uEyeColor: { value: currentPreset.eyeColor.clone() },
+        uFogColor: { value: new THREE.Color(currentPreset.fogColor) },
+        uFogDensity: { value: 0.028 }
+      };
+
+      // A. Sentinel Carapace / Medusa Bell Shader with X-Ray Structural Dissolve & Light Wrap
+      const bellMaterial = new THREE.ShaderMaterial({
+        uniforms: bellUniforms,
+        vertexShader: `
+          varying vec3 vNormal;
+          varying vec3 vViewPos;
+          varying vec2 vUv;
+          varying float vFogDepth;
+          void main() {
+            vUv = uv;
+            vNormal = normalize(normalMatrix * normal);
+            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+            vViewPos = -mvPosition.xyz;
+            vFogDepth = -mvPosition.z;
+            gl_Position = projectionMatrix * mvPosition;
+          }
+        `,
+        fragmentShader: `
+          uniform float uTime;
+          uniform float uPulsePhase;
+          uniform float uEnergy;
+          uniform float uSpiritDissolve;
+          uniform float uContam;
+          uniform vec3 uCoreColor;
+          uniform vec3 uRimColor;
+          uniform vec3 uPulseColor;
+          uniform vec3 uEyeColor;
+          uniform vec3 uFogColor;
+          uniform float uFogDensity;
+          varying vec3 vNormal;
+          varying vec3 vViewPos;
+          varying vec2 vUv;
+          varying float vFogDepth;
+
+          void main() {
+            vec3 N = normalize(vNormal);
+            vec3 V = normalize(vViewPos);
+            // Light Wrap around silhouette edges in the foggy sewer
+            float fresnel = pow(1.0 - abs(dot(N, V)), 1.9);
+            float angle = vUv.x * 6.2831853;
+            float radial = vUv.y;
+
+            // Geof Darrow micro-mechanical ribbing + 16 radial canals
+            float ribs = smoothstep(0.60, 0.98, 0.5 + 0.5 * cos(angle * 18.0)) * smoothstep(0.08, 0.94, radial);
+            float microPlates = 0.5 + 0.5 * sin(radial * 42.0 + cos(angle * 9.0) * 2.0);
+
+            // Nested Red / Golden Optical Sensor Array on the front dome (radial 0.18..0.48)
+            float eyeRing1 = exp(-pow((radial - 0.28) / 0.042, 2.0)) * smoothstep(0.76, 0.97, cos(angle * 8.0));
+            float eyeRing2 = exp(-pow((radial - 0.44) / 0.038, 2.0)) * smoothstep(0.80, 0.98, cos(angle * 12.0 + 0.3));
+            float eyes = (eyeRing1 + eyeRing2) * 1.9;
+
+            float wave = 0.5 + 0.5 * sin(radial * 10.0 - uPulsePhase * 6.2831853);
+
+            // Blend between Dark Rusted Sewer Hull and Radiant Golden Spirit Silhouette
+            vec3 metalHull = mix(vec3(0.06, 0.10, 0.14), uCoreColor * 0.55, microPlates * 0.6) + uRimColor * fresnel * 0.55;
+            vec3 spiritGold = mix(uCoreColor, uRimColor, fresnel) + uPulseColor * ribs * (0.45 + 0.55 * wave * uEnergy);
+            vec3 col = mix(metalHull, spiritGold, uSpiritDissolve);
+
+            // Independent Exponential Optical Sensor Bleed (pierces through the fog!)
+            col += uEyeColor * eyes * (1.2 + 0.4 * sin(uTime * 6.0));
+            col = mix(col, vec3(0.98, 0.12, 0.28), uContam * 0.7);
+
+            // Z-Depth Fog Swallow with optical bleed preservation
+            float fogFactor = 1.0 - exp(-uFogDensity * uFogDensity * vFogDepth * vFogDepth);
+            col = mix(col, uFogColor, clamp(fogFactor * (1.0 - eyes * 0.65), 0.0, 1.0));
+
+            // During X-Ray Spirit Dissolve, the outer hull becomes semi-translucent to expose the golden nervous system inside
+            float baseAlpha = mix(0.68, 0.26, uSpiritDissolve);
+            float alpha = clamp(baseAlpha + fresnel * 0.42 + eyes * 0.5 + ribs * 0.14, 0.14, 0.94);
+            gl_FragColor = vec4(col, alpha);
+          }
+        `,
+        transparent: true,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending
+      });
+
+      // B. Segmented "Timeworm" Tentacle Shader (Each Segment = A Saved Video Frame + Glowing Vertebral Rings)
+      const timewormMaterial = new THREE.ShaderMaterial({
+        uniforms: bellUniforms,
+        vertexShader: `
+          attribute vec3 color;
+          varying vec2 vUv;
+          varying vec3 vColor;
+          varying vec3 vNormal;
+          varying vec3 vViewPos;
+          varying float vFogDepth;
+          void main() {
+            vUv = uv;
+            vColor = color;
+            vNormal = normalize(normalMatrix * normal);
+            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+            vViewPos = -mvPosition.xyz;
+            vFogDepth = -mvPosition.z;
+            gl_Position = projectionMatrix * mvPosition;
+          }
+        `,
+        fragmentShader: `
+          uniform float uTime;
+          uniform float uFilmPhase;
+          uniform float uEnergy;
+          uniform float uSpiritDissolve;
+          uniform vec3 uRimColor;
+          uniform vec3 uPulseColor;
+          uniform vec3 uEyeColor;
+          uniform vec3 uFogColor;
+          uniform float uFogDensity;
+          varying vec2 vUv;
+          varying vec3 vColor;
+          varying vec3 vNormal;
+          varying vec3 vViewPos;
+          varying float vFogDepth;
+
+          void main() {
+            float x = vUv.x;
+            float y = vUv.y; // 0 at head socket, 1 at trailing Timeworm tip
+            float taper = 1.0 - pow(y, 1.75);
+
+            // 1. 35mm Sprocket / Mechanical Link Perforations along edges
+            bool inTrack = (x < 0.15 || x > 0.85);
+            float perf = fract(y * 34.0 - uFilmPhase * 1.8);
+            if (inTrack && (x > 0.04 && x < 0.11 || x > 0.89 && x < 0.96) && perf > 0.3 && perf < 0.7) {
+              discard;
+            }
+
+            // 2. Segmented Timeworm Vertebral Rings (like f70d97ea.png / 1000068973.png glowing red/gold rings!)
+            float segCoord = y * 18.0 - uFilmPhase * 0.65;
+            float segFract = fract(segCoord);
+            float segIdx = floor(segCoord);
+            float vertebralRing = smoothstep(0.16, 0.0, abs(segFract - 0.5) - 0.34);
+
+            // 3. Timeworm Video Frame Pixels inside each Segment (Time flows from head to tail!)
+            vec2 cellUv = vec2((x - 0.15) / 0.70, segFract);
+            vec2 gridUv = floor(cellUv * vec2(8.0, 6.0)) / vec2(8.0, 6.0);
+            vec2 subCell = fract(cellUv * vec2(8.0, 6.0)) - 0.5;
+            float dotMask = smoothstep(0.46, 0.16, length(subCell));
+            float videoPixel = 0.5 + 0.5 * sin(gridUv.x * 6.28 + segIdx * 1.4 - uFilmPhase * 2.2)
+                                     * cos(gridUv.y * 6.28 + uFilmPhase * 1.6);
+            float fleckGlow = (!inTrack) ? (dotMask * videoPixel) : 0.0;
+
+            // Combine dark mechanical segment + glowing red/gold inter-segment rings + captured video pixels
+            vec3 ringCol = mix(uEyeColor, uRimColor, uSpiritDissolve);
+            vec3 col = vColor * (0.35 + 0.45 * uSpiritDissolve);
+            col += ringCol * vertebralRing * 0.95;
+            col += mix(vColor, uPulseColor, 0.5) * fleckGlow * (0.85 + 0.5 * uEnergy);
+
+            // Edge light wrap
+            float edge = smoothstep(0.36, 0.50, abs(x - 0.5));
+            col += vColor * edge * 0.5;
+
+            // Z-Depth Fog Swallow
+            float fogFactor = 1.0 - exp(-uFogDensity * uFogDensity * vFogDepth * vFogDepth);
+            col = mix(col, uFogColor, clamp(fogFactor * 0.85, 0.0, 1.0));
+
+            float alpha = (0.28 + vertebralRing * 0.52 + fleckGlow * 0.68) * taper;
+            gl_FragColor = vec4(col, clamp(alpha, 0.0, 0.95));
+          }
+        `,
+        transparent: true,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending
+      });
+
+      // =========================================================================
+      // 5. HORIZONTAL (-Z) SUBTERRANEAN SEWER CONDUIT & ONION BARREL RIBS
+      // =========================================================================
+      // The tunnel extends along Z from Z_FAR = -56 (deep in the fog) to Z_NEAR = +12 (behind camera).
+      // The Sentinel-Jellyfish swims forward toward -Z around Z = 0!
+      const TUBE_RADIUS = 6.8;
+      const TUBE_Z_FAR = -56.0;
+      const TUBE_Z_NEAR = 12.0;
+      const TUBE_SPAN = TUBE_Z_NEAR - TUBE_Z_FAR;
+
+      function getSewerCenter(z, t) {
+        // Gentle subterranean conduit curve that winds through the depths
+        const distFromPlayer = Math.max(0, -z);
+        const curveScale = Math.min(1.0, distFromPlayer / 14.0);
+        const cx = Math.sin(z * 0.065 + t * 0.45) * 2.4 * curveScale;
+        const cy = Math.cos(z * 0.055 + t * 0.35) * 1.6 * curveScale;
+        return { cx, cy };
+      }
+
+      function sampleTubeSDF(px, py, pz, t) {
+        const { cx, cy } = getSewerCenter(pz, t);
+        const dx = px - cx;
+        const dy = py - cy;
+        return TUBE_RADIUS - Math.sqrt(dx * dx + dy * dy);
+      }
+
+      function sampleTubeInwardNormal(px, py, pz, t, outNorm) {
+        const { cx, cy } = getSewerCenter(pz, t);
+        const dx = cx - px;
+        const dy = cy - py;
+        const len = Math.sqrt(dx * dx + dy * dy) || 1.0;
+        outNorm[0] = dx / len;
+        outNorm[1] = dy / len;
+        outNorm[2] = 0.0;
+      }
+
+      const tubeEnvGroup = new THREE.Group();
+      const NUM_SEWER_ARCHES = 18;
+      const RING_PTS = 48;
+      const SHELL_RADII = [5.2, 6.0, 6.8, 7.6];
+      const sewerArches = [];
+
+      for (let sIdx = 0; sIdx < NUM_SEWER_ARCHES; sIdx++) {
+        const archGroup = new THREE.Group();
+        for (let sh = 0; sh < SHELL_RADII.length; sh++) {
+          const r = SHELL_RADII[sh];
+          const pts = [];
+          for (let p = 0; p <= RING_PTS; p++) {
+            const a = (p / RING_PTS) * Math.PI * 2;
+            pts.push(new THREE.Vector3(Math.cos(a) * r, Math.sin(a) * r, 0));
+          }
+          const geo = new THREE.BufferGeometry().setFromPoints(pts);
+          const mat = new THREE.LineBasicMaterial({
+            color: sh === 0 ? 0xfbbf24 : (sh === 2 ? 0x0ea5e9 : 0x1e293b),
+            transparent: true,
+            opacity: sh === 0 ? 0.22 : 0.16,
+            blending: THREE.AdditiveBlending
+          });
+          archGroup.add(new THREE.Line(geo, mat));
+        }
+        // Industrial radial sewer ribs connecting the concentric shells
+        const spokePts = [];
+        for (let k = 0; k < 12; k++) {
+          const a = (k / 12) * Math.PI * 2;
+          spokePts.push(new THREE.Vector3(Math.cos(a) * SHELL_RADII[0], Math.sin(a) * SHELL_RADII[0], 0));
+          spokePts.push(new THREE.Vector3(Math.cos(a) * SHELL_RADII[3], Math.sin(a) * SHELL_RADII[3], 0));
+        }
+        const spokeGeo = new THREE.BufferGeometry().setFromPoints(spokePts);
+        const spokeMat = new THREE.LineBasicMaterial({
+          color: 0x38bdf8,
+          transparent: true,
+          opacity: 0.11,
+          blending: THREE.AdditiveBlending
+        });
+        archGroup.add(new THREE.LineSegments(spokeGeo, spokeMat));
+
+        sewerArches.push({ group: archGroup, baseOffset: (sIdx / NUM_SEWER_ARCHES) * TUBE_SPAN });
+        tubeEnvGroup.add(archGroup);
+      }
+
+      // 8 Longitudinal Conduit Cable Lines running down the sewer pipe (-Z)
+      const NUM_CABLES = 8;
+      const CABLE_SEGS = 60;
+      const conduitCables = [];
+      for (let s = 0; s < NUM_CABLES; s++) {
+        const geo = new THREE.BufferGeometry();
+        const pos = new Float32Array((CABLE_SEGS + 1) * 3);
+        geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        const mat = new THREE.LineBasicMaterial({
+          color: SHELL_PALETTE[s % SHELL_PALETTE.length],
+          transparent: true,
+          opacity: 0.15,
+          blending: THREE.AdditiveBlending
+        });
+        const line = new THREE.Line(geo, mat);
+        conduitCables.push({ line, geo, angle: (s / NUM_CABLES) * Math.PI * 2 });
+        tubeEnvGroup.add(line);
+      }
+      scene.add(tubeEnvGroup);
+
+      // =========================================================================
+      // 6. SENTINEL / ENERGY-SQUID + TIMEWORM VERLET ARCHITECTURE (ORIENTED ALONG -Z!)
+      // =========================================================================
+      // Nose/Apex points forward toward -Z (Z = -1.2).
+      // Bell / Carapace expands radially in X-Y from Z = -1.2 back to Z = +0.5.
+      // Ventral Grasper Claws hang below (-Y) and reach forward/down.
+      // Timeworm Tentacles trail backward along +Z (from Z = +0.5 back to Z = +7.2) right in front of the camera!
+      const MAX_NODES = 1600;
+      const posX = new Float32Array(MAX_NODES);
+      const posY = new Float32Array(MAX_NODES);
+      const posZ = new Float32Array(MAX_NODES);
+      const prevX = new Float32Array(MAX_NODES);
+      const prevY = new Float32Array(MAX_NODES);
+      const prevZ = new Float32Array(MAX_NODES);
+      const invMass = new Float32Array(MAX_NODES);
+      const nodeRole = new Uint8Array(MAX_NODES); // 0=NoseApex, 1=BellDome, 2=RearSocketRing, 3=Timeworm, 4=VentralClaw, 5=CoreManubrium
+
+      const bellRestRad = new Float32Array(MAX_NODES);
+      const bellRestZ = new Float32Array(MAX_NODES);
+      const bellRestAngle = new Float32Array(MAX_NODES);
+      const bellRingIdx = new Uint8Array(MAX_NODES);
+
+      const constraintsA = [];
+      const constraintsB = [];
+      const constraintsRest = [];
+      const constraintsStiff = [];
+
+      let nodeCount = 0;
+      function addNode(x, y, z, w, role) {
+        const id = nodeCount++;
+        posX[id] = prevX[id] = x;
+        posY[id] = prevY[id] = y;
+        posZ[id] = prevZ[id] = z;
+        invMass[id] = w;
+        nodeRole[id] = role;
+        return id;
+      }
+
+      function addConstraint(a, b, stiff, customLen) {
+        const dx = posX[a] - posX[b];
+        const dy = posY[a] - posY[b];
+        const dz = posZ[a] - posZ[b];
+        const len = customLen !== undefined ? customLen : Math.sqrt(dx * dx + dy * dy + dz * dz);
+        constraintsA.push(a);
+        constraintsB.push(b);
+        constraintsRest.push(len);
+        constraintsStiff.push(stiff);
+      }
+
+      const BELL_RINGS = 6;
+      const BELL_SEGMENTS = 36;
+      const BELL_RADIUS = 1.65;
+      const BELL_LENGTH = 1.75;
+
+      const MAX_TIMEWORMS = 36;
+      const INITIAL_TIMEWORMS = 6;    // Start with 6 iconic Timeworms; every saved clip grows a new Timeworm!
+      const WORM_NODES = 18;
+      const WORM_SEG_LEN = 0.36;
+      const WORM_RIBBON_COLS = 5;
+
+      const NUM_VENTRAL_CLAWS = 6;    // 6 articulated ventral mechanical grasper claws underneath the head (like 1000068972.gif)
+      const CLAW_NODES = 10;
+      const CLAW_SEG_LEN = 0.24;
+      const CLAW_RIBBON_COLS = 4;
+
+      let apexNode = 0;
+      let manubriumNode = 0;
+      const bellGrid = [];
+      const dynamicTimeworms = [];
+      const ventralClaws = [];
+      const GOLDEN_STEP = 7; // Coprime with 36
+
+      function spawnNewTimeworm(filmDef) {
+        if (dynamicTimeworms.length >= MAX_TIMEWORMS) return false;
+        const wormIdx = dynamicTimeworms.length;
+        const socketRing = bellGrid[BELL_RINGS - 1];
+        const segIdx = (wormIdx * GOLDEN_STEP) % BELL_SEGMENTS;
+        const rootNode = socketRing[segIdx];
+        const rx = posX[rootNode];
+        const ry = posY[rootNode];
+        const rz = posZ[rootNode];
+        const ox = posX[manubriumNode];
+        const oy = posY[manubriumNode];
+        const theta = (segIdx / BELL_SEGMENTS) * Math.PI * 2;
+
+        const chain = [rootNode];
+        for (let k = 1; k < WORM_NODES; k++) {
+          const u = k / WORM_NODES;
+          // Graceful serpentine S-wave trailing backward along +Z
+          const flare = 1.0 + Math.sin(u * Math.PI * 0.85) * 0.35;
+          const nx = ox + (rx - ox) * flare + Math.cos(theta + u * 1.4) * 0.18;
+          const ny = oy + (ry - oy) * flare + Math.sin(theta + u * 1.4) * 0.18;
+          const nz = rz + k * WORM_SEG_LEN;
+          const nid = addNode(nx, ny, nz, 0.85 + u * 0.55, 3);
+          chain.push(nid);
+          addConstraint(chain[k - 1], nid, 0.96, WORM_SEG_LEN);
+          if (k >= 2) addConstraint(chain[k - 2], nid, 0.45, WORM_SEG_LEN * 1.94);
+          if (k >= 3) addConstraint(chain[k - 3], nid, 0.22, WORM_SEG_LEN * 2.82);
+        }
+
+        const rainbowHex = SHELL_PALETTE[wormIdx % SHELL_PALETTE.length];
+        const wormColor = new THREE.Color(filmDef ? filmDef.col : rainbowHex);
+        dynamicTimeworms.push({
+          chain: chain,
+          filmDef: filmDef || ARCHIVE_FILMS[wormIdx % ARCHIVE_FILMS.length],
+          color: wormColor,
+          birthTime: performance.now() * 0.001,
+          phaseOffset: wormIdx * 0.85
+        });
+
+        const armStatEl = document.getElementById('stat-arms');
+        if (armStatEl) armStatEl.textContent = dynamicTimeworms.length;
+        return true;
+      }
+
+      function buildSentinelJellyTopology(ox, oy, oz) {
+        nodeCount = 0;
+        constraintsA.length = 0;
+        constraintsB.length = 0;
+        constraintsRest.length = 0;
+        constraintsStiff.length = 0;
+        bellGrid.length = 0;
+        dynamicTimeworms.length = 0;
+        ventralClaws.length = 0;
+
+        // 1. Front Nose Apex (points into -Z) & Central Nervous Core (Manubrium)
+        apexNode = addNode(ox, oy, oz - BELL_LENGTH * 0.6, 0.30, 0);
+        manubriumNode = addNode(ox, oy, oz + 0.15, 0.40, 5);
+        addConstraint(apexNode, manubriumNode, 0.96);
+
+        // 2. Convex Biomechanical Carapace / Medusa Bell Rings along Z
+        for (let r = 1; r <= BELL_RINGS; r++) {
+          const u = r / BELL_RINGS;
+          const phi = u * (Math.PI * 0.54);
+          const baseRad = Math.sin(phi) * BELL_RADIUS;
+          const zOff = -Math.cos(phi) * BELL_LENGTH * 0.6 + 0.25;
+          const ringArr = [];
+          const isSocketRing = (r === BELL_RINGS);
+
+          for (let s = 0; s < BELL_SEGMENTS; s++) {
+            const theta = (s / BELL_SEGMENTS) * Math.PI * 2;
+            const scallop = isSocketRing ? (1.0 + 0.05 * Math.cos(theta * 9.0)) : 1.0;
+            const rad = baseRad * scallop;
+            const nx = ox + Math.cos(theta) * rad;
+            const ny = oy + Math.sin(theta) * rad * 0.88; // Slightly flattened squid/Sentinel profile!
+            const nz = oz + zOff;
+            const nid = addNode(nx, ny, nz, isSocketRing ? 0.80 : 0.58, isSocketRing ? 2 : 1);
+            bellRestRad[nid] = rad;
+            bellRestZ[nid] = zOff;
+            bellRestAngle[nid] = theta;
+            bellRingIdx[nid] = r;
+            ringArr.push(nid);
+          }
+          bellGrid.push(ringArr);
+        }
+
+        for (let r = 0; r < BELL_RINGS; r++) {
+          const ring = bellGrid[r];
+          for (let s = 0; s < BELL_SEGMENTS; s++) {
+            const curr = ring[s];
+            const next = ring[(s + 1) % BELL_SEGMENTS];
+            const next2 = ring[(s + 2) % BELL_SEGMENTS];
+            addConstraint(curr, next, 0.94);
+            addConstraint(curr, next2, 0.58);
+
+            if (r === 0) {
+              addConstraint(apexNode, curr, 0.95);
+              addConstraint(manubriumNode, curr, 0.78);
+            } else {
+              const prevRing = bellGrid[r - 1];
+              addConstraint(prevRing[s], curr, 0.94);
+              addConstraint(prevRing[(s + 1) % BELL_SEGMENTS], curr, 0.65);
+            }
+            if (r === 2 || r === BELL_RINGS - 1) {
+              addConstraint(manubriumNode, curr, 0.65);
+            }
+            if (r === 3 && s < BELL_SEGMENTS / 2) {
+              addConstraint(curr, ring[(s + BELL_SEGMENTS / 2) % BELL_SEGMENTS], 0.40);
+            }
+          }
+        }
+
+        // 3. 6 Ventral Mechanical Grasper Claws under the belly (like 1000068972.gif & 1000068973.png)
+        for (let c = 0; c < NUM_VENTRAL_CLAWS; c++) {
+          const side = (c % 2 === 0) ? -1 : 1;
+          const row = Math.floor(c / 2);
+          const rootX = ox + side * (0.35 + row * 0.18);
+          const rootY = oy - 0.65;
+          const rootZ = oz - 0.35 + row * 0.32;
+          const cChain = [manubriumNode];
+          for (let k = 1; k < CLAW_NODES; k++) {
+            const u = k / CLAW_NODES;
+            // Curved mantis/sentinel claw profile hanging below and curving inward
+            const nx = rootX + side * Math.sin(u * Math.PI) * 0.28;
+            const ny = rootY - k * CLAW_SEG_LEN * 0.82;
+            const nz = rootZ + u * 0.65;
+            const nid = addNode(nx, ny, nz, 0.9 + u * 0.3, 4);
+            cChain.push(nid);
+            addConstraint(cChain[k - 1], nid, 0.94, CLAW_SEG_LEN);
+            if (k >= 2) addConstraint(cChain[k - 2], nid, 0.52, CLAW_SEG_LEN * 1.88);
+          }
+          ventralClaws.push(cChain);
+        }
+
+        // 4. Spawn Initial 6 Trailing Timeworm Tentacles!
+        for (let w = 0; w < INITIAL_TIMEWORMS; w++) {
+          spawnNewTimeworm(ARCHIVE_FILMS[w]);
+        }
+      }
+
+      buildSentinelJellyTopology(0, 0, 0);
+
+      // =========================================================================
+      // 7. THREE.JS GEOMETRIES: CARAPACE + GOLDEN NERVOUS SYSTEM + TIMEWORMS
+      // =========================================================================
+      const bellGeo = new THREE.BufferGeometry();
+      const bellVertCount = (BELL_RINGS + 1) * (BELL_SEGMENTS + 1);
+      const bellPositions = new Float32Array(bellVertCount * 3);
+      const bellUvs = new Float32Array(bellVertCount * 2);
+      const bellIndices = [];
+
+      for (let r = 0; r <= BELL_RINGS; r++) {
+        for (let s = 0; s <= BELL_SEGMENTS; s++) {
+          const idx = r * (BELL_SEGMENTS + 1) + s;
+          bellUvs[idx * 2] = s / BELL_SEGMENTS;
+          bellUvs[idx * 2 + 1] = r / BELL_RINGS;
+          if (r < BELL_RINGS && s < BELL_SEGMENTS) {
+            const a = r * (BELL_SEGMENTS + 1) + s;
+            const b = a + 1;
+            const c = (r + 1) * (BELL_SEGMENTS + 1) + s;
+            const d = c + 1;
+            bellIndices.push(a, c, b, b, c, d);
+          }
+        }
+      }
+      bellGeo.setAttribute('position', new THREE.BufferAttribute(bellPositions, 3));
+      bellGeo.setAttribute('uv', new THREE.BufferAttribute(bellUvs, 2));
+      bellGeo.setIndex(bellIndices);
+      const bellMesh = new THREE.Mesh(bellGeo, bellMaterial);
+      scene.add(bellMesh);
+
+      // X-Ray Internal Fiery Golden Nervous System & Film Fleck Cloud (1,536 points)
+      const BELL_FLECK_RINGS = 16;
+      const BELL_FLECK_SEGS = 96;
+      const BELL_FLECK_COUNT = BELL_FLECK_RINGS * BELL_FLECK_SEGS;
+      const bellFleckPos = new Float32Array(BELL_FLECK_COUNT * 3);
+      const bellFleckCol = new Float32Array(BELL_FLECK_COUNT * 3);
+      const bellFleckGeo = new THREE.BufferGeometry();
+      bellFleckGeo.setAttribute('position', new THREE.BufferAttribute(bellFleckPos, 3));
+      bellFleckGeo.setAttribute('color', new THREE.BufferAttribute(bellFleckCol, 3));
+      const bellFleckMat = new THREE.PointsMaterial({
+        size: 0.088,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.95,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      const bellFleckCloud = new THREE.Points(bellFleckGeo, bellFleckMat);
+      scene.add(bellFleckCloud);
+
+      // Preallocated Dynamic Ribbon Buffer for 6 Ventral Claws + up to 36 Trailing Timeworms
+      const vertsPerClaw = CLAW_NODES * CLAW_RIBBON_COLS;
+      const trisPerClaw = (CLAW_NODES - 1) * (CLAW_RIBBON_COLS - 1) * 2;
+      const vertsPerWorm = WORM_NODES * WORM_RIBBON_COLS;
+      const trisPerWorm = (WORM_NODES - 1) * (WORM_RIBBON_COLS - 1) * 2;
+
+      const totalRibbonVerts = NUM_VENTRAL_CLAWS * vertsPerClaw + MAX_TIMEWORMS * vertsPerWorm;
+      const filmRibbonPos = new Float32Array(totalRibbonVerts * 3);
+      const filmRibbonUvs = new Float32Array(totalRibbonVerts * 2);
+      const filmRibbonCols = new Float32Array(totalRibbonVerts * 3);
+      const filmRibbonIndices = [];
+
+      let vCursor = 0;
+      const clawStartIdx = [];
+      for (let c = 0; c < NUM_VENTRAL_CLAWS; c++) {
+        clawStartIdx.push(vCursor);
+        for (let k = 0; k < CLAW_NODES; k++) {
+          for (let col = 0; col < CLAW_RIBBON_COLS; col++) {
+            const idx = vCursor + k * CLAW_RIBBON_COLS + col;
+            filmRibbonUvs[idx * 2] = col / (CLAW_RIBBON_COLS - 1);
+            filmRibbonUvs[idx * 2 + 1] = k / (CLAW_NODES - 1);
+            if (k < CLAW_NODES - 1 && col < CLAW_RIBBON_COLS - 1) {
+              const a = idx, b = idx + 1, d = idx + CLAW_RIBBON_COLS, e = d + 1;
+              filmRibbonIndices.push(a, d, b, b, d, e);
+            }
+          }
+        }
+        vCursor += vertsPerClaw;
+      }
+
+      const wormStartIdx = [];
+      for (let w = 0; w < MAX_TIMEWORMS; w++) {
+        wormStartIdx.push(vCursor);
+        for (let k = 0; k < WORM_NODES; k++) {
+          for (let col = 0; col < WORM_RIBBON_COLS; col++) {
+            const idx = vCursor + k * WORM_RIBBON_COLS + col;
+            filmRibbonUvs[idx * 2] = col / (WORM_RIBBON_COLS - 1);
+            filmRibbonUvs[idx * 2 + 1] = k / (WORM_NODES - 1);
+            if (k < WORM_NODES - 1 && col < WORM_RIBBON_COLS - 1) {
+              const a = idx, b = idx + 1, d = idx + WORM_RIBBON_COLS, e = d + 1;
+              filmRibbonIndices.push(a, d, b, b, d, e);
+            }
+          }
+        }
+        vCursor += vertsPerWorm;
+      }
+
+      const filmRibbonGeo = new THREE.BufferGeometry();
+      filmRibbonGeo.setAttribute('position', new THREE.BufferAttribute(filmRibbonPos, 3));
+      filmRibbonGeo.setAttribute('uv', new THREE.BufferAttribute(filmRibbonUvs, 2));
+      filmRibbonGeo.setAttribute('color', new THREE.BufferAttribute(filmRibbonCols, 3));
+      filmRibbonGeo.setIndex(filmRibbonIndices);
+      const filmRibbonMesh = new THREE.Mesh(filmRibbonGeo, timewormMaterial);
+      scene.add(filmRibbonMesh);
+
+      // Optional IK / Verlet Constraint Net Overlay
+      const MAX_CONSTRAINTS_VIS = 4000;
+      const constraintLinePositions = new Float32Array(MAX_CONSTRAINTS_VIS * 6);
+      const constraintLineGeo = new THREE.BufferGeometry();
+      constraintLineGeo.setAttribute('position', new THREE.BufferAttribute(constraintLinePositions, 3));
+      const constraintLineMat = new THREE.LineBasicMaterial({
+        color: 0xfacc15,
+        transparent: true,
+        opacity: 0.24,
+        blending: THREE.AdditiveBlending
+      });
+      const constraintLines = new THREE.LineSegments(constraintLineGeo, constraintLineMat);
+      constraintLines.visible = false;
+      scene.add(constraintLines);
+
+      // =========================================================================
+      // 8. LOST ARCHIVE VIDEO PLATES & RED-BLEEDING CONTAMINANT VIDEOS IN THE FOG
+      // =========================================================================
+      const streamEntities = [];
+      const entityGroup = new THREE.Group();
+      scene.add(entityGroup);
+
+      const sidePlateBorderGeo = new THREE.EdgesGeometry(new THREE.BoxGeometry(2.25, 1.62, 0.14));
+      const sidePlateBackGeo = new THREE.PlaneGeometry(2.18, 1.54);
+      const contaminantHullGeo = new THREE.DodecahedronGeometry(0.48, 0);
+      const contaminantEyeHaloGeo = new THREE.SphereGeometry(0.95, 12, 12);
+
+      function createSewerVideoPlate(filmDef) {
+        const group = new THREE.Group();
+        const backMat = new THREE.MeshBasicMaterial({
+          color: 0x050911,
+          transparent: true,
+          opacity: 0.74,
+          side: THREE.DoubleSide
+        });
+        group.add(new THREE.Mesh(sidePlateBackGeo, backMat));
+
+        const cols = 14, rows = 10;
+        const count = cols * rows;
+        const pos = new Float32Array(count * 3);
+        const col = new Float32Array(count * 3);
+        const c1 = new THREE.Color(filmDef.col);
+        const c2 = new THREE.Color(filmDef.accent);
+
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const idx = r * cols + c;
+            const u = c / (cols - 1);
+            const v = r / (rows - 1);
+            const lum = sampleFilmPattern(filmDef.id, u, v, 0);
+            pos[idx * 3]     = (u - 0.5) * 1.96;
+            pos[idx * 3 + 1] = (v - 0.5) * 1.38;
+            pos[idx * 3 + 2] = 0.05 + lum * 0.18;
+            col[idx * 3]     = THREE.MathUtils.lerp(c2.r * 0.35, c1.r, lum);
+            col[idx * 3 + 1] = THREE.MathUtils.lerp(c2.g * 0.35, c1.g, lum);
+            col[idx * 3 + 2] = THREE.MathUtils.lerp(c2.b * 0.35, c1.b, lum);
+          }
+        }
+        const pGeo = new THREE.BufferGeometry();
+        pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        pGeo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+        const pMat = new THREE.PointsMaterial({
+          size: 0.135,
+          vertexColors: true,
+          transparent: true,
+          opacity: 0.90,
+          blending: THREE.AdditiveBlending
+        });
+        group.add(new THREE.Points(pGeo, pMat));
+
+        const borderMat = new THREE.LineBasicMaterial({
+          color: filmDef.col,
+          transparent: true,
+          opacity: 0.68,
+          blending: THREE.AdditiveBlending
+        });
+        group.add(new THREE.LineSegments(sidePlateBorderGeo, borderMat));
+
+        return { group, pGeo, pMat, borderMat, cols, rows };
+      }
+
+      // Create a Contaminant Video / Rogue Sentinel Mine whose RED OPTIC GLOW pierces the Z-depth fog (`fog: false`)!
+      function createContaminantVideoNode() {
+        const group = new THREE.Group();
+        // Dark rusted hull (swallowed by fog until close)
+        const hullMat = new THREE.MeshBasicMaterial({ color: 0x261019, fog: true });
+        group.add(new THREE.Mesh(contaminantHullGeo, hullMat));
+        // Red Bioluminescent Optic Bleed (ignores fog so red eyes glow through the deep sewer haze from afar!)
+        const redEyeMat = new THREE.MeshBasicMaterial({
+          color: 0xff1133,
+          transparent: true,
+          opacity: 0.42,
+          fog: false,
+          blending: THREE.AdditiveBlending
+        });
+        const eyeHalo = new THREE.Mesh(contaminantEyeHaloGeo, redEyeMat);
+        group.add(eyeHalo);
+        return { group, eyeHalo, redEyeMat };
+      }
+
+      let nextCatalogFilmIdx = INITIAL_TIMEWORMS;
+
+      function spawnTunnelClipsAndContaminants(numClips, numContaminants) {
+        const total = numClips + numContaminants;
+        for (let i = 0; i < total; i++) {
+          const isContam = i >= numClips;
+          const z = TUBE_Z_FAR + (i / total) * TUBE_SPAN;
+          const { cx, cy } = getSewerCenter(z, 0);
+          const wallAngle = (i * 1.45) % (Math.PI * 2);
+          const shellR = isContam ? (0.8 + Math.random() * 3.2) : (3.4 + (i % 3) * 0.75);
+          const px = cx + Math.cos(wallAngle) * shellR;
+          const py = cy + Math.sin(wallAngle) * shellR;
+
+          let mesh, filmDef = null, plateObj = null, contamObj = null;
+          if (!isContam) {
+            filmDef = ARCHIVE_FILMS[(nextCatalogFilmIdx++) % ARCHIVE_FILMS.length];
+            plateObj = createSewerVideoPlate(filmDef);
+            mesh = plateObj.group;
+          } else {
+            contamObj = createContaminantVideoNode();
+            mesh = contamObj.group;
+          }
+          mesh.position.set(px, py, z);
+          entityGroup.add(mesh);
+
+          streamEntities.push({
+            kind: isContam ? 'contaminant' : 'element',
+            filmDef: filmDef,
+            plateObj: plateObj,
+            contamObj: contamObj,
+            wallAngle: wallAngle,
+            shellR: shellR,
+            x: px, y: py, z: z,
+            vx: 0, vy: 0, vz: 0,
+            flowSpeed: isContam ? 7.8 : 7.2,
+            brushExcite: 0.0,
+            brushAccum: 0.0,
+            filmPlayHead: Math.random() * 10,
+            state: 'free',
+            latchedNodes: [],
+            digestProgress: 0,
+            mesh: mesh
+          });
+        }
+        updateEntityCountUI();
+      }
+
+      spawnTunnelClipsAndContaminants(20, 8);
+
+      // Particulate Wake Vortices & Code Flecks Streaming Down the Sewer Pipe (+Z)
+      const PIXEL_FLECK_COUNT = 700;
+      const snowPos = new Float32Array(PIXEL_FLECK_COUNT * 3);
+      const snowCol = new Float32Array(PIXEL_FLECK_COUNT * 3);
+      const fleckPalette = [new THREE.Color(0xfef08a), new THREE.Color(0x38bdf8), new THREE.Color(0xff1e42), new THREE.Color(0x34d399)];
+      for (let i = 0; i < PIXEL_FLECK_COUNT; i++) {
+        const z = TUBE_Z_FAR + Math.random() * TUBE_SPAN;
+        const a = Math.random() * Math.PI * 2;
+        const r = Math.random() * TUBE_RADIUS * 0.92;
+        snowPos[i * 3]     = Math.cos(a) * r;
+        snowPos[i * 3 + 1] = Math.sin(a) * r;
+        snowPos[i * 3 + 2] = z;
+        const c = fleckPalette[i % fleckPalette.length];
+        snowCol[i * 3] = c.r; snowCol[i * 3 + 1] = c.g; snowCol[i * 3 + 2] = c.b;
+      }
+      const snowGeo = new THREE.BufferGeometry();
+      snowGeo.setAttribute('position', new THREE.BufferAttribute(snowPos, 3));
+      snowGeo.setAttribute('color', new THREE.BufferAttribute(snowCol, 3));
+      const snowMat = new THREE.PointsMaterial({
+        vertexColors: true,
+        size: 0.11,
+        transparent: true,
+        opacity: 0.62,
+        blending: THREE.AdditiveBlending
+      });
+      const snowPoints = new THREE.Points(snowGeo, snowMat);
+      scene.add(snowPoints);
+
+      // Golden Source Splice Tether Rays
+      const MAX_TETHERS = 240;
+      const tetherPositions = new Float32Array(MAX_TETHERS * 6);
+      const tetherGeo = new THREE.BufferGeometry();
+      tetherGeo.setAttribute('position', new THREE.BufferAttribute(tetherPositions, 3));
+      const tetherMat = new THREE.LineBasicMaterial({
+        color: 0xfde047,
+        transparent: true,
+        opacity: 0.88,
+        blending: THREE.AdditiveBlending
+      });
+      const tetherLines = new THREE.LineSegments(tetherGeo, tetherMat);
+      scene.add(tetherLines);
+
+      // =========================================================================
+      // 9. UNIFORM 3D SPATIAL HASH GRID (Teschner et al. 2003 O(N) Broadphase)
+      // =========================================================================
+      const CELL_SIZE = 1.25;
+      const spatialBuckets = new Map();
+      let spatialChecksPerFrame = 0;
+
+      const MAX_GRID_BOXES = 150;
+      const unitBoxGeo = new THREE.BoxGeometry(CELL_SIZE * 0.96, CELL_SIZE * 0.96, CELL_SIZE * 0.96);
+      const edgesGeo = new THREE.EdgesGeometry(unitBoxGeo);
+      const gridVisPositions = new Float32Array(MAX_GRID_BOXES * 24 * 3);
+      const gridVisGeo = new THREE.BufferGeometry();
+      gridVisGeo.setAttribute('position', new THREE.BufferAttribute(gridVisPositions, 3));
+      const gridVisMat = new THREE.LineBasicMaterial({
+        color: 0xfacc15,
+        transparent: true,
+        opacity: 0.28,
+        blending: THREE.AdditiveBlending
+      });
+      const gridVisLines = new THREE.LineSegments(gridVisGeo, gridVisMat);
+      gridVisLines.visible = false;
+      scene.add(gridVisLines);
+
+      function hashCell(cx, cy, cz) {
+        return ((cx * 73856093) ^ (cy * 19349663) ^ (cz * 83492791));
+      }
+
+      // =========================================================================
+      // 10. EFFORTLESS 1:1 SCREEN-SPACE STEERING & CINEMATIC CAMERA CONTROLS
+      // =========================================================================
+      const targetPos = new THREE.Vector3(0, 0, -1.2);
+      const beaconGeo = new THREE.RingGeometry(0.22, 0.30, 24);
+      const beaconMat = new THREE.MeshBasicMaterial({
+        color: 0xfde047,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.36,
+        blending: THREE.AdditiveBlending
+      });
+      const targetBeacon = new THREE.Mesh(beaconGeo, beaconMat);
+      targetBeacon.position.copy(targetPos);
+      scene.add(targetBeacon);
+
+      const simConfig = {
+        pulseFreq: 1.35,
+        solverIterations: 7,
+        grappleStrength: 2.2,
+        fogDensityMult: 1.0,
+        autoHunt: false,
+        cameraMode: 'chase', // 'chase' (CHASE) | 'side' (SIDE GLIDE) | 'spirit' (SPIRIT X-RAY)
+        showVerletNet: false,
+        showSDF: true,
+        showSpatialGrid: false,
+        showCaptureVectors: true,
+        grappleSurgeTimer: 0,
+        spiritSurgeTimer: 0,
+        capturedTotal: 0,
+        goldCutsTotal: 0,
+        pixelsCollected: 320,
+        integrity: 100,
+        contaminantFlash: 0,
+        swimSpeedRatio: 0.6,
+        opState: 'GLIDE'
+      };
+
+      function showEphemeralToast(msg, stateLabel) {
+        const el = document.getElementById('capture-toast');
+        if (el) {
+          el.textContent = msg;
+          el.classList.add('toast-visible');
+          if (toastTimer) clearTimeout(toastTimer);
+          toastTimer = setTimeout(() => {
+            el.classList.remove('toast-visible');
+          }, 1150);
+        }
+        if (stateLabel) updateOperationalStateUI(stateLabel);
+      }
+
+      function renderReelStripHUD() {
+        const containerEl = document.getElementById('reel-slots');
+        if (!containerEl) return;
+        const recent = splicedReel.slice(-4);
+        containerEl.innerHTML = '';
+        recent.forEach((f, idx) => {
+          const span = document.createElement('span');
+          const isGold = idx > 0 && recent[idx - 1].features.some((ft) => f.features.includes(ft));
+          span.className = isGold
+            ? 'px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-200 border border-amber-300/60'
+            : 'px-1.5 py-0.5 rounded bg-slate-900/80 text-cyan-200 border border-slate-700';
+          span.textContent = f.code + ' ' + f.title.slice(0, 8).toUpperCase();
+          containerEl.appendChild(span);
+        });
+      }
+
+      function populateFilmArchiveGrid(filterQuery) {
+        const grid = document.getElementById('film-grid');
+        if (!grid) return;
+        const q = (filterQuery || '').trim().toLowerCase();
+        grid.innerHTML = '';
+        ARCHIVE_FILMS.forEach((f) => {
+          if (q && !(f.code.toLowerCase().includes(q) || f.title.toLowerCase().includes(q) || f.features.join(' ').toLowerCase().includes(q))) {
+            return;
+          }
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          const isCurrent = f.id === activeBellFilm.id;
+          btn.className = 'zen-btn rounded-lg p-1.5 text-left flex flex-col justify-between ' + (isCurrent ? 'active-toggle' : '');
+          btn.innerHTML =
+            '<div class="font-semibold text-amber-200 truncate">' + f.code + ' · ' + f.title + '</div>' +
+            '<div class="text-[7px] text-slate-400">' + f.planes + 'P · ' + f.frames + 'f · z=' + f.shellZ + '</div>' +
+            '<div class="text-[7px] text-cyan-300 mt-0.5">' + f.features.join(' · ') + '</div>';
+          btn.addEventListener('click', () => {
+            wakeHUD();
+            saveClipAndGrowTimeworm(f, true);
+            populateFilmArchiveGrid(document.getElementById('film-search-input').value);
+          });
+          grid.appendChild(btn);
+        });
+      }
+
+      function saveClipAndGrowTimeworm(filmDef, manualSelect) {
+        const prevFilm = splicedReel[splicedReel.length - 1];
+        const sharedFeature = prevFilm ? prevFilm.features.find((ft) => filmDef.features.includes(ft)) : null;
+        activeBellFilm = filmDef;
+        splicedReel.push(filmDef);
+        simConfig.capturedTotal++;
+        simConfig.pixelsCollected += 140;
+        document.getElementById('active-film-label').textContent = 'SOURCE: ' + filmDef.code + ' ' + filmDef.title.toUpperCase();
+
+        const grewWorm = spawnNewTimeworm(filmDef);
+        const wormCount = dynamicTimeworms.length;
+
+        const goldBadge = document.getElementById('gold-cut-badge');
+        if (sharedFeature) {
+          simConfig.goldCutsTotal++;
+          simConfig.integrity = Math.min(100, simConfig.integrity + 12);
+          bellUniforms.uEnergy.value = 1.95;
+          SoundEngine.playArmGrow();
+          pulseHaptic([15, 30, 25]);
+          if (goldBadge) {
+            goldBadge.textContent = 'GOLD:' + sharedFeature;
+            goldBadge.classList.remove('hidden');
+          }
+          showEphemeralToast('GOLD SPLICE [' + filmDef.code + ' ' + filmDef.title.toUpperCase() + '] · GREW TIMEWORM #' + wormCount, 'GOLD');
+        } else {
+          simConfig.integrity = Math.min(100, simConfig.integrity + 6);
+          bellUniforms.uEnergy.value = 1.55;
+          SoundEngine.playArmGrow();
+          pulseHaptic([12, 20]);
+          if (goldBadge) goldBadge.classList.add('hidden');
+          showEphemeralToast((grewWorm ? '+TIMEWORM #' + wormCount + ' · ' : 'SAVED · ') + filmDef.code + ' ' + filmDef.title.toUpperCase(), 'SAVED');
+        }
+        renderReelStripHUD();
+      }
+
+      populateFilmArchiveGrid('');
+      renderReelStripHUD();
+
+      document.getElementById('film-search-input').addEventListener('input', (e) => {
+        populateFilmArchiveGrid(e.target.value);
+      });
+
+      // DIRECT 1:1 SCREEN-SPACE STEERING (Instant, effortless, zero raycast fighting!)
+      const keys = { w: false, a: false, s: false, d: false };
+      let isPointerDown = false;
+      let lastTapTime = 0;
+
+      function steerFromScreenCoords(clientX, clientY) {
+        const rect = renderer.domElement.getBoundingClientRect();
+        const nx = ((clientX - rect.left) / rect.width) * 2 - 1;
+        const ny = -((clientY - rect.top) / rect.height) * 2 + 1;
+        // Map directly to the sewer conduit cross-section with generous responsive range
+        targetPos.x = THREE.MathUtils.clamp(nx * 4.8, -4.8, 4.8);
+        targetPos.y = THREE.MathUtils.clamp(ny * 3.6, -3.6, 3.6);
+        if (simConfig.autoHunt && isPointerDown) {
+          simConfig.autoHunt = false;
+          document.getElementById('autopilot-state').textContent = 'OFF';
+          document.getElementById('btn-autopilot').classList.remove('active-toggle');
+        }
+      }
+
+      renderer.domElement.addEventListener('pointerdown', (e) => {
+        isPointerDown = true;
+        const now = performance.now();
+        if (now - lastTapTime < 280) {
+          triggerWhipTimeworms();
+          triggerSpiritSurge();
+        }
+        lastTapTime = now;
+        steerFromScreenCoords(e.clientX, e.clientY);
+      });
+      window.addEventListener('pointermove', (e) => {
+        // On desktop, gentle hover-steering works effortlessly; on touch, drag steers 1:1
+        if (isPointerDown || e.pointerType === 'mouse') {
+          steerFromScreenCoords(e.clientX, e.clientY);
+        }
+      });
+      window.addEventListener('pointerup', () => { isPointerDown = false; });
+
+      window.addEventListener('keydown', (e) => {
+        if (document.activeElement === document.getElementById('film-search-input')) return;
+        const k = e.key.toLowerCase();
+        if (k === 'w' || e.key === 'ArrowUp') keys.w = true;
+        if (k === 's' || e.key === 'ArrowDown') keys.s = true;
+        if (k === 'a' || e.key === 'ArrowLeft') keys.a = true;
+        if (k === 'd' || e.key === 'ArrowRight') keys.d = true;
+        if (e.code === 'Space') { e.preventDefault(); triggerSpiritSurge(); }
+        if (k === 'e') triggerWhipTimeworms();
+        if (k === 'r') releaseAllCapturedItems();
+        if (k === 'f') triggerEmpPurge();
+      });
+      window.addEventListener('keyup', (e) => {
+        const k = e.key.toLowerCase();
+        if (k === 'w' || e.key === 'ArrowUp') keys.w = false;
+        if (k === 's' || e.key === 'ArrowDown') keys.s = false;
+        if (k === 'a' || e.key === 'ArrowLeft') keys.a = false;
+        if (k === 'd' || e.key === 'ArrowRight') keys.d = false;
+      });
+
+      function updateOperationalStateUI(stateLabel, heldCount, hasHazard) {
+        simConfig.opState = stateLabel;
+        const badge = document.getElementById('state-badge');
+        const dot = document.getElementById('state-dot');
+        const btnIngest = document.getElementById('btn-digest-now');
+        const btnRelease = document.getElementById('btn-release-items');
+        const btnPurge = document.getElementById('btn-shockwave');
+        const heldPill = document.getElementById('held-pill');
+
+        badge.textContent = stateLabel;
+        if (stateLabel === 'FAULT') {
+          badge.className = 'mono text-[9px] uppercase tracking-widest text-rose-400 font-medium';
+          dot.className = 'w-1.5 h-1.5 rounded-full bg-rose-500';
+          btnPurge.classList.add('alert-action');
+        } else if (stateLabel === 'GOLD' || stateLabel === 'SAVED' || stateLabel === 'SPIRIT') {
+          badge.className = 'mono text-[9px] uppercase tracking-widest text-amber-300 font-medium';
+          dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-300';
+          btnPurge.classList.remove('alert-action');
+        } else {
+          badge.className = 'mono text-[9px] uppercase tracking-widest text-cyan-300 font-medium';
+          dot.className = 'w-1.5 h-1.5 rounded-full bg-cyan-400';
+          btnPurge.classList.remove('alert-action');
+        }
+
+        if (heldCount !== undefined) {
+          const hasHeld = heldCount > 0;
+          btnIngest.classList.toggle('hidden', !hasHeld);
+          btnRelease.classList.toggle('hidden', !hasHeld);
+          heldPill.classList.toggle('hidden', !hasHeld);
+        }
+        if (hasHazard) btnPurge.classList.add('alert-action');
+      }
+
+      // Golden Energy Squid Pass-Through Surge (Dissolves hull into fiery Golden Source light & passes harmlessly through contaminants!)
+      function triggerSpiritSurge() {
+        simConfig.spiritSurgeTimer = 1.65;
+        SoundEngine.playSpiritSurge();
+        pulseHaptic([12, 25, 15]);
+        showEphemeralToast('GOLDEN ENERGY SQUID PASS-THROUGH · X-RAY NERVOUS SYSTEM EXPOSED', 'SPIRIT');
+      }
+
+      // Whip Timeworm Tentacles outward to brush nearby video plates!
+      function triggerWhipTimeworms() {
+        simConfig.grappleSurgeTimer = 2.6;
+        SoundEngine.playWhip();
+        pulseHaptic([10, 20, 15]);
+        const cx = posX[manubriumNode];
+        const cy = posY[manubriumNode];
+        for (let w = 0; w < dynamicTimeworms.length; w++) {
+          const chain = dynamicTimeworms[w].chain;
+          for (let k = 2; k < WORM_NODES; k++) {
+            const nid = chain[k];
+            const dx = posX[nid] - cx;
+            const dy = posY[nid] - cy;
+            const d = Math.sqrt(dx * dx + dy * dy) || 1;
+            posX[nid] += (dx / d) * 0.38 + (-dy / d) * 0.22;
+            posY[nid] += (dy / d) * 0.38 + (dx / d) * 0.22;
+          }
+        }
+        showEphemeralToast('TIMEWORM WHIP · BRUSHING SEWER WALL CLIPS IN ACTION', 'BRUSH');
+      }
+
+      function releaseAllCapturedItems() {
+        let released = 0;
+        streamEntities.forEach((item) => {
+          if (item.state === 'latched') {
+            item.state = 'free';
+            item.latchedNodes.length = 0;
+            item.brushAccum = 0;
+            released++;
+          }
+        });
+        pulseHaptic(8);
+        showEphemeralToast(released > 0 ? 'RELEASED ' + released + ' VIDEO CLIP(S)' : 'NO LATCHED CLIPS', 'RECOVERY');
+      }
+
+      function digestHeldItemsNow() {
+        let count = 0;
+        streamEntities.forEach((item) => {
+          if (item.state === 'latched') {
+            item.x = posX[manubriumNode];
+            item.y = posY[manubriumNode];
+            item.z = posZ[manubriumNode];
+            count++;
+          }
+        });
+        if (count > 0) {
+          showEphemeralToast('SPLICING ' + count + ' CLIP(S) INTO TIMEWORM VAULT', 'SAVED');
+        }
+      }
+
+      function triggerEmpPurge() {
+        SoundEngine.playSpiritSurge();
+        pulseHaptic([25, 15, 25]);
+        const cx = posX[manubriumNode];
+        const cy = posY[manubriumNode];
+        const cz = posZ[manubriumNode];
+        let purged = 0;
+
+        streamEntities.forEach((item) => {
+          const dx = item.x - cx;
+          const dy = item.y - cy;
+          const dz = item.z - cz;
+          const d = Math.sqrt(dx * dx + dy * dy + dz * dz) || 1;
+          if (item.kind === 'contaminant' && (d < 8.5 || item.state === 'attached_hazard')) {
+            item.state = 'free';
+            item.latchedNodes.length = 0;
+            item.z = TUBE_Z_FAR + Math.random() * 6.0;
+            purged++;
+          }
+        });
+
+        for (let i = 0; i < nodeCount; i++) {
+          if (nodeRole[i] === 3 || nodeRole[i] === 4) {
+            const dx = posX[i] - cx;
+            const dy = posY[i] - cy;
+            const d = Math.sqrt(dx * dx + dy * dy) || 1;
+            posX[i] += (dx / d) * 0.35;
+            posY[i] += (dy / d) * 0.35;
+          }
+        }
+        simConfig.contaminantFlash = 0.0;
+        simConfig.integrity = Math.min(100, simConfig.integrity + 12);
+        showEphemeralToast(purged > 0 ? 'EMP BLAST DEACTIVATED ' + purged + ' CONTAMINANT VIDEO(S)' : 'EMP RADIAL WAVE', 'RECOVERY');
+      }
+
+      // =========================================================================
+      // 11. CORE PHYSICS: FORWARD SEWER FLIGHT + DELAYED TIMEWORM WHIP INERTIA
+      // =========================================================================
+      const tubeNorm = [0, 0, 0];
+      let simTime = 0;
+      let filmAccumTime = 0;
+      let pulseCycle = 0;
+      let sewerTravelOffset = 0;
+      let headBankAngle = 0;
+      let headPitchAngle = 0;
+
+      function stepVerletPhysics(dt) {
+        simTime += dt;
+        const forwardSpeed = 11.5 * simConfig.pulseFreq * (simConfig.spiritSurgeTimer > 0 ? 1.55 : 1.0);
+        sewerTravelOffset += dt * forwardSpeed;
+
+        if (simConfig.grappleSurgeTimer > 0) simConfig.grappleSurgeTimer = Math.max(0, simConfig.grappleSurgeTimer - dt);
+        if (simConfig.spiritSurgeTimer > 0) simConfig.spiritSurgeTimer = Math.max(0, simConfig.spiritSurgeTimer - dt);
+        if (simConfig.contaminantFlash > 0) simConfig.contaminantFlash = Math.max(0, simConfig.contaminantFlash - dt * 1.5);
+
+        // Smooth X-Ray Spirit Dissolve transitions during Spirit Surge or Spirit Camera mode
+        const targetDissolve = (simConfig.spiritSurgeTimer > 0 || simConfig.cameraMode === 'spirit')
+          ? 0.98
+          : currentPreset.spiritDissolve;
+        bellUniforms.uSpiritDissolve.value += (targetDissolve - bellUniforms.uSpiritDissolve.value) * 0.12;
+
+        // Keyboard steering
+        const moveStep = 8.2 * dt;
+        if (keys.w) targetPos.y = Math.min(3.8, targetPos.y + moveStep);
+        if (keys.s) targetPos.y = Math.max(-3.8, targetPos.y - moveStep);
+        if (keys.a) targetPos.x = Math.max(-4.8, targetPos.x - moveStep);
+        if (keys.d) targetPos.x = Math.min(4.8, targetPos.x + moveStep);
+
+        // Auto-Hunt AI (Boids-inspired steering toward approaching video clips while avoiding red contaminants)
+        if (simConfig.autoHunt) {
+          let bestScore = Infinity;
+          let bestClip = null;
+          for (let i = 0; i < streamEntities.length; i++) {
+            const it = streamEntities[i];
+            if (it.kind !== 'element' || it.state !== 'free') continue;
+            // Look ahead down the sewer pipe (Z between -28 and +2)
+            if (it.z < -28.0 || it.z > 2.5) continue;
+            const d2 = (it.x - posX[apexNode]) * (it.x - posX[apexNode]) +
+                       (it.y - posY[apexNode]) * (it.y - posY[apexNode]) +
+                       (it.z * 0.35) * (it.z * 0.35);
+            if (d2 < bestScore) { bestScore = d2; bestClip = it; }
+          }
+          if (bestClip) {
+            let desiredX = bestClip.x * 0.78;
+            let desiredY = bestClip.y * 0.78;
+            // Boids separation from red Contaminant Videos
+            for (let i = 0; i < streamEntities.length; i++) {
+              const c = streamEntities[i];
+              if (c.kind !== 'contaminant' || c.z < -18 || c.z > 4) continue;
+              const cdx = desiredX - c.x;
+              const cdy = desiredY - c.y;
+              const cd2 = cdx * cdx + cdy * cdy;
+              if (cd2 < 7.5 && cd2 > 0.01) {
+                const cd = Math.sqrt(cd2);
+                desiredX += (cdx / cd) * 2.2;
+                desiredY += (cdy / cd) * 2.2;
+              }
+            }
+            targetPos.x += (THREE.MathUtils.clamp(desiredX, -4.6, 4.6) - targetPos.x) * 3.4 * dt;
+            targetPos.y += (THREE.MathUtils.clamp(desiredY, -3.5, 3.5) - targetPos.y) * 3.4 * dt;
+          }
+        }
+
+        // Responsive, butter-smooth steering of the Sentinel-Jellyfish head in the X-Y cross-section!
+        const toTargetX = targetPos.x - posX[apexNode];
+        const toTargetY = targetPos.y - posY[apexNode];
+        const toTargetZ = targetPos.z - posZ[apexNode];
+
+        // Compute organic bank & pitch angles from lateral velocity
+        headBankAngle += (THREE.MathUtils.clamp(-toTargetX * 0.22, -0.55, 0.55) - headBankAngle) * 0.14;
+        headPitchAngle += (THREE.MathUtils.clamp(toTargetY * 0.18, -0.45, 0.45) - headPitchAngle) * 0.14;
+
+        posX[apexNode] += toTargetX * 0.14;
+        posY[apexNode] += toTargetY * 0.14;
+        posZ[apexNode] += toTargetZ * 0.14;
+
+        const instSpeed = Math.hypot(toTargetX, toTargetY) + 0.55 * simConfig.pulseFreq;
+        simConfig.swimSpeedRatio = THREE.MathUtils.clamp(0.35 + instSpeed * 0.38 + (simConfig.spiritSurgeTimer > 0 ? 0.9 : 0), 0.35, 2.8);
+        filmAccumTime += dt * simConfig.swimSpeedRatio * 2.6;
+        SoundEngine.tickProjector(simConfig.swimSpeedRatio);
+
+        pulseCycle = (pulseCycle + dt * simConfig.pulseFreq) % 1.0;
+        bellUniforms.uTime.value = simTime;
+        bellUniforms.uFilmPhase.value = filmAccumTime;
+        bellUniforms.uPulsePhase.value = pulseCycle;
+        bellUniforms.uContam.value = simConfig.contaminantFlash;
+
+        const phaseRad = pulseCycle * Math.PI * 2;
+        const apexX = posX[apexNode];
+        const apexY = posY[apexNode];
+        const apexZ = posZ[apexNode];
+
+        // 2. Verlet Inertial Step + Delayed Whip-Like Wave Propagation along Trailing Timeworms!
+        const drag = 0.042;
+        const oneMinusDrag = 1.0 - drag;
+        const surgeMult = simConfig.grappleSurgeTimer > 0 ? 1.85 : 1.0;
+        const seekRadius = 4.8 * surgeMult;
+        const seekRadiusSq = seekRadius * seekRadius;
+        const grapplePull = simConfig.grappleStrength * 0.0052 * surgeMult;
+
+        const cosB = Math.cos(headBankAngle), sinB = Math.sin(headBankAngle);
+
+        for (let i = 0; i < nodeCount; i++) {
+          const vx = (posX[i] - prevX[i]) * oneMinusDrag;
+          const vy = (posY[i] - prevY[i]) * oneMinusDrag;
+          const vz = (posZ[i] - prevZ[i]) * oneMinusDrag;
+          prevX[i] = posX[i];
+          prevY[i] = posY[i];
+          prevZ[i] = posZ[i];
+
+          const role = nodeRole[i];
+          // Strong axial slipstream force (+Z) pulling trailing Timeworms backward behind the head!
+          let fx = 0, fy = 0, fz = 0.0042 * simConfig.pulseFreq;
+
+          if (role === 1 || role === 2) {
+            const rIdx = bellRingIdx[i];
+            const ringPhase = phaseRad - rIdx * 0.32;
+            const ringContract = 1.0 - (0.22 * (rIdx / BELL_RINGS)) * (0.5 + 0.5 * Math.sin(ringPhase));
+            const lx = Math.cos(bellRestAngle[i]) * bellRestRad[i] * ringContract;
+            const ly = Math.sin(bellRestAngle[i]) * bellRestRad[i] * 0.88 * ringContract;
+            // Apply head banking rotation
+            const rotX = lx * cosB - ly * sinB;
+            const rotY = lx * sinB + ly * cosB;
+            const targetBX = apexX + rotX;
+            const targetBY = apexY + rotY;
+            const targetBZ = apexZ + BELL_LENGTH * 0.6 + bellRestZ[i];
+            fx += (targetBX - posX[i]) * 0.11;
+            fy += (targetBY - posY[i]) * 0.11;
+            fz += (targetBZ - posZ[i]) * 0.11;
+          } else if (role === 3) {
+            // Trailing Timeworm Tentacles: delayed whip-like serpentine wave + wall-clip reaching!
+            const zDist = Math.max(0, posZ[i] - apexZ);
+            const whipWave = simTime * 4.2 - zDist * 0.85 + i * 0.19;
+            const dxOut = posX[i] - apexX;
+            const dyOut = posY[i] - apexY;
+            const rOut = Math.sqrt(dxOut * dxOut + dyOut * dyOut) || 1;
+            const fanOut = 0.0012 * surgeMult;
+            fx += (dxOut / rOut) * fanOut + Math.cos(whipWave) * 0.0018;
+            fy += (dyOut / rOut) * fanOut + Math.sin(whipWave) * 0.0018;
+
+            if (grapplePull > 0) {
+              let nearestPlate = null;
+              let minD2 = seekRadiusSq;
+              for (let p = 0; p < streamEntities.length; p++) {
+                const ent = streamEntities[p];
+                const dx = ent.x - posX[i];
+                const dy = ent.y - posY[i];
+                const dz = ent.z - posZ[i];
+                const d2 = dx * dx + dy * dy + dz * dz;
+                if (ent.kind === 'element' && ent.state !== 'digesting' && d2 < minD2) {
+                  minD2 = d2;
+                  nearestPlate = ent;
+                } else if (ent.kind === 'contaminant' && d2 < 2.8) {
+                  const d = Math.sqrt(d2) || 1;
+                  fx -= (dx / d) * 0.004;
+                  fy -= (dy / d) * 0.004;
+                }
+              }
+              if (nearestPlate) {
+                const d = Math.sqrt(minD2) || 1;
+                fx += ((nearestPlate.x - posX[i]) / d) * grapplePull;
+                fy += ((nearestPlate.y - posY[i]) / d) * grapplePull;
+                fz += ((nearestPlate.z - posZ[i]) / d) * (grapplePull * 0.5);
+              }
+            }
+          } else if (role === 4) {
+            // 6 Ventral Mechanical Grasper Claws under the belly
+            const clawPinch = Math.sin(simTime * 3.2 + i * 0.4) * 0.0015;
+            fx += clawPinch;
+            fy -= 0.0020;
+            fz += 0.0025;
+          } else if (role === 5) {
+            fx += (apexX - posX[i]) * 0.09;
+            fy += (apexY - posY[i]) * 0.09;
+            fz += ((apexZ + 1.15) - posZ[i]) * 0.09;
+          }
+
+          posX[i] += vx + fx;
+          posY[i] += vy + fy;
+          posZ[i] += vz + fz;
+        }
+
+        // 3. Build Uniform 3D Spatial Hash Grid
+        spatialBuckets.clear();
+        spatialChecksPerFrame = 0;
+        const invCell = 1.0 / CELL_SIZE;
+
+        for (let i = 0; i < nodeCount; i++) {
+          const role = nodeRole[i];
+          if (role !== 3 && role !== 4 && role !== 2) continue;
+          const cx = Math.floor(posX[i] * invCell);
+          const cy = Math.floor(posY[i] * invCell);
+          const cz = Math.floor(posZ[i] * invCell);
+          const key = hashCell(cx, cy, cz);
+          let bucket = spatialBuckets.get(key);
+          if (!bucket) {
+            bucket = { cx, cy, cz, nodes: [] };
+            spatialBuckets.set(key, bucket);
+          }
+          bucket.nodes.push(i);
+        }
+
+        // 4. Advance Side-Wall Video Clips & Red-Bleeding Contaminant Videos Coming From -Z Depths!
+        const brushRadius = 1.85 * (simConfig.grappleSurgeTimer > 0 ? 1.35 : 1.0);
+        const brushRadiusSq = brushRadius * brushRadius;
+        const manuX = posX[manubriumNode];
+        const manuY = posY[manubriumNode];
+        const manuZ = posZ[manubriumNode];
+        let activeHazardCount = 0;
+        let nearestClipZ = -45;
+
+        for (let p = 0; p < streamEntities.length; p++) {
+          const item = streamEntities[p];
+
+          if (item.state === 'free') {
+            // Stream from deep -Z toward +Z past the swimming Sentinel-Jellyfish!
+            item.z += item.flowSpeed * simConfig.pulseFreq * dt + item.vz;
+            const { cx, cy } = getSewerCenter(item.z, simTime);
+
+            if (item.kind === 'element') {
+              item.wallAngle += dt * 0.10 * ((p % 2 === 0) ? 1 : -1);
+              item.x = cx + Math.cos(item.wallAngle) * item.shellR;
+              item.y = cy + Math.sin(item.wallAngle) * item.shellR;
+              if (item.z < 1.5 && item.z > nearestClipZ) nearestClipZ = item.z;
+            } else {
+              item.x = cx + Math.cos(item.wallAngle + simTime * 0.5) * item.shellR;
+              item.y = cy + Math.sin(item.wallAngle + simTime * 0.5) * item.shellR;
+              if (item.contamObj) {
+                const pulseS = 1.0 + 0.25 * Math.sin(simTime * 6.0 + p);
+                item.contamObj.eyeHalo.scale.set(pulseS, pulseS, pulseS);
+              }
+            }
+
+            // Depth-Wrap back into the deep sewer fog (-Z) once passed behind camera
+            if (item.z > TUBE_Z_NEAR) {
+              item.z = TUBE_Z_FAR + (item.z - TUBE_Z_NEAR);
+              if (item.kind === 'element') {
+                item.filmDef = ARCHIVE_FILMS[(nextCatalogFilmIdx++) % ARCHIVE_FILMS.length];
+                item.brushExcite = 0;
+                item.brushAccum = 0;
+              }
+            }
+
+            // Spatial-Hash Brush Check against Timeworm Tentacles & Grasper Claws
+            const icx = Math.floor(item.x * invCell);
+            const icy = Math.floor(item.y * invCell);
+            const icz = Math.floor(item.z * invCell);
+            let brushingNodesCount = 0;
+            item.latchedNodes.length = 0;
+
+            for (let dx = -1; dx <= 1; dx++) {
+              for (let dy = -1; dy <= 1; dy++) {
+                for (let dz = -1; dz <= 1; dz++) {
+                  const b = spatialBuckets.get(hashCell(icx + dx, icy + dy, icz + dz));
+                  if (!b) continue;
+                  const arr = b.nodes;
+                  for (let k = 0; k < arr.length; k++) {
+                    spatialChecksPerFrame++;
+                    const nid = arr[k];
+                    const ndx = posX[nid] - item.x;
+                    const ndy = posY[nid] - item.y;
+                    const ndz = posZ[nid] - item.z;
+                    const d2 = ndx * ndx + ndy * ndy + ndz * ndz;
+
+                    if (item.kind === 'element') {
+                      if (d2 < brushRadiusSq) {
+                        brushingNodesCount++;
+                        if (item.latchedNodes.length < 6) item.latchedNodes.push(nid);
+                      }
+                    } else if (item.kind === 'contaminant' && d2 < 0.65) {
+                      if (simConfig.spiritSurgeTimer > 0) {
+                        // GOLDEN ENERGY SQUID PASS-THROUGH: Harmlessly dissolve contaminant into golden code!
+                        item.z = TUBE_Z_FAR + Math.random() * 4.0;
+                        simConfig.pixelsCollected += 48;
+                        SoundEngine.playBrushShimmer(p);
+                        showEphemeralToast('SPIRIT PASS-THROUGH · TRANSMUTED CONTAMINANT INTO GOLDEN CODE', 'SPIRIT');
+                        break;
+                      } else {
+                        item.state = 'attached_hazard';
+                        item.latchedNodes = [nid];
+                        item.digestProgress = 0;
+                        simConfig.integrity = Math.max(10, simConfig.integrity - 14);
+                        simConfig.contaminantFlash = 1.0;
+                        SoundEngine.playHazard();
+                        pulseHaptic([40, 20, 40]);
+                        showEphemeralToast('CONTAMINANT VIDEO DETECTED · TAP EMP PURGE OR SPIRIT SURGE', 'FAULT');
+                        break;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
+            if (item.kind === 'element') {
+              if (brushingNodesCount > 0) {
+                item.brushExcite = Math.min(1.0, item.brushExcite + dt * 5.0);
+                item.brushAccum += dt * (1.4 + brushingNodesCount * 0.5);
+                simConfig.pixelsCollected += Math.min(5, brushingNodesCount);
+                SoundEngine.playBrushShimmer(item.filmDef.id);
+
+                if (item.brushAccum >= 0.45) {
+                  item.state = 'latched';
+                  pulseHaptic(10);
+                  showEphemeralToast('TIMEWORMS BRUSHED [' + item.filmDef.code + ' ' + item.filmDef.title.toUpperCase() + '] · SAVING CLIP', 'BRUSH');
+                }
+              } else {
+                item.brushExcite = Math.max(0.0, item.brushExcite - dt * 1.2);
+              }
+            }
+          } else if (item.state === 'latched') {
+            item.brushExcite = 1.0;
+            const toManuX = manuX - item.x;
+            const toManuY = manuY - item.y;
+            const toManuZ = manuZ - item.z;
+            const distToManu = Math.sqrt(toManuX * toManuX + toManuY * toManuY + toManuZ * toManuZ) || 1;
+            const reelSpeed = 0.085;
+            item.x += (toManuX / distToManu) * reelSpeed;
+            item.y += (toManuY / distToManu) * reelSpeed;
+            item.z += (toManuZ / distToManu) * reelSpeed;
+
+            if (distToManu < 1.55) {
+              item.state = 'digesting';
+              item.digestProgress = 0.0;
+              if (item.filmDef) {
+                saveClipAndGrowTimeworm(item.filmDef, false);
+              }
+            }
+          } else if (item.state === 'attached_hazard') {
+            activeHazardCount++;
+            item.digestProgress += dt * 0.6;
+            const nid = item.latchedNodes[0] || manubriumNode;
+            posY[nid] -= 0.015;
+            item.x = posX[nid]; item.y = posY[nid]; item.z = posZ[nid];
+            if (item.digestProgress >= 1.0) {
+              item.state = 'free';
+              item.latchedNodes.length = 0;
+              item.z = TUBE_Z_FAR + 1.0;
+            }
+          } else if (item.state === 'digesting') {
+            item.digestProgress += dt * 2.2;
+            item.x = manuX + Math.cos(item.digestProgress * 10) * (1.0 - item.digestProgress) * 0.4;
+            item.y = manuY + Math.sin(item.digestProgress * 10) * (1.0 - item.digestProgress) * 0.4;
+            item.z = manuZ;
+            item.mesh.scale.setScalar(Math.max(0.01, 1.0 - item.digestProgress));
+
+            if (item.digestProgress >= 1.0) {
+              item.z = TUBE_Z_FAR + Math.random() * 4.0;
+              item.filmDef = ARCHIVE_FILMS[(nextCatalogFilmIdx++) % ARCHIVE_FILMS.length];
+              item.latchedNodes.length = 0;
+              item.state = 'free';
+              item.digestProgress = 0;
+              item.brushExcite = 0;
+              item.brushAccum = 0;
+              item.mesh.scale.setScalar(1.0);
+            }
+          }
+
+          item.mesh.position.set(item.x, item.y, item.z);
+          if (item.kind === 'element' && item.plateObj && item.filmDef) {
+            const playRate = 0.9 + item.brushExcite * 4.5;
+            item.filmPlayHead += dt * playRate;
+
+            const pObj = item.plateObj;
+            const pArr = pObj.pGeo.attributes.position.array;
+            const cArr = pObj.pGeo.attributes.color.array;
+            const cols = pObj.cols, rows = pObj.rows;
+            const c1 = new THREE.Color(item.filmDef.col);
+            const c2 = new THREE.Color(item.filmDef.accent);
+            const boost = 1.0 + item.brushExcite * 0.95;
+
+            for (let r = 0; r < rows; r++) {
+              for (let c = 0; c < cols; c++) {
+                const idx = r * cols + c;
+                const u = c / (cols - 1);
+                const v = r / (rows - 1);
+                const lum = sampleFilmPattern(item.filmDef.id, u, v, item.filmPlayHead);
+                pArr[idx * 3 + 2] = 0.05 + (lum - 0.3) * (0.15 + item.brushExcite * 0.42);
+                cArr[idx * 3]     = Math.min(1.0, THREE.MathUtils.lerp(c2.r * 0.3, c1.r, lum) * boost);
+                cArr[idx * 3 + 1] = Math.min(1.0, THREE.MathUtils.lerp(c2.g * 0.3, c1.g, lum) * boost);
+                cArr[idx * 3 + 2] = Math.min(1.0, THREE.MathUtils.lerp(c2.b * 0.3, c1.b, lum) * boost);
+              }
+            }
+            pObj.pGeo.attributes.position.needsUpdate = true;
+            pObj.pGeo.attributes.color.needsUpdate = true;
+            pObj.pMat.size = 0.13 + item.brushExcite * 0.06;
+            pObj.borderMat.opacity = 0.58 + item.brushExcite * 0.42;
+
+            if (item.state === 'free') {
+              // Face toward the approaching swimmer / camera with a slight inward cant along the sewer wall!
+              const { cx, cy } = getSewerCenter(item.z, simTime);
+              item.mesh.lookAt(cx * 0.4, cy * 0.4, item.z + 6.5);
+              const s = 1.0 + item.brushExcite * 0.32;
+              item.mesh.scale.set(s, s, s);
+            }
+          } else {
+            item.mesh.rotation.x += 0.025;
+            item.mesh.rotation.y += 0.032;
+          }
+        }
+
+        // 5. Iterative Gauss-Seidel Constraint Projection + Sewer Tube SDF Boundary
+        const iters = simConfig.solverIterations;
+        const numConstraints = constraintsA.length;
+
+        for (let iter = 0; iter < iters; iter++) {
+          for (let c = 0; c < numConstraints; c++) {
+            const a = constraintsA[c];
+            const b = constraintsB[c];
+            const dx = posX[b] - posX[a];
+            const dy = posY[b] - posY[a];
+            const dz = posZ[b] - posZ[a];
+            const dist = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.0001;
+            const wA = invMass[a];
+            const wB = invMass[b];
+            const wSum = wA + wB;
+            if (wSum === 0) continue;
+            const diff = ((dist - constraintsRest[c]) / dist) * (constraintsStiff[c] / wSum);
+            posX[a] += dx * diff * wA;
+            posY[a] += dy * diff * wA;
+            posZ[a] += dz * diff * wA;
+            posX[b] -= dx * diff * wB;
+            posY[b] -= dy * diff * wB;
+            posZ[b] -= dz * diff * wB;
+          }
+
+          for (let p = 0; p < streamEntities.length; p++) {
+            const item = streamEntities[p];
+            if (item.kind !== 'element' || item.latchedNodes.length === 0) continue;
+            const pullStrength = item.state === 'latched' ? 0.42 : 0.16;
+            const lNodes = item.latchedNodes;
+            for (let k = 0; k < lNodes.length; k++) {
+              const nid = lNodes[k];
+              const wrapAngle = k * 2.1 + simTime * 3.5;
+              const tx = item.x + Math.cos(wrapAngle) * 0.35;
+              const ty = item.y + Math.sin(wrapAngle) * 0.35;
+              const tz = item.z + ((k % 3) - 1) * 0.15;
+              posX[nid] += (tx - posX[nid]) * pullStrength;
+              posY[nid] += (ty - posY[nid]) * pullStrength;
+              posZ[nid] += (tz - posZ[nid]) * pullStrength;
+            }
+          }
+
+          if (iter === iters - 1) {
+            for (let i = 0; i < nodeCount; i++) {
+              const dTube = sampleTubeSDF(posX[i], posY[i], posZ[i], simTime);
+              if (dTube < 0.35) {
+                sampleTubeInwardNormal(posX[i], posY[i], posZ[i], simTime, tubeNorm);
+                const pen = 0.35 - dTube;
+                posX[i] += tubeNorm[0] * pen;
+                posY[i] += tubeNorm[1] * pen;
+              }
+            }
+          }
+        }
+
+        // 6. Spatial-Hash Timeworm Separation
+        const minSep = 0.30;
+        const minSepSq = minSep * minSep;
+        spatialBuckets.forEach((bucket) => {
+          const nodes = bucket.nodes;
+          const len = Math.min(nodes.length, 12);
+          for (let i = 0; i < len; i++) {
+            const a = nodes[i];
+            for (let j = i + 1; j < len; j++) {
+              const b = nodes[j];
+              if (Math.abs(a - b) <= 2) continue;
+              spatialChecksPerFrame++;
+              const dx = posX[b] - posX[a];
+              const dy = posY[b] - posY[a];
+              const dz = posZ[b] - posZ[a];
+              const d2 = dx * dx + dy * dy + dz * dz;
+              if (d2 > 0.00001 && d2 < minSepSq) {
+                const d = Math.sqrt(d2);
+                const push = 0.5 * (minSep - d) / d;
+                posX[a] -= dx * push; posY[a] -= dy * push; posZ[a] -= dz * push;
+                posX[b] += dx * push; posY[b] += dy * push; posZ[b] += dz * push;
+              }
+            }
+          }
+        });
+
+        // 7. Particulate Vapor Vortices & Code Flecks Streaming Past (+Z)
+        const sArr = snowGeo.attributes.position.array;
+        const pullR2 = (simConfig.grappleSurgeTimer > 0) ? 5.8 : 2.6;
+        for (let i = 0; i < PIXEL_FLECK_COUNT; i++) {
+          let sx = sArr[i * 3];
+          let sy = sArr[i * 3 + 1];
+          let sz = sArr[i * 3 + 2] + dt * forwardSpeed * 1.15;
+
+          // Swirl vapor vortices directly in the wake of the Sentinel's head!
+          const dx = manuX - sx;
+          const dy = manuY - sy;
+          const dz = (manuZ + 1.5) - sz;
+          const d2 = dx * dx + dy * dy + dz * dz;
+          if (d2 < pullR2) {
+            sx += (dx * 0.12 - dy * 0.08);
+            sy += (dy * 0.12 + dx * 0.08);
+            sz += dz * 0.12;
+            if (d2 < 0.42) {
+              simConfig.pixelsCollected++;
+              sz = TUBE_Z_FAR + Math.random() * 3.0;
+              const a = Math.random() * Math.PI * 2;
+              const r = 0.8 + Math.random() * (TUBE_RADIUS - 1.5);
+              sx = Math.cos(a) * r;
+              sy = Math.sin(a) * r;
+            }
+          }
+
+          if (sz > TUBE_Z_NEAR) sz -= TUBE_SPAN;
+          sArr[i * 3]     = sx;
+          sArr[i * 3 + 1] = sy;
+          sArr[i * 3 + 2] = sz;
+        }
+        snowGeo.attributes.position.needsUpdate = true;
+
+        // 8. Animate Sewer Conduit Arches & Longitudinal Cables Along Z
+        if (simConfig.showSDF) {
+          for (let i = 0; i < NUM_SEWER_ARCHES; i++) {
+            const arch = sewerArches[i];
+            const rz = TUBE_Z_FAR + ((arch.baseOffset + sewerTravelOffset) % TUBE_SPAN);
+            const { cx, cy } = getSewerCenter(rz, simTime);
+            arch.group.position.set(cx, cy, rz);
+            arch.group.rotation.z = Math.sin(simTime * 0.25 + i * 0.4) * 0.12;
+          }
+          for (let s = 0; s < NUM_CABLES; s++) {
+            const cb = conduitCables[s];
+            const arr = cb.geo.attributes.position.array;
+            const rShell = SHELL_RADII[s % SHELL_RADII.length];
+            for (let k = 0; k <= CABLE_SEGS; k++) {
+              const u = k / CABLE_SEGS;
+              const z = TUBE_Z_FAR + u * TUBE_SPAN;
+              const { cx, cy } = getSewerCenter(z, simTime);
+              const helAngle = cb.angle + Math.sin(z * 0.06 + simTime * 0.5) * 0.22;
+              arr[k * 3]     = cx + Math.cos(helAngle) * rShell;
+              arr[k * 3 + 1] = cy + Math.sin(helAngle) * rShell;
+              arr[k * 3 + 2] = z;
+            }
+            cb.geo.attributes.position.needsUpdate = true;
+          }
+        }
+
+        bellUniforms.uEnergy.value = Math.max(0.85, bellUniforms.uEnergy.value - dt * 0.35);
+        return { activeHazardCount, nearestClipZ };
+      }
+
+      // =========================================================================
+      // 12. SKINNING: CARAPACE + GOLDEN NERVOUS SYSTEM + RMF TIMEWORM TENTACLES
+      // =========================================================================
+      function updateMeshesAndVisualizers(stepInfo) {
+        const activeHazardCount = stepInfo.activeHazardCount;
+
+        // 1. Update Carapace / Medusa Dome Mesh
+        const bPos = bellGeo.attributes.position.array;
+        for (let r = 0; r <= BELL_RINGS; r++) {
+          for (let s = 0; s <= BELL_SEGMENTS; s++) {
+            const vIdx = (r * (BELL_SEGMENTS + 1) + s) * 3;
+            const segMod = s % BELL_SEGMENTS;
+            const nid = (r === 0) ? apexNode : bellGrid[r - 1][segMod];
+            bPos[vIdx]     = posX[nid];
+            bPos[vIdx + 1] = posY[nid];
+            bPos[vIdx + 2] = posZ[nid];
+          }
+        }
+        bellGeo.attributes.position.needsUpdate = true;
+        bellGeo.computeVertexNormals();
+
+        // 2. Update 1,536 Golden Nervous-System / Film-Pixel Flecks Inside the Head
+        const bfPos = bellFleckGeo.attributes.position.array;
+        const bfCol = bellFleckGeo.attributes.color.array;
+        const fCol1 = new THREE.Color(activeBellFilm.col);
+        const fCol2 = new THREE.Color(activeBellFilm.accent);
+
+        for (let fr = 0; fr < BELL_FLECK_RINGS; fr++) {
+          const uRing = (fr + 0.5) / BELL_FLECK_RINGS;
+          const ringF = uRing * BELL_RINGS;
+          const r0 = Math.min(BELL_RINGS - 1, Math.floor(ringF));
+          const rFrac = ringF - r0;
+
+          for (let fs = 0; fs < BELL_FLECK_SEGS; fs++) {
+            const idx = fr * BELL_FLECK_SEGS + fs;
+            const uSeg = fs / BELL_FLECK_SEGS;
+            const segF = uSeg * BELL_SEGMENTS;
+            const s0 = Math.floor(segF) % BELL_SEGMENTS;
+            const s1 = (s0 + 1) % BELL_SEGMENTS;
+            const sFrac = segF - Math.floor(segF);
+
+            const nA = (r0 === 0) ? apexNode : bellGrid[r0 - 1][s0];
+            const nB = (r0 === 0) ? apexNode : bellGrid[r0 - 1][s1];
+            const nC = bellGrid[r0][s0];
+            const nD = bellGrid[r0][s1];
+
+            const topX = posX[nA] + (posX[nB] - posX[nA]) * sFrac;
+            const topY = posY[nA] + (posY[nB] - posY[nA]) * sFrac;
+            const topZ = posZ[nA] + (posZ[nB] - posZ[nA]) * sFrac;
+
+            const botX = posX[nC] + (posX[nD] - posX[nC]) * sFrac;
+            const botY = posY[nC] + (posY[nD] - posY[nC]) * sFrac;
+            const botZ = posZ[nC] + (posZ[nD] - posZ[nC]) * sFrac;
+
+            const lum = sampleFilmPattern(activeBellFilm.id, uSeg, uRing, filmAccumTime);
+            const shrink = 0.90; // Nested slightly inside the outer carapace like the glowing golden nervous system!
+
+            bfPos[idx * 3]     = (topX + (botX - topX) * rFrac) * shrink + posX[manubriumNode] * (1.0 - shrink);
+            bfPos[idx * 3 + 1] = (topY + (botY - topY) * rFrac) * shrink + posY[manubriumNode] * (1.0 - shrink);
+            bfPos[idx * 3 + 2] = (topZ + (botZ - topZ) * rFrac) + (lum - 0.3) * 0.14;
+
+            bfCol[idx * 3]     = THREE.MathUtils.lerp(fCol2.r * 0.3, fCol1.r, lum);
+            bfCol[idx * 3 + 1] = THREE.MathUtils.lerp(fCol2.g * 0.3, fCol1.g, lum);
+            bfCol[idx * 3 + 2] = THREE.MathUtils.lerp(fCol2.b * 0.3, fCol1.b, lum);
+          }
+        }
+        bellFleckGeo.attributes.position.needsUpdate = true;
+        bellFleckGeo.attributes.color.needsUpdate = true;
+
+        // 3. Sweep 6 Ventral Claws + All Grown Trailing Timeworms via Parallel Transport (RMF)
+        function sweepTimewormRMF(chain, nNodes, cols, vBase, baseHalfWidth, twistRate, pleatAmp, colStart, colEnd) {
+          let rx = 1, ry = 0, rz = 0;
+          for (let k = 0; k < nNodes; k++) {
+            const nid = chain[k];
+            const u = k / (nNodes - 1);
+            const prevId = chain[Math.max(0, k - 1)];
+            const nextId = chain[Math.min(nNodes - 1, k + 1)];
+            let tx = posX[nextId] - posX[prevId];
+            let ty = posY[nextId] - posY[prevId];
+            let tz = posZ[nextId] - posZ[prevId];
+            const tLen = Math.sqrt(tx * tx + ty * ty + tz * tz) || 1;
+            tx /= tLen; ty /= tLen; tz /= tLen;
+
+            const dotRT = rx * tx + ry * ty + rz * tz;
+            rx -= dotRT * tx; ry -= dotRT * ty; rz -= dotRT * tz;
+            const rLen = Math.sqrt(rx * rx + ry * ry + rz * rz);
+            if (rLen < 0.001) { rx = 1; ry = 0; rz = 0; }
+            else { rx /= rLen; ry /= rLen; rz /= rLen; }
+
+            const bx = ty * rz - tz * ry;
+            const by = tz * rx - tx * rz;
+            const bz = tx * ry - ty * rx;
+
+            const halfW = baseHalfWidth * Math.sin(u * Math.PI * 0.85 + 0.25) * (1.0 - u * 0.45);
+            const twist = k * twistRate - filmAccumTime * 0.75;
+            const cosW = Math.cos(twist);
+            const sinW = Math.sin(twist);
+            const spanX = rx * cosW + bx * sinW;
+            const spanY = ry * cosW + by * sinW;
+            const spanZ = rz * cosW + bz * sinW;
+            const normX = -rx * sinW + bx * cosW;
+            const normY = -ry * sinW + by * cosW;
+            const normZ = -rz * sinW + bz * cosW;
+
+            const cr = THREE.MathUtils.lerp(colStart.r, colEnd.r, u);
+            const cg = THREE.MathUtils.lerp(colStart.g, colEnd.g, u);
+            const cb = THREE.MathUtils.lerp(colStart.b, colEnd.b, u);
+
+            for (let c = 0; c < cols; c++) {
+              const s = (c / (cols - 1)) * 2.0 - 1.0;
+              // Cylindrical-ribbon hybrid camber so each Timeworm looks like a segmented 3D biomechanical tube-reel!
+              const camber = Math.cos(s * Math.PI * 0.5) * (baseHalfWidth * 0.45);
+              const vIdx = (vBase + k * cols + c) * 3;
+              filmRibbonPos[vIdx]     = posX[nid] + spanX * (s * halfW) + normX * camber;
+              filmRibbonPos[vIdx + 1] = posY[nid] + spanY * (s * halfW) + normY * camber;
+              filmRibbonPos[vIdx + 2] = posZ[nid] + spanZ * (s * halfW) + normZ * camber;
+              filmRibbonCols[vIdx]     = cr;
+              filmRibbonCols[vIdx + 1] = cg;
+              filmRibbonCols[vIdx + 2] = cb;
+            }
+          }
+        }
+
+        const pCol = currentPreset.pulseColor;
+        const cCol = currentPreset.coreColor;
+
+        for (let c = 0; c < NUM_VENTRAL_CLAWS; c++) {
+          sweepTimewormRMF(ventralClaws[c], CLAW_NODES, CLAW_RIBBON_COLS, clawStartIdx[c], 0.14, 0.08, 0.02, cCol, pCol);
+        }
+
+        for (let w = 0; w < dynamicTimeworms.length; w++) {
+          const wormObj = dynamicTimeworms[w];
+          const age = Math.min(1.0, (simTime - wormObj.birthTime) * 1.8 + 0.35);
+          const startC = currentPreset.rainbowMode > 0.5 ? wormObj.color : currentPreset.strandColor;
+          const endC = new THREE.Color(wormObj.filmDef.col);
+          sweepTimewormRMF(wormObj.chain, WORM_NODES, WORM_RIBBON_COLS, wormStartIdx[w], 0.24 * age, 0.14, 0.04, startC, endC);
+        }
+
+        const activeIndiceCount = (NUM_VENTRAL_CLAWS * trisPerClaw + dynamicTimeworms.length * trisPerWorm) * 3;
+        filmRibbonGeo.setDrawRange(0, activeIndiceCount);
+        filmRibbonGeo.attributes.position.needsUpdate = true;
+        filmRibbonGeo.attributes.color.needsUpdate = true;
+        filmRibbonGeo.computeVertexNormals();
+
+        // 4. Optional IK / Verlet Net Overlay
+        constraintLines.visible = simConfig.showVerletNet;
+        if (simConfig.showVerletNet) {
+          const cPos = constraintLineGeo.attributes.position.array;
+          const nC = Math.min(constraintsA.length, MAX_CONSTRAINTS_VIS);
+          for (let c = 0; c < nC; c++) {
+            const a = constraintsA[c];
+            const b = constraintsB[c];
+            const base = c * 6;
+            cPos[base]     = posX[a]; cPos[base + 1] = posY[a]; cPos[base + 2] = posZ[a];
+            cPos[base + 3] = posX[b]; cPos[base + 4] = posY[b]; cPos[base + 5] = posZ[b];
+          }
+          constraintLineGeo.setDrawRange(0, nC * 2);
+          constraintLineGeo.attributes.position.needsUpdate = true;
+        }
+
+        // 5. Update Brush & Splice Tether Rays
+        tetherLines.visible = simConfig.showCaptureVectors;
+        let activeTetherCount = 0;
+        let heldItemsCount = 0;
+        let brushingCount = 0;
+        const tetArr = tetherGeo.attributes.position.array;
+
+        for (let p = 0; p < streamEntities.length; p++) {
+          const item = streamEntities[p];
+          if (item.state === 'latched') heldItemsCount++;
+          if (item.brushExcite > 0.15) brushingCount++;
+          if (simConfig.showCaptureVectors && item.latchedNodes.length > 0) {
+            for (let k = 0; k < item.latchedNodes.length; k++) {
+              if (activeTetherCount >= MAX_TETHERS) break;
+              const nid = item.latchedNodes[k];
+              const base = activeTetherCount * 6;
+              tetArr[base]     = posX[nid]; tetArr[base + 1] = posY[nid]; tetArr[base + 2] = posZ[nid];
+              tetArr[base + 3] = item.x;    tetArr[base + 4] = item.y;    tetArr[base + 5] = item.z;
+              activeTetherCount++;
+            }
+          }
+        }
+        tetherGeo.setDrawRange(0, activeTetherCount * 2);
+        if (simConfig.showCaptureVectors) tetherGeo.attributes.position.needsUpdate = true;
+
+        const nextState = activeHazardCount > 0 || simConfig.contaminantFlash > 0.2
+          ? 'FAULT'
+          : (simConfig.spiritSurgeTimer > 0 ? 'SPIRIT' : (heldItemsCount > 0 ? 'SAVED' : (brushingCount > 0 ? 'BRUSH' : (simConfig.autoHunt ? 'AUTO' : 'GLIDE'))));
+        updateOperationalStateUI(nextState, heldItemsCount, activeHazardCount > 0);
+
+        // 6. Optional Spatial Hash Grid Visualizer
+        gridVisLines.visible = simConfig.showSpatialGrid;
+        if (simConfig.showSpatialGrid) {
+          const edgeBase = edgesGeo.attributes.position.array;
+          const gArr = gridVisGeo.attributes.position.array;
+          let boxCount = 0;
+          spatialBuckets.forEach((b) => {
+            if (boxCount >= MAX_GRID_BOXES || b.nodes.length < 2) return;
+            const wx = (b.cx + 0.5) * CELL_SIZE;
+            const wy = (b.cy + 0.5) * CELL_SIZE;
+            const wz = (b.cz + 0.5) * CELL_SIZE;
+            const offset = boxCount * 72;
+            for (let e = 0; e < 72; e += 3) {
+              gArr[offset + e]     = edgeBase[e] + wx;
+              gArr[offset + e + 1] = edgeBase[e + 1] + wy;
+              gArr[offset + e + 2] = edgeBase[e + 2] + wz;
+            }
+            boxCount++;
+          });
+          gridVisGeo.setDrawRange(0, boxCount * 24);
+          gridVisGeo.attributes.position.needsUpdate = true;
+        }
+
+        jellyLight.position.set(posX[manubriumNode], posY[manubriumNode], posZ[manubriumNode]);
+        targetBeacon.position.set(targetPos.x, targetPos.y, -2.5);
+        targetBeacon.lookAt(camera.position);
+
+        return { activeTetherCount, heldItemsCount };
+      }
+
+      // =========================================================================
+      // 13. UI CONTROLS & SHEET BINDINGS
+      // =========================================================================
+      function applySpeciesPreset(key) {
+        wakeHUD();
+        currentPreset = PRESETS[key];
+        bellUniforms.uCoreColor.value.copy(currentPreset.coreColor);
+        bellUniforms.uRimColor.value.copy(currentPreset.rimColor);
+        bellUniforms.uPulseColor.value.copy(currentPreset.pulseColor);
+        bellUniforms.uEyeColor.value.copy(currentPreset.eyeColor);
+        bellUniforms.uFogColor.value.setHex(currentPreset.fogColor);
+        scene.background.setHex(currentPreset.fogColor);
+        scene.fog.color.setHex(currentPreset.fogColor);
+        jellyLight.color.copy(currentPreset.pulseColor);
+        document.getElementById('species-tag').textContent = currentPreset.name;
+
+        ['aurelia', 'chrysaora', 'medusae', 'abyssal'].forEach((k) => {
+          const btn = document.getElementById('preset-' + k);
+          if (btn) btn.classList.toggle('active-toggle', k === key);
+        });
+      }
+
+      document.getElementById('preset-aurelia').addEventListener('click', () => applySpeciesPreset('aurelia'));
+      document.getElementById('preset-chrysaora').addEventListener('click', () => applySpeciesPreset('chrysaora'));
+      document.getElementById('preset-medusae').addEventListener('click', () => applySpeciesPreset('medusae'));
+      document.getElementById('preset-abyssal').addEventListener('click', () => applySpeciesPreset('abyssal'));
+
+      function bindToggle(btnId, propKey) {
+        const btn = document.getElementById(btnId);
+        btn.addEventListener('click', () => {
+          wakeHUD();
+          simConfig[propKey] = !simConfig[propKey];
+          btn.classList.toggle('active-toggle', simConfig[propKey]);
+          const span = btn.querySelector('.state-ind');
+          if (span) {
+            span.textContent = simConfig[propKey] ? 'ON' : 'OFF';
+            span.className = simConfig[propKey] ? 'state-ind text-amber-300' : 'state-ind text-slate-500';
+          }
+          if (propKey === 'showSDF') tubeEnvGroup.visible = simConfig.showSDF;
+        });
+      }
+
+      bindToggle('toggle-verlet-net', 'showVerletNet');
+      bindToggle('toggle-sdf-field', 'showSDF');
+      bindToggle('toggle-spatial-grid', 'showSpatialGrid');
+      bindToggle('toggle-capture-vectors', 'showCaptureVectors');
+
+      document.getElementById('btn-spawn-prey').addEventListener('click', () => {
+        wakeHUD();
+        const nextF = ARCHIVE_FILMS[(nextCatalogFilmIdx++) % ARCHIVE_FILMS.length];
+        saveClipAndGrowTimeworm(nextF, true);
+      });
+      document.getElementById('btn-grapple-surge').addEventListener('click', () => { wakeHUD(); triggerWhipTimeworms(); });
+      document.getElementById('btn-digest-now').addEventListener('click', () => { wakeHUD(); digestHeldItemsNow(); });
+      document.getElementById('btn-release-items').addEventListener('click', () => { wakeHUD(); releaseAllCapturedItems(); });
+      document.getElementById('btn-shockwave').addEventListener('click', () => { wakeHUD(); triggerEmpPurge(); });
+      document.getElementById('btn-jet-pulse').addEventListener('click', () => { wakeHUD(); triggerSpiritSurge(); });
+
+      document.getElementById('btn-reset-sim').addEventListener('click', () => {
+        wakeHUD();
+        releaseAllCapturedItems();
+        buildSentinelJellyTopology(0, 0, 0);
+        targetPos.set(0, 0, -1.2);
+        simConfig.integrity = 100;
+        simConfig.contaminantFlash = 0;
+        showEphemeralToast('RESTORED TO 6 CORE TIMEWORMS', 'RECOVERY');
+      });
+
+      document.getElementById('btn-autopilot').addEventListener('click', () => {
+        wakeHUD();
+        simConfig.autoHunt = !simConfig.autoHunt;
+        const st = document.getElementById('autopilot-state');
+        st.textContent = simConfig.autoHunt ? 'ON' : 'OFF';
+        st.className = simConfig.autoHunt ? 'text-amber-300 font-medium' : 'text-slate-400';
+        document.getElementById('btn-autopilot').classList.toggle('active-toggle', simConfig.autoHunt);
+        showEphemeralToast(simConfig.autoHunt ? 'AUTO-GLIDE · HARVESTING SEWER CLIPS & EVADING CONTAMINANTS' : 'DIRECT 1:1 POINTER STEERING', simConfig.autoHunt ? 'AUTO' : 'GLIDE');
+      });
+
+      document.getElementById('btn-camera-mode').addEventListener('click', () => {
+        wakeHUD();
+        const modes = ['chase', 'side', 'spirit'];
+        const labels = { chase: 'CHASE', side: 'SIDE', spirit: 'SPIRIT' };
+        const idx = (modes.indexOf(simConfig.cameraMode) + 1) % modes.length;
+        simConfig.cameraMode = modes[idx];
+        document.getElementById('camera-mode-label').textContent = labels[simConfig.cameraMode];
+        showEphemeralToast('CAMERA: ' + labels[simConfig.cameraMode], 'GLIDE');
+      });
+
+      document.getElementById('btn-audio-toggle').addEventListener('click', () => {
+        wakeHUD();
+        const isPlaying = SoundEngine.toggle();
+        document.getElementById('audio-label').textContent = isPlaying ? 'SOUND' : 'MUTE';
+        document.getElementById('btn-audio-toggle').classList.toggle('active-toggle', isPlaying);
+      });
+
+      const filmSheet = document.getElementById('film-archive-sheet');
+      const btnModeShape = document.getElementById('btn-mode-shape');
+      function toggleFilmSheet(force) {
+        const show = force !== undefined ? force : filmSheet.classList.contains('hidden');
+        filmSheet.classList.toggle('hidden', !show);
+        btnModeShape.classList.toggle('active-toggle', show);
+        if (show) populateFilmArchiveGrid(document.getElementById('film-search-input').value);
+        wakeHUD();
+      }
+      btnModeShape.addEventListener('click', () => toggleFilmSheet());
+      document.getElementById('btn-close-films').addEventListener('click', () => toggleFilmSheet(false));
+
+      const modal = document.getElementById('lineage-modal');
+      document.getElementById('btn-lineage-modal').addEventListener('click', () => {
+        wakeHUD();
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      });
+      document.getElementById('btn-close-modal').addEventListener('click', () => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      });
+
+      const controlPanel = document.getElementById('control-panel');
+      let panelOpen = false;
+      function setPanelOpen(open) {
+        panelOpen = open;
+        if (open) {
+          controlPanel.classList.remove('translate-y-full', 'sm:translate-x-[120%]');
+          controlPanel.classList.add('translate-y-0', 'sm:translate-x-0');
+        } else {
+          controlPanel.classList.add('translate-y-full', 'sm:translate-x-[120%]');
+          controlPanel.classList.remove('translate-y-0', 'sm:translate-x-0');
+        }
+        document.getElementById('panel-toggle-label').textContent = open ? 'CLOSE' : 'TUNE';
+        document.getElementById('btn-toggle-panel').classList.toggle('active-toggle', open);
+        wakeHUD();
+      }
+
+      document.getElementById('btn-toggle-panel').addEventListener('click', () => setPanelOpen(!panelOpen));
+      document.getElementById('btn-close-panel').addEventListener('click', () => setPanelOpen(false));
+
+      document.getElementById('slider-pulse-freq').addEventListener('input', (e) => {
+        simConfig.pulseFreq = parseFloat(e.target.value);
+        document.getElementById('val-pulse-freq').textContent = simConfig.pulseFreq.toFixed(2) + 'x';
+      });
+      document.getElementById('slider-solver-iters').addEventListener('input', (e) => {
+        simConfig.solverIterations = parseInt(e.target.value, 10);
+        document.getElementById('val-solver-iters').textContent = simConfig.solverIterations;
+      });
+      document.getElementById('slider-grapple-pull').addEventListener('input', (e) => {
+        simConfig.grappleStrength = parseFloat(e.target.value);
+        document.getElementById('val-grapple-pull').textContent = simConfig.grappleStrength.toFixed(1) + 'x';
+      });
+      document.getElementById('slider-sdf-margin').addEventListener('input', (e) => {
+        simConfig.fogDensityMult = parseFloat(e.target.value);
+        const d = 0.028 * simConfig.fogDensityMult;
+        scene.fog.density = d;
+        bellUniforms.uFogDensity.value = d;
+        document.getElementById('val-sdf-margin').textContent = simConfig.fogDensityMult.toFixed(1) + 'x';
+      });
+
+      function updateEntityCountUI() {
+        const el = document.getElementById('prey-count-label');
+        if (el) el.textContent = streamEntities.length;
+      }
+
+      // =========================================================================
+      // 14. MAIN ANIMATION & CINEMATIC CAMERA LOOP
+      // =========================================================================
+      let lastFrameTime = performance.now();
+      let fpsFrames = 0;
+      let fpsClock = performance.now();
+
+      function animate(now) {
+        requestAnimationFrame(animate);
+        const rawDt = Math.min(0.033, (now - lastFrameTime) / 1000);
+        lastFrameTime = now;
+
+        const stepInfo = stepVerletPhysics(rawDt);
+        const stats = updateMeshesAndVisualizers(stepInfo);
+
+        const jx = posX[manubriumNode];
+        const jy = posY[manubriumNode];
+        const jz = posZ[manubriumNode];
+
+        if (simConfig.cameraMode === 'chase') {
+          // Cinematic Chase Camera: right behind the trailing Timeworms looking forward down the foggy sewer pipe!
+          const camX = jx * 0.58 + Math.sin(simTime * 0.25) * 0.6;
+          const camY = jy * 0.58 + 1.35;
+          const camZ = 8.4;
+          camera.position.x += (camX - camera.position.x) * 0.08;
+          camera.position.y += (camY - camera.position.y) * 0.08;
+          camera.position.z += (camZ - camera.position.z) * 0.08;
+          camera.lookAt(jx * 0.75, jy * 0.75, -14.0);
+        } else if (simConfig.cameraMode === 'side') {
+          // Sentinel Profile Glide (matches 1000068973.png & 1000068985.png!)
+          const camX = jx + 7.6;
+          const camY = jy + 0.55;
+          const camZ = jz + 2.2;
+          camera.position.x += (camX - camera.position.x) * 0.07;
+          camera.position.y += (camY - camera.position.y) * 0.07;
+          camera.position.z += (camZ - camera.position.z) * 0.07;
+          camera.lookAt(jx, jy - 0.15, jz + 1.2);
+        } else {
+          // Spirit X-Ray Close-Up (inside the golden particle cloud and Timeworm reels!)
+          const camX = jx + Math.sin(simTime * 0.4) * 2.2;
+          const camY = jy + 0.4;
+          const camZ = 4.6;
+          camera.position.x += (camX - camera.position.x) * 0.08;
+          camera.position.y += (camY - camera.position.y) * 0.08;
+          camera.position.z += (camZ - camera.position.z) * 0.08;
+          camera.lookAt(jx, jy, -8.0);
+        }
+
+        fpsFrames++;
+        if (now - fpsClock >= 250) {
+          const fps = Math.round((fpsFrames * 1000) / (now - fpsClock));
+          fpsFrames = 0;
+          fpsClock = now;
+
+          document.getElementById('stat-fps').textContent = fps;
+          const projFpsEl = document.getElementById('stat-proj-fps');
+          if (projFpsEl) projFpsEl.textContent = Math.round(simConfig.swimSpeedRatio * 24) + 'fps';
+          document.getElementById('stat-nodes').textContent = (nodeCount + streamEntities.length).toLocaleString();
+          document.getElementById('stat-constraints').textContent = (constraintsA.length + stats.activeTetherCount).toLocaleString();
+          document.getElementById('stat-checks').textContent = spatialChecksPerFrame.toLocaleString();
+          const naiveChecks = (nodeCount + streamEntities.length) * (nodeCount + streamEntities.length);
+          const savedPct = Math.max(0, Math.min(99.9, (1 - spatialChecksPerFrame / naiveChecks) * 100));
+          document.getElementById('stat-naive-saved').textContent = '(-' + savedPct.toFixed(1) + '%)';
+          document.getElementById('stat-captured').textContent = simConfig.capturedTotal;
+          document.getElementById('stat-pixels').textContent = simConfig.pixelsCollected.toLocaleString();
+          document.getElementById('stat-latched').textContent = stats.heldItemsCount;
+          document.getElementById('stat-active-tethers').textContent = stats.activeTetherCount;
+
+          const pct = Math.round(simConfig.integrity);
+          document.getElementById('stat-energy-pct').textContent = pct + '%';
+          const bar = document.getElementById('energy-bar-fill');
+          bar.style.width = pct + '%';
+          bar.className = pct < 50
+            ? 'h-full bg-rose-500 transition-all duration-200'
+            : 'h-full bg-amber-400 transition-all duration-200';
+
+          const sdfEl = document.getElementById('stat-sdf-dist');
+          if (sdfEl) sdfEl.textContent = Math.round(stepInfo.nearestClipZ) + 'm';
+        }
+
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener('resize', () => {
+        const w = container.clientWidth;
+        const h = container.clientHeight;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      });
+
+      window.__bonus = {THREE, scene, camera, renderer, streamEntities};   // contaminant-jelly: real footage, song and sound (bonus.js)
+      requestAnimationFrame(animate);
+    });
+  </script>
+<script src="bonus.js" data-song="nightbus-06" data-mode="entities"></script>
+</body>
+</html>
