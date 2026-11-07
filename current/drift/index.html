@@ -31,6 +31,7 @@ body.game{overflow:hidden;touch-action:none;overscroll-behavior:none;-webkit-use
 .card{display:block;text-decoration:none;color:var(--ink);border-radius:14px;overflow:hidden;background:#0c1413;transition:transform .2s}.card:hover{transform:translateY(-3px)}
 .card .im{aspect-ratio:16/9;background-size:cover;background-position:center;filter:saturate(.8);-webkit-mask-image:radial-gradient(ellipse at 50% 50%,#000 55%,transparent 100%);mask-image:radial-gradient(ellipse at 50% 50%,#000 55%,transparent 100%)}
 .card .tx{padding:10px 14px 16px}.card b{font:800 18px system-ui;letter-spacing:.04em}.card small{display:block;font:600 10px system-ui;letter-spacing:.2em;color:var(--gold);margin:4px 0 6px}.card span{font:italic 13px/1.45 Georgia,serif;color:var(--dim)}
+@media (max-width:640px){#hud{flex-direction:column;gap:2px}#song{font-size:11px;opacity:.75}#say{top:calc(max(12px,env(safe-area-inset-top)) + 64px);font-size:15px}#tag{white-space:normal;max-width:78vw;text-align:center}}
 </style>
 <script type="importmap">{"imports":{"three":"../../paeleo/scion/videotext/vendor/three.module.min.js","three/addons/":"../../paeleo/scion/videotext/vendor/addons/"}}</script>
 </head>

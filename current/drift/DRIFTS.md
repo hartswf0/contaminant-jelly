@@ -140,3 +140,38 @@ Measured (headless, software GL):
 **Not verified:**
 - the distant audio and the music on a real device (github.io is blocked here);
 - a bot test of holding on a sign film to watch it. It is flaky because it depends on where the camera lands.
+
+## Seeing the films: screens
+**The problem.** The user asked: "In all the videos generated see how the videos become clear? The last one we had with clear playing videos was v2 … the videos never get watched as videos in almost all of our work."
+
+**The cause.** Since v4, every film has been drawn as flecks from a 128×96 slot, which is 8 frames in a shared atlas. The sources are much sharper:
+- secondhand-motion frames are 384×288;
+- cineosis strips are 8 frames of about 240×136;
+- cineosis clips are 320–640 px video.
+
+The splats threw most of that away. Pulling a film forward only made the blur bigger.
+
+**The design videos (`fal/design_v*`) do something else.** The footage is projected into the water:
+- one continuous, sharp picture;
+- an oval edge that dissolves into the haze;
+- darks gone transparent;
+- tinted toward the water's colour;
+- behind and beside the jelly, never in front of it.
+
+v2 was legible for the same reason: real image planes.
+
+**The rule now.** When a jelly-film comes clear, its real footage takes over as a **screen**: a soft-edged picture in the water, where the film already is.
+- A film comes clear by passing near it, a glimpse, a pulse, a speck of light, or holding on it.
+- Up to three screens show at once.
+- **Edges:** an oval mask broken by moving noise, so the picture condenses out of the flecks. The fleck cloud fades by about 85% under it, and a few flecks still sparkle on top.
+- **Tone:** brightness is mapped from the water's colour toward light, so dark areas sink into the water. Colour films keep half their colour; black-and-white films stay toned.
+- **What plays:**
+  - secondhand-motion films play their real frames;
+  - cineosis strips crossfade slowly through their 8 frames, like a living photograph;
+  - shots with a clip play the clip. It is the same video element that carries the film's distant sound, so picture and sound stay together.
+- **Holding** opens the screen to about 60% of the view, in place, and the camera centres it. The film plays at its own speed even where the water slows.
+
+**Measured (headless):**
+- a 640-px clip plays in a screen (readyState 4);
+- strip, frame and clip screens all render (snowy cars, a giraffe, Market Street in 1906);
+- the phone HUD no longer overlaps, and film labels stay on screen.

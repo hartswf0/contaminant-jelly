@@ -294,7 +294,7 @@ export async function play(L, ALL) {
     retG.attributes.position.needsUpdate = true; retMat.uniforms.uA.value = .4 + .6 * k; retMat.uniforms.uK.value = ready ? 1 : 0;
     const f = FILMS[best.film], fi = best.doodle ? best.key || 0 : best.from + Math.floor(T * fps(f)) % BLOCK; _a.copy(best.pos).addScaledVector(uU.value, rad * .9).project(camera);
     tag.innerHTML = `<b style="font:600 10px system-ui;letter-spacing:.16em;color:var(--gold);display:block;text-align:center">${ready ? (L.fluid ? 'SWIM THROUGH' : 'TAP TO TAKE') : 'RESOLVING'}${f.sign ? ' · ' + f.sign.sym : ''}</b>${f.title}${best.doodle && f.film ? ' · from ' + f.film : ''} · ${stamp(best.film, fi)}`;
-    tag.style.left = `${(_a.x * .5 + .5) * innerWidth}px`; tag.style.top = `${(-_a.y * .5 + .5) * innerHeight}px`; tag.style.opacity = _a.z < 1 ? .92 : 0; }
+    { const hw = Math.min(innerWidth / 2 - 8, (tag.offsetWidth || 0) / 2 + 8); tag.style.left = `${THREE.MathUtils.clamp((_a.x * .5 + .5) * innerWidth, hw, innerWidth - hw)}px`; } tag.style.top = `${(-_a.y * .5 + .5) * innerHeight}px`; tag.style.opacity = _a.z < 1 ? .92 : 0; }
   // ------------------------------------------------ input: gestures only
   const G = {colored: 0, state: 'card', t0: 0, wake: 0, watched: new Map(), watchDone: 0, pairs: new Map(), pairsDone: 0, halo: 0, unearth: 0, orderN: 0, pulses: 0, look: [0, 0], zoom: 1, hold: null, watch: null, lastTap: 0, endT: 0};
   const touches = new Map(); let pinch = null;
@@ -343,7 +343,7 @@ export async function play(L, ALL) {
     speed(v) { if (this.bedLP) this.bedLP.frequency.setTargetAtTime(200 + v * 70, this.ac.currentTime, .4); },
     // a jelly-film's own sound, heard from far off through the water: muffled, reverberant, panned to where it is
     filmAudio(s) { if (!this.ac) return; const ac = this.ac, f = s && s.pos && FILMS[s.film]; const want = f && f.clip ? f.clip : null;
-      if (!this.fa) { const el = new Audio(); el.crossOrigin = 'anonymous'; el.loop = true; const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 600; const g = ac.createGain(); g.gain.value = 0; const pan = ac.createStereoPanner ? ac.createStereoPanner() : ac.createGain();
+      if (!this.fa) { const el = document.createElement('video'); el.playsInline = true; el.setAttribute('playsinline', ''); el.crossOrigin = 'anonymous'; el.loop = true; const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 600; const g = ac.createGain(); g.gain.value = 0; const pan = ac.createStereoPanner ? ac.createStereoPanner() : ac.createGain();
         try { ac.createMediaElementSource(el).connect(lp).connect(g).connect(pan).connect(this.out); g.connect(this.wet); } catch (e) {} this.fa = {el, lp, g, pan, src: null}; }
       const A = this.fa, t = ac.currentTime;
       if (want && A.src !== want) { A.src = want; A.el.src = want; A.el.play().catch(() => {}); }
@@ -392,6 +392,49 @@ export async function play(L, ALL) {
   const lightR = () => L.dark ? THREE.MathUtils.lerp(12, 5, prog()) : 99;
   const prog = () => THREE.MathUtils.clamp(J.u / LEN, 0, 1);
   let T = 0, RT = 0, last = performance.now();
+  // ------------------------------------------------ screens: a jelly-film that comes clear shows its real footage (384×288 frames, 320×240 clips, not the 128×96 fleck slot),
+  // projected into the water like the design videos: soft oval edges that dissolve into the haze, darks gone transparent, tinted toward the water, flecks still sparkling over it
+  const NSC = 3, scrGeo = new THREE.PlaneGeometry(1, 1), SCR = [];
+  const scrFS = `uniform sampler2D map; uniform float uA, uT, uSat, uAsp; uniform vec3 uWater; varying vec2 vU;
+    float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+    float n(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3. - 2. * f); return mix(mix(h(i), h(i + vec2(1., 0.)), f.x), mix(h(i + vec2(0., 1.)), h(i + vec2(1., 1.)), f.x), f.y); }
+    void main(){ vec2 q = (vU - .5) * 2.; float r = length(q); float nn = n(vU * vec2(uAsp, 1.) * 4. + uT * .12) * .6 + n(vU * 21. - uT * .25) * .4;
+      float edge = (1. - smoothstep(.2 + .58 * uA, .99, r + (nn - .5) * .5 * (1.2 - uA))) * (1. - smoothstep(.8, .99, abs(q.x))) * (1. - smoothstep(.8, .99, abs(q.y)));
+      vec3 c = texture2D(map, vU).rgb; float l = dot(c, vec3(.299, .587, .114));
+      vec3 proj = mix(uWater * .4, mix(uWater, vec3(1.), .62), pow(smoothstep(.03, .95, l), 1.15)); vec3 col = mix(proj, c * .9, uSat) + (h(vU * 517. + fract(uT)) - .5) * .05;
+      gl_FragColor = vec4(col, edge * uA * (.5 + .5 * smoothstep(.0, .55, l))); }`;
+  for (let i = 0; i < NSC; i++) { const cv = document.createElement('canvas'); cv.width = 384; cv.height = 288; const tex = new THREE.CanvasTexture(cv); tex.minFilter = THREE.LinearFilter; tex.generateMipmaps = false;
+    const mat = new THREE.ShaderMaterial({transparent: true, depthWrite: false, fog: false, uniforms: {map: {value: tex}, uA: {value: 0}, uT: {value: 0}, uSat: {value: .5}, uAsp: {value: 1.33}, uWater: {value: new THREE.Color()}},
+      vertexShader: `varying vec2 vU; void main(){ vU = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`, fragmentShader: scrFS});
+    const m = new THREE.Mesh(scrGeo, mat); m.visible = false; m.frustumCulled = false; m.renderOrder = 5; scene.add(m); SCR.push({m, mat, cv, g: cv.getContext('2d'), tex, s: null, a: 0, want: 0, vid: null, vsrc: null}); }
+  const scrA = s => { const S = SCR.find(S => S.s === s); return S ? S.a : 0; };
+  const scrVid = url => { const v = document.createElement('video'); v.crossOrigin = 'anonymous'; v.muted = true; v.loop = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto'; v.src = url; v.play().catch(() => {}); return v; };
+  function scrSource(S, f, s, clock) {   // [image, sx, sy, sw, sh, crossfade-next-or-null, mix]
+    if (f.clip) { const A = AU.fa; let v = A && A.src === f.clip && A.el.readyState >= 2 && A.el.videoWidth ? A.el : null;   // the same element that plays its distant sound, so picture and sound agree
+      if (!v) { if (S.vsrc !== f.clip) { if (S.vid) { S.vid.pause(); S.vid.removeAttribute('src'); S.vid.load(); } S.vid = scrVid(f.clip); S.vsrc = f.clip; } else if (S.vid.paused) S.vid.play().catch(() => {}); if (S.vid.readyState >= 2 && S.vid.videoWidth) v = S.vid; }
+      if (v) return [v, 0, 0, v.videoWidth, v.videoHeight, null, 0]; }
+    if (f.kind === 'sm') { const i = (s.from || 0) + Math.floor(clock * fps(f)) % BLOCK; for (let k = 0; k < 3; k++) withImg(frameURL(f, i + k), () => {}); let e = IMG.get(frameURL(f, i));
+      if (!(e && e.ok)) e = S.lastE; if (!(e && e.ok)) return null; S.lastE = e; return [e.im, 0, 0, e.im.width, e.im.height, null, 0]; }
+    if (f.kind === 'strip' || f.kind === 'thumb') { const e = IMG.get(f.url); if (!e) withImg(f.url, () => {}); if (!e || !e.ok) return null; const im = e.im;
+      if (f.kind === 'strip') { const ph = clock * 1.6, k = Math.floor(ph) % 8, w = im.width / 8, x = ph % 1; return [im, k * w, 0, w, im.height, [((k + 1) % 8) * w, 0], Math.max(0, (x - .55) / .45)]; }   // eight frames of the shot, crossfaded: a slow living photograph
+      const z = 1 - .05 * (.5 + .5 * Math.sin(clock * .2)); return [im, im.width * (1 - z) / 2, im.height * (1 - z) / 2, im.width * z, im.height * z, null, 0]; }
+    return null; }
+  const _sv = new THREE.Vector3();
+  function stepScreens(real) {
+    const cand = [], W0 = G.watch && G.watch.s; if (W0 && W0.pos && W0.film !== undefined && FILMS[W0.film] && FILMS[W0.film].kind !== 'doodle') cand.push([W0, 1]);
+    for (const s of SP) if (s.slot >= 0 && !s.bad && !s.doodle && !s.gone && s.pos && (s.clear || 0) > .18 && visible(s) && s !== W0) cand.push([s, Math.min(1, s.clear * 1.15)]);
+    cand.sort((a, b) => b[1] - a[1]); const top = G.state === 'end' ? [] : cand.slice(0, NSC);
+    for (const S of SCR) { const c = top.find(x => x[0] === S.s); S.want = c ? c[1] : 0; }
+    for (const [s, k] of top) if (!SCR.some(S => S.s === s)) { const S = SCR.filter(S => !S.s || S.a < .03).sort((a, b) => a.a - b.a)[0]; if (S) { S.s = s; S.a = 0; S.want = k; S.lastE = null; } }
+    for (const S of SCR) { S.a += (S.want - S.a) * Math.min(1, real * (S.want > S.a ? 1.8 : 2.6));
+      if (!S.s || S.a < .01) { S.m.visible = false; if (S.want === 0 && S.s) { S.s = null; if (S.vid) S.vid.pause(); } continue; }
+      const s = S.s, f = FILMS[s.film], watching = G.watch && G.watch.s === s, src = f && scrSource(S, f, s, watching ? RT - G.watch.t0 + (s.i || 0) : T + (s.i || 0) * 1.7); if (!src) { S.m.visible = false; continue; }
+      const [im, sx, sy, sw, sh, nx, mx] = src, asp = sw / sh, cw = Math.min(480, Math.round(sw)), ch = Math.max(2, Math.round(cw / asp)); if (S.cv.width !== cw || S.cv.height !== ch) { S.cv.width = cw; S.cv.height = ch; }
+      S.g.globalAlpha = 1; S.g.drawImage(im, sx, sy, sw, sh, 0, 0, cw, ch); if (nx && mx > 0) { S.g.globalAlpha = mx; S.g.drawImage(im, nx[0], nx[1], sw, sh, 0, 0, cw, ch); } S.tex.needsUpdate = true;
+      const at = (s.p || s.pos), wu = watching ? Math.min(1, (RT - G.watch.t0) / .6) : 0, base = s.size * (1.05 + .25 * S.a); camera.getWorldDirection(_sv); const vw0 = 2 * Math.tan(camera.fov * Math.PI / 360) * Math.max(1, _sv.dot(_a.copy(at).sub(camera.position))) * camera.aspect, wd = watching ? THREE.MathUtils.lerp(base, Math.max(base * 1.6, Math.min(vw0 * .62, vw0 * .62 / camera.aspect * asp * .9)), wu * wu * (3 - 2 * wu)) : base;   // held: it opens to most of the view, where it is
+      S.m.position.copy(at).addScaledVector(_sv, .15); S.m.quaternion.copy(camera.quaternion); S.m.scale.set(wd, wd / asp, 1);
+      const d = S.m.position.distanceTo(camera.position), fogK = Math.exp(-Math.pow(scene.fog.density * d, 2));
+      const U = S.mat.uniforms; U.uA.value = Math.min(1, S.a) * (.35 + .65 * fogK) * (watching ? 1 : .9); U.uT.value = RT; U.uAsp.value = asp; U.uSat.value = f.bw ? .08 : .5; U.uWater.value.copy(scene.fog.color).lerp(new THREE.Color(1, 1, 1), .12); S.m.visible = true; } }
   function frame(now) { requestAnimationFrame(frame); const real = Math.max(0, Math.min(.05, (now - last) / 1000)); /* the first rAF stamp can precede setup */ last = now; RT += real; const ws = G.watch && !L.fluid ? .12 : 1, dt = real * ws; T += dt;
     const playing = G.state === 'play';
     // swimmer: hold the water and it swims toward your finger; let go and it drifts with the current
@@ -415,7 +458,7 @@ export async function play(L, ALL) {
     stepArms(Math.max(dt, 1e-4));
     // camera: trailing from the side, small jelly, look-ahead with the current; two fingers look around
     camera.fov += (50 + 12 * J.boost - camera.fov) * Math.min(1, real * 3); camera.updateProjectionMatrix(); const vis = 2 * Math.tan(THREE.MathUtils.degToRad(50 / 2)) * Math.min(1, camera.aspect), d = THREE.MathUtils.clamp(2 * .92 * CS / (.12 * G.zoom * vis), 7, 26) * (G.state === 'end' ? 1.25 : 1) * (1 + .15 * J.boost);
-    const look = W(J.u + 3.5 + J.vu * .45 + G.look[0], J.w * .75 + J.vw * .3 + G.look[1], 0); if (G.watch && G.watch.s.pos) look.lerp(G.watch.s.pos.clone().setZ(0), .55 * Math.min(1, (RT - G.watch.t0) * 2)); const lookZ = G.watch ? .75 : 1, camT = look.clone().add(new THREE.Vector3(0, DIR === 'right' ? 1.2 : 0, d * lookZ)); camera.position.lerp(camT, 1 - Math.pow(.004, real));   // the camera leads with your speed camera.lookAt(look.x, look.y, 0); camera.updateMatrixWorld();
+    const look = W(J.u + 3.5 + J.vu * .45 + G.look[0], J.w * .75 + J.vw * .3 + G.look[1], 0); if (G.watch && G.watch.s.pos) look.lerp((G.watch.s.p || G.watch.s.pos).clone().setZ(0), .88 * Math.min(1, (RT - G.watch.t0) * 2)); const lookZ = G.watch ? .75 : 1, camT = look.clone().add(new THREE.Vector3(0, DIR === 'right' ? 1.2 : 0, d * lookZ)); camera.position.lerp(camT, 1 - Math.pow(.004, real));   // the camera leads with your speed camera.lookAt(look.x, look.y, 0); camera.updateMatrixWorld();
     uR.value.setFromMatrixColumn(camera.matrixWorld, 0); uU.value.setFromMatrixColumn(camera.matrixWorld, 1); uF.value.setFromMatrixColumn(camera.matrixWorld, 2);
     // water colour toward the surface or the void
     const k = L.surface ? sm(.55, 1, prog()) : L.top ? prog() : 0; scene.fog.color.copy(FOG).lerp(TOP, k); if (L.hueWater) { const nr = SP.reduce((m, x) => !m || Math.abs(x.u - J.u) < Math.abs(m.u - J.u) ? x : m, null); if (nr) { G.hw = G.hw ?? nr.film; const hc = new THREE.Color().setHSL(FILMS[nr.film].hue / 360, .32, .14); scene.fog.color.lerp(hc, .85); } } { const hx = scene.fog.color.getHexString(); if (hx !== bgLast) { bgLast = hx; paintBG(scene.fog.color); } } scene.fog.density = L.fogD * (1 - .35 * k) * (L.dark ? 1 + 1.2 * prog() : 1);
@@ -434,21 +477,22 @@ export async function play(L, ALL) {
       if (L.fluid && playing && !s.bad && s.budget > 0 && res > .55 && dist < s.size * .45 + 1.1 && Math.abs(s.z) < 1 && RT - (s.lastCap ?? -9) > 2.2 && !G.watch) { s.lastCap = RT; capture(s); }   // fluid: swim through it to take the frame
       if (s.bad && playing && dist < s.size * .6 + .6 && Math.abs(s.z) < 1) { J.mem = Math.max(0, J.mem - 10); J.hurt = 1; flash(); say('red interference: your membrane tears; nothing is lost'); buzz([20, 20, 40]); G.burst = RT; s.bad = false; s.budget = 0; s.gone = true; }
       if (s.gone) { hide(r); continue; }
-      const lightR = J.lightT > 0 ? 9 : 4.5, gl = s.glimpse ? Math.max(0, 1 - Math.abs(RT - s.glimpse - .8) / .8) : 0, clear = s.bad ? 0 : Math.max(gl, s.lit > RT - 6 ? Math.min(1, (6 - (RT - s.lit)) / 2) : 0, Math.max(0, 1 - dist / lightR) * .85, G.watch && G.watch.s === s ? 1 : 0); s.clear = clear; if (clear > .35 && visible(s) && (!LIT || clear - dist * .02 > LIT.clear - LIT.d * .02)) { LIT = s; LIT.d = dist; }   // light shines on a cloud and it becomes readable video
-      row(r, 0, s.pos.x, s.pos.y, s.pos.z, s.size * (1 + .08 * res + .28 * clear)); row(r, 1, s.bad ? -1 : SP_BLOCK.get(s), 1.35, s.sleep && !s.awake ? 0 : T * fps(FILMS[s.film]), (s.bad ? .9 : 1.15) * shown * sleepy * fade * (s.giant ? 1.2 : 1) * (1 + .5 * clear));
+      const lightR = J.lightT > 0 ? 9 : 4.5, gl = s.glimpse ? Math.max(0, 1 - Math.abs(RT - s.glimpse - .8) / .8) : 0, clear = s.bad ? 0 : Math.max(gl, s.lit > RT - 6 ? Math.min(1, (6 - (RT - s.lit)) / 2) : 0, Math.max(0, 1 - dist / lightR) * .85, sm(.45, 1, res) * .6, G.watch && G.watch.s === s ? 1 : 0); s.clear = clear; if (clear > .35 && visible(s) && (!LIT || clear - dist * .02 > LIT.clear - LIT.d * .02)) { LIT = s; LIT.d = dist; }   // light shines on a cloud and it becomes readable video
+      row(r, 0, s.pos.x, s.pos.y, s.pos.z, s.size * (1 + .08 * res + .28 * clear)); row(r, 1, s.bad ? -1 : SP_BLOCK.get(s), 1.35, s.sleep && !s.awake ? 0 : T * fps(FILMS[s.film]), (s.bad ? .9 : 1.15) * shown * sleepy * fade * (s.giant ? 1.2 : 1) * (1 + .5 * clear) * (1 - .85 * scrA(s)));
       row(r, 2, 0, s.bad ? .6 : .7 * (1 - .7 * clear), s.bad ? 1 : 0, 0); row(r, 3, 0, 0, 0, s.awake ? .4 : 0); row(r, 4, s.bad ? 0 : .7 + .6 * res + (s.giant ? .5 : 0) + .7 * clear, 1.8 - .75 * clear, 0, s.bad ? 0 : (1 - res) * .9 * (1 - clear)); }
     if (playing && RT > (G.nextGlimpse ?? 6)) { G.nextGlimpse = RT + 7 + Math.random() * 5; const c = SP.filter(x => x.slot >= 0 && !x.bad && !x.doodle && visible(x) && x.pos && Math.abs(x.u - J.u) < 22); if (c.length) { const g = c[(Math.random() * c.length) | 0]; g.glimpse = RT; AU.tone(1760, .6, .012); } }   // a glimpse: light catches one jelly-film
     AU.filmAudio(LIT || (G.watch && G.watch.s));
+    stepScreens(real);
     // the chain: one film laid out as slices in time
     for (const b of CHAIN.beads) { const r = CHROW + b.j; if (b.taken || Math.abs(b.u - J.u) > 45) { hide(r); continue; } W(b.u, b.w + Math.sin(T * .8 + b.j * .4) * .25, 0, b.p); const nxt = b.j === CHAIN.next;
       row(r, 0, b.p.x, b.p.y, b.p.z, .95); row(r, 1, CHAIN.blocks[b.j >> 3], 1.35, b.j % 8, nxt ? 1.5 : .9); row(r, 2, 0, .4, 0, 0); row(r, 3, 0, 0, 0, nxt ? .5 : 0); row(r, 4, .6, 1.6, 0, .1); }
     // watching: hold on a film and it blooms, large and clear, while the water nearly stops
     if (G.watch) { const s = G.watch.s, u = Math.min(1, (RT - G.watch.t0) / .5), at = (s.p || s.pos).clone();   // seen clearly where it is, in the back, transparent
       const blk = G.watch.blk ?? (s.j !== undefined ? CHAIN.blocks[s.j >> 3] : SP_BLOCK.get(s)), fr = s.j !== undefined ? s.j % 8 : (RT - G.watch.t0) * fps(FILMS[s.film]) % BLOCK;
-      row(VROW, 0, at.x, at.y, at.z + .05, s.size * (1.1 + .5 * u)); row(VROW, 1, blk, 1.4, fr, .95 * u + .2); row(VROW, 2, 0, .45, 0, 0); row(VROW, 3, 0, 0, 0, .25); row(VROW, 4, 1.6, 1.1, 0, 0); }
+      row(VROW, 0, at.x, at.y, at.z + .05, s.size * (1.1 + .5 * u)); row(VROW, 1, blk, 1.4, fr, (.95 * u + .2) * (1 - .88 * scrA(s))); row(VROW, 2, 0, .45, 0, 0); row(VROW, 3, 0, 0, 0, .25); row(VROW, 4, 1.6, 1.1, 0, 0); }
     else if (G.state !== 'end' && LIT && SP_BLOCK.get(LIT) >= 0) { const s = LIT, c = s.clear;   // the lit film takes the fine cloud: 48,000 flecks, enough to read the footage
-      row(VROW, 0, s.pos.x, s.pos.y, s.pos.z + .05, s.size * (1.15 + .25 * c)); row(VROW, 1, SP_BLOCK.get(s), 1.4, T * fps(FILMS[s.film]), .85 * c); row(VROW, 2, 0, .25, 0, 0); row(VROW, 3, 0, 0, 0, .15); row(VROW, 4, 1.5, 1.15, 0, 0);
-      row(FROW + s.slot, 1, SP_BLOCK.get(s), 1.35, T * fps(FILMS[s.film]), 1.15 * (1 - .8 * c)); }
+      row(VROW, 0, s.pos.x, s.pos.y, s.pos.z + .05, s.size * (1.15 + .25 * c)); row(VROW, 1, SP_BLOCK.get(s), 1.4, T * fps(FILMS[s.film]), .85 * c * (1 - .88 * scrA(s))); row(VROW, 2, 0, .25, 0, 0); row(VROW, 3, 0, 0, 0, .15); row(VROW, 4, 1.5, 1.15, 0, 0);
+      row(FROW + s.slot, 1, SP_BLOCK.get(s), 1.35, T * fps(FILMS[s.film]), 1.15 * (1 - .8 * c) * (1 - .85 * scrA(s))); }
     else if (G.state !== 'end') hide(VROW);
     // casting, flecks travelling into the bell, the interference burst
     { const ct = RT - CAST.t, kk = ct < .25 ? ct / .25 : ct < .45 ? 1 : Math.max(0, 1 - (ct - .45) / .3); for (let j = 0; j < NCAST; j++) { const r = CROW + j; if (kk <= 0) { hide(r); continue; } _a.copy(J.p).lerp(CAST.to, (j + 1) / NCAST * kk); row(r, 0, _a.x, _a.y, _a.z, .12); row(r, 1, -1, 1, 0, .9); row(r, 4, 0, 0, 0, 0); } }
@@ -530,6 +574,6 @@ export async function play(L, ALL) {
     const F = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 2).negate(), R = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0), p = camera.position.clone().addScaledVector(F, 6).addScaledVector(R, innerWidth > innerHeight ? 2.2 : 0);
     row(VROW, 0, p.x, p.y, p.z, 2.1); row(VROW, 1, VB(REEL.i), 1.4, (RT - REEL.t0) * fps(FILMS[it.film]) % BLOCK, 1.5); row(VROW, 2, 0, .45, 0, 0); row(VROW, 3, 0, 0, 0, .25); row(VROW, 4, 1.6, 1.1, 0, 0); }
   window.__drift = () => ({state: G.state, u: J.u, w: J.w, len: LEN, goal: goalN(), n: L.goal.n, cut: CUT.length, films: ARMS.length, mem: J.mem, watch: !!G.watch, angler: ANG && ANG.st, spots: SP.length, active: SP.filter(s => s.slot >= 0).length});
-  if (DEBUG) window.__dd = {ANG, FILMS, dlSample, J, G, SP, CHAIN, ARMS, CUT, camera, filmAt, capture, startWatch, endWatch, pulse, THREE, visible};
+  if (DEBUG) window.__dd = {ANG, SCR, FILMS, dlSample, J, G, SP, CHAIN, ARMS, CUT, camera, filmAt, capture, startWatch, endWatch, pulse, THREE, visible};
   requestAnimationFrame(frame);
 }
