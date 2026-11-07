@@ -297,7 +297,7 @@ export async function play(L, ALL) {
     tag.innerHTML = `<b style="font:600 10px system-ui;letter-spacing:.16em;color:var(--gold);display:block;text-align:center">${ready ? (L.fluid ? 'SWIM THROUGH' : 'TAP TO TAKE') : 'RESOLVING'}${f.sign ? ' · ' + f.sign.sym : ''}</b>${f.title}${best.doodle && f.film ? ' · from ' + f.film : ''} · ${stamp(best.film, fi)}`;
     { const hw = Math.min(innerWidth / 2 - 8, (tag.offsetWidth || 0) / 2 + 8); tag.style.left = `${THREE.MathUtils.clamp((_a.x * .5 + .5) * innerWidth, hw, innerWidth - hw)}px`; } tag.style.top = `${(-_a.y * .5 + .5) * innerHeight}px`; tag.style.opacity = _a.z < 1 ? .92 : 0; }
   // ------------------------------------------------ input: gestures only
-  const AUTO = Q.has('auto') || Q.has('trailer') ? {} : null, CINE = cinema(['hud', 'say', 'hint', 'dbg', 'tag', 'card']);   // cinema: no words on screen (H, or a three-finger tap)
+  const TRAILER = Q.has('trailer'), AUTO = Q.has('auto') || TRAILER ? {} : null, CINE = cinema(['hud', 'say', 'hint', 'dbg', 'tag', 'card']);   // cinema: no words on screen (H, or a three-finger tap)
   const G = {colored: 0, state: 'card', t0: 0, wake: 0, watched: new Map(), watchDone: 0, pairs: new Map(), pairsDone: 0, halo: 0, unearth: 0, orderN: 0, pulses: 0, look: [0, 0], zoom: 1, hold: null, watch: null, lastTap: 0, endT: 0};
   const touches = new Map(); let pinch = null;
   const cv = $('gl');
@@ -410,7 +410,7 @@ export async function play(L, ALL) {
     if (BACK.list.length && (BACK.f === undefined || RT > BACK.until)) { BACK.f = BACK.list[(BACK.k = (BACK.k ?? -1) + 1) % BACK.list.length]; BACK.until = RT + 24; }
     if (G.backFilm !== undefined && G.backFilm !== BACK.shown) { BACK.f = G.backFilm; BACK.until = RT + 30; }
     BACK.shown = BACK.f; const bf = BACK.f !== undefined ? FILMS[BACK.f] : null, bsrc = bf && L.back !== false ? srcOf(bf) : null; if (bsrc) bsrc.el = null;   // the back layer plays silently on its own
-    SCN.backdrop(bsrc, (L.dark ? .16 : .3) * (G.state === 'end' ? .5 : 1), RT * .6, scene.fog.color, real, 70); }
+    SCN.backdrop(bsrc, (L.dark ? .14 : .22) * (G.state === 'end' ? .5 : 1), RT * .6, scene.fog.color, real, 70); }
   const BACK = {};
   function frame(now) { requestAnimationFrame(frame); const real = Math.max(0, Math.min(.05, (now - last) / 1000)); /* the first rAF stamp can precede setup */ last = now; RT += real; const ws = G.watch && !L.fluid ? .12 : 1, dt = real * ws; T += dt;
     const playing = G.state === 'play';
@@ -424,7 +424,7 @@ export async function play(L, ALL) {
       const A = AUTO; if (!A.s || RT > A.until || A.s.slot < 0 || A.s.gone || (A.s.pos && toUW(A.s.pos)[0] < J.u - 2)) { A.s = SP.filter(x => x.slot >= 0 && !x.bad && !x.gone && !x.doodle && x.pos && x.u > J.u + 2 && x.u < J.u + 30 && Math.abs(x.z || 0) < 2 && visible(x)).sort((a, b) => (a.u - J.u + Math.abs(a.w - J.w) * .6) - (b.u - J.u + Math.abs(b.w - J.w) * .6))[0] || null; A.until = RT + 6; }
       if (G.watch) { if (RT - G.watch.t0 > A.watchFor) { endWatch(); A.lastW = RT; A.s = null; } }
       else if (A.s) { const [pu, pw] = toUW(A.s.p || A.s.pos); tu = pu - J.u; tw = pw - J.w; const dd = Math.hypot(tu, tw);
-        if (dd < A.s.size * .5 + 1.6 && RT - (A.lastW ?? -99) > 8 && Math.random() < .5) { startWatch(A.s); A.watchFor = 3.5 + Math.random() * 2.5; } else if (dd < A.s.size * .5 + 1.2) { capture(A.s); A.s = null; } }
+        if (dd < A.s.size * .5 + 1.6 && RT - (A.lastW ?? -99) > (TRAILER ? 4.5 : 8) && Math.random() < (TRAILER ? .85 : .5)) { startWatch(A.s); A.watchFor = 3.5 + Math.random() * 2.5; } else if (dd < A.s.size * .5 + 1.2) { capture(A.s); A.s = null; } }
       else { tu = 5; tw = Math.sin(RT * .3) * 3 - J.w * .3; }
       for (const b of SP) if (b.bad && b.pos && b.slot >= 0 && Math.abs(b.u - J.u) < 4 && Math.abs(b.w - J.w) < 2.5) tw += (J.w > b.w ? 4 : -4);
       if (RT - (A.pulse ?? 0) > 9 + Math.random() * 6) { A.pulse = RT; pulse(); } }

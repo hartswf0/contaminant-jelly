@@ -175,3 +175,26 @@ v2 was legible for the same reason: real image planes.
 - a 640-px clip plays in a screen (readyState 4);
 - strip, frame and clip screens all render (snowy cars, a giraffe, Market Street in 1906);
 - the phone HUD no longer overlaps, and film labels stay on screen.
+
+## Clear everywhere, a back layer, and a mode for trailers
+**The user's direction:**
+- "bring the clear screens to v6 and the other versions too"
+- "consider playing in the farthest back layer of the world in the dark water full"
+- "think of each game as needing to be able to contribute to a trailer … a mode with less text and clutter"
+- "clearer more visible videos in each experience where the viewer can't tell what is a generated video and what is a game"
+
+**What changed:**
+- **`current/screens.js`** is shared by the drifts, v4, v5 and v6.
+  - `makeScreens()` gives each version the same projected-footage screens.
+  - `backdrop()` is the farthest layer: one archive film plays full-frame in the dark water behind everything, faint, tinted to the water, with its darks transparent. In the drifts it is the film you last took or watched, otherwise the archive turning over every 24 s. In v4–v6 the archive turns over on its own.
+  - The back layer sits at about 0.22 strength in the open drifts, and lower in dark levels and in the v4–v6 tunnels.
+- **Cinema mode.** Press **H** or tap with three fingers; `?cinema` starts in it.
+  - Every word on the screen goes: HUD, captions, hints, labels, cards and the reticle.
+  - A slight vignette and moving grain are added, so the game reads like the design videos.
+  - It works in the drifts, v4, v5 and v6.
+- **Trailer mode** (`?trailer`, or `?auto` to keep the words). The drift swims itself:
+  - it heads for the films ahead, takes them, holds on most of them to watch them open, pulses now and then and steers round interference;
+  - at the end it moves on to the next drift.
+
+  Gameplay clips for the index were recorded from it frame by frame at 24 fps: `play/<id>.mp4`, 640×360, 5 s.
+- **Fix:** holding the water to swim had stopped working in the drifts. A `//` comment had swallowed that line; it is restored.
