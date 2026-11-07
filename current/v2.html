@@ -45,7 +45,7 @@ import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
-const $ = id => document.getElementById(id), Q = new URLSearchParams(location.search), COARSE = matchMedia('(pointer: coarse)').matches, DEBUG = Q.has('debug');
+const $ = id => document.getElementById(id), Q = new URLSearchParams(location.search), DEMO = Q.has('demo'), COARSE = matchMedia('(pointer: coarse)').matches, DEBUG = Q.has('debug');
 const SM = Q.get('sm') || 'https://hartswf0.github.io/secondhand-motion/';
 let FILMS = await (await fetch('films109.json')).json();
 if (Q.get('films')) { const keep = Q.get('films').split(','); FILMS = FILMS.filter(f => keep.includes(f.slug)); }
@@ -322,7 +322,7 @@ function stepJelly(dt) {
 // ------------------------------------------------------------------ camera: on the far side of the axis, level with the bell, so the wall behind it fills the frame
 let camA = 0;
 function stepCamera(dt) { const r = Math.hypot(J.p.x, J.p.z); if (r > .6) { let a = Math.atan2(J.p.z, J.p.x), d = a - camA; d = Math.atan2(Math.sin(d), Math.cos(d)); camA += d * (1 - Math.pow(.15, dt)); }
-  const rj = Math.max(.6, Math.hypot(J.p.x, J.p.z)), rc = rj - 3.4, cp = new THREE.Vector3(Math.cos(camA) * rc, J.p.y + .45, Math.sin(camA) * rc); camera.position.lerp(cp, 1 - Math.pow(.02, dt)); camera.lookAt(J.p.x, J.p.y - .45, J.p.z);
+  const rj = Math.max(.6, Math.hypot(J.p.x, J.p.z)), rc = rj - (DEMO ? 5.4 : 3.4), cp = new THREE.Vector3(Math.cos(camA) * rc, J.p.y + (DEMO ? .2 : .45), Math.sin(camA) * rc); camera.position.lerp(cp, 1 - Math.pow(DEMO ? .08 : .02, dt)); camera.lookAt(J.p.x, J.p.y + (DEMO ? .55 : -.45), J.p.z);   // ?demo: pulled back, the whole bell and the films around it
   wall.position.y = J.p.y; streaks.position.y = Math.floor(J.p.y / 30) * 30; }
 // ------------------------------------------------------------------ your edit: every frame caught, in the order you caught it, each strip its own track
 function playEdit() {
@@ -367,7 +367,9 @@ addEventListener('pointerup', () => { ptr.down = false; });
 addEventListener('keydown', e => { const k = e.key.toLowerCase(); if (k === ' ') { e.preventDefault(); if (G.state === 'play') pulse(); else if (G.state === 'reel') { G.state = 'play'; $('reel').style.display = 'none'; } } if (k.startsWith('arrow')) e.preventDefault(); keys.add(k); });
 addEventListener('keyup', e => keys.delete(e.key.toLowerCase()));
 $('reel').addEventListener('pointerdown', () => { G.state = 'play'; $('reel').style.display = 'none'; });
-$('go').onclick = begin; $('play').onclick = playEdit; $('save').onclick = saveEdit; if (DEBUG) $('dbg').style.display = 'block';
+$('go').onclick = begin;
+if (DEMO) { const st = document.createElement('style'); st.textContent = '#state,#film,#edit,#play,#save,#dbg,#title,#rc{opacity:0!important;pointer-events:none!important}'; document.head.appendChild(st);   // ?demo: no words, it starts itself and pulses now and then
+  setTimeout(() => { if (G.state !== 'play') begin(); }, 900); setInterval(() => { const t = performance.now() / 1000; ptr.down = true; ptr.x = innerWidth * (.5 + .16 * Math.sin(t * .31)); ptr.y = innerHeight * (.3 + .08 * Math.sin(t * .23)); }, 60); setInterval(() => { if (G.state === 'play') pulse(); if (G.state === 'reel') { G.state = 'play'; $('reel').style.display = 'none'; } }, 5200); } $('play').onclick = playEdit; $('save').onclick = saveEdit; if (DEBUG) $('dbg').style.display = 'block';
 addArm(-1); addArm(-1);   // two lengths of clear leader, waiting for film
 J.q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), J.heading); for (const ch of chains()) seat(ch); updateRings(0); camera.position.set(-2.8, .45, 0);
 requestAnimationFrame(frame);

@@ -240,3 +240,11 @@ v2 was legible for the same reason: real image planes.
   - The coloured cartoon jars (`labels/jars`) and the posters remain in `labels/` but are no longer shown.
 - **Trailer:** gaussian-splat dissolves replace the bubbles, set to VOLHOLLA's *Stratospheric Void Crossing*. The title sequence (`title.js`) is three frames drawing in the water.
 - **Trailer mode** (`?trailer`): eased, capped, drifting steering; longer holds; a looser camera; fewer scripted cues (see `SCION_VOID_INDEX.md`).
+
+## Brand back, bigger table, the demo
+- **Brand:** the CONTAMINANT wordmark (Anton) is back, small, above the light "jelly-films". Each section opens with a kicker in the same face, and a large outlined wordmark closes the page.
+- **Jars:** the coloured jars return, each with its cartoon jelly or periodic symbol (`jarCard` in `jar.js`). The thin glass outlines now sit behind them as ghosts (1 → 2 → 3). The film and the game play in the label window.
+- **The periodic table** is grouped under its sixteen types: each type's jar leads a row of its signs, at about 118 px each instead of a 16-column grid. The question reads in a strip pinned to the bottom of the screen. The drift landing uses the same layout.
+- **The drift landing** is in the water style: thin type, the wordmark, live doodles drawn in thin light, jar shelves for the episodes and the eleven drifts, and a list for the subjects.
+- **The demo:** `current/v2.html?demo` (The Rising Tube) pulls the camera back from inside the bell (5.4 behind instead of 3.4, looking up the tube), hides every word, starts itself, swims with a slow wandering hold, and pulses every 5 s. Its recording (`play/demo-v2.mp4`) opens the index right after the landing.
+- **Newly linked:** VIDEOTEXT (`paeleo/scion/videotext/`); and, in the bolas repo, the Crash Lab process (18 cases, including *CINEOSIS in the crash lab*), the 108-shot cutout worms, and the SCION swarm operator.
