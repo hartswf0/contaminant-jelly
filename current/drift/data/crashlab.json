@@ -1,0 +1,265 @@
+{
+ "from": "hartswf0/bolas media/films: the Crash Lab films, each film's liveliest 10 s at 6 fps",
+ "films": [
+  {
+   "slug": "bolas-videotext",
+   "title": "Bolas Videotext",
+   "n": 64,
+   "fps": 6,
+   "dir": "data/crashlab/bolas-videotext",
+   "from": 19.0,
+   "dur": 36.5,
+   "src": "https://hartswf0.github.io/bolas/media/films/bolas-videotext.mp4"
+  },
+  {
+   "slug": "cineosis-crash-lab",
+   "title": "CINEOSIS in the Crash Lab",
+   "n": 64,
+   "fps": 6,
+   "dir": "data/crashlab/cineosis-crash-lab",
+   "from": 75.5,
+   "dur": 851.3,
+   "src": "https://hartswf0.github.io/bolas/media/films/cineosis-crash-lab.mp4"
+  },
+  {
+   "slug": "cineosis-hand-butter",
+   "title": "Hand Butter",
+   "n": 64,
+   "fps": 6,
+   "dir": "data/crashlab/cineosis-hand-butter",
+   "from": 119.0,
+   "dur": 241.3,
+   "src": "https://hartswf0.github.io/bolas/media/films/cineosis-hand-butter.mp4"
+  },
+  {
+   "slug": "cineosis-handmade-batch1",
+   "title": "Handmade, batch 1",
+   "n": 64,
+   "fps": 6,
+   "dir": "data/crashlab/cineosis-handmade-batch1",
+   "from": 31.5,
+   "dur": 51.9,
+   "src": "https://hartswf0.github.io/bolas/media/films/cineosis-handmade-batch1.mp4"
+  },
+  {
+   "slug": "cineosis-handmade-film",
+   "title": "Handmade CINEOSIS",
+   "n": 64,
+   "fps": 6,
+   "dir": "data/crashlab/cineosis-handmade-film",
+   "from": 584.5,
+   "dur": 1306.4,
+   "src": "https://hartswf0.github.io/bolas/media/films/cineosis-handmade-film.mp4"
+  },
+  {
+   "slug": "cineosis-handmade-signs1-8",
+   "title": "Handmade signs 1\u20138",
+   "n": 64,
+   "fps": 6,
+   "dir": "data/crashlab/cineosis-handmade-signs1-8",
+   "from": 114.0,
+   "dur": 210.5,
+   "src": "https://hartswf0.github.io/bolas/media/films/cineosis-handmade-signs1-8.mp4"
+  },
+  {
+   "slug": "cineosis-handmade-signs13-41",
+   "title": "Handmade signs 13\u201341",
+   "n": 64,
+   "fps": 6,
+   "dir": "data/crashlab/cineosis-handmade-signs13-41",
+   "from": 201.0,
+   "dur": 717.1,
+   "src": "https://hartswf0.github.io/bolas/media/films/cineosis-handmade-signs13-41.mp4"
+  },
+  {
+   "slug": "cineosis-hybrid-atlas",
+   "title": "The Hybrid Atlas",
+   "n": 64,
+   "fps": 6,
+   "dir": "data/crashlab/cineosis-hybrid-atlas",
+   "from": 330.0,
+   "dur": 721.6,
+   "src": "https://hartswf0.github.io/bolas/media/films/cineosis-hybrid-atlas.mp4"
+  },
+  {
+   "slug": "cineosis-hybrid-pilot",
+   "title": "The Hybrid Pilot",
+   "n": 64,
+   "fps": 6,
+   "dir": "data/crashlab/cineosis-hybrid-pilot",
+   "from": 43.5,
+   "dur": 71.6,
+   "src": "https://hartswf0.github.io/bolas/media/films/cineosis-hybrid-pilot.mp4"
+  },
+  {
+   "slug": "crash-lab-film",
+   "title": "The Crash Lab",
+   "n": 64,
+   "fps": 6,
+   "dir": "data/crashlab/crash-lab-film",
+   "from": 696.5,
+   "dur": 1161.3,
+   "src": "https://hartswf0.github.io/bolas/media/films/crash-lab-film.mp4"
+  },
+  {
+   "slug": "ep1-nobody",
+   "title": "Found Odyssey 1 \u00b7 Nobody",
+   "n": 64,
+   "fps": 6,
+   "dir": "data/crashlab/ep1-nobody",
+   "from": 49.5,
+   "dur": 207.1,
+   "src": "https://hartswf0.github.io/bolas/media/films/ep1-nobody.mp4"
+  },
+  {
+   "slug": "ep2-draft-opening",
+   "title": "Found Odyssey 2 \u00b7 draft opening",
+   "n": 64,
+   "fps": 6,
+   "dir": "data/crashlab/ep2-draft-opening",
+   "from": 48.0,
+   "dur": 89.0,
+   "src": "https://hartswf0.github.io/bolas/media/films/ep2-draft-opening.mp4"
+  },
+  {
+   "slug": "ep2-the-guest-gift",
+   "title": "Found Odyssey 2 \u00b7 The Guest-Gift",
+   "n": 64,
+   "fps": 6,
+   "dir": "data/crashlab/ep2-the-guest-gift",
+   "from": 403.5,
+   "dur": 509.9,
+   "src": "https://hartswf0.github.io/bolas/media/films/ep2-the-guest-gift.mp4"
+  },
+  {
+   "slug": "ep3-the-raft",
+   "title": "Found Odyssey 3 \u00b7 The Raft",
+   "n": 64,
+   "fps": 6,
+   "dir": "data/crashlab/ep3-the-raft",
+   "from": 382.0,
+   "dur": 501.3,
+   "src": "https://hartswf0.github.io/bolas/media/films/ep3-the-raft.mp4"
+  },
+  {
+   "slug": "ep4-circe",
+   "title": "Found Odyssey 4 \u00b7 Circe",
+   "n": 64,
+   "fps": 6,
+   "dir": "data/crashlab/ep4-circe",
+   "from": 292.0,
+   "dur": 389.6,
+   "src": "https://hartswf0.github.io/bolas/media/films/ep4-circe.mp4"
+  },
+  {
+   "slug": "ep5-the-blood",
+   "title": "Found Odyssey 5 \u00b7 The Blood",
+   "n": 64,
+   "fps": 6,
+   "dir": "data/crashlab/ep5-the-blood",
+   "from": 291.0,
+   "dur": 454.9,
+   "src": "https://hartswf0.github.io/bolas/media/films/ep5-the-blood.mp4"
+  },
+  {
+   "slug": "ep6-the-knot",
+   "title": "Found Odyssey 6 \u00b7 The Knot",
+   "n": 64,
+   "fps": 6,
+   "dir": "data/crashlab/ep6-the-knot",
+   "from": 69.5,
+   "dur": 424.8,
+   "src": "https://hartswf0.github.io/bolas/media/films/ep6-the-knot.mp4"
+  },
+  {
+   "slug": "ep7-the-loop",
+   "title": "Found Odyssey 7 \u00b7 The Loop",
+   "n": 64,
+   "fps": 6,
+   "dir": "data/crashlab/ep7-the-loop",
+   "from": 30.5,
+   "dur": 407.5,
+   "src": "https://hartswf0.github.io/bolas/media/films/ep7-the-loop.mp4"
+  },
+  {
+   "slug": "found-odyssey-drawn-tests",
+   "title": "Found Odyssey \u00b7 drawn tests",
+   "n": 64,
+   "fps": 6,
+   "dir": "data/crashlab/found-odyssey-drawn-tests",
+   "from": 66.0,
+   "dur": 115.9,
+   "src": "https://hartswf0.github.io/bolas/media/films/found-odyssey-drawn-tests.mp4"
+  },
+  {
+   "slug": "found-odyssey-drawn-v2",
+   "title": "Found Odyssey \u00b7 drawn v2",
+   "n": 64,
+   "fps": 6,
+   "dir": "data/crashlab/found-odyssey-drawn-v2",
+   "from": 31.5,
+   "dur": 160.1,
+   "src": "https://hartswf0.github.io/bolas/media/films/found-odyssey-drawn-v2.mp4"
+  },
+  {
+   "slug": "found-odyssey-style-lab",
+   "title": "Found Odyssey \u00b7 style lab",
+   "n": 64,
+   "fps": 6,
+   "dir": "data/crashlab/found-odyssey-style-lab",
+   "from": 36.5,
+   "dur": 113.8,
+   "src": "https://hartswf0.github.io/bolas/media/films/found-odyssey-style-lab.mp4"
+  },
+  {
+   "slug": "the-physical",
+   "title": "The Physical",
+   "n": 62,
+   "fps": 6,
+   "dir": "data/crashlab/the-physical",
+   "from": 197.5,
+   "dur": 207.8,
+   "src": "https://hartswf0.github.io/bolas/media/films/the-physical.mp4"
+  },
+  {
+   "slug": "wygwyl-celstyle-proof",
+   "title": "WYGWYL \u00b7 cel-style proof",
+   "n": 63,
+   "fps": 6,
+   "dir": "data/crashlab/wygwyl-celstyle-proof",
+   "from": 20.5,
+   "dur": 31.0,
+   "src": "https://hartswf0.github.io/bolas/media/films/wygwyl-celstyle-proof.mp4"
+  },
+  {
+   "slug": "wygwyl-inkcel-P05-008",
+   "title": "WYGWYL \u00b7 ink cel P05",
+   "n": 53,
+   "fps": 6,
+   "dir": "data/crashlab/wygwyl-inkcel-P05-008",
+   "from": 0,
+   "dur": 8.8,
+   "src": "https://hartswf0.github.io/bolas/media/films/wygwyl-inkcel-P05-008.mp4"
+  },
+  {
+   "slug": "wygwyl-poem07-paper-poet",
+   "title": "WYGWYL \u00b7 the paper poet",
+   "n": 64,
+   "fps": 6,
+   "dir": "data/crashlab/wygwyl-poem07-paper-poet",
+   "from": 12.0,
+   "dur": 98.7,
+   "src": "https://hartswf0.github.io/bolas/media/films/wygwyl-poem07-paper-poet.mp4"
+  },
+  {
+   "slug": "wygwyl-poet-paper-proof",
+   "title": "WYGWYL \u00b7 paper proof",
+   "n": 64,
+   "fps": 6,
+   "dir": "data/crashlab/wygwyl-poet-paper-proof",
+   "from": 7.5,
+   "dur": 25.2,
+   "src": "https://hartswf0.github.io/bolas/media/films/wygwyl-poet-paper-proof.mp4"
+  }
+ ]
+}

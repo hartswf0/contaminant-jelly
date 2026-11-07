@@ -18,9 +18,10 @@ export async function play(L, ALL) {
   let FILMS = await (await fetch('../films109.json')).json();
   if (Q.get('films')) { const keep = Q.get('films').split(','); FILMS = FILMS.filter(f => keep.includes(f.slug)); }
   const MUSIC = await fetch('../music.json').then(r => r.json()).catch(() => null), S2G = await fetch('../audio/song2game.json').then(r => r.ok ? r.json() : null).catch(() => null);
-  const frameURL = (f, i) => `${SM}${f.dir}/f${String(((i % f.n) + f.n) % f.n).padStart(3, '0')}.jpg`, fps = f => Math.min(10, f.fps || 8);
+  const frameURL = (f, i) => `${f.base ?? SM}${f.dir}/f${String(((i % f.n) + f.n) % f.n).padStart(3, '0')}.jpg`, fps = f => Math.min(10, f.fps || 8);
   const hueCol = h => new THREE.Color().setHSL(((h % 360) + 360) % 360 / 360, .75, .6);
   FILMS = FILMS.map((f, i) => ({...f, kind: 'sm', col: hueCol(i * 47)}));
+  if (L.kind === 'crashlab') { const CL = await (await fetch('data/crashlab.json')).json(); FILMS = CL.films.filter(f => !L.match || new RegExp(L.match).test(f.slug)).map((f, i) => ({...f, kind: 'sm', base: '', col: hueCol(i * 61 + 20)})); }   // the Crash Lab films, from bolas
   let CINEO = null, DOODLES = null;
   if (L.kind === 'cineosis') { CINEO = await (await fetch('data/cineosis.json')).json(); const base = Q.get('cineo') || CINEO.base, signOf = n => CINEO.signs.find(g => g.n === n);
     let sh = CINEO.shots.slice(), p = L.pick || {};

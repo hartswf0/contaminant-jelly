@@ -81,6 +81,10 @@ export function archiveLevels(C) {
   out.push({id: 'bolas', kind: 'doodle', data: 'bolas', title: 'Bolas Planes', source: 'bolas', song: 'daehoned-19', start: null, dir: 'right', len: 520, current: 1.6, band: 10, fog: '#1f2624', fogD: .026, films: {layout: 'menagerie'}, bad: 0,
     layers: LAYS[4].concat([{kind: 'reef', side: 1, z: -16, glow: .4}]), creatures: ['school'], fluid, specks, goal: {type: 'doodles', n: 24, label: 'catch the drawn planes as they replay their motion'},
     took: 'The bolas depth-worm drawings: 321 drawn planes from 109 second-hand shots (a walking giraffe, its young, the grass in front), each in its tracked colour, replaying the motion it had in its shot as it swims.'});
+  // the Crash Lab: our own films from bolas (handmade CINEOSIS, the hybrid atlas, the Found Odyssey episodes, WYGWYL cels), played as the archive
+  for (const [id, title, match, line, song, fog] of [['crashlab', 'The Crash Lab', '', 'every Crash Lab film', 'event-04', '#1a1f26'], ['odyssey', 'Found Odyssey', '^(ep|found-odyssey)', 'the seven episodes and the drawn tests', 'siltwire-02', '#16202a'], ['handmade', 'Handmade', 'handmade|hand-butter|hybrid|wygwyl|physical', 'the hand-made films and cels', 'firstwintera-13', '#211c18']])
+    out.push({id, kind: 'crashlab', match, title, source: 'bolas crash lab', song, start: null, dir: 'right', len: 260, current: 2, band: 9, fog, fogD: .028, films: {layout: 'list'}, bad: 0, layers: LAYS[out.length % 5], creatures: ['school', 'shrimp'], fluid, specks,
+      goal: {type: 'frames', n: 8, label: `take ${line}`}, took: `Our own films from the Crash Lab (${line}), each its liveliest ten seconds, drifting as jelly-films.`});
   out.forEach(l => { if (JARS.includes(l.id)) l.jar = 'jars/' + l.id; }); if (!C) return out;
   const decs = [...new Set(C.shots.filter(s => s.dec).map(s => s.dec))].sort();
   out.push({id: 'strata', kind: 'cineosis', title: 'Strata', source: 'cineosis-lab', pick: {by: 'decade'}, song: 'nightbus-14', start: null, dir: 'up', len: decs.length * 26, current: 1.8, band: 10, fog: '#2a2620', top: '#294f52', fogD: .026, films: {layout: 'list'}, bad: 0,
