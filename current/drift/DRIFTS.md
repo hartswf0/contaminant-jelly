@@ -232,3 +232,11 @@ v2 was legible for the same reason: real image planes.
 **Recordings** (`current/drift/play/*.mp4`, 960×540, 6 s): frame-stepped at 24 fps in trailer mode, with a shot list per drift (`rec3.js`: Lure's lunge, holds in Toward the Surface and Bloom, pulses in the dark levels).
 
 **The back layer** in every game is black. It plays a film only while one is held or focused, or as an echo for about 2 s after a pulse, Echo, cast or drink.
+
+## The water look (this round)
+- **Index and jars:** the paper look is gone. Everything is dark water and thin light type (Jost).
+  - The landing is a live WebGL jelly (`hero.js`) with a real film inside its bell.
+  - Jars are glass drawn in light (`jar.js`), shared by the index, the drift landing's periodic table and the game's intro card.
+  - The coloured cartoon jars (`labels/jars`) and the posters remain in `labels/` but are no longer shown.
+- **Trailer:** gaussian-splat dissolves replace the bubbles, set to VOLHOLLA's *Stratospheric Void Crossing*. The title sequence (`title.js`) is three frames drawing in the water.
+- **Trailer mode** (`?trailer`): eased, capped, drifting steering; longer holds; a looser camera; fewer scripted cues (see `SCION_VOID_INDEX.md`).

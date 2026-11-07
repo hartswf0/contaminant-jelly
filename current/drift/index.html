@@ -15,7 +15,7 @@ body.game{overflow:hidden;touch-action:none;overscroll-behavior:none;-webkit-use
 #hud{top:max(12px,env(safe-area-inset-top));left:16px;right:16px;display:flex;justify-content:space-between;gap:12px;font:italic 13px Georgia,serif;color:var(--dim);text-shadow:0 0 6px #000;opacity:0}
 #hud b{font:700 11px system-ui;letter-spacing:.24em;color:var(--gold);font-style:normal}
 #say{left:0;right:0;top:max(48px,calc(env(safe-area-inset-top) + 38px));text-align:center;font:italic clamp(14px,2vw,18px) Georgia,serif;text-shadow:0 0 8px #000;opacity:0;padding:0 30px}
-#card .jarimg{display:block;width:min(30vmin,190px);height:auto;margin:0 auto 12px;filter:drop-shadow(0 10px 24px rgba(0,0,0,.5))}
+#card .jarimg{width:min(26vmin,170px);margin:0 auto 10px}#card .jarimg svg{width:100%;height:auto;display:block}
 #tag{font:italic 13px Georgia,serif;color:#fff3dc;text-shadow:0 0 6px #000,0 0 2px #000;white-space:nowrap;transform:translate(-50%,-100%);opacity:0;transition:opacity .25s}
 #hint{left:0;right:0;bottom:max(18px,env(safe-area-inset-bottom));text-align:center;font:13px/1.7 system-ui;color:rgba(230,238,232,.75);text-shadow:0 0 6px #000;opacity:0;padding:0 20px}
 #card{inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 8vw;background:radial-gradient(ellipse at 60% 50%,rgba(7,12,11,.1),rgba(7,12,11,.85) 75%)}
@@ -38,6 +38,7 @@ body.game{overflow:hidden;touch-action:none;overscroll-behavior:none;-webkit-use
 </head>
 <body>
 <script type="module">
+import {jarSVG} from '../../jar.js';
 import {LEVELS, archiveLevels} from './levels.js';
 const Q = new URLSearchParams(location.search), $ = id => document.getElementById(id);
 const C = await fetch('data/cineosis.json').then(r => r.json()).catch(() => null), ARCH = archiveLevels(C), ALL = LEVELS.concat(ARCH);
@@ -58,7 +59,7 @@ if (!Q.get('v')) {
     .ep .tx{position:absolute;left:14px;right:14px;bottom:12px}.ep small{font:700 10px system-ui;letter-spacing:.24em;color:var(--gold)}.ep b{display:block;font:800 22px system-ui;margin:2px 0}.ep span{font:italic 13px Georgia,serif;color:#dfe6e0}
     h2{font:800 12px system-ui;letter-spacing:.3em;color:var(--gold);margin:44px 0 0}.pt{display:grid;grid-template-columns:repeat(16,minmax(46px,1fr));gap:5px;margin-top:14px;overflow-x:auto;padding-bottom:6px}
     .el{display:block;text-decoration:none;color:var(--ink);border-radius:7px;padding:5px 5px 7px;min-height:64px;border:1px solid rgba(255,255,255,.07)}.el:hover{border-color:var(--gold)}.el b{font:800 17px system-ui;display:block}.el i{font:9px/1.2 system-ui;font-style:normal;color:var(--dim);display:block}.el s{text-decoration:none;font:9px system-ui;color:var(--gold)}
-    .jarel{position:relative;display:block;padding:0;border:0;min-height:0;transition:transform .25s cubic-bezier(.2,.7,.2,1);z-index:1}.jarel img{display:block;width:100%;height:auto}.jarel:hover,.jarel:focus-visible{transform:scale(1.9);z-index:5}.pt{gap:4px;overflow:visible}.tjars{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:10px;margin-top:14px}.tjars .jarel:hover{transform:scale(1.35)}
+    .jarel{position:relative;display:block;padding:0;border:0;min-height:0;transition:transform .25s cubic-bezier(.2,.7,.2,1);z-index:1}.jarel img{display:block;width:100%;height:auto}.jarel:hover,.jarel:focus-visible{transform:scale(1.9);z-index:5}.pt{gap:4px;overflow:visible}.jarel .jar-svg{width:100%;height:auto;display:block}.tjars{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:10px;margin-top:14px}.tjars .jarel:hover{transform:scale(1.35)}
     @media (max-width:760px){.pt{grid-template-columns:repeat(5,1fr)}.pt .jarel{grid-column:auto!important;grid-row:auto!important}.jarel:hover{transform:none}}
     .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}.chip{font:600 12px system-ui;color:var(--ink);text-decoration:none;border:1px solid rgba(255,196,106,.35);border-radius:999px;padding:7px 12px}.chip:hover{border-color:var(--gold)}
     details{margin-top:40px}summary{cursor:pointer;font:800 12px system-ui;letter-spacing:.3em;color:var(--gold)}.ac{background:linear-gradient(160deg,#122120,#0c1413)}</style>
@@ -68,8 +69,8 @@ if (!Q.get('v')) {
       <div class="ops"><span><b>hold</b> to swim</span><span><b>two fingers</b> to boost</span><span><b>tap</b> a film to take it</span><span><b>double-tap</b> to pulse and see</span><span><b>pinch</b> to pull back</span><span><b>H</b> or <b>three fingers</b> hides every word</span><span><a href="?v=ascent&trailer${keep}" style="color:var(--gold)">trailer mode</a>: it swims itself, no words</span></div></div>
     <h2>EPISODES</h2><div class="eps">${EPIS.map(([id, ep, line]) => { const l = L(id); return l ? `<a class="ep" href="?v=${id}${keep}">${art[id] ? `<div class="im" style="background-image:url(${art[id]})"></div>` : `<canvas data-doodle="${id === 'doodles' ? 0 : 1}"></canvas>`}<div class="tx"><small>${ep.toUpperCase()}</small><b>${l.title}</b><span>${line}</span></div></a>` : ''; }).join('')}</div>
     <h2>THE PERIODIC TABLE OF CINEOSIS</h2><p style="font-size:14px">One level for each sign the lab reads in moving images; or swim a whole type.</p>
-    <div class="pt">${signs.map(g => { const l = L('sign-' + g.n); return `<a class="el jarel" href="?v=sign-${g.n}${keep}" style="grid-column:${g.col + 1};grid-row:${g.row + 1}" title="${g.name} · ${nOf(g)} shots: ${g.q || g.gloss || ''}">${l && l.jar ? `<img src="../../labels/${l.jar}.svg" alt="${g.sym} ${g.name}" loading="lazy">` : `<b>${g.sym}</b>`}</a>`; }).join('')}</div>
-    <h2>THE SIXTEEN TYPES</h2><div class="tjars">${ARCH.filter(l => l.type).map(l => `<a class="jarel" href="?v=${l.id}${keep}" title="${l.title}">${l.jar ? `<img src="../../labels/${l.jar}.svg" alt="${l.title}" loading="lazy">` : l.title}</a>`).join('')}</div>
+    <div class="pt">${signs.map(g => { const l = L('sign-' + g.n); return `<a class="el jarel" href="?v=sign-${g.n}${keep}" style="grid-column:${g.col + 1};grid-row:${g.row + 1}" title="${g.name} · ${nOf(g)} shots: ${g.q || g.gloss || ''}">${jarSVG({seed: 100 + (+String(g.n).replace(/\D/g, "") || 0), sym: g.sym, jelly: false})}</a>`; }).join('')}</div>
+    <h2>THE SIXTEEN TYPES</h2><div class="tjars">${ARCH.filter(l => l.type).map(l => `<a class="jarel" href="?v=${l.id}${keep}" title="${l.title}">${jarSVG({seed: 200 + l.title.length, sym: l.title.split(" ")[0]})}</a>`).join('')}</div>
     <details><summary>MORE DRIFTS</summary>
       <h2>BY SUBJECT</h2><div class="grid">${ARCH.filter(l => l.id.startsWith('sub-')).map(acard).join('')}</div>
       <h2>FROM OUR VIDEOS</h2><div class="grid">${LEVELS.map(card).join('')}</div></details>

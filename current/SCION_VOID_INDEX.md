@@ -100,3 +100,25 @@ REST / READY                       SHELF                              WAY (stick
   - The Long Descent, Twin Caves and Ray Run: the radar pulse;
   - Silt Bench: swimming low, then a pulse;
   - the doodle levels: the pulse, so they flash.
+
+## Revision: the water (supersedes the paper label)
+**The user's direction:** "I hate the paper look and the bubbles … keep the jelly jars but make them with this … the transition is cheap and seems scripted, as does the gameplay footage. I like the idea of the gaussian splats as the bubbles transition. Less hokey, everything integrated."
+
+The reference plates:
+- "jelly-films" in thin light type over dark water;
+- one translucent jelly with a film inside its bell;
+- three thin rounded frames stacked one behind another (1 → 2 → 3);
+- "Play The Drifts →" over a single thin rule.
+
+**Keep / cut:**
+| element | verdict |
+|---|---|
+| paper, letterpress, red overprint, warning text | **cut** |
+| bubbles in the trailer | **cut**, replaced by gaussian-splat dissolves |
+| the jars | **kept**, redrawn as glass in light (`jar.js`): three thin outlines offset like frames, crosshair ticks, a translucent jelly inside; the film plays clipped to the glass |
+| REST | the jelly itself (`hero.js`, WebGL): a bell of 24,000 gaussian flecks with a perforated film band and an amber glow; a real secondhand film (hand, face, eye or fish) lives inside the bell; film-strip and filament tentacles; light from above; marine snow. Only three words: *jelly-films*, *Index*, *Play The Drifts →* |
+| the periodic table | the same glass jars, with only the sign's symbol |
+
+**How it feels in motion:**
+- **The trailer.** The title is three frames drawing in the water. Each cut breaks the picture into about 22,000 soft flecks, which drift in a slow swirl and settle bright-to-bright into the next picture. The song is *Stratospheric Void Crossing*: the title sits in its quiet passage, and the first film lands on the beat where the song comes back in.
+- **The recordings.** Trailer mode now steers like a camera operator. Speed is capped and the steering is eased, with a constant gentle drift. Holds last 5.5–7.5 s, the camera turns toward a held film slowly, and it follows the jelly more loosely. Most drifts have no scripted cues; only Lure's lunge, holds in Toward the Surface and Bloom, one pulse in The Long Descent, and swimming low in Silt Bench remain.

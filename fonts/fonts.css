@@ -4,3 +4,6 @@
 @font-face{font-family:'Courier Prime';src:url(courier-prime-700.woff2) format('woff2');font-weight:700;font-display:swap}
 @font-face{font-family:'Cormorant Garamond';src:url(cormorant-500.woff2) format('woff2');font-weight:500;font-display:swap}
 @font-face{font-family:'Cormorant Garamond';src:url(cormorant-500i.woff2) format('woff2');font-weight:500;font-style:italic;font-display:swap}
+/* Jost (Owen Earl, indestructible type*, OFL), variable 100-900; JetBrains Mono (JetBrains, OFL) */
+@font-face{font-family:'Jost';src:url(jost.woff2) format('woff2');font-weight:100 900;font-display:swap}
+@font-face{font-family:'JetBrains Mono';src:url(jetbrains-mono-300.woff2) format('woff2');font-weight:300;font-display:swap}

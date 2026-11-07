@@ -6,13 +6,14 @@ import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {makeScreens, cinema} from '../screens.js';
+import {jarSVG} from '../../jar.js';
 
 export async function play(L, ALL) {
   const Q = new URLSearchParams(location.search), DEBUG = Q.has('debug'), COARSE = matchMedia('(pointer: coarse)').matches, $ = id => document.getElementById(id);
   document.body.className = 'game';
   document.body.innerHTML = `<canvas id="gl"></canvas><div class="ui" id="dark"></div><div class="ui" id="flash"></div><div class="ui" id="tag"></div>
     <div class="ui" id="hud"><div><b>${L.title.toUpperCase()}</b> · <span id="goal"></span></div><div id="song"></div></div><div class="ui" id="say"></div><div class="ui" id="hint"></div><div class="ui" id="dbg"></div>
-    <div class="ui" id="card">${L.jar ? `<img class="jarimg" src="../../labels/${L.jar}.svg" alt="">` : ""}<div class="k">${L.kind ? 'FROM THE ARCHIVE · ' : 'A DRIFT FROM '}${L.source.replace('_', ' ').toUpperCase()}</div><h1>${L.title}</h1><p>${L.took}</p><p style="font-style:normal;font-size:14px;color:var(--dim)">Goal: ${L.goal.label}.</p><div class="go">TOUCH THE WATER TO BEGIN</div></div>`;
+    <div class="ui" id="card">${L.jar ? `<div class="jarimg">${jarSVG({seed: L.id.length * 7, sym: L.sign ? L.sign.sym : ""})}</div>` : ""}<div class="k">${L.kind ? 'FROM THE ARCHIVE · ' : 'A DRIFT FROM '}${L.source.replace('_', ' ').toUpperCase()}</div><h1>${L.title}</h1><p>${L.took}</p><p style="font-style:normal;font-size:14px;color:var(--dim)">Goal: ${L.goal.label}.</p><div class="go">TOUCH THE WATER TO BEGIN</div></div>`;
   const SM = Q.get('sm') || 'https://hartswf0.github.io/secondhand-motion/';
   let FILMS = await (await fetch('../films109.json')).json();
   if (Q.get('films')) { const keep = Q.get('films').split(','); FILMS = FILMS.filter(f => keep.includes(f.slug)); }
@@ -423,10 +424,14 @@ export async function play(L, ALL) {
       const A = AUTO; if (!A.s || RT > A.until || A.s.slot < 0 || A.s.gone || (A.s.pos && toUW(A.s.pos)[0] < J.u - 2)) { A.s = SP.filter(x => x.slot >= 0 && !x.bad && !x.gone && !x.doodle && x.pos && x.u > J.u + 2 && x.u < J.u + 30 && Math.abs(x.z || 0) < 2 && visible(x)).sort((a, b) => (a.u - J.u + Math.abs(a.w - J.w) * .6) - (b.u - J.u + Math.abs(b.w - J.w) * .6))[0] || null; A.until = RT + 6; }
       if (G.watch) { if (RT - G.watch.t0 > A.watchFor) { endWatch(); A.lastW = RT; A.s = null; } }
       else if (A.s) { const [pu, pw] = toUW(A.s.p || A.s.pos); tu = pu - J.u; tw = pw - J.w; const dd = Math.hypot(tu, tw);
-        if (dd < A.s.size * .5 + 1.6 && RT - (A.lastW ?? -99) > (TRAILER ? 4.5 : 8) && Math.random() < (TRAILER ? .85 : .5)) { startWatch(A.s); A.watchFor = 3.5 + Math.random() * 2.5; } else if (dd < A.s.size * .5 + 1.2) { capture(A.s); A.s = null; } }
+        if (dd < A.s.size * .5 + 1.6 && RT - (A.lastW ?? -99) > (TRAILER ? 4.5 : 8) && Math.random() < (TRAILER ? .85 : .5)) { startWatch(A.s); A.watchFor = TRAILER ? 5.5 + Math.random() * 2 : 3.5 + Math.random() * 2.5; } else if (dd < A.s.size * .5 + 1.2) { capture(A.s); A.s = null; } }
       else { tu = 5; tw = Math.sin(RT * .3) * 3 - J.w * .3; }
       for (const b of SP) if (b.bad && b.pos && b.slot >= 0 && Math.abs(b.u - J.u) < 4 && Math.abs(b.w - J.w) < 2.5) tw += (J.w > b.w ? 4 : -4);
-      if (RT - (A.pulse ?? 0) > 9 + Math.random() * 6) { A.pulse = RT; pulse(); } }
+      if (!TRAILER && RT - (A.pulse ?? 0) > 9 + Math.random() * 6) { A.pulse = RT; pulse(); }
+      if (TRAILER) {   // a camera operator, not a bot: slow, eased, always a little adrift; it leans toward a film rather than darting at it
+        const m = Math.hypot(tu, tw), cap = 3; if (m > cap) { tu *= cap / m; tw *= cap / m; }
+        const k = Math.min(1, dt * .9); A.su = (A.su ?? tu) + (tu - (A.su ?? tu)) * k; A.sw = (A.sw ?? tw) + (tw - (A.sw ?? tw)) * k;
+        tu = A.su + Math.sin(RT * .31) * .7 + .8; tw = A.sw + Math.sin(RT * .19 + 1.3) * .9; } }
     if (G.hold && G.hold.film && !G.watch && performance.now() - G.hold.t0 > 340 && G.hold.moved < 14) startWatch(G.hold.film);
     J.boost += (boost - J.boost) * Math.min(1, dt * 4); if (boost && !G.boostSaid) { G.boostSaid = 1; say('boost'); } const m = Math.hypot(tu, tw), sp = Math.min(6 + 5 * J.boost, m * 1.4 + 4 * J.boost), du = m > .3 ? tu / m * sp : 0, dw = m > .3 ? tw / m * sp : 0, slip = J.slip > 0 ? 4 : 0;
     const ph = J.ph % 1, thrust = ph < .28 ? Math.sin(ph / .28 * Math.PI) * .8 : 0;
@@ -443,7 +448,7 @@ export async function play(L, ALL) {
     stepArms(Math.max(dt, 1e-4));
     // camera: trailing from the side, small jelly, look-ahead with the current; two fingers look around
     camera.fov += (50 + 12 * J.boost - camera.fov) * Math.min(1, real * 3); camera.updateProjectionMatrix(); const vis = 2 * Math.tan(THREE.MathUtils.degToRad(50 / 2)) * Math.min(1, camera.aspect), d = THREE.MathUtils.clamp(2 * .92 * CS / (.12 * G.zoom * vis), 7, 26) * (G.state === 'end' ? 1.25 : 1) * (1 + .15 * J.boost);
-    const look = W(J.u + 3.5 + J.vu * .45 + G.look[0], J.w * .75 + J.vw * .3 + G.look[1], 0); if (G.watch && G.watch.s.pos) look.lerp((G.watch.s.p || G.watch.s.pos).clone().setZ(0), .88 * Math.min(1, (RT - G.watch.t0) * 2)); const lookZ = G.watch ? .75 : 1, camT = look.clone().add(new THREE.Vector3(0, DIR === 'right' ? 1.2 : 0, d * lookZ)); camera.position.lerp(camT, 1 - Math.pow(.004, real));   // the camera leads with your speed camera.lookAt(look.x, look.y, 0); camera.updateMatrixWorld();
+    const look = W(J.u + 3.5 + J.vu * .45 + G.look[0], J.w * .75 + J.vw * .3 + G.look[1], 0); if (G.watch && G.watch.s.pos) look.lerp((G.watch.s.p || G.watch.s.pos).clone().setZ(0), (TRAILER ? .62 : .88) * sm(0, 1, (RT - G.watch.t0) * (TRAILER ? .7 : 2))); const lookZ = G.watch ? .75 : 1, camT = look.clone().add(new THREE.Vector3(0, DIR === 'right' ? 1.2 : 0, d * lookZ)); camera.position.lerp(camT, 1 - Math.pow(TRAILER ? .06 : .004, real));   // the camera leads with your speed camera.lookAt(look.x, look.y, 0); camera.updateMatrixWorld();
     uR.value.setFromMatrixColumn(camera.matrixWorld, 0); uU.value.setFromMatrixColumn(camera.matrixWorld, 1); uF.value.setFromMatrixColumn(camera.matrixWorld, 2);
     // water colour toward the surface or the void
     const k = L.surface ? sm(.55, 1, prog()) : L.top ? prog() : 0; scene.fog.color.copy(FOG).lerp(TOP, k); if (L.hueWater) { const nr = SP.reduce((m, x) => !m || Math.abs(x.u - J.u) < Math.abs(m.u - J.u) ? x : m, null); if (nr) { G.hw = G.hw ?? nr.film; const hc = new THREE.Color().setHSL(FILMS[nr.film].hue / 360, .32, .14); scene.fog.color.lerp(hc, .85); } } { const hx = scene.fog.color.getHexString(); if (hx !== bgLast) { bgLast = hx; paintBG(scene.fog.color); } } scene.fog.density = L.fogD * (1 - .35 * k) * (L.dark ? 1 + 1.2 * prog() : 1);
