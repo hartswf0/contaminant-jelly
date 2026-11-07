@@ -11,14 +11,16 @@ section{margin-top:12vh}.k{font:400 13px/1 Anton,Impact,sans-serif;letter-spacin
 .shelf:after{content:"";position:absolute;left:-2%;right:-2%;bottom:-7px;height:6px;border-radius:3px;background:linear-gradient(#2a2017,#120d09)}
 .jar{display:block}.jar .cap{margin-top:8px;text-align:center}.jar .cap b{font:300 16px Jost,system-ui,sans-serif}.jar .cap i{display:block;font:300 11px 'JetBrains Mono',monospace;color:var(--faint);font-style:normal}
 .jar:hover .cap b{color:var(--glow)}
+.small{display:grid;grid-template-columns:repeat(9,minmax(0,110px));gap:14px;margin-top:30px}@media (max-width:900px){.small{grid-template-columns:repeat(4,1fr)}}
 @media (max-width:900px){.shelf{grid-template-columns:repeat(3,1fr)}}@media (max-width:520px){.shelf{grid-template-columns:repeat(2,1fr)}}
 </style></head>
 <body>
 <div class="wm">CONTAMINANT · JAR LAB</div><h1>three ways to bottle a film</h1>
 <p class="lede">Every jar is its own: its tint, its fill line, its tag, its number. The lid is a reel; the label says CONTAMINANT. Hover a jar and the film fills it, up to its line; then the game it became. Click to swim it.</p>
-<section><div class="k">A · SPECIMEN</div><h2>A tall lab jar, a typed kraft tag tied on with string</h2><p>Graduated glass, a little sediment of film flecks at the bottom, a signature in red ink.</p><div class="shelf" id="specimen"></div></section>
+<section><div class="k">A · SPECIMEN</div><h2>A tall lab jar with a typed paper label</h2><p>Graduated glass, a paper label on its front, a note in red ink.</p><div class="shelf" id="specimen"></div></section>
 <section><div class="k">B · APOTHECARY</div><h2>A round flask, a reel stopper, an enamel plaque</h2><p>The film swirls in the bulb; the plaque carries the wordmark, the name and the number.</p><div class="shelf" id="apothecary"></div></section>
-<section><div class="k">C · PRESERVE</div><h2>A preserving jar with CONTAMINANT pressed into the glass</h2><p>A reel for a lid, a hand-drawn fill line, a tag on twine with the batch number.</p><div class="shelf" id="preserve"></div></section>
+<section><div class="k">C · PRESERVE</div><h2>A preserving jar with CONTAMINANT pressed into the glass</h2><p>A reel for a lid, a mark at the fill line, a round batch seal with the number and the name.</p><div class="shelf" id="preserve"></div></section>
+<section><div class="k">AT SMALL SIZE</div><h2>The same jars at periodic-table size</h2><p>Fine detail (string, notes, ticks, sources) drops away below 150 px; the wordmark, the name and the number stay.</p><div class="small" id="small"></div></section>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="defs"></defs></svg>
 <script type="module">
 import {bottle, BOTTLE_CSS} from './jarlab.js';
@@ -33,7 +35,8 @@ const L = [
   {id: 'halo', name: 'Halo', src: 'neon butterfly', film: '../current/fal/song_neonbutterfly-02.mp4', poster: '../current/drift/thumbs/song_neonbutterfly-02.jpg', tint: '#e0b45a', lid: '#c98d2e', ink: '#2e2210', note: 'turns by itself'}];
 const defs = document.getElementById('defs');
 for (const kind of ['specimen', 'apothecary', 'preserve']) document.getElementById(kind).innerHTML = L.map((o, k) => { const b = bottle(kind, {...o, seed: k * 3 + kind.length, no: k + 1}); defs.insertAdjacentHTML('beforeend', b.defs);
-  return `<a class="jar" href="../current/drift/?v=${o.id}" data-film="${o.film}" data-game="../current/drift/play/${o.id}.mp4">${b.html}<div class="cap"><b>${o.name}</b><i>no. ${String(k + 1).padStart(2, '0')}</i></div></a>`; }).join('');
+  return `<a class="jar" href="../current/drift/?v=${o.id}" data-film="${o.film}" data-game="../current/drift/play/${o.id}.mp4">${b.html}<div class="cap"><b>${o.name}</b><i>from ${o.src}</i></div></a>`; }).join('');
+document.getElementById('small').innerHTML = ['specimen', 'apothecary', 'preserve'].flatMap(kind => L.slice(0, 3).map((o, k) => { const b = bottle(kind, {...o, seed: 50 + k * 3 + kind.length, no: k + 1}); defs.insertAdjacentHTML('beforeend', b.defs); return `<a class="jar" href="../current/drift/?v=${o.id}" data-film="${o.film}" data-game="../current/drift/play/${o.id}.mp4">${b.html}</a>`; })).join('');
 // the poster frame sits in the liquid at rest; hover fills the jar with the film, then the game
 const live = (a, on) => { const bt = a.querySelector('.bt'), [f, g] = a.querySelectorAll('video'); clearTimeout(a._t); bt.classList.toggle('live', on); bt.classList.remove('game');
   if (!on) { f.pause(); g.pause(); return; } if (!f.src) f.src = a.dataset.film; f.play().catch(() => {});
