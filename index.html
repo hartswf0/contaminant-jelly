@@ -51,7 +51,7 @@ footer{max-width:1240px;}.bigwm{max-width:1240px;margin:0 auto 26px;font:400 cla
   <p class="l">The Rising Tube, the second version: a jelly of film rises through the archive's 109 films, clear and playing. <a href="current/v2.html?demo" style="color:var(--glow)">Watch it swim →</a> &nbsp; <a href="#trailer" style="color:var(--dim)">the reel ↓</a></p></section>
 <section class="sec" id="shelf"><span class="k">01 · THE SHELF</span><h2>Eleven videos, eleven games</h2><p class="l">Each jar holds a film and the game it became. Hover a jar: the film plays in the glass, then the game. Click to swim it.</p>
   <div class="shelf" id="jars"></div></section>
-<section class="sec"><span class="k">02 · THE ARCHIVE</span><h2>From the archive</h2><p class="l">Traced doodles, drawn worms, footage sorted by decade, by colour and by subject.</p><div class="shelf" id="arch"></div></section>
+<section class="sec"><span class="k">02 · THE ARCHIVE</span><h2>From the archive</h2><p class="l">Our own Crash Lab films, the Found Odyssey and the hand-made cineosis; traced doodles and drawn worms; footage sorted by decade, by colour and by subject.</p><div class="shelf" id="arch"></div></section>
 <section class="sec"><span class="k">03 · BONUS</span><h2>Bonus</h2><p class="l">Four sketches from the same water, now carrying real footage from the archives, a song each, and their own sound.</p><div class="shelf" id="bonus"></div></section>
 <section class="sec" id="table"><span class="k">04 · THE PERIODIC TABLE</span><h2>The periodic table of cineosis</h2><p class="l">Forty-five signs the lab reads in moving images, grouped under the sixteen types they belong to. Each jar is a level. Hover to read its question.</p>
   <div class="pt" id="pt"></div><div id="tj"></div><p class="read" id="read" aria-live="polite">&nbsp;</p></section>
@@ -65,12 +65,12 @@ footer{max-width:1240px;}.bigwm{max-width:1240px;margin:0 auto 26px;font:400 cla
     <div class="step" data-s="1"><p><b>4 · The drift</b>The rule, played in open water, with no buttons. <a href="current/drift/?v=lure">Swim it →</a></p></div>
   </div></div>
 <main>
-<section class="sec reel" id="trailer"><span class="k">06 · THE REEL</span><h2>Three trailers</h2><p class="l">Three title sequences, three songs; the films and the games they became, dissolving into each other.</p>
-  <video id="tv" controls playsinline preload="none" poster="current/drift/play/trailer-jar.jpg" src="current/drift/play/trailer-jar.mp4"></video>
+<section class="sec reel" id="trailer"><span class="k">06 · THE REEL</span><h2>Three trailers</h2><p class="l">Each moment of a film cut against the moment in the game that moves like it. Three films, three songs.</p>
+  <video id="tv" controls playsinline preload="none" poster="current/drift/play/metis-odyssey-thumb.jpg" src="current/drift/play/metis-odyssey.mp4"></video>
   <div class="tsel" id="tsel">
-    <button class="on" data-v="trailer-jar"><b>The Jar</b><i>Gospel Under Water</i></button>
-    <button data-v="trailer-wordmark"><b>The Wordmark</b><i>Stratospheric Void Crossing</i></button>
-    <button data-v="trailer-reel"><b>The Reel</b><i>The Long Descent (Memory Rot)</i></button></div></section>
+    <button class="on" data-v="metis-odyssey"><b>The Found Odyssey</b><i>Ritual of the Ash and Silt</i></button>
+    <button data-v="metis-handmade"><b>Handmade</b><i>Command Decent</i></button>
+    <button data-v="metis-translation"><b>Video to Game</b><i>Steel &amp; Static</i></button></div></section>
 <section class="sec"><span class="k">07 · EVERY VERSION</span><h2>Every version</h2><p class="l">Seven waters, oldest still playable. Hover a jar to see it swim.</p><div class="shelf" id="vers"></div>
   <h2 style="margin-top:12vh">The lab</h2>
   <ul class="list">
@@ -101,14 +101,14 @@ const PAL = [['#8fb3d6', '#d79a3e', '#1d2a4f'], ['#3e8f9a', '#b8452f', '#1f1720'
 const J = [['ascent', 'design_v2_720', 'Ascent', 'galleries of frames', 'design_v2'], ['pairs', 'design_v4_720', 'Pairs', 'a face and a hand', 'design_v4'], ['lure', 'design_v5_720', 'Lure', 'an angler with a lure', 'design_v5'], ['surface', 'design_v6_720', 'Toward the Surface', 'a face by a tiny jelly', 'design_v6'],
   ['halo', 'song_neonbutterfly-02', 'Halo', 'a ring of films', 'song_neonbutterfly-02'], ['rayrun', 'song_nightbus-03', 'Ray Run', 'a ray overhead', 'song_nightbus-03'], ['slices', 'song_nightbus-06', 'Slices', 'a chain of slices', 'song_nightbus-06'], ['caves', 'song_nightbus-08', 'Twin Caves', 'two cave mouths', 'song_nightbus-08'],
   ['bloom', 'song_nightbus-13', 'Bloom', 'films in bloom', 'song_nightbus-13'], ['descent', 'song_nightbus-14', 'The Long Descent', 'sinking to a point', 'song_nightbus-14'], ['silt', 'song_nightbus-17', 'Silt Bench', 'an angler in silt', 'song_nightbus-17']];
-const A = [['doodles', 'Doodles', 'traced drawings'], ['menagerie', 'Menagerie', '86 creatures'], ['bolas', 'Bolas', 'drawn worms'], ['strata', 'Strata', '1900s to 2020s'], ['spectrum', 'Spectrum', 'sorted by colour'], ['sub-person', 'The Subjects', 'people to crowds']];
+const A = [['crashlab', 'The Crash Lab', 'our own films'], ['odyssey', 'Found Odyssey', 'seven episodes'], ['handmade', 'Handmade', 'hand-made cineosis'], ['doodles', 'Doodles', 'traced drawings'], ['menagerie', 'Menagerie', '86 creatures'], ['bolas', 'Bolas', 'drawn worms'], ['strata', 'Strata', '1900s to 2020s'], ['spectrum', 'Spectrum', 'sorted by colour'], ['sub-person', 'The Subjects', 'people to crowds']];
 const B = [['reel', 'Film-Reel Jelly', 'a 3D reel', 'bonus/reel.html'], ['sewer', 'Sentinel Timeworm', 'the sewer of lost video', 'bonus/sewer.html'], ['medusae', 'Afterlight Medusae', 'a 12-reel voyage', 'bonus/medusae.html'], ['worms', 'Raw Doodle Worms', 'the periodic table', 'bonus/worms.html']];
 const defs = document.getElementById('jdefs');
 const jar = (href, o, film, game, cap) => { const b = bottle('specimen', o); defs.insertAdjacentHTML('beforeend', b.defs); return `<a class="jar" href="${href}" data-film="${film || ''}" data-game="${game || ''}">${b.html}${cap ? `<div class="cap"><b>${o.name}</b><i>${cap}</i></div>` : ''}</a>`; };
 const lvl = (id, name, k, icon, poster) => { const [tint, lid, ink] = PAL[k % PAL.length]; return {id, name, seed: 7 + k * 5, no: k + 1, tint, lid, ink, icon: iconFor(icon, ink, lid), poster}; };
 const fv = v => `current/fal/${v}.mp4`, pv = id => `current/drift/play/${id}.mp4`;
 document.getElementById('jars').innerHTML = J.map(([id, v, t, l, th], k) => jar(`current/drift/?v=${id}`, lvl(id, t, k, id, `current/drift/thumbs/${th}.jpg`), fv(v), pv(id), l)).join('');
-document.getElementById('arch').innerHTML = A.map(([id, t, l], k) => jar(`current/drift/?v=${id}`, {...lvl(id, t, k + 3, id === 'sub-person' ? 'subjects' : id, id === 'sub-person' ? '' : `current/drift/play/${id}.jpg`), no: 12 + k}, id === 'sub-person' ? '' : pv(id), '', l)).join('');
+document.getElementById('arch').innerHTML = A.map(([id, t, l], k) => jar(`current/drift/?v=${id}`, {...lvl(id, t, k + 3, id === 'sub-person' ? 'subjects' : ({crashlab: 'reel', odyssey: 'surface', handmade: 'doodles'}[id] || id), id === 'sub-person' ? '' : `current/drift/play/${id}.jpg`), no: 12 + k}, id === 'sub-person' ? '' : pv(id), '', l)).join('');
 const V = [['current/drift/', 'The Drifts', 'v7 · open water', 'ascent', 'current/drift/play/ascent.mp4', 'current/drift/play/ascent.jpg'], ['current/', 'The Branching Archive', 'v6 · forks, the angler', 'v6', 'current/drift/play/ver-v6.mp4', 'current/drift/play/ver-v6.jpg'],
   ['current/v5.html', 'The Dive to the Source', 'v5 · 605 m down', 'v5', 'current/drift/play/ver-v5.mp4', 'current/drift/play/ver-v5.jpg'], ['current/v4.html', 'Never a Frame', 'v4 · clouds of light', 'v4', 'current/drift/play/ver-v4.mp4', 'current/drift/play/ver-v4.jpg'],
   ['current/v3.html', 'The Sewers of Internet Video', 'v3 · clips in the fog', 'v3', 'current/drift/play/ver-v3.mp4', 'current/drift/play/ver-v3.jpg'], ['current/v2.html?demo', 'The Rising Tube', 'v2 · 109 films, playing', 'v2', 'current/drift/play/demo-v2.mp4', 'current/drift/play/demo-v2.jpg'],
@@ -123,7 +123,7 @@ const HOVER = matchMedia('(hover: hover)').matches; let cur = null; const io = H
 const wire = a => { if (HOVER) { a.addEventListener('mouseenter', () => live(a, true)); a.addEventListener('mouseleave', () => live(a, false)); a.addEventListener('focus', () => live(a, true)); a.addEventListener('blur', () => live(a, false)); } else io.observe(a); };
 document.querySelectorAll('.jar').forEach(wire);
 // the reel: choose a trailer
-document.querySelectorAll('#tsel button').forEach(b => b.onclick = () => { const v = document.getElementById('tv'); document.querySelectorAll('#tsel button').forEach(x => x.classList.toggle('on', x === b)); v.poster = `current/drift/play/${b.dataset.v}.jpg`; v.src = `current/drift/play/${b.dataset.v}.mp4`; v.play().catch(() => {}); });
+document.querySelectorAll('#tsel button').forEach(b => b.onclick = () => { const v = document.getElementById('tv'); document.querySelectorAll('#tsel button').forEach(x => x.classList.toggle('on', x === b)); v.poster = `current/drift/play/${b.dataset.v}-thumb.jpg`; v.src = `current/drift/play/${b.dataset.v}.mp4`; v.play().catch(() => {}); });
 // the periodic table: each sign in its own jar with its own icon, symbol and number, filled with one of its shots
 const pt = document.getElementById('pt'), read = document.getElementById('read'), tj = document.getElementById('tj'), say = (b, t) => { read.innerHTML = b ? `<b>${b}</b>${t}` : '&nbsp;'; };
 new IntersectionObserver((es, o) => { if (!es.some(e => e.isIntersecting)) return; o.disconnect(); Promise.all([fetch('labels/cineosis/index.json').then(r => r.json()), fetch('current/drift/data/cineosis.json').then(r => r.json()), fetch('labels/icons.json').then(r => r.json())]).then(([IX, C, IC]) => {

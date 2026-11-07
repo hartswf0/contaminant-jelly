@@ -1,0 +1,22 @@
+CONTAMINANT · jelly-films · Video To Game
+
+A jellyfish of film swims an archive. Every film you pass is a cloud of light. Come near it, light it or pulse, and it clears into what it shows. Take a frame and it becomes one of your tentacles.
+
+This trailer is made the video-to-game way: each moment of a film is cut against the moment in the game that moves like it.
+
+PLAY (free, in the browser, phone or desktop): https://hartswf0.github.io/contaminant-jelly/
+• Hold to swim · Tap a film to take it · Hold on it to see it clearly · Double-tap to pulse · Outrun the angler
+• H hides every word · ?trailer lets it swim itself
+
+0:00 Title
+0:04 Act I · film and game
+0:23 Act II · how to play
+0:34 Act III · terminal velocity
+0:48 Play the drifts
+
+Music: VOLHOLLA, "Steel & Static — The 2 AM Express"
+Films: design_v2_720, design_v4_720, design_v5_720, design_v6_720, song_neonbutterfly-02, song_nightbus-03, song_nightbus-06, song_nightbus-08, song_nightbus-13, song_nightbus-14, song_nightbus-17
+Archive: public-domain footage via cineosis-lab and secondhand-motion; the Crash Lab films by hartswf0/bolas.
+Made with three.js and gaussian splats.
+
+#indiegame #browsergame #jellyfish #archivefootage #experimentalfilm #videotogame

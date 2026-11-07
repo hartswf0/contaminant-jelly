@@ -1,0 +1,22 @@
+CONTAMINANT · jelly-films · Handmade
+
+A jellyfish of film swims an archive. Every film you pass is a cloud of light. Come near it, light it or pulse, and it clears into what it shows. Take a frame and it becomes one of your tentacles.
+
+This trailer is made the video-to-game way: each moment of a film is cut against the moment in the game that moves like it.
+
+PLAY (free, in the browser, phone or desktop): https://hartswf0.github.io/contaminant-jelly/
+• Hold to swim · Tap a film to take it · Hold on it to see it clearly · Double-tap to pulse · Outrun the angler
+• H hides every word · ?trailer lets it swim itself
+
+0:00 Title
+0:03 Act I · film and game
+0:15 Act II · how to play
+0:23 Act III · terminal velocity
+0:33 Play the drifts
+
+Music: VOLHOLLA, "Command Decent"
+Films: cineosis-crash-lab, cineosis-hand-butter, cineosis-handmade-film, cineosis-handmade-signs1-8, cineosis-handmade-signs13-41, cineosis-hybrid-atlas, crash-lab-film, the-physical, wygwyl-poem07-paper-poet
+Archive: public-domain footage via cineosis-lab and secondhand-motion; the Crash Lab films by hartswf0/bolas.
+Made with three.js and gaussian splats.
+
+#indiegame #browsergame #jellyfish #archivefootage #experimentalfilm #videotogame
