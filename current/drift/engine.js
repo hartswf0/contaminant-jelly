@@ -10,19 +10,21 @@ import {bottle, BOTTLE_CSS, iconFor} from '../../labels/jarlab.js';
 import {makePredators, predatorsFor, seaOf, regionOf} from './sea.js';
 import {mountEditor, ED_CSS} from './editor.js';
 import {TAXA, MECH, ARC, HERO, speciesOf, mechOf, an} from './taxa.js';
+import {RIGS, makeRig} from './rigs.js';
 
 export async function play(L, ALL) {
   const Q = new URLSearchParams(location.search), DEBUG = Q.has('debug'), COARSE = matchMedia('(pointer: coarse)').matches, $ = id => document.getElementById(id);
   document.body.className = 'game';
+  let RIGID = Q.get('rig') || 'celluloid'; if (!Q.get('rig')) try { RIGID = localStorage.getItem('cj-rig') || 'celluloid'; } catch (e) {} if (!RIGS.some(r => r.id === RIGID)) RIGID = 'celluloid';
   const SPC = speciesOf(L), MEC = L.sea ? {verb: 'EXPLORE', how: ['One long water: its levels laid end to end as regions.', 'Each region keeps its own verb; read it as you enter.', 'Take a film in each region: the strip at the foot marks them ★.'], nudge: 'follow the amber arrows to the nearest film'} : mechOf(L);
   const PALJ = [['#8fb3d6', '#d79a3e', '#1d2a4f'], ['#3e8f9a', '#b8452f', '#1f1720'], ['#7fb9c9', '#6c8ea8', '#16263a'], ['#c49ad6', '#8c5aa8', '#2a1736'], ['#5d7ea6', '#a37a4a', '#141c2a'], ['#e0b45a', '#c98d2e', '#2e2210'], ['#7bb39a', '#4e8a6c', '#13261d'], ['#d98b74', '#b4553c', '#2a1410']];
   const CARDJAR = (() => { const k = [...L.id].reduce((a, c) => a + c.charCodeAt(0), 0), [tint, lid, ink] = PALJ[k % PALJ.length]; try { return bottle('specimen', L.sign ? {name: L.sign.name, sym: L.sign.sym, n: L.sign.n, no: 0, line: L.title.toUpperCase().slice(0, 22), seed: 500 + k, tint, lid, ink, icon: ''} : {name: L.title, seed: 500 + k, no: (k % 90) + 1, tint, lid, ink, icon: iconFor(L.sea ? 'reel' : L.id, ink, lid), poster: `play/${L.id}.jpg`}); } catch (e) { return {html: '', defs: ''}; } })();
   document.body.innerHTML = `<canvas id="gl"></canvas><div class="ui" id="dark"></div><div class="ui" id="flash"></div><div class="ui" id="tag"></div>
     <div class="ui" id="hud"><div><b>${L.title.toUpperCase()}</b> · <span id="goal"></span></div><div id="song"></div></div><div class="ui" id="say"></div><div class="ui" id="hint"></div><div class="ui" id="dbg"></div>
-    <canvas class="ui" id="guide"></canvas><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="jdefs"></defs></svg><style>${BOTTLE_CSS}${ED_CSS}#guide{inset:0;width:100%;height:100%;opacity:1}#card .jarimg{width:min(22vmin,150px)}#card .brief{display:flex;gap:22px;align-items:flex-start;margin-top:14px;max-width:760px}#card .vb{font:400 clamp(44px,8vw,86px)/.9 Anton,Impact,sans-serif;letter-spacing:.03em;color:#f0a35a}#card .sp{font:300 15px Jost,system-ui,sans-serif;color:#dfe6e0}#card .sp i{color:#8293a4}#card .sp b{font-weight:500}#card .how{margin:8px 0 0;padding-left:20px;font:300 15px/1.55 Jost,system-ui,sans-serif;color:#dfe6e0;max-height:none}#card .gl{margin-top:8px;font:400 12px Anton,Impact,sans-serif;letter-spacing:.22em;color:#f0a35a}@media (max-width:640px){#card .brief{flex-direction:column;gap:6px}}</style>
+    <canvas class="ui" id="guide"></canvas><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="jdefs"></defs></svg><style>${BOTTLE_CSS}${ED_CSS}#guide{inset:0;width:100%;height:100%;opacity:1}#card .jarimg{width:min(22vmin,150px)}#card .brief{display:flex;gap:22px;align-items:flex-start;margin-top:14px;max-width:760px}#card .vb{font:400 clamp(44px,8vw,86px)/.9 Anton,Impact,sans-serif;letter-spacing:.03em;color:#f0a35a}#card .sp{font:300 15px Jost,system-ui,sans-serif;color:#dfe6e0}#card .sp i{color:#8293a4}#card .sp b{font-weight:500}#card .how{margin:8px 0 0;padding-left:20px;font:300 15px/1.55 Jost,system-ui,sans-serif;color:#dfe6e0;max-height:none}#card .rigs{pointer-events:auto;margin-top:16px;max-width:760px;font:300 12px/1.9 'JetBrains Mono',monospace;color:#55687a}#card .rigs button{all:unset;cursor:pointer;margin-right:10px;color:#8293a4}#card .rigs button:hover{color:#e6edf3}#card .rigs button.on{color:#f0a35a}#card .rigs a{color:#cfdde8}#card .gl{margin-top:8px;font:400 12px Anton,Impact,sans-serif;letter-spacing:.22em;color:#f0a35a}@media (max-width:640px){#card .brief{flex-direction:column;gap:6px}}</style>
     <div class="ui" id="card">${CARDJAR.html ? `<div class="jarimg">${CARDJAR.html}</div>` : ""}<div class="k">${L.sea ? 'THE OPEN WATER' : `CHAPTER ${SPC.ch} OF 13 · ${SPC.chapter.toUpperCase()}`} · ${L.kind ? 'FROM THE ARCHIVE' : 'FROM ' + L.source.replace('_', ' ').toUpperCase()}</div><h1>${L.title}</h1>
       <div class="brief"><div class="vb">${MEC.verb}</div><div><div class="sp">${L.sea ? 'Every species of the family, one water' : `You are a <b>${SPC.name}</b> <i>${SPC.latin}</i> · ${SPC.phylum}, ${SPC.cls}`}</div><ol class="how">${MEC.how.map(x => `<li>${x}</li>`).join('')}</ol>
-      <div class="gl">GOAL · ${L.goal.label} · ${L.goal.n}</div></div></div><p>${L.sea ? L.took : SPC.fact}</p><div class="go">TOUCH THE WATER TO BEGIN</div></div>`;
+      <div class="gl">GOAL · ${L.goal.label} · ${L.goal.n}</div></div></div><p>${L.sea ? L.took : SPC.fact}</p><div class="rigs" id="rigs">YOUR JELLY · ${RIGS.map(r => `<button data-rig="${r.id}" class="${r.id === RIGID ? 'on' : ''}">${r.name.replace(/^The /, '')}</button>`).join('')} · <a href="characters.html?rig=${RIGID}&next=${encodeURIComponent(location.pathname + location.search)}">see them all →</a></div><div class="go">TOUCH THE WATER TO BEGIN</div></div>`;
   $('jdefs').innerHTML = CARDJAR.defs;
   const SM = Q.get('sm') || 'https://hartswf0.github.io/secondhand-motion/';
   let FILMS = await (await fetch('../films109.json')).json();
@@ -208,6 +210,11 @@ export async function play(L, ALL) {
       vec3 col = vL < .5 ? vec3(1., .5, .12) : vL < 1.5 ? vec3(1., .72, .3) : vec3(1., .9, .66); if (vL > 1.5) col += vec3(-.05, .03, .08) * sin(vS * 40.);
       col *= (.45 + .9 * pow(vT, 4.)) * (1. + uGlow) * (vL > 1.5 ? .7 : 1.); col = mix(col, vec3(1., .12, .05), uHurt * .6); gl_FragColor = vec4(col * uTint * g * .24, 1.); }`});
   const bell = new THREE.Points(bg, bellM); bell.frustumCulled = false; const jelly = new THREE.Group(); jelly.add(bell); jelly.scale.setScalar(CS * BODY.size); scene.add(jelly);
+  // the character: any of the ten jellies the project has built (rigs.js); the celluloid is the engine's own bell
+  let RIG = null; const rgC = document.createElement('canvas'); rgC.width = 160; rgC.height = 120; const rgx = rgC.getContext('2d'), rtex = new THREE.CanvasTexture(rgC); rtex.colorSpace = THREE.SRGBColorSpace;
+  const setRig = id => { if (RIG) { jelly.remove(RIG.group); RIG.dispose(); RIG = null; } RIGID = id; bell.visible = id === 'celluloid'; G_rf = 0; if (id !== 'celluloid') { RIG = makeRig(THREE, id); RIG.group.scale.setScalar(RIG.norm); jelly.add(RIG.group); } };
+  let G_rf = 0; setRig(RIGID);
+  document.querySelectorAll('#rigs button').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); setRig(b.dataset.rig); try { localStorage.setItem('cj-rig', b.dataset.rig); } catch (x) {} document.querySelectorAll('#rigs button').forEach(x => x.classList.toggle('on', x === b)); }));
   // arms: one per recovered film, its frames in source order, trailing in the water
   const ARMS = [], CUT = [], AX = new Float32Array(NAR * AN * 3), AXP = new Float32Array(NAR * AN * 3);
   const armRoot = (k, out) => { const a = k / NAR * 6.283; return out.set(Math.cos(a) * .7, -.1, Math.sin(a) * .7).multiplyScalar(CS).add(J.p); };
@@ -575,6 +582,9 @@ export async function play(L, ALL) {
     snM.uniforms.uScale.value = us; snM.uniforms.uHigh.value = AU.high(); pulseMat.uniforms.uScale.value = us; if (surfMat) { surfMat.uniforms.uScale.value = us; surfMat.uniforms.uTime.value = T; }
     for (const m of [fishPts, dlPts, spkPts, combPts, shrPts, RAY && RAY.m, ANG && ANG.mb, ANG && ANG.mg, ANG && ANG.lure, ...(PR ? PR.meshes : [])]) if (m) { m.material.uniforms.uScale.value = us; if (m.material.uniforms.uTime) m.material.uniforms.uTime.value = T; }
     const bu = bellM.uniforms; bu.uPulse.value = J.ph; bu.uTime.value = T; bu.uGlow.value = J.glow + (1 - AU.phase()) * .15; bu.uHurt.value = J.hurt; bu.uFray.value = 1 - J.mem / 100; bu.uScale.value = ps * .0095;
+    if (RIG) { RIG.update({t: T, ph: J.ph, glow: J.glow + (1 - AU.phase()) * .15, hurt: J.hurt, scale: ps * .0095, lit: ARMS.length});
+      if (RT - (G.rfT || 0) > .2) { G.rfT = RT; let c = null; for (let i = CUT.length - 1; i >= 0; i--) if (!CUT[i].lost) { c = CUT[i]; break; }   // the jellies that carry a film show the one you took last
+        if (c && drawFrame(rgx, c.film, c.fi + Math.floor(RT * fps(FILMS[c.film])) % BLOCK, 160, 120)) { rtex.needsUpdate = true; if (!G_rf) { RIG.setFilm(rtex); G_rf = 1; } } else if (!c && G_rf) { RIG.setFilm(null); G_rf = 0; } } }
     AU.speed(Math.hypot(J.vu, J.vw)); params.needsUpdate = true;
     if (RT - (G.sayT ?? -9) > 3.2) $('say').style.opacity = 0;
     if (CINE.on) retMat.uniforms.uA.value = 0;

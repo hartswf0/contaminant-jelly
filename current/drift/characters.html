@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Choose Your Jelly · jelly-films</title>
+<link rel="stylesheet" href="../../fonts/fonts.css">
+<script type="importmap">{"imports":{"three":"../../paeleo/scion/videotext/vendor/three.module.min.js","three/addons/":"../../paeleo/scion/videotext/vendor/addons/"}}</script>
+<style>
+:root{color-scheme:dark}html,body{margin:0;height:100%;background:#020611;color:#e6edf3;overflow:hidden;font:300 16px/1.5 Jost,system-ui,sans-serif}a{color:inherit;text-decoration:none}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.ui{position:fixed;left:0;right:0;pointer-events:none;padding:0 clamp(16px,5vw,60px)}
+.top{top:max(18px,env(safe-area-inset-top));display:flex;justify-content:space-between;align-items:baseline;gap:12px}.top b{font:400 13px Anton,Impact,sans-serif;letter-spacing:.34em;color:#8293a4}.top a{pointer-events:auto;font:300 12px 'JetBrains Mono',monospace;color:#55687a}
+.who{bottom:max(22px,env(safe-area-inset-bottom));max-width:760px}
+.no{font:300 12px 'JetBrains Mono',monospace;color:#f0a35a}.who h1{margin:4px 0 0;font:200 clamp(38px,6.5vw,76px)/1 Jost,system-ui,sans-serif}.who .fr{font:400 12px Anton,Impact,sans-serif;letter-spacing:.24em;color:#8293a4;margin-top:8px}
+.who p{margin:8px 0 0;color:#b7c9d8;max-width:560px}.who .tr{font:300 12px 'JetBrains Mono',monospace;color:#55687a;margin-top:6px}
+.go{pointer-events:auto;display:inline-flex;gap:16px;align-items:center;margin-top:16px;font:300 clamp(20px,2.6vw,30px)/1 Jost,system-ui,sans-serif;padding-bottom:10px;border-bottom:1.5px solid rgba(240,163,90,.7)}.go:hover{color:#f0a35a}
+.chips{pointer-events:auto;display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:16px;font:300 12px 'JetBrains Mono',monospace;color:#55687a}.chips button{all:unset;cursor:pointer}.chips button.on{color:#f0a35a}.chips button:hover{color:#e6edf3}
+.arw{position:fixed;top:42%;pointer-events:auto;font:200 54px Jost,system-ui,sans-serif;color:#55687a;cursor:pointer;user-select:none;padding:10px}.arw:hover{color:#f0a35a}.l{left:clamp(4px,2vw,30px)}.r{right:clamp(4px,2vw,30px)}
+.mine{color:#f0a35a}
+</style></head><body>
+<canvas id="gl" aria-label="The chosen jellyfish, turning slowly in dark water"></canvas>
+<div class="ui top"><b>CONTAMINANT · CHOOSE YOUR JELLY</b><a href="./">the drifts →</a></div>
+<div class="arw l" id="prev" aria-label="previous">‹</div><div class="arw r" id="next" aria-label="next">›</div>
+<div class="ui who"><div class="no" id="no"></div><h1 id="nm"></h1><div class="fr" id="fr"></div><p id="ln"></p><div class="tr" id="tr"></div>
+  <a class="go" id="go" href="./"><span>Swim as this jelly</span><span aria-hidden="true">→</span></a><div class="chips" id="chips"></div></div>
+<script type="module">
+import * as THREE from 'three';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+import {RIGS, makeRig} from './rigs.js';
+const Q = new URLSearchParams(location.search), $ = id => document.getElementById(id);
+let mine = 'celluloid'; try { mine = localStorage.getItem('cj-rig') || 'celluloid'; } catch (e) {}
+let k = Math.max(0, RIGS.findIndex(r => r.id === (Q.get('rig') || mine)));
+const R = new THREE.WebGLRenderer({canvas: $('gl'), antialias: true}); R.setPixelRatio(Math.min(2, devicePixelRatio)); R.toneMapping = THREE.ACESFilmicToneMapping;
+const scene = new THREE.Scene(); scene.background = new THREE.Color('#03070d'); scene.fog = new THREE.FogExp2('#03070d', .05);
+const cam = new THREE.PerspectiveCamera(42, 1, .1, 100); cam.position.set(0, -.2, 6.2);
+const comp = new EffectComposer(R); comp.addPass(new RenderPass(scene, cam)); const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), .8, .6, .62); comp.addPass(bloom); comp.addPass(new OutputPass());
+// marine snow
+{ const n = 700, P = new Float32Array(n * 3); for (let i = 0; i < n; i++) P.set([(Math.random() - .5) * 16, (Math.random() - .5) * 10, (Math.random() - .5) * 8 - 2], i * 3); const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(P, 3)); scene.add(new THREE.Points(g, new THREE.PointsMaterial({color: 0x7f97a8, size: .018, transparent: true, opacity: .5}))); }
+// a real film for the jellies that carry one: a Crash Lab film, frame by frame
+const fc = document.createElement('canvas'); fc.width = 160; fc.height = 120; const fx = fc.getContext('2d'), ftex = new THREE.CanvasTexture(fc); ftex.colorSpace = THREE.SRGBColorSpace; const frames = []; let fOK = false;
+fetch('data/crashlab.json').then(r => r.json()).then(C => { const f = C.films[(Math.random() * C.films.length) | 0]; for (let i = 0; i < f.n; i++) { const im = new Image(); im.src = `${f.dir}/f${String(i).padStart(3, '0')}.jpg`; frames.push(im); } fOK = true; }).catch(() => {});
+let cur = null, holder = new THREE.Group(); scene.add(holder);
+function show(i) { k = (i + RIGS.length) % RIGS.length; const r = RIGS[k]; if (cur) { holder.remove(cur.group); cur.dispose(); }
+  cur = makeRig(THREE, r.id); cur.group.scale.setScalar(1.35 * cur.norm); holder.add(cur.group); if (fOK) cur.setFilm(ftex);
+  $('no').textContent = `${String(k + 1).padStart(2, '0')} / ${RIGS.length}${r.id === mine ? '  ·  your jelly' : ''}`; $('nm').textContent = r.name; $('fr').textContent = r.from.toUpperCase(); $('ln').textContent = r.line; $('tr').textContent = r.traits;
+  $('chips').innerHTML = RIGS.map((x, j) => `<button class="${j === k ? 'on' : ''}${x.id === mine ? ' mine' : ''}" data-j="${j}">${x.name.replace(/^The /, '')}</button>`).join(''); $('chips').querySelectorAll('button').forEach(b => b.onclick = () => show(+b.dataset.j));
+  const back = Q.get('next') || './'; $('go').href = back; history.replaceState(null, '', `?rig=${r.id}${Q.get('next') ? '&next=' + encodeURIComponent(Q.get('next')) : ''}`); }
+$('go').addEventListener('click', () => { try { localStorage.setItem('cj-rig', RIGS[k].id); } catch (e) {} });
+$('prev').onclick = () => show(k - 1); $('next').onclick = () => show(k + 1);
+addEventListener('keydown', e => { if (e.key === 'ArrowLeft') show(k - 1); if (e.key === 'ArrowRight') show(k + 1); if (e.key === 'Enter') $('go').click(), location.href = $('go').href; });
+let sx = null; $('gl').addEventListener('pointerdown', e => sx = e.clientX); $('gl').addEventListener('pointerup', e => { if (sx !== null && Math.abs(e.clientX - sx) > 60) show(k + (e.clientX < sx ? 1 : -1)); sx = null; });
+const size = () => { R.setSize(innerWidth, innerHeight, false); comp.setSize(innerWidth, innerHeight); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); holder.position.set(innerWidth > innerHeight ? 1.2 : 0, innerWidth > innerHeight ? .1 : .9, 0); }; addEventListener('resize', size); size();
+show(k);
+let t = 0, last = performance.now(), fi = 0, ft = 0;
+(function loop(now) { requestAnimationFrame(loop); const dt = Math.min(.05, (now - last) / 1000); last = now; t += dt;
+  if (fOK && frames.length) { ft += dt; if (ft > 1 / 6) { ft = 0; fi = (fi + 1) % frames.length; const im = frames[fi]; if (im.complete && im.naturalWidth) { fx.drawImage(im, 0, 0, 160, 120); ftex.needsUpdate = true; } } }
+  holder.rotation.y = t * .25; holder.rotation.z = Math.sin(t * .4) * .08; holder.position.y += (Math.sin(t * .6) * .1 - (holder.position.y - (innerWidth > innerHeight ? .1 : .9))) * dt;
+  const ps = innerHeight * R.getPixelRatio(); cur.update({t, ph: (t / 2.6) % 1, glow: .1, hurt: 0, scale: ps * .0095 * 1.35, lit: 4});
+  comp.render(); })(performance.now());
+window.__rigs = {show, RIGS};
+</script></body></html>
