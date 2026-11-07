@@ -53,6 +53,12 @@ const I = (D, A) => { const S = (d, w = 5) => `<path d="${d}" fill="none" stroke
     reel: `<circle cx="50" cy="50" r="38" fill="none" stroke="${D}" stroke-width="4.5"/>` + [0, 1, 2, 3, 4].map(k => { const a = k * 1.2566 - 1.57; return `<circle cx="${(50 + Math.cos(a) * 20).toFixed(1)}" cy="${(50 + Math.sin(a) * 20).toFixed(1)}" r="7.5" fill="none" stroke="${D}" stroke-width="3.5"/>`; }).join('') + C(50, 50, 5),
     sewer: `<circle cx="50" cy="50" r="40" fill="none" stroke="${D}" stroke-width="4.5"/><circle cx="50" cy="50" r="24" fill="none" stroke="${D}" stroke-width="3"/>` + S('M18 52q8-10 16 0t16 0t16 0t16 0', 3.5).replace(D, A),
     medusae: F('M20 54a30 30 0 0 1 60 0z', 'none') + S('M20 54a30 30 0 0 1 60 0zM30 58q-6 14 2 28M44 58q-4 16 2 34M56 58q4 16 -2 34M70 58q6 14 -2 28', 4) + S('M36 22l5-10 5 8 4-10 4 10 5-8 5 10', 3).replace(D, A),
+    v1: S('M10 30q20-14 40 0t40 0M10 50q20-14 40 0t40 0') + C(50, 76, 9),
+    v2: [0, 1, 2].map(k => `<ellipse cx="50" cy="${22 + k * 26}" rx="${36 - k * 4}" ry="9" fill="none" stroke="${D}" stroke-width="4"/>`).join('') + C(50, 50, 5),
+    v3: `<circle cx="50" cy="50" r="38" fill="none" stroke="${D}" stroke-width="5"/>` + S('M24 62q13-16 26 0t26 0', 4) + C(50, 34, 6),
+    v4: Array.from({length: 22}, (_, i) => { const a = i * 2.4, r = 6 + i * 1.6; return `<circle cx="${(50 + Math.cos(a) * r).toFixed(1)}" cy="${(50 + Math.sin(a) * r * .8).toFixed(1)}" r="${(4 - i * .12).toFixed(1)}" fill="${i % 3 ? D : A}"/>`; }).join(''),
+    v5: S('M50 8V70M30 52l20 20 20-20', 5) + C(50, 88, 7),
+    v6: S('M50 90V54M50 54L22 18M50 54L78 18M36 36L50 10', 5) + C(22, 18, 6) + C(78, 18, 6),
     worms: S('M6 26q12-12 24 0t24 0t24 0t16 0M6 50q12-12 24 0t24 0t24 0t16 0M6 74q12-12 24 0t24 0t24 0t16 0', 4.5),
   };
 };

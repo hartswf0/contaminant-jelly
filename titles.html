@@ -1,0 +1,112 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="favicon.svg"><link rel="stylesheet" href="fonts/fonts.css">
+<title>Title Sequences · jelly-films</title><meta name="description" content="Three title sequences for the jelly-films trailers: the jar, the wordmark, the reel. ?t=jar|word|reel|outro">
+<style>html,body{margin:0;height:100%;background:#01040b;overflow:hidden}#stage{position:fixed;left:50%;top:50%;width:960px;height:540px;transform:translate(-50%,-50%);overflow:hidden;background:#01040b}
+#stage canvas,#stage svg{position:absolute;inset:0;width:960px;height:540px}#push{position:absolute;inset:0;transform-origin:50% 50%}</style></head>
+<body><div id="stage"><div id="push"><canvas id="bg" width="960" height="540"></canvas><canvas id="liq" width="960" height="540"></canvas><canvas id="jel" width="960" height="540"></canvas><canvas id="fx" width="960" height="540"></canvas></div><canvas id="grain" width="480" height="270" style="opacity:.16;mix-blend-mode:screen"></canvas></div>
+<script type="module">
+import {mountHero} from './hero.js';
+const Q = new URLSearchParams(location.search), MODE = Q.get('t') || 'jar', SM = Q.get('sm') || 'https://hartswf0.github.io/secondhand-motion/', W = 960, H = 540;
+const F = await fetch('current/films109.json').then(r => r.json()); const pick = slugs => slugs.map(s => F.find(f => f.slug === s)).filter(Boolean);
+const FILMS = pick((Q.get('films') || 'giraffe-walks-past,cat,bicycle,dog,butterfly').split(','));
+const IMG = new Map(), img = u => { let e = IMG.get(u); if (!e) { const im = new Image(); im.crossOrigin = 'anonymous'; e = {im, ok: false}; im.onload = () => e.ok = true; im.src = u; IMG.set(u, e); } return e; };
+const frameURL = (f, i) => `${SM}${f.dir}/f${String(((i % f.n) + f.n) % f.n).padStart(3, '0')}.jpg`;
+FILMS.forEach(f => { for (let i = 0; i < f.n; i++) img(frameURL(f, i)); });
+const frame = (k, t) => { const f = FILMS[k % FILMS.length]; const e = img(frameURL(f, Math.floor(t * Math.min(10, f.fps || 8)))); return e.ok ? e.im : null; };
+const $ = id => document.getElementById(id), bg = $('bg').getContext('2d'), lq = $('liq').getContext('2d'), fx = $('fx').getContext('2d'), gr = $('grain').getContext('2d');
+const sm = (a, b, x) => { const u = Math.min(1, Math.max(0, (x - a) / (b - a))); return u * u * (3 - 2 * u); }, lerp = (a, b, u) => a + (b - a) * u;
+const rnd = n => { const x = Math.sin(n * 127.1) * 43758.5; return x - Math.floor(x); };
+const SNOW = Array.from({length: 160}, (_, i) => [rnd(i + 1) * W, rnd(i + 7) * H, .4 + rnd(i + 3) * 1.6, rnd(i + 9)]);
+function water(t, glow = 1) {   // dark water lit from above, slow shafts, marine snow
+  const g = bg.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#0b1b2e'); g.addColorStop(.55, '#040a16'); g.addColorStop(1, '#01040b'); bg.fillStyle = g; bg.fillRect(0, 0, W, H);
+  bg.globalCompositeOperation = 'lighter'; for (let i = 0; i < 4; i++) { const x = W * (.2 + i * .2) + Math.sin(t * .1 + i * 2) * 30, sg = bg.createLinearGradient(x, 0, x - 90, H);
+    sg.addColorStop(0, `rgba(120,170,220,${.07 * glow})`); sg.addColorStop(1, 'rgba(120,170,220,0)'); bg.fillStyle = sg; bg.beginPath(); bg.moveTo(x - 24 - i * 6, 0); bg.lineTo(x + 24 + i * 6, 0); bg.lineTo(x - 60, H); bg.lineTo(x - 150, H); bg.fill(); }
+  bg.fillStyle = 'rgba(200,220,240,.5)'; for (const [x, y, r, p] of SNOW) { const yy = (y - t * (6 + p * 10) + H * 10) % H; bg.globalAlpha = .15 + .35 * p; bg.beginPath(); bg.arc(x + Math.sin(t * .3 + p * 9) * 6, yy, r, 0, 7); bg.fill(); } bg.globalAlpha = 1; bg.globalCompositeOperation = 'source-over'; }
+function grain(t) { const d = gr.createImageData(480, 270), a = d.data; let s = Math.floor(t * 24) * 9301 + 49297; for (let i = 0; i < a.length; i += 4) { s = (s * 9301 + 49297) % 233280; const v = s / 233280 * 255; a[i] = a[i + 1] = a[i + 2] = v; a[i + 3] = 255; } gr.putImageData(d, 0, 0); }
+// the wordmark: CONTAMINANT in Anton, glowing; optionally filled with film; jelly-films spaced in light
+function wordmark(ctx, t, x, y, size, a, filmFill, col = '#4a86ff') {
+  if (a <= 0) return; ctx.save(); ctx.globalAlpha = a; ctx.font = `${size}px Anton`; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; const word = 'CONTAMINANT', track = size * .035;
+  const ws = [...word].map(c => ctx.measureText(c).width), tw = ws.reduce((s, w) => s + w + track, -track); let cx = x - tw / 2;
+  const pos = ws.map(w => { const p = cx + w / 2; cx += w + track; return p; });
+  // glow
+  ctx.shadowColor = col; ctx.shadowBlur = size * .45; ctx.fillStyle = filmFill ? 'rgba(20,40,90,.9)' : col; [...word].forEach((c, i) => ctx.fillText(c, pos[i] + Math.sin(t * 9 + i) * .4, y)); ctx.shadowBlur = 0;
+  if (filmFill) { const off = document.createElement('canvas'); off.width = W; off.height = H; const o = off.getContext('2d'); [...word].forEach((c, i) => { o.font = `${size}px Anton`; o.textAlign = 'center'; o.fillText(c, pos[i], y); });
+    o.globalCompositeOperation = 'source-in'; for (let k = 0; k < 3; k++) { const im = frame(k + 1, t + k); if (im) o.drawImage(im, x - tw / 2 + k * tw / 3 - 20, y - size, tw / 3 + 40, size * 1.15); }
+    o.globalCompositeOperation = 'source-atop'; o.fillStyle = 'rgba(90,140,255,.28)'; o.fillRect(0, 0, W, H); ctx.globalAlpha = a; ctx.drawImage(off, 0, 0);
+    ctx.lineWidth = 1.4; ctx.strokeStyle = 'rgba(170,200,255,.9)'; ctx.shadowColor = col; ctx.shadowBlur = size * .2; [...word].forEach((c, i) => ctx.strokeText(c, pos[i], y)); ctx.shadowBlur = 0; }
+  ctx.restore(); }
+function sub(ctx, text, x, y, size, a, col = '#bcd2ff', track = .62) { if (a <= 0) return; ctx.save(); ctx.globalAlpha = a; ctx.font = `300 ${size}px Jost`; ctx.fillStyle = col; ctx.textAlign = 'center'; ctx.shadowColor = col; ctx.shadowBlur = size * .5;
+  const cs = [...text], ws = cs.map(c => ctx.measureText(c).width), tr = size * track, tw = ws.reduce((s, w) => s + w + tr, -tr); let cx = x - tw / 2; cs.forEach((c, i) => { ctx.fillText(c, cx + ws[i] / 2, y); cx += ws[i] + tr; }); ctx.restore(); }
+
+// ---------- 1 · THE JAR: the jelly swims into a specimen jar; film rises in the glass; the label; the wordmark; the camera pushes into the film
+const JX = 640, JY = 306, JW = 262, JH = 334, jx0 = JX - JW / 2, jy0 = JY - JH / 2 + 24, jx1 = JX + JW / 2, jy1 = JY + JH / 2;
+function jarPath(c) { const r = 26; c.beginPath(); c.moveTo(jx0 + r, jy0); c.lineTo(jx1 - r, jy0); c.quadraticCurveTo(jx1, jy0, jx1, jy0 + r); c.lineTo(jx1, jy1 - r); c.quadraticCurveTo(jx1, jy1, jx1 - r, jy1); c.lineTo(jx0 + r, jy1); c.quadraticCurveTo(jx0, jy1, jx0, jy1 - r); c.lineTo(jx0, jy0 + r); c.quadraticCurveTo(jx0, jy0, jx0 + r, jy0); c.closePath(); }
+function reel(c, cx, cy, rx, ry, rot, a, ink = '#1b2640', lid = '#d79a3e') { c.save(); c.globalAlpha = a; c.fillStyle = ink; c.fillRect(cx - rx, cy, rx * 2, 22); c.beginPath(); c.ellipse(cx, cy + 22, rx, ry, 0, 0, Math.PI); c.fill();
+  c.fillStyle = '#efe4cc'; for (let i = 0; i < 18; i++) { const u = (i + .5) / 18, xx = cx - rx + u * rx * 2; c.globalAlpha = a * .8 * Math.sin(u * Math.PI); c.fillRect(xx - 3, cy + 7, 6, 8); } c.globalAlpha = a;
+  c.beginPath(); c.ellipse(cx, cy, rx, ry, 0, 0, 7); c.fillStyle = lid; c.fill(); c.strokeStyle = ink; c.lineWidth = 3; c.stroke(); c.fillStyle = ink;
+  for (let i = 0; i < 5; i++) { const q = rot + i * 1.2566; c.beginPath(); c.ellipse(cx + Math.cos(q) * rx * .55, cy + Math.sin(q) * ry * .55, rx * .15, ry * .25, 0, 0, 7); c.fill(); } c.beginPath(); c.ellipse(cx, cy, rx * .12, ry * .2, 0, 0, 7); c.fill(); c.restore(); }
+function jarScene(t) {
+  water(t); fx.clearRect(0, 0, W, H); lq.clearRect(0, 0, W, H);
+  const draw = sm(1.2, 3.4, t), fill = sm(3.4, 6.2, t), lab = sm(5.2, 6.4, t), word = sm(6.4, 7.6, t), push = sm(8.2, 9.4, t);
+  // glass: drawn in light, then filled
+  if (draw > 0) { lq.save(); jarPath(lq); lq.clip(); lq.fillStyle = `rgba(10,20,32,${.55 * draw})`; lq.fillRect(0, 0, W, H);
+    if (fill > 0) { const top = lerp(jy1, jy0 + 40, fill); lq.beginPath(); lq.moveTo(jx0, H); for (let x = jx0; x <= jx1; x += 6) lq.lineTo(x, top + Math.sin(x * .05 + t * 2.2) * 4); lq.lineTo(jx1, H); lq.closePath(); lq.clip();
+      const im = frame(1, t), im2 = frame(0, t + 1.3); lq.globalAlpha = .85; if (im) lq.drawImage(im, jx0 - 40, jy0, JW + 80, JH); lq.globalAlpha = .35 * sm(6, 8, t); if (im2) lq.drawImage(im2, jx0 - 40, jy0, JW + 80, JH);
+      lq.globalAlpha = 1; const tg = lq.createLinearGradient(0, top, 0, jy1); tg.addColorStop(0, 'rgba(90,150,190,.25)'); tg.addColorStop(1, 'rgba(10,30,50,.55)'); lq.fillStyle = tg; lq.fillRect(jx0, top, JW, jy1 - top); } lq.restore(); }
+  // the outline draws itself, the glass highlights, the reel lid
+  fx.save(); fx.strokeStyle = 'rgba(205,222,234,.85)'; fx.lineWidth = 2; const L = 2 * (JW + JH); fx.setLineDash([L * draw, L]); jarPath(fx); fx.stroke(); fx.setLineDash([]);
+  if (draw > .6) { const ga = (draw - .6) / .4; const hg = fx.createLinearGradient(jx0, 0, jx1, 0); hg.addColorStop(0, `rgba(255,255,255,${.16 * ga})`); hg.addColorStop(.15, 'rgba(255,255,255,0)'); hg.addColorStop(.85, 'rgba(255,255,255,0)'); hg.addColorStop(.95, `rgba(255,255,255,${.12 * ga})`); fx.fillStyle = hg; jarPath(fx); fx.fill();
+    fx.fillStyle = `rgba(38,48,60,${ga})`; fx.fillRect(jx0 - 6, jy0 - 16, JW + 12, 18); reel(fx, JX, jy0 - 40, 132, 30, t * .8, ga); }
+  // the label: paper, a band with CONTAMINANT, jelly-films, the number
+  if (lab > 0) { const ly = jy1 - 112 + (1 - lab) * 30, lw = 168, lx = JX - lw / 2; fx.globalAlpha = lab; fx.fillStyle = '#efe4cc'; fx.fillRect(lx, ly, lw, 92); fx.fillStyle = '#1b2640'; fx.fillRect(lx, ly, lw, 24);
+    fx.font = '15px Anton'; fx.fillStyle = '#efe4cc'; fx.textAlign = 'center'; fx.letterSpacing = '3px'; fx.fillText('CONTAMINANT', JX, ly + 18); fx.letterSpacing = '0px';
+    fx.font = '400 24px Jost'; fx.fillStyle = '#141b26'; fx.fillText('jelly-films', JX, ly + 58); fx.strokeStyle = 'rgba(27,38,64,.45)'; fx.lineWidth = 1; fx.beginPath(); fx.moveTo(lx + 14, ly + 70); fx.lineTo(lx + lw - 14, ly + 70); fx.stroke();
+    fx.font = '700 11px "Courier Prime"'; fx.fillStyle = '#1b2640'; fx.fillText('No. 01 · FILM, LIVE', JX, ly + 84); fx.globalAlpha = 1; }
+  fx.restore();
+  // the wordmark comes up beside the jar, in light
+  wordmark(fx, t, 290, 290, 62, word * (1 - push), true); sub(fx, 'jelly-films', 290, 326, 17, word * (1 - push));
+  // push in: into the film in the glass
+  $('push').style.transformOrigin = `${JX}px ${JY + 20}px`; $('push').style.transform = `scale(${1 + push * 3.4})`; }
+let HERO = null;
+if (MODE === 'jar') HERO = mountHero($('jel'), {transparent: true, noSnow: true, gain: 2.6, frames: i => frameURL(FILMS[2 % FILMS.length], i), n: FILMS[2 % FILMS.length].n, fps: 8,
+  drive: (t, jelly) => { const k = sm(.2, 4.6, t); jelly.position.set(lerp(-3.6, 1.75, k), lerp(1.3, -.5, k) + Math.sin(t * 1.2) * .06, 0); jelly.scale.setScalar(lerp(1.15, .72, k)); jelly.rotation.z = lerp(-.7, 0, k) + Math.sin(t * .8) * .05; }});
+
+// ---------- 2 · THE WORDMARK: a 35 mm gate; CONTAMINANT filled with film and lit blue; jelly-films; the letters break into flecks
+const PART = []; let partReady = false;
+function gate(c, a, t) { c.save(); c.globalAlpha = a; const wx = Math.sin(t * 7) * .8, wy = Math.cos(t * 5) * .6; c.translate(wx, wy); c.fillStyle = '#000'; c.fillRect(0, 0, 70, H); c.fillRect(W - 70, 0, 70, H);
+  c.fillStyle = 'rgba(230,220,200,.12)'; for (let y = -40 + (t * 120) % 40; y < H; y += 40) { c.fillRect(22, y, 26, 18); c.fillRect(W - 48, y, 26, 18); }
+  c.strokeStyle = 'rgba(200,170,120,.35)'; c.lineWidth = 2; c.strokeRect(84, 40, W - 168, H - 80); c.restore(); }
+function wordScene(t) {
+  water(t, .4); lq.clearRect(0, 0, W, H); fx.clearRect(0, 0, W, H); const g = sm(0, 1.2, t), wa = sm(1, 2.6, t), sa = sm(3, 4.4, t), brk = sm(6.2, 8, t);
+  // the film behind the gate, very dim
+  const im = frame(3, t); if (im) { lq.globalAlpha = .12 * g; lq.drawImage(im, 84, 40, W - 168, H - 80); lq.globalAlpha = 1; } gate(lq, g, t);
+  const flick = .92 + .08 * Math.sin(t * 31) * Math.sin(t * 7);
+  if (brk < 1) { fx.save(); fx.globalAlpha = 1 - brk; wordmark(fx, t, W / 2, 300, 150, wa * flick, true); sub(fx, 'jelly-films', W / 2, 360, 30, sa); fx.restore(); }
+  if (brk > 0) { if (!partReady) { const o = document.createElement('canvas'); o.width = W; o.height = H; const oc = o.getContext('2d'); wordmark(oc, t, W / 2, 300, 150, 1, true); const d = oc.getImageData(0, 0, W, H).data;
+      for (let i = 0; i < 9000; i++) { const x = Math.floor(rnd(i + 3) * W), y = Math.floor(rnd(i + 11) * H), k = (y * W + x) * 4; if (d[k + 3] > 90) PART.push([x, y, d[k], d[k + 1], d[k + 2], rnd(i + 5), rnd(i + 8)]); } partReady = true; }
+    fx.globalCompositeOperation = 'lighter'; for (const [x, y, r, gg, b, p, q] of PART) { const dx = Math.sin(p * 9 + brk * 3) * 90 * brk, dy = -brk * brk * (60 + q * 220) + Math.cos(q * 7 + brk * 2) * 30 * brk;
+      fx.fillStyle = `rgba(${r},${gg},${b},${(1 - brk) * .9})`; const s = 1.4 + brk * 2.2 * p; fx.fillRect(x + dx, y + dy, s, s); } fx.globalCompositeOperation = 'source-over'; } }
+
+// ---------- 3 · THE REEL: a reel turns; a strip unspools with live frames and becomes the jelly's tentacle; the name settles
+function stripPath(u, t) { const x = 300 + u * 380 + Math.sin(u * 5 + t * .9) * 60, y = 120 + u * 430 + Math.sin(u * 7 - t * 1.1) * 26; return [x, y]; }
+function reelScene(t) {
+  water(t, .7); lq.clearRect(0, 0, W, H); fx.clearRect(0, 0, W, H); const ra = sm(0, 1.2, t), un = sm(.8, 4.8, t), na = sm(4.6, 6, t), out = sm(7.4, 8.6, t);
+  // the strip of frames, unspooling from the reel
+  const N = 14; for (let i = N - 1; i >= 0; i--) { const u = i / N; if (u > un) continue; const [x, y] = stripPath(u, t), [x2, y2] = stripPath(u + .02, t), ang = Math.atan2(y2 - y, x2 - x) - Math.PI / 2;
+    lq.save(); lq.translate(x, y); lq.rotate(ang); lq.globalAlpha = (1 - out) * (1 - u * .5); lq.fillStyle = '#0a0d12'; lq.fillRect(-46, -30, 92, 60); const im = frame(i, t + i * .4); if (im) lq.drawImage(im, -36, -24, 72, 48);
+    lq.fillStyle = 'rgba(230,220,200,.55)'; for (let k = -2; k <= 2; k++) { lq.fillRect(-43, k * 12 - 3, 5, 6); lq.fillRect(38, k * 12 - 3, 5, 6); } lq.restore(); }
+  reel(fx, 300, 96, 120, 28, t * 1.6, ra * (1 - out * .6), '#1b2640', '#c98d2e');
+  wordmark(fx, t, 640, 230, 70, na * (1 - out), false, '#6fa0ff'); sub(fx, 'jelly-films', 640, 268, 18, na * (1 - out)); sub(fx, 'return to the reel', 640, 300, 12, na * (1 - out) * .8, '#f0a35a', .4); }
+if (MODE === 'reel') HERO = mountHero($('jel'), {transparent: true, noSnow: true, gain: 2.6, frames: i => frameURL(FILMS[0], i), n: FILMS[0].n, fps: 8,
+  drive: (t, jelly) => { const k = sm(3.6, 7.6, t); jelly.position.set(lerp(2.2, .9, k), lerp(-3, -.2, k), 0); jelly.scale.setScalar(.55); jelly.visible = t > 3.4; }});
+
+// ---------- outro: the wordmark small, the line, the address
+function outroScene(t) { water(t, .5); lq.clearRect(0, 0, W, H); fx.clearRect(0, 0, W, H); const a = sm(.3, 1.6, t), b = sm(1.4, 2.8, t), c = sm(2.4, 3.6, t);
+  const col = Q.get('col') || '#4a86ff'; wordmark(fx, t, W / 2, 270, 96, a, true, col); sub(fx, 'jelly-films', W / 2, 312, 22, b); sub(fx, Q.get('line') || 'return to the reel', W / 2, 360, 14, c, '#f0a35a', .4);
+  fx.save(); fx.globalAlpha = c * .8; fx.font = '300 13px "JetBrains Mono"'; fx.fillStyle = '#8293a4'; fx.textAlign = 'center'; fx.fillText('hartswf0.github.io/contaminant-jelly', W / 2, 470); fx.restore(); }
+
+const SCENE = {jar: jarScene, word: wordScene, reel: reelScene, outro: outroScene}[MODE], DUR = {jar: 9.4, word: 8, reel: 8.6, outro: 5.5}[MODE];
+window.__title = {dur: DUR, mode: MODE}; await document.fonts.ready; let t0 = null;
+(function loop(now) { requestAnimationFrame(loop); if (t0 === null) t0 = now; const t = (now - t0) / 1000; SCENE(t); grain(t); })(performance.now());
+const fit = () => { const s = Math.min(innerWidth / W, innerHeight / H); $('stage').style.transform = `translate(-50%,-50%) scale(${s})`; }; addEventListener('resize', fit); fit();
+</script></body></html>

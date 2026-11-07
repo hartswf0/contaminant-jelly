@@ -10,8 +10,8 @@
   const SM = Q.get('sm') || 'https://hartswf0.github.io/secondhand-motion/', CINEO = Q.get('cineo');
   const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const wait = (f, cb) => { const t = setInterval(() => { let v = null; try { v = f(); } catch (e) {} if (v) { clearInterval(t); cb(v); } }, 150); };
-  Promise.all([fetch('../current/films109.json').then(r => r.json()), fetch('footage.json').then(r => r.json()), fetch('../current/music.json').then(r => r.json()).catch(() => null), import('../current/screens.js')])
-    .then(([F, FT, MU, mod]) => wait(() => window.__bonus, B => start(B, F, FT, MU, mod))).catch(e => console.warn('[realfilm]', e));
+  Promise.all([fetch('../current/films109.json').then(r => r.json()), fetch('footage.json').then(r => r.json()), fetch('../current/music.json').then(r => r.json()).catch(() => null), import('../current/screens.js'), import('../current/flycam.js')])
+    .then(([F, FT, MU, mod, fly]) => wait(() => window.__bonus, B => { start(B, F, FT, MU, mod); fly.attachFlycam(B.THREE, B.renderer, B.scene, B.camera, {back: +(me.dataset.back || 1.7), reach: +(me.dataset.reach || 5), max: 5, fast: 10}); })).catch(e => console.warn('[realfilm]', e));
 
   function start(B, F0, FT, MU, mod) { let F = F0;
     const {THREE, scene, camera, renderer} = B, SCN = mod.makeScreens(THREE, scene, camera, {n: 3}); mod.cinema(B.hide || []); SCN.pool.forEach(S => { S.mat.depthTest = false; S.m.renderOrder = 999; });   // over the sketch's own placeholders

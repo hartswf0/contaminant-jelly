@@ -45,6 +45,7 @@ import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+import {attachFlycam} from './flycam.js';
 const $ = id => document.getElementById(id), Q = new URLSearchParams(location.search), DEMO = Q.has('demo'), COARSE = matchMedia('(pointer: coarse)').matches, DEBUG = Q.has('debug');
 const SM = Q.get('sm') || 'https://hartswf0.github.io/secondhand-motion/';
 let FILMS = await (await fetch('films109.json')).json();
@@ -61,6 +62,8 @@ const renderer = new THREE.WebGLRenderer({canvas: $('gl'), antialias: true, powe
 renderer.setPixelRatio(Math.min(COARSE ? 1.25 : 1.75, devicePixelRatio || 1)); renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1;
 const scene = new THREE.Scene(); scene.background = new THREE.Color(0x050302); scene.fog = new THREE.FogExp2(0x070403, .045);
 const camera = new THREE.PerspectiveCamera(60, 1, .05, 120);
+// a freer camera: further back by default; wheel or pinch to pull back, right-drag or two fingers to orbit and tilt, Q/E R/F Z/X, C recentres
+const FLY = attachFlycam(THREE, renderer, null, camera, {back: Q.has('demo') ? 1 : 1.3, reach: 3.2, max: 2.2, fast: 6});
 const composer = new EffectComposer(renderer); composer.addPass(new RenderPass(scene, camera));
 const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), .55, .45, .62); composer.addPass(bloom); composer.addPass(new OutputPass());
 function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); composer.setSize(w, h); bloom.setSize(w * .6, h * .6); camera.aspect = w / h; camera.updateProjectionMatrix(); const rc = $('rc'); rc.width = w; rc.height = h; }
@@ -98,7 +101,7 @@ function layRing(m, k) {
   ringOf[m] = k; const y = k * RS, tw = k * .17;   // each ring turns a little: the tube is a helix of moments
   for (let j = 0; j < PER; j++) { const s = m * PER + j, th = j / PER * Math.PI * 2 + tw, p = P[s];
     _o.position.set(Math.cos(th) * R, y, Math.sin(th) * R); _o.lookAt(0, y, 0); _o.updateMatrix(); panels.setMatrixAt(s, _o.matrix);
-    p.film = hash(k + 1000, j) % FILMS.length; p.frame = (k * 2 + j) % FILMS[p.film].n; p.play = 0; p.glow = 0; p.shown = -1; p.k = k; p.j = j; p.th = th; p.y = y; aSlot.setX(s, s); aGlow.setX(s, 0);
+    p.film = nextFilm(); p.frame = (k * 2 + j) % FILMS[p.film].n; p.play = 0; p.glow = 0; p.shown = -1; p.k = k; p.j = j; p.th = th; p.y = y; aSlot.setX(s, s); aGlow.setX(s, 0);
     show(s);
   }
   panels.instanceMatrix.needsUpdate = true; aSlot.needsUpdate = true;
@@ -319,6 +322,8 @@ function stepJelly(dt) {
   J.heading.lerp(want.add(new THREE.Vector3(0, .5, 0)).normalize(), 1 - Math.pow(.1, dt)).normalize(); J.q.slerp(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), J.heading), 1 - Math.pow(.05, dt));
   J.ph += dt * (performance.now() / 1000 - J.lastTap < 1.3 ? 1.25 : .5); J.glow = Math.max(0, J.glow - dt * 1.4);
 }
+// films are dealt from a shuffled deck: no film returns until every one has been shown
+function nextFilm() { if (!nextFilm.o || nextFilm.o.length !== FILMS.length) { nextFilm.o = [...Array(FILMS.length).keys()].sort(() => Math.random() - .5); nextFilm.i = 0; } return nextFilm.o[(nextFilm.i++) % nextFilm.o.length]; }
 // ------------------------------------------------------------------ camera: on the far side of the axis, level with the bell, so the wall behind it fills the frame
 let camA = 0;
 function stepCamera(dt) { const r = Math.hypot(J.p.x, J.p.z); if (r > .6) { let a = Math.atan2(J.p.z, J.p.x), d = a - camA; d = Math.atan2(Math.sin(d), Math.cos(d)); camA += d * (1 - Math.pow(.15, dt)); }

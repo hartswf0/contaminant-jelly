@@ -5,7 +5,7 @@
 import * as THREE from './paeleo/scion/videotext/vendor/three.module.min.js';
 
 export function mountHero(cv, opt = {}) {
-  const R = new THREE.WebGLRenderer({canvas: cv, antialias: true, alpha: false}); R.setPixelRatio(Math.min(2, devicePixelRatio));
+  const R = new THREE.WebGLRenderer({canvas: cv, antialias: true, alpha: !!opt.transparent}); if (opt.transparent) R.setClearColor(0x000000, 0); R.setPixelRatio(Math.min(2, devicePixelRatio));
   const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(38, 1, .1, 100); cam.position.set(0, 0, 9);
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   // water: a gradient, lighter where the light comes in
@@ -14,15 +14,15 @@ export function mountHero(cv, opt = {}) {
     fragmentShader: `varying vec2 v; uniform float uT; void main(){ vec3 deep = vec3(.008,.016,.032), top = vec3(.03,.07,.12); float g = smoothstep(.0, 1., v.y);
       float shaft = 0.; for (int i = 0; i < 4; i++) { float fi = float(i); float x = .18 + fi * .21 + .03 * sin(uT * .07 + fi * 2.); shaft += exp(-pow((v.x - x - (1. - v.y) * .12) / (.025 + .02 * fi), 2.)) * (.35 - fi * .06); }
       vec3 c = mix(deep, top, g * g) + vec3(.09,.16,.24) * shaft * pow(v.y, 2.2); gl_FragColor = vec4(c, 1.); }`}));
-  bg.frustumCulled = false; scene.add(bg);
+  bg.frustumCulled = false; if (!opt.transparent) scene.add(bg);
   // gaussian flecks
   const flecks = (n, fill) => { const P = new Float32Array(n * 3), C = new Float32Array(n * 3), S = new Float32Array(n), A = new Float32Array(n); for (let i = 0; i < n; i++) fill(i, P, C, S, A);
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(P, 3)); g.setAttribute('aC', new THREE.BufferAttribute(C, 3)); g.setAttribute('aS', new THREE.BufferAttribute(S, 1)); g.setAttribute('aA', new THREE.BufferAttribute(A, 1)); return g; };
-  const fleckMat = (bend) => new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: {uT: {value: 0}, uP: {value: 0}, uScale: {value: 1}, uLean: {value: new THREE.Vector2()}},
-    vertexShader: `attribute vec3 aC; attribute float aS, aA; uniform float uT, uP, uScale; uniform vec2 uLean; varying vec3 vC; varying float vA;
+  const fleckMat = (bend) => new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: {uT: {value: 0}, uP: {value: 0}, uScale: {value: 1}, uLean: {value: new THREE.Vector2()}, uGain: {value: opt.gain || 1}},
+    vertexShader: `attribute vec3 aC; attribute float aS, aA; uniform float uT, uP, uScale, uGain; uniform vec2 uLean; varying vec3 vC; varying float vA;
       void main(){ vec3 p = position; ${bend}
-        vec4 mv = modelViewMatrix * vec4(p, 1.); gl_Position = projectionMatrix * mv; gl_PointSize = aS * uScale / -mv.z; vC = aC; vA = aA; }`,
-    fragmentShader: `varying vec3 vC; varying float vA; void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; float g = exp(-r2 * 14.); gl_FragColor = vec4(vC * vA * g, 1.); }`});
+        vec4 mv = modelViewMatrix * vec4(p, 1.); gl_Position = projectionMatrix * mv; gl_PointSize = aS * uScale / -mv.z; vC = aC; vA = min(1., aA * uGain); }`,
+    fragmentShader: `varying vec3 vC; varying float vA; void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; float g = exp(-r2 * 14.); vec3 c = vC * vA * g; gl_FragColor = vec4(c, max(c.r, max(c.g, c.b))); }`});
   const jelly = new THREE.Group(); scene.add(jelly);
   // the bell: a half-ellipsoid of flecks; brighter at the rim, an amber glow on the right where light passes through
   const NB = 24000, blue = new THREE.Color('#86a6c6'), pale = new THREE.Color('#d7e6f3'), amber = new THREE.Color('#f2a453');
@@ -39,7 +39,7 @@ export function mountHero(cv, opt = {}) {
   const frame = new THREE.Mesh(new THREE.PlaneGeometry(1.25, .94), new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: {map: {value: ftex}, uA: {value: 0}},
     vertexShader: 'varying vec2 v; void main(){ v = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }',
     fragmentShader: `uniform sampler2D map; uniform float uA; varying vec2 v; void main(){ vec3 c = texture2D(map, v).rgb; float l = dot(c, vec3(.3,.59,.11)); float e = smoothstep(.0, .18, v.x) * smoothstep(1., .82, v.x) * smoothstep(.0, .2, v.y) * smoothstep(1., .8, v.y);
-      vec3 tone = mix(vec3(.15,.22,.3), vec3(1.,.72,.42), smoothstep(.15, .9, l)); gl_FragColor = vec4(tone * l * 1.5 * e * uA, 1.); }`}));
+      vec3 tone = mix(vec3(.15,.22,.3), vec3(1.,.72,.42), smoothstep(.15, .9, l)); vec3 o = tone * l * 1.5 * e * uA; gl_FragColor = vec4(o, max(o.r, max(o.g, o.b))); }`}));
   frame.position.set(.18, .38, .15); frame.rotation.y = -.25; jelly.add(frame);
   const imgs = new Map(); const img = u => { let e = imgs.get(u); if (!e) { const im = new Image(); im.crossOrigin = 'anonymous'; e = {im, ok: false}; im.onload = () => e.ok = true; im.src = u; imgs.set(u, e); } return e; };
   // tentacles: one film strip, three filaments with bright tips, and soft oral arms
@@ -57,7 +57,7 @@ export function mountHero(cv, opt = {}) {
   addEventListener('pointermove', e => { ptr.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight * 2 - 1)); }, {passive: true});
   const size = () => { const w = cv.clientWidth, h = cv.clientHeight; R.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); const us = h * R.getPixelRatio() * .5 / Math.tan(cam.fov * Math.PI / 360) / 330;
     [bellM, tentM, armM, snowM].forEach(m => m.uniforms.uScale.value = us); jelly.scale.setScalar(w < h ? .8 : 1); };
-  addEventListener('resize', size); size();
+  addEventListener('resize', size); size(); if (opt.noSnow) snowM.uniforms.uScale.value = 0;
   const api = {scroll: 0, stop: false, jelly}; jelly.position.set(cam.aspect < 1 ? .3 : .7, .25, 0);
   (function frameLoop(now) { if (api.stop) return; requestAnimationFrame(frameLoop); const dt = Math.min(.05, (now - last) / 1000); last = now; if (!reduce) t += dt; else t = 2;
     const ph = (t / 3.2) % 1, pulse = ph < .3 ? Math.sin(ph / .3 * Math.PI) : 0; bellM.uniforms.uP.value = pulse;
@@ -73,6 +73,7 @@ export function mountHero(cv, opt = {}) {
     if (opt.frames) { ft += dt; if (ft > 1 / (opt.fps || 8)) { ft = 0; fi = (fi + 1) % (opt.n || 30); for (let k = 1; k < 3; k++) img(opt.frames(fi + k)); }
       const e = img(opt.frames(fi)); if (e.ok) { fx.drawImage(e.im, 0, 0, fc.width, fc.height); ftex.needsUpdate = true; frame.material.uniforms.uA.value = Math.min(.85, frame.material.uniforms.uA.value + dt * .4); } }
     [bellM, tentM, armM, snowM].forEach(m => m.uniforms.uT.value = t); bg.material.uniforms.uT.value = t;
+    if (opt.drive) opt.drive(t, jelly, cam, api);   // a title sequence can steer the jelly
     R.render(scene, cam); })(performance.now());
   return api;
 }

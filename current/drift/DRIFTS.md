@@ -248,3 +248,30 @@ v2 was legible for the same reason: real image planes.
 - **The drift landing** is in the water style: thin type, the wordmark, live doodles drawn in thin light, jar shelves for the episodes and the eleven drifts, and a list for the subjects.
 - **The demo:** `current/v2.html?demo` (The Rising Tube) pulls the camera back from inside the bell (5.4 behind instead of 3.4, looking up the tube), hides every word, starts itself, swims with a slow wandering hold, and pulses every 5 s. Its recording (`play/demo-v2.mp4`) opens the index right after the landing.
 - **Newly linked:** VIDEOTEXT (`paeleo/scion/videotext/`); and, in the bolas repo, the Crash Lab process (18 cases, including *CINEOSIS in the crash lab*), the 108-shot cutout worms, and the SCION swarm operator.
+
+## Three trailers, freer cameras, every version in a jar
+**Titles** (`titles.html?t=jar|word|reel|outro`): drawn from a single clock, so they render frame by frame.
+- **The Jar:** the landing's jelly swims into a specimen jar drawn in light. Film rises in the glass, the CONTAMINANT label settles, the wordmark glows in, and the camera pushes into the film.
+- **The Wordmark:** CONTAMINANT in a 35 mm gate (sprockets, gate weave, flicker), its letters filled with moving film and edged in blue light. *jelly-films* spaces in, then the letters break into flecks.
+- **The Reel:** a reel turns and a strip of live frames unspools from it, becoming the jelly's tentacle.
+
+**Trailers** (`play/trailer-jar.mp4`, `trailer-wordmark.mp4`, `trailer-reel.mp4`):
+| trailer | song | the first cut lands at | shots |
+|---|---|---|---|
+| The Jar | *Gospel Under Water* | the surge out of its quiet, about 52 s | the design videos and their drifts, the v2 demo, Medusae |
+| The Wordmark | *Stratospheric Void Crossing* | where it comes back in, about 34 s | the song videos and their drifts, a sign level, the Sewer |
+| The Reel | *The Long Descent (Memory Rot)* | its first full swell, about 31.6 s | every version, the archive levels, the Reel and Worms bonus pieces |
+
+How the shots are chosen and cut:
+- **Highlight windows:** every clip is scored frame by frame (motion, contrast, bright pictures). Each shot takes the best window, or the second-best when another trailer already used that clip, so no moment repeats across the trailers.
+- **On the beat:** cuts fall every 4 beats, dissolving through gaussian splats.
+
+**Cameras** (`current/flycam.js`): a camera layer over any piece's own camera.
+- **Controls:** wheel or pinch pulls back, right-drag or two fingers orbit and tilt, Q/E · R/F · Z/X do the same from the keyboard, C recentres.
+- **Speed:** moving fast, it lags, pulls back and widens.
+- **Where:**
+  - v2 is further back by default;
+  - the four bonus sketches get the full open camera, no longer claustrophobic.
+- **v2's wall** now deals films from a shuffled deck, so none repeats until all have been shown.
+
+**Every version** has a jar on the index (v7 down to v1), filled with a frame-stepped recording of it swimming (`play/ver-v*.mp4`).
