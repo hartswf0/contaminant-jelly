@@ -20,12 +20,12 @@ h1{margin:0;font:200 clamp(44px,8vw,104px)/1 var(--sans);letter-spacing:.01em;op
 main{position:relative;z-index:1;background:linear-gradient(rgba(2,6,17,0),var(--bg) 26vh);padding:14vh clamp(20px,7vw,96px) 10vh}
 main+main{background:var(--bg);padding-top:6vh}
 .sec{max-width:1240px;margin:0 auto 18vh}.sec h2{margin:0;font:200 clamp(30px,4.4vw,58px)/1.05 var(--sans)}.sec p.l{margin:14px 0 0;max-width:560px;color:var(--dim)}
-.shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,210px),1fr));gap:44px 30px;margin-top:48px}
-.jar{display:block}.jar .cap{margin-top:12px}.jar .cap b{display:block;font:300 21px/1.2 var(--sans)}.jar .cap i{display:block;font:300 12px/1.4 var(--mono);color:var(--faint);margin-top:4px;font-style:normal}
+.shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,180px),1fr));gap:44px 28px;margin-top:48px}
+.jar{display:block}.jar .cap{margin-top:10px;text-align:center}.jar .cap b{display:block;font:300 21px/1.2 var(--sans)}.jar .cap i{display:block;font:300 12px/1.4 var(--mono);color:var(--faint);margin-top:4px;font-style:normal}
 .jar .now{position:absolute;left:50%;top:2%;transform:translateX(-50%);font:300 11px var(--mono);color:var(--glow);opacity:0;transition:opacity .4s;white-space:nowrap}.jar.live .now{opacity:.9}
 .jar:hover .cap b{color:var(--glow)}
 .pt{margin-top:44px}.trow{display:grid;grid-template-columns:170px 1fr;gap:24px;padding:22px 0;border-top:1px solid var(--line);align-items:center}.tname b{display:block;font:300 22px var(--sans)}.tname i{font:300 12px var(--mono);color:var(--faint);font-style:normal}
-.tjars{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:18px}.tjars a{display:block;transition:transform .3s}.tjars a:hover,.tjars a:focus-visible{transform:translateY(-6px)}
+.tjars{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:16px}.tjars a{display:block;transition:transform .3s}.tjars a:hover,.tjars a:focus-visible{transform:translateY(-6px)}
 .read{position:sticky;bottom:16px;z-index:4;background:rgba(2,6,17,.85);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);padding:10px 14px;border-radius:10px}.read{min-height:3em;margin:22px 0 0;max-width:760px;color:var(--dim);font-size:15px}.read b{font-weight:300;color:var(--ink);margin-right:10px;font-size:20px}
 /* the way: one video becoming one game */
 .way{position:relative;z-index:1;background:var(--bg)}.stage{position:sticky;top:0;height:100svh;display:grid;place-items:center;pointer-events:none}
@@ -92,42 +92,49 @@ footer{max-width:1240px;}.bigwm{max-width:1240px;margin:0 auto 26px;font:400 cla
 </main>
 <script type="module">
 import {mountHero} from './hero.js';
-import {jarSVG, jarDefs, JAR_CSS, jarCard, JC_CSS} from './jar.js';
-document.head.insertAdjacentHTML('beforeend', `<style>${JAR_CSS}${JC_CSS}</style>`); document.body.insertAdjacentHTML('beforeend', jarDefs());
+import {bottle, BOTTLE_CSS, iconFor} from './labels/jarlab.js';
+document.head.insertAdjacentHTML('beforeend', `<style>${BOTTLE_CSS}</style>`); document.body.insertAdjacentHTML('beforeend', '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="jdefs"></defs></svg>');
 // REST: the jelly. A real film lives in its bell.
 const Q = new URLSearchParams(location.search), SM = Q.get('sm') || 'https://hartswf0.github.io/secondhand-motion/', HF = [['hand', 62], ['face', 38], ['eye', 32], ['fish', 25]][Math.floor(Math.random() * 4)];
 let hero = null; try { hero = mountHero(document.getElementById('hero'), {frames: i => `${SM}shots/${HF[0]}/frames/f${String(i % HF[1]).padStart(3, '0')}.jpg`, n: HF[1], fps: 8}); } catch (e) {}
 const hc = document.getElementById('hero'); addEventListener('scroll', () => { const k = Math.min(1, scrollY / innerHeight); if (hero) hero.scroll = k; hc.style.opacity = 1 - .85 * k; }, {passive: true});
-// the shelves: one glass jar each; the film plays in the glass, then the game
-const J = [['ascent', 'design_v2_720', 'Ascent', 'galleries of frames'], ['pairs', 'design_v4_720', 'Pairs', 'a face and a hand'], ['lure', 'design_v5_720', 'Lure', 'an angler with a lure'], ['surface', 'design_v6_720', 'Toward the Surface', 'a face by a tiny jelly'],
-  ['halo', 'song_neonbutterfly-02', 'Halo', 'a ring of films'], ['rayrun', 'song_nightbus-03', 'Ray Run', 'a ray overhead'], ['slices', 'song_nightbus-06', 'Slices', 'a chain of slices'], ['caves', 'song_nightbus-08', 'Twin Caves', 'two cave mouths'],
-  ['bloom', 'song_nightbus-13', 'Bloom', 'films in bloom'], ['descent', 'song_nightbus-14', 'The Long Descent', 'sinking to a point'], ['silt', 'song_nightbus-17', 'Silt Bench', 'an angler in silt']];
+// the shelves: every piece in a specimen jar; a standard label (CONTAMINANT, its icon, its name, its number); the film fills the jar above the label
+const PAL = [['#8fb3d6', '#d79a3e', '#1d2a4f'], ['#3e8f9a', '#b8452f', '#1f1720'], ['#7fb9c9', '#6c8ea8', '#16263a'], ['#c49ad6', '#8c5aa8', '#2a1736'], ['#5d7ea6', '#a37a4a', '#141c2a'], ['#e0b45a', '#c98d2e', '#2e2210'], ['#7bb39a', '#4e8a6c', '#13261d'], ['#d98b74', '#b4553c', '#2a1410']];
+const J = [['ascent', 'design_v2_720', 'Ascent', 'galleries of frames', 'design_v2'], ['pairs', 'design_v4_720', 'Pairs', 'a face and a hand', 'design_v4'], ['lure', 'design_v5_720', 'Lure', 'an angler with a lure', 'design_v5'], ['surface', 'design_v6_720', 'Toward the Surface', 'a face by a tiny jelly', 'design_v6'],
+  ['halo', 'song_neonbutterfly-02', 'Halo', 'a ring of films', 'song_neonbutterfly-02'], ['rayrun', 'song_nightbus-03', 'Ray Run', 'a ray overhead', 'song_nightbus-03'], ['slices', 'song_nightbus-06', 'Slices', 'a chain of slices', 'song_nightbus-06'], ['caves', 'song_nightbus-08', 'Twin Caves', 'two cave mouths', 'song_nightbus-08'],
+  ['bloom', 'song_nightbus-13', 'Bloom', 'films in bloom', 'song_nightbus-13'], ['descent', 'song_nightbus-14', 'The Long Descent', 'sinking to a point', 'song_nightbus-14'], ['silt', 'song_nightbus-17', 'Silt Bench', 'an angler in silt', 'song_nightbus-17']];
 const A = [['doodles', 'Doodles', 'traced drawings'], ['menagerie', 'Menagerie', '86 creatures'], ['bolas', 'Bolas', 'drawn worms'], ['strata', 'Strata', '1900s to 2020s'], ['spectrum', 'Spectrum', 'sorted by colour'], ['sub-person', 'The Subjects', 'people to crowds']];
 const B = [['reel', 'Film-Reel Jelly', 'a 3D reel', 'bonus/reel.html'], ['sewer', 'Sentinel Timeworm', 'the sewer of lost video', 'bonus/sewer.html'], ['medusae', 'Afterlight Medusae', 'a 12-reel voyage', 'bonus/medusae.html'], ['worms', 'Raw Doodle Worms', 'the periodic table', 'bonus/worms.html']];
-const card = (href, title, line, film, game, art) => `<a class="jar" href="${href}" data-film="${film || ''}" data-game="${game || ''}">${jarCard({art, alt: title})}<div class="cap"><b>${title}</b><i>${line}</i></div></a>`;
+const defs = document.getElementById('jdefs');
+const jar = (href, o, film, game, cap) => { const b = bottle('specimen', o); defs.insertAdjacentHTML('beforeend', b.defs); return `<a class="jar" href="${href}" data-film="${film || ''}" data-game="${game || ''}">${b.html}${cap ? `<div class="cap"><b>${o.name}</b><i>${cap}</i></div>` : ''}</a>`; };
+const lvl = (id, name, k, icon, poster) => { const [tint, lid, ink] = PAL[k % PAL.length]; return {id, name, seed: 7 + k * 5, no: k + 1, tint, lid, ink, icon: iconFor(icon, ink, lid), poster}; };
 const fv = v => `current/fal/${v}.mp4`, pv = id => `current/drift/play/${id}.mp4`;
-document.getElementById('jars').innerHTML = J.map(([id, v, t, l]) => card(`current/drift/?v=${id}`, t, l, fv(v), pv(id), `labels/jars/${id}.svg`)).join('');
-document.getElementById('arch').innerHTML = A.map(([id, t, l]) => card(`current/drift/?v=${id}`, t, l, '', id === 'sub-person' ? '' : pv(id), `labels/jars/${id === 'sub-person' ? 'subjects' : id}.svg`)).join('');
-document.getElementById('bonus').innerHTML = B.map(([id, t, l, h]) => card(h, t, l, '', pv('bonus-' + id), `labels/jars/${id}.svg`)).join('');
-const live = (a, on) => { const [f, g] = a.querySelectorAll('video'), now = a.querySelector('.now'); clearTimeout(a._t); a.classList.toggle('live', on);
-  if (!on) { f.classList.remove('on'); g.classList.remove('on'); f.pause(); g.pause(); return; }
-  const game = () => { if (!a.dataset.game) return; if (!g.src) g.src = a.dataset.game; g.play().catch(() => {}); g.classList.add('on'); f.classList.remove('on'); now.textContent = 'the game'; if (a.dataset.film) a._t = setTimeout(film, 5200); };
-  const film = () => { if (!a.dataset.film) return game(); if (!f.src) f.src = a.dataset.film; f.play().catch(() => {}); f.classList.add('on'); g.classList.remove('on'); now.textContent = 'the film'; a._t = setTimeout(game, 3200); };
-  film(); };
-const jars = [...document.querySelectorAll('.jar')];
-if (matchMedia('(hover: hover)').matches) jars.forEach(a => { a.addEventListener('mouseenter', () => live(a, true)); a.addEventListener('mouseleave', () => live(a, false)); a.addEventListener('focus', () => live(a, true)); a.addEventListener('blur', () => live(a, false)); });
-else { let cur = null; const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { if (cur && cur !== e.target) live(cur, false); cur = e.target; live(cur, true); } else if (cur === e.target) { live(cur, false); cur = null; } }), {rootMargin: '-40% 0px -40% 0px'}); jars.forEach(a => io.observe(a)); }
-// the periodic table: glass jars with the sign's symbol; the question reads beside the table
+document.getElementById('jars').innerHTML = J.map(([id, v, t, l, th], k) => jar(`current/drift/?v=${id}`, lvl(id, t, k, id, `current/drift/thumbs/${th}.jpg`), fv(v), pv(id), l)).join('');
+document.getElementById('arch').innerHTML = A.map(([id, t, l], k) => jar(`current/drift/?v=${id}`, {...lvl(id, t, k + 3, id === 'sub-person' ? 'subjects' : id, id === 'sub-person' ? '' : `current/drift/play/${id}.jpg`), no: 12 + k}, id === 'sub-person' ? '' : pv(id), '', l)).join('');
+document.getElementById('bonus').innerHTML = B.map(([id, t, l, h], k) => jar(h, {...lvl(id, t, k + 5, id, `current/drift/play/bonus-${id}.jpg`), no: 18 + k}, pv('bonus-' + id), '', l)).join('');
+// live: the film fills the jar, then the game; leaving drains it back to its still
+const live = (a, on) => { const bt = a.querySelector('.bt'), [f, g] = a.querySelectorAll('video'); clearTimeout(a._t); bt.classList.toggle('live', on); bt.classList.remove('game'); a.classList.toggle('live', on);
+  if (!on) { f.pause(); g.pause(); return; } const first = a.dataset.film || a.dataset.game; if (!first) return; if (!f.src) f.src = first; f.play().catch(() => {});
+  if (a.dataset.film && a.dataset.game) a._t = setTimeout(() => { if (!g.src) g.src = a.dataset.game; g.play().catch(() => {}); bt.classList.add('game'); }, 3400); };
+const HOVER = matchMedia('(hover: hover)').matches; let cur = null; const io = HOVER ? null : new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { if (cur && cur !== e.target) live(cur, false); cur = e.target; live(cur, true); } else if (cur === e.target) { live(cur, false); cur = null; } }), {rootMargin: '-42% 0px -42% 0px'});
+const wire = a => { if (HOVER) { a.addEventListener('mouseenter', () => live(a, true)); a.addEventListener('mouseleave', () => live(a, false)); a.addEventListener('focus', () => live(a, true)); a.addEventListener('blur', () => live(a, false)); } else io.observe(a); };
+document.querySelectorAll('.jar').forEach(wire);
+// the periodic table: each sign in its own jar with its own icon, symbol and number, filled with one of its shots
 const pt = document.getElementById('pt'), read = document.getElementById('read'), tj = document.getElementById('tj'), say = (b, t) => { read.innerHTML = b ? `<b>${b}</b>${t}` : '&nbsp;'; };
-new IntersectionObserver((es, o) => { if (!es.some(e => e.isIntersecting)) return; o.disconnect(); Promise.all([fetch('labels/cineosis/index.json').then(r => r.json()), fetch('current/drift/data/cineosis.json').then(r => r.json())]).then(([IX, C]) => {
-  const byN = Object.fromEntries(C.signs.map(g => [g.n, g])), cnt = n => C.shots.filter(x => x.sign === n).length;
+new IntersectionObserver((es, o) => { if (!es.some(e => e.isIntersecting)) return; o.disconnect(); Promise.all([fetch('labels/cineosis/index.json').then(r => r.json()), fetch('current/drift/data/cineosis.json').then(r => r.json()), fetch('labels/icons.json').then(r => r.json())]).then(([IX, C, IC]) => {
+  const byN = Object.fromEntries(C.signs.map(g => [g.n, g])), base = Q.get('cineo') || C.base, shotsOf = n => C.shots.filter(x => x.sign === n);
   const KEYS = ['perception', 'affection', 'impulse', 'small', 'large', 'attraction', 'inversion', 'discourse', 'dream', 'recollection', 'relation', '\u0000opsign', 'hyalosign', 'chronosign', 'noosign', 'lectosign'];
   const typeOf = g => { const s = (g.image || '').toLowerCase(); if (s.startsWith('opsign') || s.startsWith('sonsign')) return 11; return KEYS.findIndex(k => s.includes(k)); };
-  const types = IX.filter(j => j.kind === 'type'), signs = IX.filter(j => j.kind === 'sign'), cell = (href, art, b, t, lab) => `<a href="${href}" data-b="${b}" data-t="${t.replace(/"/g, '&quot;')}" aria-label="${lab}">${jarCard({art, alt: lab})}</a>`;
-  pt.innerHTML = types.map((ty, ti) => { const mine = signs.filter(j => typeOf(byN[j.id] || {}) === ti); return `<div class="trow"><div class="tname"><b>${ty.name}</b><i>${mine.length} sign${mine.length === 1 ? '' : 's'}</i></div><div class="tjars">${cell(`current/drift/?v=type-${ty.file.slice(8)}`, `labels/cineosis/${ty.file}.svg`, ty.name, 'Swim the whole type: every shot of its signs.', ty.name)}${mine.map(j => cell(`current/drift/?v=sign-${j.id}`, `labels/cineosis/${j.file}.svg`, `${j.symbol} · ${j.name}`, `${j.question || ''} (${cnt(j.id)} shots)`, `${j.symbol} ${j.name}`)).join('')}</div></div>`; }).join('');
-  const rest = signs.filter(j => typeOf(byN[j.id] || {}) < 0); tj.innerHTML = rest.length ? `<div class="trow"><div class="tname"><b>Other signs</b></div><div class="tjars">${rest.map(j => cell(`current/drift/?v=sign-${j.id}`, `labels/cineosis/${j.file}.svg`, `${j.symbol} · ${j.name}`, j.question || '', j.symbol)).join('')}</div></div>` : '';
-  [...pt.querySelectorAll('a'), ...tj.querySelectorAll('a')].forEach(a => { const on = () => say(a.dataset.b, a.dataset.t), off = () => say(); a.addEventListener('mouseenter', on); a.addEventListener('focus', on); a.addEventListener('mouseleave', off); a.addEventListener('blur', off); });
-}).catch(() => {}); }, {rootMargin: '600px'}).observe(pt);
+  const types = IX.filter(j => j.kind === 'type'), signs = IX.filter(j => j.kind === 'sign');
+  const cell = (href, j, o, film, b, t) => { const ic = IC[j.file] || {}, bb = bottle('specimen', {...o, seed: 300 + (+String(j.id).replace(/\D/g, '') || j.index || 0) * 7, ink: ic.ink || '#1d2430', lid: ic.lid || '#b46d3d', tint: ic.lid || '#7fa3c7', icon: ic.icon || ''}); defs.insertAdjacentHTML('beforeend', bb.defs);
+    return `<a class="jar" href="${href}" data-film="${film || ''}" data-b="${b}" data-t="${String(t || '').replace(/"/g, '&quot;')}" aria-label="${b}">${bb.html}</a>`; };
+  const signCell = j => { const sh = shotsOf(j.id), w = sh.find(x => x.clip) || sh[0], poster = sh.find(x => x.thumb) || sh[0];
+    return cell(`current/drift/?v=sign-${j.id}`, j, {name: j.name, sym: j.symbol, n: j.id, no: 0, line: `${sh.length} SHOTS`, poster: poster ? base + (poster.thumb || poster.strip) : ''}, w && w.clip ? base + w.clip : '', `${j.symbol} · ${j.name}`, `${j.question || ''} (${sh.length} shots)`); };
+  pt.innerHTML = types.map((ty, ti) => { const mine = signs.filter(j => typeOf(byN[j.id] || {}) === ti), all = mine.flatMap(j => shotsOf(j.id)), w = all.find(x => x.clip), poster = all.find(x => x.thumb);
+    return `<div class="trow"><div class="tname"><b>${ty.name}</b><i>${mine.length} sign${mine.length === 1 ? '' : 's'}</i></div><div class="tjars">${cell(`current/drift/?v=type-${ty.file.slice(8)}`, ty, {name: ty.name, no: ti + 1, poster: poster ? base + (poster.thumb || poster.strip) : ''}, w ? base + w.clip : '', ty.name, 'Swim the whole type: every shot of its signs.')}${mine.map(signCell).join('')}</div></div>`; }).join('');
+  const rest = signs.filter(j => typeOf(byN[j.id] || {}) < 0); tj.innerHTML = rest.length ? `<div class="trow"><div class="tname"><b>Other signs</b></div><div class="tjars">${rest.map(signCell).join('')}</div></div>` : '';
+  [...pt.querySelectorAll('a'), ...tj.querySelectorAll('a')].forEach(a => { wire(a); const on = () => say(a.dataset.b, a.dataset.t), off = () => say(); a.addEventListener('mouseenter', on); a.addEventListener('focus', on); a.addEventListener('mouseleave', off); a.addEventListener('blur', off); });
+}).catch(e => console.warn(e)); }, {rootMargin: '600px'}).observe(pt);
 // the way: the sticky frame shows the film, then the game, with the step in view
 const vids = [...document.querySelectorAll('.frame video')], tag = document.getElementById('wtag'), TAGS = ['1 · the video  ·  design_v5', '3 · the drift  ·  recorded in trailer mode'];
 const show = s => { vids.forEach(v => { const on = +v.dataset.k === s; if (on) { if (!v.src) v.src = v.dataset.src; v.play().catch(() => {}); } else v.pause(); v.classList.toggle('on', on); }); tag.textContent = TAGS[s]; };
