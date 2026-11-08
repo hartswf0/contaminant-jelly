@@ -111,3 +111,43 @@ There is a difference between watching a jelly cartwheel and feeling your little
 - **Turn by taking an arm out of time.**
 - **Ride a cut.**
 - **Sand ski**, as a dedicated slope.
+
+## 11 · More experiments: five rooms
+Each room is built around one thing a body of arms can do. Choose a room from the chips on the card (`?room=`). Finishing a room seals it and offers the next.
+
+| room | verb | the experiment | what it tests |
+|---|---|---|---|
+| 1 · The Silt Halfpipe | PEEL | the room above: one heavy anchor, one loose reel, a buried hand, the exit over the far lip | staggered release, the hinge, catching the wreck, the route through the silt as the edit |
+| 2 · The Kelp Swing | SWING | Nine stalks over a deep floor. Here you are **heavy** (gravity 3.4, drag 0.35), so the water will not hold you up. | **Hook and swing** (let go at the top of the arc) and **pass the pull** (hook the next stalk before releasing the last; registered when two stalks are held at once) |
+| 3 · The Ray's Wake | TOW | A ray crosses the room again and again, and the band behind it moves the water. An arm braced in the wake is carried along; the ray itself is a moving heavy anchor. | **Borrow a wake:** the fastest water belongs to something else |
+| 4 · Twice the Hand | TWICE | The film's hand moves through the water on the gesture's own timing (hesitation, reach, rest) as a bright ring. Where it has just been, it leaves five fading rings. | **Catch the same thing twice:** the live hand carries you while a ghost holds, and the bell swings between two moments. Ride the reach to its end. |
+| 5 · The Harpoon Range | CAST | Flick a finger and lift: the arm is thrown along the flick. A light reel it hooks comes flying back; a heavy post pulls you over to it. Haul three reels in, and the exit opens. | **Cast and catch:** an arm is also a harpoon |
+
+**The flick** is shared by every room: a finger moving faster than 11 m/s when it lifts throws its arm at 24 m/s. The arm hooks the first thing it meets, or recoils if it meets nothing.
+
+**Taking hold of a thrown arm** that is still hooked makes it yours again, still hooked.
+
+**Tested in the build (simulated input):**
+- the harpoon hooked a reel, which came flying back ("reel 1 of 3");
+- an arm braced in the ray's wake towed the bell forward;
+- two arms held the hand and its ghost ("twice the hand");
+- the halfpipe's peel and hinge registered, and the kelp reach stretched toward an out-of-range stalk.
+
+## 12 · Compatible with the open worlds
+**The shared body.** The body is now one module, `bonus/tentacles.js` (`makeArms`, `drawPosture`). It works in a plane and asks the host world only for its anchors. The Steer Lab and the Open Water both use it.
+
+**The fourth way to swim.** In the Open Water, **ARMS** joins GLIDE · REINS · TAP:
+- **The plane.** Entering ARMS sets a plane through the jelly facing the camera, and turns the camera side-on. The screen becomes the water your fingers work in, as in the lab. The plane rebases as you travel.
+- **Anchors in the world:**
+  - **kelp stalks**, at the height you touch them;
+  - **rocks**;
+  - **the places' rings**;
+  - **the floor** (a deep grip);
+  - **open water** (a brace).
+- **Films are light.** Throw an arm at one and it is hauled to you and taken.
+- **Currents.** An arm braced in a current is carried by it: borrowing the current.
+- **Shared with the lab:** strokes (double-tap), the posture glyph and finger rings, peel, catch, slip and the lost grip.
+
+**Tested in the Open World:** a finger on a real kelp stalk latched and moved the jelly; an arm thrown at a film hooked it, hauled it and took it.
+
+**Next:** the lab's rooms as places in the open water, built into the terrain (a kelp swing in the kelp forest, the ray crossing the open sea), so the experiments become the world.

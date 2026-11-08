@@ -38,6 +38,7 @@ import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RIGS, makeRig} from '../current/drift/rigs.js';
+import {makeArms, drawPosture} from './tentacles.js';
 const $ = id => document.getElementById(id), Q = new URLSearchParams(location.search), COARSE = matchMedia('(pointer: coarse)').matches, LO = COARSE || Q.has('lo');
 let RID = Q.get('rig'); if (!RID) try { RID = localStorage.getItem('cj-rig'); } catch (e) {} if (!RIGS.some(r => r.id === RID)) RID = 'reel';
 // ---------------------------------------------------------------- the lie of the floor, baked once into a heightmap that both the splats and the swimmer read
@@ -103,9 +104,10 @@ const staticVS = (glow, sway) => `uniform float uScale, uT, uFogD, uFade; unifor
 const bag = () => ({P: [], S: [], K: [], C: []}), put = (b, x, y, z, s, k, c) => { b.P.push(x, y, z); b.S.push(s); b.K.push(k); b.C.push(c[0], c[1], c[2]); };
 const bake = (b, glow, sway) => pts(geoOf({position: [new Float32Array(b.P), 3], aS: [new Float32Array(b.S), 1], aK: [new Float32Array(b.K), 1], aCol: [new Float32Array(b.C), 3]}), mat(staticVS(glow, sway), glow, {uFade: {value: 1}}));
 const KD = bag(), KG = bag(), RD = bag(), LD = bag(), LG = bag(), DARK = [.008, .014, .014];
-for (let i = 0, n = 0; i < 9000 && n < (LO ? 520 : 900); i++) { const x = (Math.random() - .5) * 780, z = (Math.random() - .5) * 780; if (fbm(x * .012 + 9, z * .012) < .52) continue; n++; const y0 = floorY(x, z), h = 10 + Math.random() * 26, segs = Math.round(h / 1.6);
+const KELPS = [], ROCKL = [];
+for (let i = 0, n = 0; i < 9000 && n < (LO ? 520 : 900); i++) { const x = (Math.random() - .5) * 780, z = (Math.random() - .5) * 780; if (fbm(x * .012 + 9, z * .012) < .52) continue; n++; const y0 = floorY(x, z), h = 10 + Math.random() * 26, segs = Math.round(h / 1.6); KELPS.push({x, z, y0, h});
   for (let s = 0; s <= segs; s++) { const k = s / segs; put(KD, x, y0 + k * h, z, 1.6 - .6 * k, k, DARK); } if (Math.random() < .45) put(KG, x, y0 + h, z, .7, 1, Math.random() < .3 ? [1, .6, .3] : [.25, .85, .8]); }
-for (let i = 0; i < (LO ? 220 : 340); i++) { const x = (Math.random() - .5) * 800, z = (Math.random() - .5) * 800, s = 1.5 + Math.random() * Math.random() * 8, y0 = floorY(x, z);
+for (let i = 0; i < (LO ? 220 : 340); i++) { const x = (Math.random() - .5) * 800, z = (Math.random() - .5) * 800, s = 1.5 + Math.random() * Math.random() * 8, y0 = floorY(x, z); ROCKL.push({x, z, y0, s});
   for (let j = 0; j < 14 + s * 6; j++) { const a = Math.random() * 6.283, b = Math.acos(Math.random()), r = s * (.6 + .4 * Math.random()); put(RD, x + Math.cos(a) * Math.sin(b) * r, y0 + Math.cos(b) * r * .6, z + Math.sin(a) * Math.sin(b) * r, s * .7, 0, DARK); } }
 bake(KD, false, true); bake(KG, true, true); bake(RD, false, false);
 // the places: shells of dark splats lit by points of their own colour, and a ring of light to swim into
@@ -179,7 +181,7 @@ const UP = new THREE.Vector3(0, 1, 0);
 const J = {p: new THREE.Vector3(SITES[4].x + 22, 0, SITES[4].z + 36), v: new THREE.Vector3(), dir: new THREE.Vector3(0, 0, -1), ph: .9, lastStroke: -9, interval: .84, kick: 0, boost: 0, got: 0, seen: new Set(), alt: 10, goal: null, trail: []};
 J.p.y = floorY(J.p.x, J.p.z) + J.alt;
 const C = {yaw: 0, z: .08, zT: .08, tgt: J.p.clone(), vel: new THREE.Vector3()};   // the view: yaw, semantic zoom (0 = the jelly, 1 = the whole sea)
-let MODE = 'glide'; try { MODE = localStorage.getItem('cj-swim') || (Q.get('mode')) || 'glide'; } catch (e) {} if (Q.get('mode')) MODE = Q.get('mode'); if (!['glide', 'reins', 'tap'].includes(MODE)) MODE = 'glide';
+let MODE = 'glide'; try { MODE = localStorage.getItem('cj-swim') || (Q.get('mode')) || 'glide'; } catch (e) {} if (Q.get('mode')) MODE = Q.get('mode'); if (!['glide', 'reins', 'tap', 'arms'].includes(MODE)) MODE = 'glide';
 const S = {state: 'card', hold: null, keys: new Set(), touches: new Map(), leaving: false, fov: 0, done: false, drag: null, pinch: null};
 const say = (t, s = 3) => { $('say').textContent = t; $('say').style.opacity = 1; S.sayT = performance.now() + s * 1000; };
 const pad = () => { try { return navigator.getGamepads && [...navigator.getGamepads()].find(Boolean) || null; } catch (e) { return null; } };
@@ -205,25 +207,66 @@ function pick(x, y) {   // what is under the finger: a place, a film, or the wat
   ndc.set(x / innerWidth * 2 - 1, -(y / innerHeight) * 2 + 1); ray.setFromCamera(ndc, cam); const o = ray.ray.origin, d = ray.ray.direction;
   if (C.z > .35) { for (let t = 0; t < 1600; t += 3) { _b.copy(o).addScaledVector(d, t); if (Math.abs(_b.x) < 450 && Math.abs(_b.z) < 450 && _b.y < floorY(_b.x, _b.z) + 1) return {p: _b.clone().setY(floorY(_b.x, _b.z) + J.alt), what: null}; } return null; }
   const plane = J.p.y; if (Math.abs(d.y) < .03) return {p: o.clone().addScaledVector(d, 30).setY(plane), what: null}; let t = (plane - o.y) / d.y; if (t < 0 || t > 160) t = 40; const p = o.clone().addScaledVector(d, t); p.y = plane; return {p, what: null}; }
+// ---------------------------------------------------------------- ARMS: the Steer Lab's body (tentacles.js) in the open water
+// On entering, a plane is set through the jelly facing the camera; the camera turns side-on; the screen is that plane.
+// Kelp, rocks, films, the places, the floor and the water become anchors; the currents carry an arm braced in them; a film you throw an arm at comes to you.
+const PL = {on: false, O: new THREE.Vector3(), e1: new THREE.Vector3(1, 0, 0), e2: new THREE.Vector3(0, 1, 0), n: new THREE.Vector3(0, 0, -1)}, AB = {x: 0, y: 0, vx: 0, vy: 0, th: 0, w: 0}, AR = makeArms({n: 6, AN: 16, reach: 7.2, R: .95 * 1.5}), ASCR = new Map();
+const toPlane = v => { _b.copy(v).sub(PL.O); return {x: _b.dot(PL.e1), y: _b.dot(PL.e2), d: _b.dot(PL.n)}; };
+const fromPlane = (x, y, d = 0) => PL.O.clone().addScaledVector(PL.e1, x).addScaledVector(PL.e2, y).addScaledVector(PL.n, d);
+const planeAt = (sx, sy) => { ndc.set(sx / innerWidth * 2 - 1, -(sy / innerHeight) * 2 + 1); ray.setFromCamera(ndc, cam); const pl = new THREE.Plane().setFromNormalAndCoplanarPoint(PL.n, J.p), hit = new THREE.Vector3(); return ray.ray.intersectPlane(pl, hit) ? toPlane(hit) : toPlane(J.p); };
+function enterArms() { if (PL.on) return; PL.on = true; PL.O.copy(J.p); const f = new THREE.Vector3(); cam.getWorldDirection(f); f.y = 0; if (f.lengthSq() < 1e-4) f.set(0, 0, -1); PL.n.copy(f.normalize()); PL.e2.set(0, 1, 0); PL.e1.crossVectors(PL.n, PL.e2).normalize(); AB.th = 0; AB.w = 0; AR.arms.forEach(a => { a.init = false; a.mode = 'free'; a.anc = null; }); J.goal = null; say('ARMS: the screen is the water your fingers work in', 3); }
+function leaveArms() { AR.releaseAll(AENV, T); PL.on = false; armCloud.visible = false; }
+const takeFilm = f => { if (f.got) return; f.got = true; J.got++; say(`${f.c.t}${f.c.y ? ' · ' + f.c.y : ''} · ${J.got} film${J.got > 1 ? 's' : ''}`); tone(660, 1.4, .05); tone(990, 1.8, .03); buzz([12, 40, 12], .5); J.kick = 1; rig.setFilm(f.tex); };
+const AENV = {
+  anchorAt(p, a, Bb, o) { const cast = o.cast, wp = fromPlane(p.x, p.y, 0);
+    for (const st of SITES) { const q = toPlane(st.G.position); if (Math.abs(q.d) < 12) { const dx = p.x - q.x, dy = p.y - q.y, d = Math.hypot(dx, dy); if (Math.abs(d - st.r) < (cast ? 1.6 : 2.2)) { const ax = q.x + dx / (d || 1) * st.r, ay = q.y + dy / (d || 1) * st.r; return {type: 'place', x: ax, y: ay, k: 62, heavy: true, w: fromPlane(ax, ay, q.d)}; } } }
+    let bf = null, bfd = cast ? 4 : 4.6; for (const f of FILMS) { if (f.got) continue; const q = toPlane(f.G.position); if (Math.abs(q.d) > 8) continue; const d = Math.hypot(p.x - q.x, p.y - q.y); if (d < bfd) { bfd = d; bf = {f, q}; } } if (bf) return {type: 'film', x: bf.q.x, y: bf.q.y, k: 40, light: true, obj: bf.f, w: bf.f.G.position};
+    for (const k of KELPS) { if (Math.abs(k.x - PL.O.x) > 40 || Math.abs(k.z - PL.O.z) > 40) continue; const q = toPlane(new THREE.Vector3(k.x, k.y0, k.z)); if (Math.abs(q.d) > 4 || Math.abs(p.x - q.x) > (cast ? 1.2 : 1.7) || p.y < q.y || p.y > q.y + k.h) continue; return {type: 'kelp', x: q.x, y: p.y, k: 62, heavy: true, w: new THREE.Vector3(k.x, PL.O.y + p.y, k.z)}; }
+    for (const r of ROCKL) { if (Math.abs(r.x - PL.O.x) > 40 || Math.abs(r.z - PL.O.z) > 40) continue; const q = toPlane(new THREE.Vector3(r.x, r.y0, r.z)); if (Math.abs(q.d) > r.s + 2) continue; const dx = p.x - q.x, dy = p.y - q.y, d = Math.hypot(dx, dy); if (d < r.s + (cast ? .8 : 1.3)) { const ax = q.x + dx / (d || 1) * r.s * .8, ay = q.y + dy / (d || 1) * r.s * .5; return {type: 'rock', x: ax, y: ay, k: 62, heavy: true, w: fromPlane(ax, ay, q.d)}; } }
+    if (wp.y < floorY(wp.x, wp.z) + .5) return {type: 'floor', x: p.x, y: p.y, k: 58, heavy: true, w: wp};
+    return null; },
+  update(an, a, f, dt) { if (an.w) { const q = toPlane(an.w); an.x = q.x; an.y = q.y; }
+    if (an.type === 'water') { const wp = fromPlane(an.x, an.y, 0); for (const c of CURR) { let bi = 0, bd = 1e9; for (let i = 0; i < c.N; i += 4) { const d = c.P[i].distanceToSquared(wp); if (d < bd) { bd = d; bi = i; } } if (bd < 36) { const t = c.P[(bi + 3) % c.N].clone().sub(c.P[bi]).normalize(); an.x += t.dot(PL.e1) * 14 * dt; an.y += t.dot(PL.e2) * 14 * dt; if (!S.borrowSaid) { S.borrowSaid = 1; say('an arm in the current: it borrows the current'); } } } } },
+  react(an, Fx, Fy, dt) { if (an.obj && an.obj.G) { const f = an.obj; f.G.position.addScaledVector(PL.e1, -Fx * dt * .25).addScaledVector(PL.e2, -Fy * dt * .25); f.x = f.G.position.x; f.y = f.G.position.y; f.z = f.G.position.z; if (f.G.position.distanceTo(J.p) < 3) takeFilm(f); } },
+  event(name, d) { if (name === 'latch') { buzz(d.tumbling ? [10, 40, 10] : 6); tone(d.an.type === 'water' ? 330 : 520, .4, .04); if (d.tumbling && d.an.type !== 'water') say('caught the wreck'); if (d.an.type === 'place') say('you have the ring'); }
+    else if (name === 'release') { buzz(5); tone(880, .3, .03); } else if (name === 'slip') { buzz([8, 16, 8]); say('it slipped'); } else if (name === 'lost') say('lost its grip');
+    else if (name === 'cast') { buzz(6); tone(640, .3, .03); } else if (name === 'hooked') { buzz([6, 14, 6]); say(d.an.light ? 'harpooned a film: it comes to you' : 'harpooned: it pulls you'); } else if (name === 'hauled') takeFilm(d.an.obj); else if (name === 'full') say('all six arms are taken'); } };
+function armsDown(e) { if (!PL.on) return; const now = performance.now(); if (!AR.F.size && now - (S.aTap || 0) < 300 && Math.hypot(e.clientX - S.alx, e.clientY - S.aly) < 40) { J.dir.copy(PL.e1.clone().multiplyScalar(-Math.sin(AB.th)).addScaledVector(PL.e2, Math.cos(AB.th))); stroke(.4); S.aTap = 0; return; } S.aTap = now; S.alx = e.clientX; S.aly = e.clientY;
+  if (AR.down(e.pointerId, planeAt(e.clientX, e.clientY), AB, AENV, T)) ASCR.set(e.pointerId, [e.clientX, e.clientY]); }
+function armsMove(e) { if (!AR.F.has(e.pointerId)) return; ASCR.set(e.pointerId, [e.clientX, e.clientY]); AR.move(e.pointerId, planeAt(e.clientX, e.clientY), T); }
+function armsUp(e, intr) { ASCR.delete(e.pointerId); AR.up(e.pointerId, intr, AB, AENV, T); }
+function armsStep(dt) { let q = toPlane(J.p); if (Math.hypot(q.x, q.y) > 35) { const sx = q.x, sy = q.y; PL.O.addScaledVector(PL.e1, sx).addScaledVector(PL.e2, sy); AR.shift(sx, sy); q = toPlane(J.p); }   // rebase the plane as you travel
+  AB.x = q.x; AB.y = q.y; AB.vx = J.v.dot(PL.e1); AB.vy = J.v.dot(PL.e2); const o = AR.step(dt, T, AB, AENV);
+  if (o.snap) { J.v.addScaledVector(PL.e1, o.fx * .14).addScaledVector(PL.e2, o.fy * .14); AB.w += o.tq * .16; }
+  J.v.addScaledVector(PL.e1, o.fx * dt).addScaledVector(PL.e2, o.fy * dt).addScaledVector(PL.n, (-q.d * 2 - J.v.dot(PL.n) * 2) * dt);
+  AB.w += o.tq * dt * 1.4 - Math.sin(AB.th) * dt * 1.1; AB.w *= Math.exp(-dt * 1.6); AB.th += AB.w * dt; AR.chains(dt, T, AB); }
+const armMat = mat(`uniform float uScale; attribute vec3 aCol; attribute float aS; varying vec3 vC; varying float vA; void main(){ vC = aCol; vA = 1.; vec4 mv = modelViewMatrix * vec4(position, 1.); gl_PointSize = max(1., aS * uScale / -mv.z); gl_Position = projectionMatrix * mv; }`, true);
+const armCloud = pts(geoOf({position: [new Float32Array(6 * 20 * 3), 3], aCol: [new Float32Array(6 * 20 * 3), 3], aS: [new Float32Array(6 * 20), 1]}), armMat); armCloud.visible = false;
+function armsDraw() { armCloud.visible = true; const P = armCloud.geometry.attributes.position.array, Cc = armCloud.geometry.attributes.aCol.array, Sz = armCloud.geometry.attributes.aS.array, N = AR.AN; let k = 0;
+  for (const a of AR.arms) { const X = a.X, taut = Math.min(1, a.ten / 30), owned = a.owner !== null || a.mode === 'cast' || (a.anc && a.anc.cast); for (let j = 0; j < N && k < 120; j++) { const w = fromPlane(X[j * 2], X[j * 2 + 1], -.4), u = j / (N - 1), bead = taut > .25 ? Math.max(0, 1 - Math.abs(((1 - u) - ((T * 1.6 + a.i * .2) % 1)) * 7)) * taut : 0, base = owned ? a.col : [.32, .42, .48], br = owned ? .4 + .55 * taut + .8 * bead : .25;
+      P.set([w.x, w.y, w.z], k * 3); Cc.set([base[0] * br + (a.slipK > .7 ? .5 : 0), base[1] * br, base[2] * br], k * 3); Sz[k] = (.42 - .2 * u) * (1 + .4 * taut); k++; } }
+  for (; k < 120; k++) Sz[k] = 0; ['position', 'aCol', 'aS'].forEach(n => armCloud.geometry.attributes[n].needsUpdate = true); }
 // ---------------------------------------------------------------- input
 const cv = $('gl'), GW = 56;
-const setMode = m => { MODE = m; try { localStorage.setItem('cj-swim', m); } catch (e) {} $('modes').innerHTML = [['glide', 'GLIDE'], ['reins', 'REINS'], ['tap', 'TAP']].map(([k, n]) => `<button data-m="${k}" class="${k === MODE ? 'on' : ''}">${n}</button>`).join(''); $('modes').querySelectorAll('button').forEach(b => b.onclick = e => { e.stopPropagation(); setMode(b.dataset.m); say(HELP[b.dataset.m], 4); }); if (m !== 'tap') J.goal = null; };
-const HELP = {glide: 'glide: a finger down anywhere is a stick; push to swoop, push to the rim to surge, let go to coast', reins: 'reins: two fingers are your fins; lift both to rise, drop both to dive, pull one to carve, spread to surge', tap: 'tap: tap where to go, a film or a place, and your jelly swims there itself'};
+const setMode = m => { MODE = m; try { localStorage.setItem('cj-swim', m); } catch (e) {} $('modes').innerHTML = [['glide', 'GLIDE'], ['reins', 'REINS'], ['tap', 'TAP'], ['arms', 'ARMS']].map(([k, n]) => `<button data-m="${k}" class="${k === MODE ? 'on' : ''}">${n}</button>`).join(''); $('modes').querySelectorAll('button').forEach(b => b.onclick = e => { e.stopPropagation(); setMode(b.dataset.m); say(HELP[b.dataset.m], 4); }); if (m !== 'tap') J.goal = null; if (m === 'arms') enterArms(); else if (PL.on) leaveArms(); };
+const HELP = {glide: 'glide: a finger down anywhere is a stick; push to swoop, push to the rim to surge, let go to coast', reins: 'reins: two fingers are your fins; lift both to rise, drop both to dive, pull one to carve, spread to surge', tap: 'tap: tap where to go, a film or a place, and your jelly swims there itself', arms: 'arms: the Steer Lab in the open water; every finger takes a tentacle and hooks kelp, rocks, films, the places, the floor or the water; peel, catch, flick to throw'};
 const begin = () => { if (S.state !== 'card') return; S.state = 'play'; setMode(MODE); $('modes').style.opacity = 1; $('card').style.opacity = 0; setTimeout(() => $('card').style.display = 'none', 700); $('hud').style.opacity = 1; buzz(10); audio();
   $('hint').innerHTML = COARSE ? HELP[MODE] + ' · the right bar zooms out to the whole sea' : HELP[MODE] + ' · W A S D and R F swim by hand · shift surges · scroll zooms out · H home'; $('hint').style.opacity = 1; setTimeout(() => $('hint').style.opacity = 0, 12000); };
 const gaugeY = () => [Math.max(90, innerHeight * .18), innerHeight - Math.max(70, innerHeight * .14)];
 function dragGauge(y) { const [y0, y1] = gaugeY(), k = THREE.MathUtils.clamp((y - y0) / (y1 - y0), 0, 1); if (S.drag === 'depth') { const fy = floorY(J.p.x, J.p.z), d = k * 110; J.alt = THREE.MathUtils.clamp(-d - fy, 3, Math.max(3, -1.5 - fy)); if (J.goal && !J.goal.what) J.goal.p.y = fy + J.alt; } else C.zT = 1 - k; }
 cv.addEventListener('pointerdown', e => { S.touches.set(e.pointerId, {x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY}); if (S.state === 'card') { begin(); return; } try { cv.setPointerCapture(e.pointerId); } catch (x) {}
   if (e.clientX < GW) { S.drag = 'depth'; dragGauge(e.clientY); return; } if (e.clientX > innerWidth - GW) { S.drag = 'zoom'; dragGauge(e.clientY); return; }
+  if (MODE === 'arms') { armsDown(e); return; }
   if (S.touches.size === 2) { const [a, b] = [...S.touches.values()]; a.x0 = a.x; a.y0 = a.y; b.x0 = b.x; b.y0 = b.y; if (MODE === 'tap') { S.pinch = {d: Math.hypot(a.x - b.x, a.y - b.y), z: C.zT, ang: Math.atan2(b.y - a.y, b.x - a.x), yaw: C.yaw}; S.hold = null; } if (MODE === 'reins') S.stick = null; return; }
   if (MODE === 'tap') S.hold = {id: e.pointerId, x: e.clientX, y: e.clientY, cx: e.clientX, cy: e.clientY, t: performance.now(), moved: 0};
   else S.stick = {id: e.pointerId, ox: e.clientX, oy: e.clientY, x: e.clientX, y: e.clientY, t: performance.now()}; });
 cv.addEventListener('pointermove', e => { const t = S.touches.get(e.pointerId); if (t) { t.x = e.clientX; t.y = e.clientY; }
   if (S.drag) { dragGauge(e.clientY); return; }
+  if (MODE === 'arms') { armsMove(e); return; }
   if (S.pinch && S.touches.size >= 2 && MODE === 'tap') { const [a, b] = [...S.touches.values()]; C.zT = THREE.MathUtils.clamp(S.pinch.z - Math.log(Math.hypot(a.x - b.x, a.y - b.y) / S.pinch.d) * .5, 0, 1); C.yaw = S.pinch.yaw - (Math.atan2(b.y - a.y, b.x - a.x) - S.pinch.ang); return; }
   if (S.stick && S.stick.id === e.pointerId) { S.stick.x = e.clientX; S.stick.y = e.clientY; }
   if (S.hold && S.hold.id === e.pointerId) { S.hold.cx = e.clientX; S.hold.cy = e.clientY; S.hold.moved = Math.max(S.hold.moved, Math.hypot(e.clientX - S.hold.x, e.clientY - S.hold.y)); } });
-const up = e => { S.touches.delete(e.pointerId); if (S.touches.size < 2) S.pinch = null; if (S.drag) { S.drag = null; return; }
+const up = e => { S.touches.delete(e.pointerId); if (S.touches.size < 2) S.pinch = null; if (S.drag) { S.drag = null; return; } if (MODE === 'arms') { armsUp(e, e.type === 'pointercancel'); return; }
   if (S.stick && S.stick.id === e.pointerId) { if (performance.now() - S.stick.t < 220 && Math.hypot(S.stick.x - S.stick.ox, S.stick.y - S.stick.oy) < 12) stroke(.3); S.stick = null; }
   if (S.hold && S.hold.id === e.pointerId) { const h = S.hold; S.hold = null; if (performance.now() - h.t < 300 && h.moved < 14) { const k = pick(h.x, h.y); if (k) { goTo(k.p, k.what, k.alt); buzz(5); tone(k.what ? 880 : 520, .5, .025); if (k.what && k.what.name) say(`to ${k.what.name}`); } } } };
 cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up); cv.addEventListener('contextmenu', e => e.preventDefault());
@@ -241,6 +284,8 @@ function drawGuide() { const W = innerWidth, H = innerHeight; if (gd.width !== W
   if (S.stick) { const R0 = Math.min(90, innerWidth * .12); gx.strokeStyle = 'rgba(240,163,90,.45)'; gx.lineWidth = 1.5; gx.beginPath(); gx.arc(S.stick.ox, S.stick.oy, R0, 0, 7); gx.stroke(); gx.fillStyle = 'rgba(240,163,90,.85)'; gx.beginPath(); gx.arc(S.stick.x, S.stick.y, 14, 0, 7); gx.fill(); }
   if (S.reins) for (const [t, l] of [[S.reins.a, S.reins.la], [S.reins.b, S.reins.lb]]) { gx.strokeStyle = 'rgba(240,163,90,.4)'; gx.lineWidth = 1.5; gx.beginPath(); gx.moveTo(t.x0, t.y0 - 110); gx.lineTo(t.x0, t.y0 + 110); gx.stroke(); gx.fillStyle = l > 0 ? '#f0a35a' : '#7fd3d3'; gx.beginPath(); gx.arc(t.x, t.y, 12, 0, 7); gx.fill(); }
   if (J.inCur && C.z < .4) { gx.fillStyle = 'rgba(160,240,240,.85)'; gx.font = "400 11px Anton, Impact, sans-serif"; gx.textAlign = 'center'; gx.fillText('IN THE CURRENT', W / 2, H - 92); }
+  if (MODE === 'arms' && PL.on) { for (const [id, f] of AR.F) { const sc = ASCR.get(id); if (!sc) continue; gx.strokeStyle = `rgb(${f.col.map(v => v * 255 | 0)})`; gx.lineWidth = 2; gx.beginPath(); gx.arc(sc[0], sc[1], 30, 0, 7); gx.stroke(); if (f.arm.mode === 'reach') { gx.setLineDash([3, 5]); gx.beginPath(); gx.arc(sc[0], sc[1], 38, 0, 7); gx.stroke(); gx.setLineDash([]); } }
+    const lft = [...ASCR.values()].some(q => q[0] > W / 2); drawPosture(gx, AR.arms, AB.th, lft ? 120 : W - 120, 150); }
   const far = C.z > .4; gx.textAlign = 'center';
   for (const s of SITES) { const q = screenOf(s.G.position); if (!q) continue; const c = '#' + new THREE.Color(s.col).getHexString(), d = s.G.position.distanceTo(J.p); if (!far && d > 260) continue;
     gx.fillStyle = c; gx.font = `400 ${far ? 14 : 11}px Anton, Impact, sans-serif`; gx.fillText((J.seen.has(s.id) ? '★ ' : '') + s.name.toUpperCase(), q[0], q[1] - (far ? 16 : 24)); gx.font = "300 10px 'JetBrains Mono', monospace"; gx.fillStyle = 'rgba(207,221,232,.7)'; gx.fillText(`${s.piece} · ${Math.round(d)} m`, q[0], q[1] - (far ? 3 : 11));
@@ -281,8 +326,8 @@ function frame(now) { requestAnimationFrame(frame); const dt = Math.min(.05, (no
   J.boost += (hard - J.boost) * Math.min(1, dt * 3); const b = beat(); J.interval = b ? b.L * (hard ? 1 : 2) : (hard ? .45 : .8);
   if (play && push) { const since = T - J.lastStroke; if (b) { const n = hard ? b.n : b.n - (b.n % 2); if (n !== J.lastBeat && since > J.interval * .6) { J.lastBeat = n; stroke(hard); } } else if (since > J.interval) stroke(hard); }
   J.ph = Math.min(.999, (T - J.lastStroke) / Math.max(.4, J.interval * 1.1)); if (!push && T - J.lastStroke > 1.5) J.ph = (T * .33) % 1;
-  const sp = J.v.length(); if (sp > .01) { const vd = J.v.clone().divideScalar(sp).lerp(J.dir, Math.min(1, dt * 2.6)).normalize(); J.v.copy(vd).multiplyScalar(sp); } J.v.multiplyScalar(Math.pow(.38, dt));
-  if (!steering) J.v.y += (wantY - J.p.y) * dt * (push ? .6 : 1.4); else if (J.p.y < fyHere + 4) J.v.y += (fyHere + 4 - J.p.y) * dt * 3; if (!play) J.v.set(Math.sin(T * .3) * .4, 0, Math.cos(T * .3) * .4);
+  const sp = J.v.length(); if (sp > .01 && MODE !== 'arms') { const vd = J.v.clone().divideScalar(sp).lerp(J.dir, Math.min(1, dt * 2.6)).normalize(); J.v.copy(vd).multiplyScalar(sp); } J.v.multiplyScalar(Math.pow(.38, dt));
+  if (MODE === 'arms' && PL.on && play) armsStep(dt); else if (!steering) J.v.y += (wantY - J.p.y) * dt * (push ? .6 : 1.4); else if (J.p.y < fyHere + 4) J.v.y += (fyHere + 4 - J.p.y) * dt * 3; if (!play) J.v.set(Math.sin(T * .3) * .4, 0, Math.cos(T * .3) * .4);
   // a current: if you are inside one it pulls you to its heart and carries you along it
   { let inC = null, best = 1e9, bi = 0; for (const c of CURR) { const st = c.last; for (let k = -40; k <= 40; k += 2) { const i = (st + k + c.N) % c.N, d = c.P[i].distanceToSquared(J.p); if (d < best) { best = d; bi = i; inC = c; } } if (best > 900) for (let i = 0; i < c.N; i += 6) { const d = c.P[i].distanceToSquared(J.p); if (d < best) { best = d; bi = i; inC = c; } } }
     if (inC) { inC.last = bi; const d = Math.sqrt(best); if (d < 5.5 && play) { const a = inC.P[bi], b = inC.P[(bi + 3) % inC.N]; _cT.copy(b).sub(a).normalize(); const pull = 1 - d / 5.5; J.v.lerp(_cT.clone().multiplyScalar(19), Math.min(1, dt * 2.2 * pull + dt * .4)); J.v.addScaledVector(a.clone().sub(J.p), dt * 1.6 * pull);
@@ -290,17 +335,20 @@ function frame(now) { requestAnimationFrame(frame); const dt = Math.min(.05, (no
   J.p.addScaledVector(J.v, dt); if (J.p.y < fyHere + 1.6) { J.p.y = fyHere + 1.6; J.v.y = Math.abs(J.v.y) * .3; } if (J.p.y > -1.5) { J.p.y = -1.5; J.v.y = Math.min(0, J.v.y); } ['x', 'z'].forEach(a => { if (Math.abs(J.p[a]) > 430) { J.p[a] = Math.sign(J.p[a]) * 430; J.v[a] *= -.3; } });
   if (J.kick > 0) J.kick = Math.max(0, J.kick - dt * 1.6); if (!J.trail.length || J.trail[J.trail.length - 1].distanceTo(J.p) > 8) { J.trail.push(J.p.clone()); if (J.trail.length > 400) J.trail.shift(); }
   body.position.copy(J.p); { const q = new THREE.Quaternion().setFromUnitVectors(UP, J.dir.clone().lerp(UP, .15).normalize()); q.premultiply(new THREE.Quaternion().setFromAxisAngle(J.dir, -(J.yawR || 0) * .35)); body.quaternion.slerp(q, 1 - Math.pow(.02, dt)); }   // bank into the curve
-  if (MODE !== 'tap' && C.z < .5) { const want = Math.atan2(-J.dir.x, -J.dir.z); let d = want - C.yaw; d = Math.atan2(Math.sin(d), Math.cos(d)); C.yaw += d * Math.min(1, dt * (1.6 + 1.2 * Math.min(1, J.v.length() / 12))); }   // the camera swings behind you as you curve
+  if (MODE === 'arms' && PL.on) { const up3 = PL.e1.clone().multiplyScalar(-Math.sin(AB.th)).addScaledVector(PL.e2, Math.cos(AB.th)); body.quaternion.copy(new THREE.Quaternion().setFromUnitVectors(UP, up3)); }
+  if (MODE !== 'tap' && MODE !== 'arms' && C.z < .5) { const want = Math.atan2(-J.dir.x, -J.dir.z); let d = want - C.yaw; d = Math.atan2(Math.sin(d), Math.cos(d)); C.yaw += d * Math.min(1, dt * (1.6 + 1.2 * Math.min(1, J.v.length() / 12))); }   // the camera swings behind you as you curve
   // the view: one continuous zoom from behind the jelly to above the whole sea; north stays where you put it
   C.z += (C.zT - C.z) * Math.min(1, dt * 3); const z = C.z, dist = THREE.MathUtils.lerp(11, 520, Math.pow(z, 1.8)), pitch = THREE.MathUtils.lerp(.32, 1.42, Math.min(1, z * 1.25));
   const mid = new THREE.Vector3(J.p.x * .25, J.p.y, J.p.z * .25); C.tgt.lerp(J.p.clone().lerp(mid, THREE.MathUtils.smoothstep(z, .5, 1)), 1 - Math.pow(.02, dt));
   const camT = C.tgt.clone().add(new THREE.Vector3(Math.sin(C.yaw) * Math.cos(pitch), Math.sin(pitch), Math.cos(C.yaw) * Math.cos(pitch)).multiplyScalar(dist)); if (z < .3) { const cfy = floorY(camT.x, camT.z) + 2; if (camT.y < cfy) camT.y = cfy; if (camT.y > -1) camT.y = -1; }
+  if (MODE === 'arms' && PL.on) { camT.copy(J.p).addScaledVector(PL.n, -(15 + z * 60)).addScaledVector(UP, 1.2); C.tgt.lerp(J.p, 1 - Math.pow(.001, dt)); }   // ARMS: the side view; the screen is the plane your fingers work in
   C.vel.addScaledVector(camT.sub(cam.position), dt * 10); C.vel.multiplyScalar(Math.pow(.003, dt)); cam.position.addScaledVector(C.vel, dt); cam.up.set(0, 1, 0).applyAxisAngle(_cT.set(-Math.sin(C.yaw), 0, -Math.cos(C.yaw)), MODE === 'tap' ? 0 : -(J.yawR || 0) * .06); cam.lookAt(C.tgt); S.fov *= Math.pow(.05, dt); cam.fov += (52 + 6 * J.boost + 8 * (J.curK || 0) + S.fov - cam.fov) * Math.min(1, dt * 6); cam.updateProjectionMatrix();
   const us = innerHeight * R.getPixelRatio() * .5 / Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)), above = cam.position.y > -1;
   // the world follows the view: the fine floor and the surface centre on what you look at; the coarse floor fades in as you rise; the haze thins
   const sn = v => Math.floor(v / (FSP * 4)) * FSP * 4; fineO.uO.value.set(sn(C.tgt.x), sn(C.tgt.z)); fineO.uFade.value = 1 - THREE.MathUtils.smoothstep(z, .32, .6); coarseO.uFade.value = THREE.MathUtils.smoothstep(z, .22, .5);
   surfO.uO.value.set(Math.floor(cam.position.x / (SSP * 4)) * SSP * 4, Math.floor(cam.position.z / (SSP * 4)) * SSP * 4); surfO.uFade.value = (above ? .15 : .35 + .65 * THREE.MathUtils.smoothstep(-cam.position.y, 4, 22)) * (1 - THREE.MathUtils.smoothstep(z, .12, .32));
   U.uFogD.value = THREE.MathUtils.lerp(.017, .0016, THREE.MathUtils.smoothstep(z, .12, .7)); scene.fog.density = U.uFogD.value; U.uFogC.value.copy(scene.fog.color); U.uScale.value = us; U.uT.value = T;
+  if (PL.on) armsDraw();
   rig.update({t: T, dt, cam: cam.position, ph: J.ph, glow: .12 + .7 * J.kick + .25 * J.boost, hurt: 0, scale: innerHeight * R.getPixelRatio() * .0095 * 1.5, lit: J.got});
   // the films
   let near = null, nd = 1e9; for (const f of FILMS) { const d = f.G.position.distanceTo(J.p); f.G.lookAt(cam.position); f.clear += (THREE.MathUtils.smoothstep(d, 34, 9) - f.clear) * Math.min(1, dt * 2.5); const u = f.cl.material.uniforms; u.uClear.value = f.clear; u.uT.value = T; u.uScale.value = us; u.uGot.value += ((f.got ? 1 : 0) - u.uGot.value) * dt; u.uAim.value = J.goal && J.goal.what === f ? .5 + .5 * Math.sin(T * 6) : 0;
@@ -341,5 +389,5 @@ function frame(now) { requestAnimationFrame(frame); const dt = Math.min(.05, (no
   if (S.sayT && performance.now() > S.sayT) $('say').style.opacity = 0;
   drawGuide(); comp.render(); }
 requestAnimationFrame(frame);
-window.__sea = {J, S, C, SITES, FILMS, begin, stroke, cam, setRig, goTo, pick, setMode, CURR};
+window.__sea = {J, S, C, SITES, FILMS, begin, stroke, cam, setRig, goTo, pick, setMode, CURR, AR, AB, PL, AENV, planeAt, toPlane, fromPlane, KELPS};
 </script></body></html>
