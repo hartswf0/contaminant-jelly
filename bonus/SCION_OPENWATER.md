@@ -82,3 +82,40 @@
 - the sea remembers where you entered a piece (`cj-sea`), so you return beside it;
 - every bonus piece now has "← the open water";
 - the main index lists the Open Water first on the Bonus shelf.
+
+## 4 · The feel, rebuilt
+**The direction:** "steering is awkward in open water, the details are bad, the level design doesn't match the others, not enough haptic or satisfying steering."
+
+**Steering: point to swim, as in the drifts.**
+- Hold the water where you want to go. Your jelly's heading swings toward that point, 24 m out along your finger's ray.
+- Turning is quicker when cruising and wider when pushing hard.
+- The velocity bends toward the heading, so you never skid sideways.
+- W A S D and R F, or a gamepad's left stick, steer by hand.
+
+**Strokes: the bell is the engine.**
+- Swimming comes in strokes timed to the song (143.5 bpm): every two beats cruising, every beat when pushing (two fingers, shift, or the right trigger).
+- Each stroke throws you forward and closes the bell. It also sheds a ring of wake flecks, kicks the field of view out, thumps (a pitched-down sine with a noise breath), and ticks the motor: phone vibration, or gamepad rumble.
+- Between strokes you glide, and the bell relaxes. Left alone, it breathes.
+
+**Camera:**
+- a damped spring behind and above you, pulling back with speed;
+- it rolls a little into turns and widens when you push;
+- it shakes when you hit the floor.
+
+**Feedback:**
+- haptic patterns for a stroke, taking a film, finding a place, entering a ring, and bumping the floor;
+- a comb jelly's rainbow runs down your bell when you brush one;
+- the HUD goal (places 4, films 12) ends in a ★ moment, and the water is sealed (`open-water`).
+
+**The look of the drifts:**
+- **The water:** a lit haze, lighter above (the same background-gradient method), fog-faded black silhouettes for the floor, kelp and rocks, and reef bulbs glowing teal and amber.
+- **The films:** clouds of flecks sampled from their footage, which gather into a clear oval screen as you near.
+- **The places:** rings of points instead of solid torus rings, and black landmarks lit by points of their own colour.
+- **The trench:** the Afterlight's own medusae, live rigs with tentacles, rising and sinking.
+- **Life:** a school of flecks that runs ahead of you and parts as you pass, 26 rainbow comb jellies, and marine snow that streams past.
+- **The card:** the drift briefing (the verb, three steps, the goal) and the same jelly picker.
+
+**Guidance:**
+- amber edge arrows to the nearest films;
+- the nearest unfound place named at the edge, with its distance;
+- a round corner map (tap it, or M, for the full map).
