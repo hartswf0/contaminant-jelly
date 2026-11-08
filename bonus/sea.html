@@ -18,14 +18,15 @@ canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-acti
 #card p{max-width:560px;font:italic 15px/1.55 Georgia,serif;color:#dfe6e0;margin:14px 0 0}#card .go{margin-top:22px;font:600 14px system-ui;letter-spacing:.12em;color:var(--gold)}
 #card .rigs{pointer-events:auto;margin-top:14px;max-width:780px;font:300 12px/1.9 'JetBrains Mono',monospace;color:#55687a}#card .rigs button{all:unset;cursor:pointer;margin-right:10px;color:var(--dim)}#card .rigs button:hover{color:#e6edf3}#card .rigs button.on{color:var(--gold)}#card .rigs a{color:#cfdde8}
 @media (max-width:640px){#card .brief{flex-direction:column;gap:6px}#hud{flex-direction:column;gap:2px}}
+#modes{left:50%;transform:translateX(-50%);bottom:max(46px,calc(env(safe-area-inset-bottom) + 30px));pointer-events:auto;display:flex;gap:4px;opacity:0;font:400 11px Anton,Impact,sans-serif;letter-spacing:.22em}#modes button{all:unset;cursor:pointer;padding:6px 12px;border-radius:14px;color:var(--dim);background:rgba(5,9,9,.45)}#modes button.on{color:#0b1413;background:var(--gold)}
 #fade{inset:0;background:#000;opacity:0;transition:opacity 1.1s}
 </style></head><body>
 <canvas id="gl" aria-label="The open water, made of soft splats of light: dark ridges, kelp, reefs with glowing bulbs, films drifting as clouds; your jellyfish swims to wherever you tap"></canvas>
 <canvas class="ui" id="guide"></canvas>
 <div class="ui" id="hud"><div><b>THE OPEN WATER</b><span id="goal"></span></div><div id="stat"></div></div>
-<div class="ui" id="say"></div><div class="ui" id="hint"></div>
+<div class="ui" id="say"></div><div class="ui" id="hint"></div><div class="ui" id="modes"></div>
 <div class="ui" id="card"><div class="k">BONUS · THE WATER THAT JOINS THE BONUS PIECES</div><h1>The Open Water</h1>
-  <div class="brief"><div class="vb">EXPLORE</div><div><ol class="how"><li>Tap the water, a film or a place: your jelly swims there on the beat and keeps going when you let go.</li><li>Pinch or scroll to zoom out from the jelly to the whole sea; tap anything on the map to travel to it.</li><li>The bar on the left is your depth: drag it to swim higher or lower. Swim into a ring of light to enter its piece.</li></ol>
+  <div class="brief"><div class="vb">EXPLORE</div><div><ol class="how"><li><b>Glide</b>: put a finger down anywhere and push: a stick appears under it and you swoop in curves; push to the rim to surge.</li><li><b>Reins</b>: two fingers are your two fins. Lift both to rise, drop both to dive, pull one harder to carve a turn, spread them to surge.</li><li><b>Tap</b>: tap a place or a film and the jelly swims there itself. Ride the bright currents between the places. Scroll, or the right bar, zooms out to the whole sea.</li></ol>
   <div class="gl">GOAL · find the four places · take 12 films</div></div></div>
   <p>Four sketches were made in this water: a tower of reels, a sewer of lost video, a trench of medusae, a reef drawn by hand. Here they are one sea.</p>
   <div class="rigs" id="rigs"></div><div class="go">TOUCH THE WATER TO BEGIN</div></div>
@@ -91,9 +92,9 @@ const coarseO = {uO: {value: new THREE.Vector2()}, uFade: {value: 0}}; pts(coars
 // the surface: a sheet of light splats overhead, brightest where the ripples cross
 const SG = LO ? 70 : 96, SSP = 3.4; const surfGeo = (() => { const n = SG * SG, G = new Float32Array(n * 2), S = new Float32Array(n); for (let j = 0, k = 0; j < SG; j++) for (let i = 0; i < SG; i++, k++) { G.set([(i - SG / 2) * SSP, (j - SG / 2) * SSP], k * 2); S[k] = Math.random(); } return geoOf({position: [new Float32Array(n * 3), 3], aG: [G, 2], aS: [S, 1]}); })();
 const surfO = {uO: {value: new THREE.Vector2()}, uFade: {value: 1}};
-pts(surfGeo, mat(`uniform float uScale, uT, uFade; uniform vec2 uO; attribute vec2 aG; attribute float aS; varying vec3 vC; varying float vA; ${HGT}
+pts(surfGeo, mat(`uniform float uScale, uT, uFade, uFogD; uniform vec2 uO; attribute vec2 aG; attribute float aS; varying vec3 vC; varying float vA; ${HGT}
   void main(){ vec2 L = uO + aG, xz = L + (vec2(h1(L), h1(L + 2.1)) - .5) * ${SSP}; vec2 p = xz * .05; float c = sin(p.x * 1.3 + uT * .6) * sin(p.y * 1.1 - uT * .5) + sin(p.x * 2.7 - uT * .9 + p.y) * .5; c = pow(abs(c), 3.);
-    float edge = smoothstep(${(SG * SSP * .5).toFixed(1)}, ${(SG * SSP * .3).toFixed(1)}, length(aG)); vC = vec3(.55, .8, .78) * (.06 + .5 * c); vA = edge * uFade; vec4 mv = modelViewMatrix * vec4(xz.x, -.2 + .3 * sin(uT + aS * 6.), xz.y, 1.); gl_PointSize = max(1., ${(SSP * 1.6).toFixed(1)} * (.7 + .6 * aS) * uScale / -mv.z); gl_Position = projectionMatrix * mv; }`, true, surfO));
+    float edge = smoothstep(${(SG * SSP * .5).toFixed(1)}, ${(SG * SSP * .3).toFixed(1)}, length(aG)); vec4 mv = modelViewMatrix * vec4(xz.x, -.2 + .3 * sin(uT + aS * 6.), xz.y, 1.); float fz = 1. - exp(-pow(uFogD * .7 * -mv.z, 2.)); vC = vec3(.55, .8, .78) * (.025 + .2 * c); vA = edge * uFade * (1. - fz); gl_PointSize = max(1., ${(SSP * 1.2).toFixed(1)} * (.7 + .6 * aS) * uScale / -mv.z); gl_Position = projectionMatrix * mv; }`, true, surfO));
 // static splat sets: kelp (dark, swaying), rocks (dark clumps), landmarks (dark shells and coloured bulbs)
 const staticVS = (glow, sway) => `uniform float uScale, uT, uFogD, uFade; uniform vec3 uFogC; attribute float aS, aK; attribute vec3 aCol; varying vec3 vC; varying float vA; ${FOGV}
   void main(){ vec3 p = position; ${sway ? 'p.x += sin(uT * .7 + p.z * .1 + aK * 2.) * aK * aK * 3.; p.z += cos(uT * .5 + p.x * .1 + aK * 1.6) * aK * aK * 2.;' : ''} vec4 mv = modelViewMatrix * vec4(p, 1.); float z = -mv.z;
@@ -123,18 +124,29 @@ for (const s of SITES) { const n = 520, P = new Float32Array(n * 3), K = new Flo
 // the trench: the Afterlight's own medusae rising and sinking
 const MED = []; for (let i = 0; i < 6; i++) { const r = makeRig(THREE, 'medusa'), g = new THREE.Group(); g.add(r.group); r.group.scale.setScalar(r.norm * (1.2 + Math.random())); scene.add(g); MED.push({r, g, a: i * 1.05, y0: SITES[2].y - 12 - i * 9, ph: Math.random()}); }
 // ---------------------------------------------------------------- the films: clouds of flecks that gather into their footage as you near
-const FILMS = [], GX = 30, GY = 22; const loader = new THREE.TextureLoader(); loader.crossOrigin = 'anonymous'; let FBASE = '';
-const fGeo = (() => { const P = new Float32Array(GX * GY * 3), Uv = new Float32Array(GX * GY * 2), S = new Float32Array(GX * GY); let k = 0; for (let j = 0; j < GY; j++) for (let i = 0; i < GX; i++, k++) { P.set([(i / (GX - 1) - .5) * 6.4, (j / (GY - 1) - .5) * 4.8, 0], k * 3); Uv.set([i / (GX - 1), j / (GY - 1)], k * 2); S[k] = Math.random(); } return geoOf({position: [P, 3], aUv: [Uv, 2], aS: [S, 1]}); })();
+const FILMS = [], GX = LO ? 36 : 48, GY = LO ? 27 : 36; const loader = new THREE.TextureLoader(); loader.crossOrigin = 'anonymous'; let FBASE = '';
+const fGeo = (() => { const NS = 22, n = GX * GY + NS * 2, P = new Float32Array(n * 3), Uv = new Float32Array(n * 2), S = new Float32Array(n), Pf = new Float32Array(n); let k = 0;
+  for (let j = 0; j < GY; j++) for (let i = 0; i < GX; i++, k++) { P.set([(i / (GX - 1) - .5) * 9.6, (j / (GY - 1) - .5) * 7.2, 0], k * 3); Uv.set([i / (GX - 1), j / (GY - 1)], k * 2); S[k] = Math.random(); }
+  for (let r = 0; r < 2; r++) for (let i = 0; i < NS; i++, k++) { P.set([(i / (NS - 1) - .5) * 9.3, (r ? 1 : -1) * 4.15, 0], k * 3); Uv.set([i / (NS - 1), r], k * 2); S[k] = Math.random(); Pf[k] = 1; }   // sprocket holes along both edges: it is a strip of film
+  return geoOf({position: [P, 3], aUv: [Uv, 2], aS: [S, 1], aP: [Pf, 1]}); })();
 const cloudMat = tex => new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: {map: {value: tex}, uClear: {value: 0}, uT: {value: 0}, uScale: {value: 1}, uGot: {value: 0}, uAim: {value: 0}},
-  vertexShader: `uniform float uClear, uT, uScale; attribute vec2 aUv; attribute float aS; varying vec2 vUv; varying float vC, vE; void main(){ vUv = aUv; vC = uClear; vec2 q = aUv - .5; vE = smoothstep(.5, .3, length(q * vec2(1., 1.25)));
-    float sc = 1. - uClear; vec3 p = position + sc * vec3(sin(aS * 61. + uT * .7), cos(aS * 47. + uT * .6), sin(aS * 33. - uT * .5)) * (1.2 + 2.2 * aS); p.xy *= 1. + .5 * sc; vec4 mv = modelViewMatrix * vec4(p, 1.); gl_PointSize = (.24 + .34 * sc) * uScale / -mv.z; gl_Position = projectionMatrix * mv; }`,
-  fragmentShader: `uniform sampler2D map; uniform float uGot, uAim; varying vec2 vUv; varying float vC, vE; void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; vec3 c = texture2D(map, vUv).rgb; c = mix(c, vec3(1., .72, .4) * dot(c, vec3(.3, .59, .11)) * 1.3, uGot); c += vec3(.25, .18, .1) * uAim;
-    gl_FragColor = vec4(c * (.3 + .7 * vC) * vE * (1. - 4. * r2), 1.); }`});
+  // a gaussian video: every splat reads its own pixel of the film; bright pixels stand forward and swell, dark ones recede and shrink, so the footage has relief;
+  // far off the splats are a swirling cloud; as you near they settle into the picture; a row of sprocket holes runs along each edge
+  vertexShader: `uniform float uClear, uT, uScale; uniform sampler2D map; attribute vec2 aUv; attribute float aS, aP; varying vec2 vUv; varying float vC, vE, vL, vP, vN; void main(){ vUv = aUv; vC = uClear; vP = aP; vec2 q = aUv - .5; vE = aP > .5 ? 1. : smoothstep(.52, .36, length(q * vec2(1., 1.18)));
+    vec3 col = texture2D(map, aUv).rgb; float L = dot(col, vec3(.3, .59, .11)); vL = L; float sc = 1. - uClear;
+    vec3 p = position + vec3(0., 0., (L - .45) * 1.5 * uClear * (1. - aP)) + sc * sc * vec3(sin(aS * 61. + uT * .7), cos(aS * 47. + uT * .6), sin(aS * 33. - uT * .5)) * (2.2 + 3.6 * aS) + vec3(0., 0., sin(uT * 1.3 + aUv.x * 6. + aUv.y * 4.) * .06 * uClear);
+    p.xy *= 1. + .5 * sc; vec4 mv = modelViewMatrix * vec4(p, 1.); float sz = aP > .5 ? .28 : (.15 + .15 * L) * (1. + .1 * sin(aS * 20. + uT * 2.)) + .34 * sc, gap = ${(9.6 / (GX - 1)).toFixed(3)} * (1. + 1.6 * sc);
+    vN = clamp(pow(gap / sz, 2.) * 1.15, .04, 1.2);   // additive splats overlap: divide by how much, so the footage keeps its own colour and never burns to white
+    gl_PointSize = sz * uScale / -mv.z; gl_Position = projectionMatrix * mv; }`,
+  fragmentShader: `uniform sampler2D map; uniform float uGot, uAim; varying vec2 vUv; varying float vC, vE, vL, vP, vN; void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; float g = exp(-r2 * 12.);
+    if (vP > .5) { gl_FragColor = vec4(vec3(.9, .72, .45) * .35 * vC * g, 1.); return; }
+    vec3 c = texture2D(map, vUv).rgb; c = mix(c, vec3(1., .72, .4) * dot(c, vec3(.3, .59, .11)) * 1.3, uGot); c += vec3(.25, .18, .1) * uAim;
+    gl_FragColor = vec4(c * (.35 + .65 * vC) * vE * g * vN, 1.); }`});
 const screenMat = tex => new THREE.ShaderMaterial({transparent: true, depthWrite: false, uniforms: {map: {value: tex}, uA: {value: 0}}, vertexShader: 'varying vec2 v; void main(){ v = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }',
   fragmentShader: 'uniform sampler2D map; uniform float uA; varying vec2 v; void main(){ vec2 q = v - .5; float e = smoothstep(.5, .3, length(q * vec2(1., 1.25))); gl_FragColor = vec4(texture2D(map, v).rgb, e * uA); }'});
 fetch('footage.json').then(r => r.json()).then(F => { FBASE = Q.get('cineo') || F.base; const clips = F.clips.filter(c => c.thumb).slice(0, 60);
   clips.forEach((c, i) => { const a = i * 2.39996, r = 36 + Math.sqrt(i / clips.length) * 330, x = Math.cos(a) * r, z = Math.sin(a) * r, y = THREE.MathUtils.clamp(floorY(x, z) + 7 + Math.random() * 12, -70, -5);
-    const tex = loader.load(FBASE + c.thumb); tex.colorSpace = THREE.SRGBColorSpace; const G = new THREE.Group(); G.position.set(x, y, z); scene.add(G); const cl = new THREE.Points(fGeo, cloudMat(tex)); cl.frustumCulled = false; G.add(cl); const sc = new THREE.Mesh(new THREE.PlaneGeometry(6.4, 4.8), screenMat(tex)); G.add(sc);
+    const tex = loader.load(FBASE + c.thumb); tex.colorSpace = THREE.SRGBColorSpace; const G = new THREE.Group(); G.position.set(x, y, z); scene.add(G); const cl = new THREE.Points(fGeo, cloudMat(tex)); cl.frustumCulled = false; G.add(cl); const sc = new THREE.Mesh(new THREE.PlaneGeometry(9.6, 7.2), screenMat(tex)); G.add(sc);
     FILMS.push({c, G, cl, sc, tex, x, y, z, got: false, clear: 0}); }); }).catch(() => {});
 const vid = document.createElement('video'); vid.muted = true; vid.loop = true; vid.playsInline = true; vid.crossOrigin = 'anonymous'; const vtex = new THREE.VideoTexture(vid); vtex.colorSpace = THREE.SRGBColorSpace; let playing = null;
 // ---------------------------------------------------------------- life: a school, comb jellies, marine snow, the wake, and the marks of where you are going
@@ -148,6 +160,12 @@ const combPts = pts(geoOf({position: [new Float32Array(COMB.length * 160 * 3), 3
 const SN = LO ? 1200 : 2000, snow = pts(geoOf({position: [new Float32Array(SN * 3).map((_, i) => (Math.random() - .5) * (i % 3 === 1 ? 50 : 80)), 3], aK: [new Float32Array(SN).map(() => Math.random()), 1]}), glowK('vec3(.62, .78, .78) * (.25 + .5 * vK)', '(.035 + .03 * aK)'));
 const WAKE = Array.from({length: 8}, () => ({t: -9, p: new THREE.Vector3(), q: new THREE.Quaternion()})), WN = 64;
 const wakePts = pts(geoOf({position: [new Float32Array(WAKE.length * WN * 3), 3], aK: [new Float32Array(WAKE.length * WN), 1]}), glowK('vec3(.7, .95, 1.) * vK', '.1'));
+let CURR = [], _cA = new THREE.Vector3(), _cT = new THREE.Vector3(), curAt;
+// the currents: jet streams that curve through the sea between the places; swim into one and it carries you, fast, until you steer out
+CURR = [[4, 0, 3, 4], [4, 1, 2, 4]].map((route, ci) => { const pts = []; route.forEach((si, k) => { const st = SITES[si]; pts.push(new THREE.Vector3(st.x + (k ? 18 : -18), 0, st.z + (k ? -14 : 14))); if (k < route.length - 1) { const nx = SITES[route[k + 1]], m = new THREE.Vector3((st.x + nx.x) / 2 + (ci ? 60 : -60), 0, (st.z + nx.z) / 2 + (ci ? -40 : 40)); pts.push(m); } });
+  const curve = new THREE.CatmullRomCurve3(pts, true, 'centripetal'), N = 900, P = curve.getSpacedPoints(N).slice(0, N); P.forEach(v => v.y = Math.min(-12, Math.max(floorY(v.x, v.z) + 9, Math.min(-12, floorY(v.x, v.z) + 16)))); return {P, N, last: 0, dir: ci ? 1 : 1}; });
+{ const per = LO ? 900 : 1600; CURR.forEach(c => { const n = per, P = new Float32Array(n * 3), K = new Float32Array(n); c.pts = pts(geoOf({position: [P, 3], aK: [K, 1]}), glowK('vec3(.55, .95, .95) * vK', '.22')); c.u = Float32Array.from({length: n}, () => Math.random()); c.r = Float32Array.from({length: n * 2}, () => (Math.random() - .5) * 3.2); }); }
+curAt = (c, u) => { const f = ((u % 1) + 1) % 1 * c.N, i = Math.floor(f), a = c.P[i], b = c.P[(i + 1) % c.N]; return _cA.copy(a).lerp(b, f - i); };
 // where you are going, made visible: a ring on the floor under the target, a plumb line up to your depth, a dotted path from you to it
 const MKN = 48 + 16 + 30, markPts = pts(geoOf({position: [new Float32Array(MKN * 3), 3], aK: [new Float32Array(MKN), 1]}), glowK('vec3(1., .66, .35) * vK', '.32'));
 // ---------------------------------------------------------------- you
@@ -160,6 +178,7 @@ const UP = new THREE.Vector3(0, 1, 0);
 const J = {p: new THREE.Vector3(SITES[4].x + 22, 0, SITES[4].z + 36), v: new THREE.Vector3(), dir: new THREE.Vector3(0, 0, -1), ph: .9, lastStroke: -9, interval: .84, kick: 0, boost: 0, got: 0, seen: new Set(), alt: 10, goal: null, trail: []};
 J.p.y = floorY(J.p.x, J.p.z) + J.alt;
 const C = {yaw: 0, z: .08, zT: .08, tgt: J.p.clone(), vel: new THREE.Vector3()};   // the view: yaw, semantic zoom (0 = the jelly, 1 = the whole sea)
+let MODE = 'glide'; try { MODE = localStorage.getItem('cj-swim') || (Q.get('mode')) || 'glide'; } catch (e) {} if (Q.get('mode')) MODE = Q.get('mode'); if (!['glide', 'reins', 'tap'].includes(MODE)) MODE = 'glide';
 const S = {state: 'card', hold: null, keys: new Set(), touches: new Map(), leaving: false, fov: 0, done: false, drag: null, pinch: null};
 const say = (t, s = 3) => { $('say').textContent = t; $('say').style.opacity = 1; S.sayT = performance.now() + s * 1000; };
 const pad = () => { try { return navigator.getGamepads && [...navigator.getGamepads()].find(Boolean) || null; } catch (e) { return null; } };
@@ -187,19 +206,24 @@ function pick(x, y) {   // what is under the finger: a place, a film, or the wat
   const plane = J.p.y; if (Math.abs(d.y) < .03) return {p: o.clone().addScaledVector(d, 30).setY(plane), what: null}; let t = (plane - o.y) / d.y; if (t < 0 || t > 160) t = 40; const p = o.clone().addScaledVector(d, t); p.y = plane; return {p, what: null}; }
 // ---------------------------------------------------------------- input
 const cv = $('gl'), GW = 56;
-const begin = () => { if (S.state !== 'card') return; S.state = 'play'; $('card').style.opacity = 0; setTimeout(() => $('card').style.display = 'none', 700); $('hud').style.opacity = 1; buzz(10); audio();
-  $('hint').innerHTML = COARSE ? 'tap where to go · pinch to zoom out to the whole sea · drag the left bar for depth · two fingers to turn the view' : 'click where to go (or hold and drag) · scroll to zoom out to the whole sea · drag the left bar for depth · Q/E turn the view · W A S D to swim by hand · H home'; $('hint').style.opacity = 1; setTimeout(() => $('hint').style.opacity = 0, 12000); };
+const setMode = m => { MODE = m; try { localStorage.setItem('cj-swim', m); } catch (e) {} $('modes').innerHTML = [['glide', 'GLIDE'], ['reins', 'REINS'], ['tap', 'TAP']].map(([k, n]) => `<button data-m="${k}" class="${k === MODE ? 'on' : ''}">${n}</button>`).join(''); $('modes').querySelectorAll('button').forEach(b => b.onclick = e => { e.stopPropagation(); setMode(b.dataset.m); say(HELP[b.dataset.m], 4); }); if (m !== 'tap') J.goal = null; };
+const HELP = {glide: 'glide: a finger down anywhere is a stick; push to swoop, push to the rim to surge, let go to coast', reins: 'reins: two fingers are your fins; lift both to rise, drop both to dive, pull one to carve, spread to surge', tap: 'tap: tap where to go, a film or a place, and your jelly swims there itself'};
+const begin = () => { if (S.state !== 'card') return; S.state = 'play'; setMode(MODE); $('modes').style.opacity = 1; $('card').style.opacity = 0; setTimeout(() => $('card').style.display = 'none', 700); $('hud').style.opacity = 1; buzz(10); audio();
+  $('hint').innerHTML = COARSE ? HELP[MODE] + ' · the right bar zooms out to the whole sea' : HELP[MODE] + ' · W A S D and R F swim by hand · shift surges · scroll zooms out · H home'; $('hint').style.opacity = 1; setTimeout(() => $('hint').style.opacity = 0, 12000); };
 const gaugeY = () => [Math.max(90, innerHeight * .18), innerHeight - Math.max(70, innerHeight * .14)];
 function dragGauge(y) { const [y0, y1] = gaugeY(), k = THREE.MathUtils.clamp((y - y0) / (y1 - y0), 0, 1); if (S.drag === 'depth') { const fy = floorY(J.p.x, J.p.z), d = k * 110; J.alt = THREE.MathUtils.clamp(-d - fy, 3, Math.max(3, -1.5 - fy)); if (J.goal && !J.goal.what) J.goal.p.y = fy + J.alt; } else C.zT = 1 - k; }
-cv.addEventListener('pointerdown', e => { S.touches.set(e.pointerId, {x: e.clientX, y: e.clientY}); if (S.state === 'card') { begin(); return; } try { cv.setPointerCapture(e.pointerId); } catch (x) {}
-  if (S.touches.size === 2) { const [a, b] = [...S.touches.values()]; S.pinch = {d: Math.hypot(a.x - b.x, a.y - b.y), z: C.zT, ang: Math.atan2(b.y - a.y, b.x - a.x), yaw: C.yaw}; S.hold = null; return; }
+cv.addEventListener('pointerdown', e => { S.touches.set(e.pointerId, {x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY}); if (S.state === 'card') { begin(); return; } try { cv.setPointerCapture(e.pointerId); } catch (x) {}
   if (e.clientX < GW) { S.drag = 'depth'; dragGauge(e.clientY); return; } if (e.clientX > innerWidth - GW) { S.drag = 'zoom'; dragGauge(e.clientY); return; }
-  S.hold = {id: e.pointerId, x: e.clientX, y: e.clientY, cx: e.clientX, cy: e.clientY, t: performance.now(), moved: 0}; });
+  if (S.touches.size === 2) { const [a, b] = [...S.touches.values()]; a.x0 = a.x; a.y0 = a.y; b.x0 = b.x; b.y0 = b.y; if (MODE === 'tap') { S.pinch = {d: Math.hypot(a.x - b.x, a.y - b.y), z: C.zT, ang: Math.atan2(b.y - a.y, b.x - a.x), yaw: C.yaw}; S.hold = null; } if (MODE === 'reins') S.stick = null; return; }
+  if (MODE === 'tap') S.hold = {id: e.pointerId, x: e.clientX, y: e.clientY, cx: e.clientX, cy: e.clientY, t: performance.now(), moved: 0};
+  else S.stick = {id: e.pointerId, ox: e.clientX, oy: e.clientY, x: e.clientX, y: e.clientY, t: performance.now()}; });
 cv.addEventListener('pointermove', e => { const t = S.touches.get(e.pointerId); if (t) { t.x = e.clientX; t.y = e.clientY; }
-  if (S.pinch && S.touches.size >= 2) { const [a, b] = [...S.touches.values()]; C.zT = THREE.MathUtils.clamp(S.pinch.z - Math.log(Math.hypot(a.x - b.x, a.y - b.y) / S.pinch.d) * .5, 0, 1); C.yaw = S.pinch.yaw - (Math.atan2(b.y - a.y, b.x - a.x) - S.pinch.ang); return; }
   if (S.drag) { dragGauge(e.clientY); return; }
+  if (S.pinch && S.touches.size >= 2 && MODE === 'tap') { const [a, b] = [...S.touches.values()]; C.zT = THREE.MathUtils.clamp(S.pinch.z - Math.log(Math.hypot(a.x - b.x, a.y - b.y) / S.pinch.d) * .5, 0, 1); C.yaw = S.pinch.yaw - (Math.atan2(b.y - a.y, b.x - a.x) - S.pinch.ang); return; }
+  if (S.stick && S.stick.id === e.pointerId) { S.stick.x = e.clientX; S.stick.y = e.clientY; }
   if (S.hold && S.hold.id === e.pointerId) { S.hold.cx = e.clientX; S.hold.cy = e.clientY; S.hold.moved = Math.max(S.hold.moved, Math.hypot(e.clientX - S.hold.x, e.clientY - S.hold.y)); } });
 const up = e => { S.touches.delete(e.pointerId); if (S.touches.size < 2) S.pinch = null; if (S.drag) { S.drag = null; return; }
+  if (S.stick && S.stick.id === e.pointerId) { if (performance.now() - S.stick.t < 220 && Math.hypot(S.stick.x - S.stick.ox, S.stick.y - S.stick.oy) < 12) stroke(.3); S.stick = null; }
   if (S.hold && S.hold.id === e.pointerId) { const h = S.hold; S.hold = null; if (performance.now() - h.t < 300 && h.moved < 14) { const k = pick(h.x, h.y); if (k) { goTo(k.p, k.what, k.alt); buzz(5); tone(k.what ? 880 : 520, .5, .025); if (k.what && k.what.name) say(`to ${k.what.name}`); } } } };
 cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up); cv.addEventListener('contextmenu', e => e.preventDefault());
 cv.addEventListener('wheel', e => { e.preventDefault(); C.zT = THREE.MathUtils.clamp(C.zT + e.deltaY * .0012, 0, 1); }, {passive: false});
@@ -213,6 +237,9 @@ function drawGuide() { const W = innerWidth, H = innerHeight; if (gd.width !== W
   gx.font = "300 10px 'JetBrains Mono', monospace"; gx.textAlign = 'left'; gx.fillStyle = 'rgba(207,221,232,.7)'; gx.fillText(`${Math.round(-J.p.y)} m`, 40, yy(-J.p.y) + 3); gx.fillText('surface', 40, y0 + 3); gx.fillText(`floor ${Math.round(-fy)}`, 40, yy(-fy) + 3);
   const zx = W - 28; gx.strokeStyle = 'rgba(207,221,232,.25)'; gx.beginPath(); gx.moveTo(zx, y0); gx.lineTo(zx, y1); gx.stroke(); gx.textAlign = 'right'; [['sea', 1], ['water', .45], ['jelly', 0]].forEach(([n, z]) => { const y = y0 + (1 - z) * (y1 - y0); gx.fillStyle = 'rgba(207,221,232,.55)'; gx.fillText(n, zx - 12, y + 3); gx.fillRect(zx - 4, y, 8, 1); });
   gx.fillStyle = '#f0a35a'; gx.beginPath(); gx.arc(zx, y0 + (1 - C.z) * (y1 - y0), 6, 0, 7); gx.fill();
+  if (S.stick) { const R0 = Math.min(90, innerWidth * .12); gx.strokeStyle = 'rgba(240,163,90,.45)'; gx.lineWidth = 1.5; gx.beginPath(); gx.arc(S.stick.ox, S.stick.oy, R0, 0, 7); gx.stroke(); gx.fillStyle = 'rgba(240,163,90,.85)'; gx.beginPath(); gx.arc(S.stick.x, S.stick.y, 14, 0, 7); gx.fill(); }
+  if (S.reins) for (const [t, l] of [[S.reins.a, S.reins.la], [S.reins.b, S.reins.lb]]) { gx.strokeStyle = 'rgba(240,163,90,.4)'; gx.lineWidth = 1.5; gx.beginPath(); gx.moveTo(t.x0, t.y0 - 110); gx.lineTo(t.x0, t.y0 + 110); gx.stroke(); gx.fillStyle = l > 0 ? '#f0a35a' : '#7fd3d3'; gx.beginPath(); gx.arc(t.x, t.y, 12, 0, 7); gx.fill(); }
+  if (J.inCur && C.z < .4) { gx.fillStyle = 'rgba(160,240,240,.85)'; gx.font = "400 11px Anton, Impact, sans-serif"; gx.textAlign = 'center'; gx.fillText('IN THE CURRENT', W / 2, H - 92); }
   const far = C.z > .4; gx.textAlign = 'center';
   for (const s of SITES) { const q = screenOf(s.G.position); if (!q) continue; const c = '#' + new THREE.Color(s.col).getHexString(), d = s.G.position.distanceTo(J.p); if (!far && d > 260) continue;
     gx.fillStyle = c; gx.font = `400 ${far ? 14 : 11}px Anton, Impact, sans-serif`; gx.fillText((J.seen.has(s.id) ? '★ ' : '') + s.name.toUpperCase(), q[0], q[1] - (far ? 16 : 24)); gx.font = "300 10px 'JetBrains Mono', monospace"; gx.fillStyle = 'rgba(207,221,232,.7)'; gx.fillText(`${s.piece} · ${Math.round(d)} m`, q[0], q[1] - (far ? 3 : 11));
@@ -229,49 +256,64 @@ let T = 0, last = performance.now();
 try { const L = JSON.parse(localStorage.getItem('cj-sea') || 'null'); if (L && !Q.has('fresh')) { J.p.set(L.x - 16 * Math.sign(L.x || 1), L.y, L.z); J.alt = Math.max(3, L.y - floorY(L.x, L.z)); } } catch (e) {}
 C.tgt.copy(J.p); cam.position.copy(J.p).add(new THREE.Vector3(0, 6, 14));
 function frame(now) { requestAnimationFrame(frame); const dt = Math.min(.05, (now - last) / 1000); last = now; T += dt; const play = S.state === 'play';
-  // hold and drag: the target follows the finger, live
-  if (play && S.hold && performance.now() - S.hold.t > 280) { const k = pick(S.hold.cx, S.hold.cy); if (k) goTo(k.p, k.what, k.what ? k.alt : undefined); }
-  // by hand: keys and the stick move the target relative to the view
-  const gp = pad(); let mx = (S.keys.has('d') || S.keys.has('arrowright') ? 1 : 0) - (S.keys.has('a') || S.keys.has('arrowleft') ? 1 : 0), mz = (S.keys.has('s') || S.keys.has('arrowdown') ? 1 : 0) - (S.keys.has('w') || S.keys.has('arrowup') ? 1 : 0);
-  if (gp) { if (Math.abs(gp.axes[0]) > .15) mx += gp.axes[0]; if (Math.abs(gp.axes[1]) > .15) mz += gp.axes[1]; if (Math.abs(gp.axes[2] || 0) > .2) C.yaw -= gp.axes[2] * dt * 1.6; if (Math.abs(gp.axes[3] || 0) > .2) C.zT = THREE.MathUtils.clamp(C.zT + gp.axes[3] * dt * .6, 0, 1); if (gp.buttons[4]?.pressed) J.alt = Math.max(3, J.alt - dt * 8); if (gp.buttons[5]?.pressed) J.alt += dt * 8; }
-  if (play && (mx || mz)) { const fw = new THREE.Vector3(-Math.sin(C.yaw), 0, -Math.cos(C.yaw)), rt = new THREE.Vector3(Math.cos(C.yaw), 0, -Math.sin(C.yaw)); goTo(J.p.clone().addScaledVector(rt, mx * 12).addScaledVector(fw, -mz * 12), null); }
-  if (S.keys.has('q')) C.yaw += dt * 1.4; if (S.keys.has('e')) C.yaw -= dt * 1.4; if (S.keys.has('r')) J.alt = Math.min(J.alt + dt * 10, 80); if (S.keys.has('f')) J.alt = Math.max(3, J.alt - dt * 10); if (S.keys.has('z')) C.zT = Math.max(0, C.zT - dt * .5); if (S.keys.has('x')) C.zT = Math.min(1, C.zT + dt * .5);
-  // the swimmer: heads for the goal at its depth over the floor (looking ahead, so ridges are climbed in time); strokes on the beat until it arrives
-  const fyHere = floorY(J.p.x, J.p.z); let wantY = THREE.MathUtils.clamp(Math.max(fyHere, floorY(J.p.x + J.v.x * 1.5, J.p.z + J.v.z * 1.5)) + J.alt, fyHere + 2.5, -2);
-  let push = 0, hard = S.keys.has('shift') || (gp && gp.buttons[7]?.value > .3) ? 1 : 0;
-  if (play && J.goal) { const g = J.goal.p, dxz = Math.hypot(g.x - J.p.x, g.z - J.p.z); if (J.goal.what) wantY = THREE.MathUtils.clamp(g.y, fyHere + 2.5, -2); const want = new THREE.Vector3(g.x - J.p.x, (wantY - J.p.y) * 1.2, g.z - J.p.z).normalize();
+  // ------------------------------------------------ three ways to swim (see SCION_SWIM_CONTROLS.md)
+  const gp = pad(), fyHere = floorY(J.p.x, J.p.z); let wantY = THREE.MathUtils.clamp(Math.max(fyHere, floorY(J.p.x + J.v.x * 1.5, J.p.z + J.v.z * 1.5)) + J.alt, fyHere + 2.5, -2);
+  let push = 0, hard = S.keys.has('shift') || (gp && gp.buttons[7]?.value > .3) ? 1 : 0, yawR = 0, pitR = 0, steering = false;
+  if (S.keys.has('q')) C.yaw += dt * 1.4; if (S.keys.has('e')) C.yaw -= dt * 1.4; if (S.keys.has('z')) C.zT = Math.max(0, C.zT - dt * .5); if (S.keys.has('x')) C.zT = Math.min(1, C.zT + dt * .5);
+  // a stick: from the finger (glide), the keys, or a gamepad; shaped by a dead zone and a curve so small pushes are gentle and full pushes swoop
+  let sx = 0, sy = 0; if (play && S.stick && MODE !== 'tap') { const R0 = Math.min(90, innerWidth * .12); sx = (S.stick.x - S.stick.ox) / R0; sy = (S.stick.y - S.stick.oy) / R0; const m = Math.hypot(sx, sy); if (m > 1) { sx /= m; sy /= m; S.stick.ox += (S.stick.x - S.stick.ox) * (1 - 1 / m); S.stick.oy += (S.stick.y - S.stick.oy) * (1 - 1 / m); } steering = true; push = 1; }   // the stick's base follows a finger that runs past its rim
+  const kx = (S.keys.has('d') || S.keys.has('arrowright') ? 1 : 0) - (S.keys.has('a') || S.keys.has('arrowleft') ? 1 : 0), ky = (S.keys.has('f') ? 1 : 0) - (S.keys.has('r') ? 1 : 0), kf = S.keys.has('w') || S.keys.has('arrowup') ? 1 : 0, kb = S.keys.has('s') || S.keys.has('arrowdown');
+  if (play && (kx || ky || kf)) { sx += kx; sy += ky; steering = true; push = 1; } if (gp && (Math.abs(gp.axes[0]) > .12 || Math.abs(gp.axes[1]) > .12)) { sx += gp.axes[0]; sy += gp.axes[1]; steering = true; push = 1; } if (gp && Math.abs(gp.axes[2] || 0) > .2) C.yaw -= gp.axes[2] * dt * 1.6;
+  const sm = Math.hypot(sx, sy), shape = v => Math.sign(v) * Math.max(0, Math.abs(v) - .1) / .9 * Math.min(1, Math.abs(v) * 1.1); if (steering) { yawR = -shape(sx) * 1.9; pitR = -shape(sy) * 1.3; if (sm > .9 && !kf) hard = 1; }
+  // reins: two fingers are two fins; their lift is the pitch, their difference the turn, their spread the surge
+  if (play && MODE === 'reins' && S.touches.size >= 2) { const [a, b] = [...S.touches.values()].sort((p, q) => p.x - q.x), R1 = Math.min(110, innerHeight * .14), la = (a.y0 - a.y) / R1, lb = (b.y0 - b.y) / R1, d0 = Math.hypot(a.x0 - b.x0, a.y0 - b.y0), d1 = Math.hypot(a.x - b.x, a.y - b.y);
+    yawR = THREE.MathUtils.clamp((lb - la) * 1.4, -2.2, 2.2);   /* the left fin driving harder turns you right, as tank tracks and oars do */ pitR = THREE.MathUtils.clamp((la + lb) * .7, -1.3, 1.3); push = d1 / d0 < .82 ? 0 : 1; hard = d1 / d0 > 1.15 ? 1 : hard; steering = true; S.reins = {a, b, la, lb}; } else S.reins = null;
+  if (play && MODE === 'glide' && S.touches.size >= 2 && !S.reins) hard = 1;   // a second finger in glide: surge
+  if (steering) { const side = new THREE.Vector3().crossVectors(J.dir, UP).normalize(); J.dir.applyAxisAngle(UP, yawR * dt * (1 - .35 * J.boost)).applyAxisAngle(side, pitR * dt); J.dir.y = THREE.MathUtils.clamp(J.dir.y, -.8, .8); J.dir.normalize(); J.yawR = yawR; J.goal = null; }
+  else J.yawR = (J.yawR || 0) * Math.pow(.05, dt);
+  if (kb && play) J.v.multiplyScalar(Math.pow(.2, dt));
+  // tap: the target follows a held finger, and the jelly steers itself there
+  if (play && MODE === 'tap' && S.hold && performance.now() - S.hold.t > 280) { const k = pick(S.hold.cx, S.hold.cy); if (k) goTo(k.p, k.what, k.what ? k.alt : undefined); }
+  if (play && J.goal && !steering) { const g = J.goal.p, dxz = Math.hypot(g.x - J.p.x, g.z - J.p.z); if (J.goal.what) wantY = THREE.MathUtils.clamp(g.y, fyHere + 2.5, -2); const want = new THREE.Vector3(g.x - J.p.x, (wantY - J.p.y) * 1.2, g.z - J.p.z).normalize();
     J.dir.lerp(want, Math.min(1, dt * 2.6)).normalize(); if (dxz > 2.2 || (J.goal.what && Math.abs(g.y - J.p.y) > 2)) { push = 1; if (dxz > 70) hard = 1; } else if (!J.goal.what) J.goal = null; }
-  else { const want = new THREE.Vector3(J.dir.x, (wantY - J.p.y) * .25, J.dir.z).normalize(); J.dir.lerp(want, Math.min(1, dt)).normalize(); }
+  else if (!steering) { const want = new THREE.Vector3(J.dir.x, (wantY - J.p.y) * .25, J.dir.z).normalize(); J.dir.lerp(want, Math.min(1, dt * .8)).normalize(); }   // let go: coast and level out over the floor
   J.boost += (hard - J.boost) * Math.min(1, dt * 3); const b = beat(); J.interval = b ? b.L * (hard ? 1 : 2) : (hard ? .45 : .8);
   if (play && push) { const since = T - J.lastStroke; if (b) { const n = hard ? b.n : b.n - (b.n % 2); if (n !== J.lastBeat && since > J.interval * .6) { J.lastBeat = n; stroke(hard); } } else if (since > J.interval) stroke(hard); }
   J.ph = Math.min(.999, (T - J.lastStroke) / Math.max(.4, J.interval * 1.1)); if (!push && T - J.lastStroke > 1.5) J.ph = (T * .33) % 1;
   const sp = J.v.length(); if (sp > .01) { const vd = J.v.clone().divideScalar(sp).lerp(J.dir, Math.min(1, dt * 2.6)).normalize(); J.v.copy(vd).multiplyScalar(sp); } J.v.multiplyScalar(Math.pow(.38, dt));
-  J.v.y += (wantY - J.p.y) * dt * (push ? .6 : 1.4); if (!play) J.v.set(Math.sin(T * .3) * .4, 0, Math.cos(T * .3) * .4);
+  if (!steering) J.v.y += (wantY - J.p.y) * dt * (push ? .6 : 1.4); else if (J.p.y < fyHere + 4) J.v.y += (fyHere + 4 - J.p.y) * dt * 3; if (!play) J.v.set(Math.sin(T * .3) * .4, 0, Math.cos(T * .3) * .4);
+  // a current: if you are inside one it pulls you to its heart and carries you along it
+  { let inC = null, best = 1e9, bi = 0; for (const c of CURR) { const st = c.last; for (let k = -40; k <= 40; k += 2) { const i = (st + k + c.N) % c.N, d = c.P[i].distanceToSquared(J.p); if (d < best) { best = d; bi = i; inC = c; } } if (best > 900) for (let i = 0; i < c.N; i += 6) { const d = c.P[i].distanceToSquared(J.p); if (d < best) { best = d; bi = i; inC = c; } } }
+    if (inC) { inC.last = bi; const d = Math.sqrt(best); if (d < 5.5 && play) { const a = inC.P[bi], b = inC.P[(bi + 3) % inC.N]; _cT.copy(b).sub(a).normalize(); const pull = 1 - d / 5.5; J.v.lerp(_cT.clone().multiplyScalar(19), Math.min(1, dt * 2.2 * pull + dt * .4)); J.v.addScaledVector(a.clone().sub(J.p), dt * 1.6 * pull);
+        if (!steering) J.dir.lerp(_cT, Math.min(1, dt * 2)).normalize(); if (!J.inCur) { J.inCur = true; say('a current: it carries you · steer out of it to leave'); buzz([8, 20, 8, 20, 8], .5); tone(523, 1.2, .04); tone(784, 1.6, .03); S.fov = 8; } J.curK = pull; } else { if (J.inCur && d > 8) { J.inCur = false; buzz(8); } J.curK = 0; } } }
   J.p.addScaledVector(J.v, dt); if (J.p.y < fyHere + 1.6) { J.p.y = fyHere + 1.6; J.v.y = Math.abs(J.v.y) * .3; } if (J.p.y > -1.5) { J.p.y = -1.5; J.v.y = Math.min(0, J.v.y); } ['x', 'z'].forEach(a => { if (Math.abs(J.p[a]) > 430) { J.p[a] = Math.sign(J.p[a]) * 430; J.v[a] *= -.3; } });
   if (J.kick > 0) J.kick = Math.max(0, J.kick - dt * 1.6); if (!J.trail.length || J.trail[J.trail.length - 1].distanceTo(J.p) > 8) { J.trail.push(J.p.clone()); if (J.trail.length > 400) J.trail.shift(); }
-  body.position.copy(J.p); body.quaternion.slerp(new THREE.Quaternion().setFromUnitVectors(UP, J.dir.clone().lerp(UP, .15).normalize()), 1 - Math.pow(.02, dt));
+  body.position.copy(J.p); { const q = new THREE.Quaternion().setFromUnitVectors(UP, J.dir.clone().lerp(UP, .15).normalize()); q.premultiply(new THREE.Quaternion().setFromAxisAngle(J.dir, -(J.yawR || 0) * .35)); body.quaternion.slerp(q, 1 - Math.pow(.02, dt)); }   // bank into the curve
+  if (MODE !== 'tap' && C.z < .5) { const want = Math.atan2(-J.dir.x, -J.dir.z); let d = want - C.yaw; d = Math.atan2(Math.sin(d), Math.cos(d)); C.yaw += d * Math.min(1, dt * (1.6 + 1.2 * Math.min(1, J.v.length() / 12))); }   // the camera swings behind you as you curve
   // the view: one continuous zoom from behind the jelly to above the whole sea; north stays where you put it
   C.z += (C.zT - C.z) * Math.min(1, dt * 3); const z = C.z, dist = THREE.MathUtils.lerp(11, 520, Math.pow(z, 1.8)), pitch = THREE.MathUtils.lerp(.32, 1.42, Math.min(1, z * 1.25));
   const mid = new THREE.Vector3(J.p.x * .25, J.p.y, J.p.z * .25); C.tgt.lerp(J.p.clone().lerp(mid, THREE.MathUtils.smoothstep(z, .5, 1)), 1 - Math.pow(.02, dt));
   const camT = C.tgt.clone().add(new THREE.Vector3(Math.sin(C.yaw) * Math.cos(pitch), Math.sin(pitch), Math.cos(C.yaw) * Math.cos(pitch)).multiplyScalar(dist)); if (z < .3) { const cfy = floorY(camT.x, camT.z) + 2; if (camT.y < cfy) camT.y = cfy; if (camT.y > -1) camT.y = -1; }
-  C.vel.addScaledVector(camT.sub(cam.position), dt * 10); C.vel.multiplyScalar(Math.pow(.003, dt)); cam.position.addScaledVector(C.vel, dt); cam.lookAt(C.tgt); S.fov *= Math.pow(.05, dt); cam.fov += (52 + 6 * J.boost + S.fov - cam.fov) * Math.min(1, dt * 6); cam.updateProjectionMatrix();
+  C.vel.addScaledVector(camT.sub(cam.position), dt * 10); C.vel.multiplyScalar(Math.pow(.003, dt)); cam.position.addScaledVector(C.vel, dt); cam.up.set(0, 1, 0).applyAxisAngle(_cT.set(-Math.sin(C.yaw), 0, -Math.cos(C.yaw)), MODE === 'tap' ? 0 : -(J.yawR || 0) * .06); cam.lookAt(C.tgt); S.fov *= Math.pow(.05, dt); cam.fov += (52 + 6 * J.boost + 8 * (J.curK || 0) + S.fov - cam.fov) * Math.min(1, dt * 6); cam.updateProjectionMatrix();
   const us = innerHeight * R.getPixelRatio() * .5 / Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)), above = cam.position.y > -1;
   // the world follows the view: the fine floor and the surface centre on what you look at; the coarse floor fades in as you rise; the haze thins
   const sn = v => Math.floor(v / (FSP * 4)) * FSP * 4; fineO.uO.value.set(sn(C.tgt.x), sn(C.tgt.z)); fineO.uFade.value = 1 - THREE.MathUtils.smoothstep(z, .32, .6); coarseO.uFade.value = THREE.MathUtils.smoothstep(z, .22, .5);
-  surfO.uO.value.set(Math.floor(cam.position.x / (SSP * 4)) * SSP * 4, Math.floor(cam.position.z / (SSP * 4)) * SSP * 4); surfO.uFade.value = (above ? .15 : 1) * (1 - THREE.MathUtils.smoothstep(z, .12, .32));
+  surfO.uO.value.set(Math.floor(cam.position.x / (SSP * 4)) * SSP * 4, Math.floor(cam.position.z / (SSP * 4)) * SSP * 4); surfO.uFade.value = (above ? .15 : .35 + .65 * THREE.MathUtils.smoothstep(-cam.position.y, 4, 22)) * (1 - THREE.MathUtils.smoothstep(z, .12, .32));
   U.uFogD.value = THREE.MathUtils.lerp(.017, .0016, THREE.MathUtils.smoothstep(z, .12, .7)); scene.fog.density = U.uFogD.value; U.uFogC.value.copy(scene.fog.color); U.uScale.value = us; U.uT.value = T;
   rig.update({t: T, dt, cam: cam.position, ph: J.ph, glow: .12 + .7 * J.kick + .25 * J.boost, hurt: 0, scale: innerHeight * R.getPixelRatio() * .0095 * 1.5, lit: J.got});
   // the films
-  let near = null, nd = 1e9; for (const f of FILMS) { const d = f.G.position.distanceTo(J.p); f.G.lookAt(cam.position); f.clear += (THREE.MathUtils.clamp(1 - (d - 5) / 22, 0, 1) - f.clear) * Math.min(1, dt * 2); const u = f.cl.material.uniforms; u.uClear.value = f.clear; u.uT.value = T; u.uScale.value = us; u.uGot.value += ((f.got ? 1 : 0) - u.uGot.value) * dt; u.uAim.value = J.goal && J.goal.what === f ? .5 + .5 * Math.sin(T * 6) : 0;
-    f.sc.material.uniforms.uA.value = THREE.MathUtils.smoothstep(f.clear, .7, 1) * .9; if (d < nd) { nd = d; near = f; } }
+  let near = null, nd = 1e9; for (const f of FILMS) { const d = f.G.position.distanceTo(J.p); f.G.lookAt(cam.position); f.clear += (THREE.MathUtils.smoothstep(d, 34, 9) - f.clear) * Math.min(1, dt * 2.5); const u = f.cl.material.uniforms; u.uClear.value = f.clear; u.uT.value = T; u.uScale.value = us; u.uGot.value += ((f.got ? 1 : 0) - u.uGot.value) * dt; u.uAim.value = J.goal && J.goal.what === f ? .5 + .5 * Math.sin(T * 6) : 0;
+    f.sc.material.uniforms.uA.value = THREE.MathUtils.smoothstep(f.clear, .75, 1) * .35; if (d < nd) { nd = d; near = f; } }
   if (near && nd < 22 && FBASE && playing !== near && near.c.clip) { if (playing) playing.cl.material.uniforms.map.value = playing.sc.material.uniforms.map.value = playing.tex; playing = near; vid.src = FBASE + near.c.clip; vid.play().catch(() => {}); near.cl.material.uniforms.map.value = near.sc.material.uniforms.map.value = vtex; }
   if (playing && playing.G.position.distanceTo(J.p) > 30) { playing.cl.material.uniforms.map.value = playing.sc.material.uniforms.map.value = playing.tex; playing = null; vid.pause(); }
-  if (play && near && nd < 4.6 && !near.got) { near.got = true; J.got++; say(`${near.c.t}${near.c.y ? ' · ' + near.c.y : ''} · ${J.got} film${J.got > 1 ? 's' : ''}`); tone(660, 1.4, .05); tone(990, 1.8, .03); buzz([12, 40, 12], .5); J.kick = 1; rig.setFilm(near.tex); S.fov = 5; if (J.goal && J.goal.what === near) J.goal = null; }
+  if (play && near && nd < 6 && !near.got) { near.got = true; J.got++; say(`${near.c.t}${near.c.y ? ' · ' + near.c.y : ''} · ${J.got} film${J.got > 1 ? 's' : ''}`); tone(660, 1.4, .05); tone(990, 1.8, .03); buzz([12, 40, 12], .5); J.kick = 1; rig.setFilm(near.tex); S.fov = 5; if (J.goal && J.goal.what === near) J.goal = null; }
   // the places
   for (const s of SITES) { s.ring.lookAt(cam.position); s.ring.rotateZ(T * .2); const d = s.G.position.distanceTo(J.p);
     if (play && d < 46 && !J.seen.has(s.id)) { J.seen.add(s.id); say(`${s.name}: ${s.line}. Swim into the ring of light.`); tone(392, 2, .05); tone(588, 2.4, .03); buzz([10, 30, 10, 30, 10]); }
     if (play && d < s.r - .6 && !S.leaving) { S.leaving = true; $('fade').style.opacity = 1; say(`into ${s.piece}`); tone(196, 2.4, .08); buzz([30, 60, 30, 60, 90], .9); try { localStorage.setItem('cj-sea', JSON.stringify({x: J.p.x, y: J.p.y, z: J.p.z})); } catch (e) {} setTimeout(() => location.href = s.href, 1200); } }
   MED.forEach((m, i) => { const s = SITES[2]; m.g.position.set(s.x + Math.cos(m.a + T * .05) * 10, m.y0 + Math.sin(T * .35 + i) * 8, s.z + Math.sin(m.a + T * .05) * 10); m.r.update({t: T, dt, cam: cam.position, ph: (T * .4 + m.ph) % 1, glow: .2, hurt: 0, scale: us * .019, lit: 12}); });
+  for (const c of CURR) { const a = c.pts.geometry.attributes.position.array, k = c.pts.geometry.attributes.aK.array, n = c.u.length; for (let i = 0; i < n; i++) { c.u[i] = (c.u[i] + dt * (.006 + .004 * (i % 3))) % 1; const p = curAt(c, c.u[i]); a[i * 3] = p.x + c.r[i * 2]; a[i * 3 + 1] = p.y + c.r[i * 2 + 1]; a[i * 3 + 2] = p.z + c.r[(i * 2 + 2) % (n * 2)]; k[i] = .25 + .35 * Math.sin(c.u[i] * 400 + T * 3) ** 2; }
+    c.pts.geometry.attributes.position.needsUpdate = true; c.pts.geometry.attributes.aK.needsUpdate = true; }
   // the marks of where you are going
   { const a = markPts.geometry.attributes.position.array, k = markPts.geometry.attributes.aK.array; if (J.goal && play) { const g = J.goal.p, gf = floorY(g.x, g.z) + .5, r = 2.2 + .3 * Math.sin(T * 4);
       for (let i = 0; i < 48; i++) { const an = i / 48 * 6.283 + T; a.set([g.x + Math.cos(an) * r, gf, g.z + Math.sin(an) * r], i * 3); k[i] = .9; }
@@ -293,10 +335,10 @@ function frame(now) { requestAnimationFrame(frame); const dt = Math.min(.05, (no
     const c = FOG.clone().multiplyScalar(1.25 - .55 * depth).lerp(new THREE.Color(n2.col).multiplyScalar(.12).add(FOG.clone().multiplyScalar(.7)), kk * .22); scene.fog.color.lerp(c, Math.min(1, dt * 1.5)); const hx = scene.fog.color.getHexString(); if (hx !== bgLast) { bgLast = hx; paintBG(scene.fog.color); } }
   if (SA.lp && AC) SA.lp.frequency.setTargetAtTime(220 + J.v.length() * 45, AC.currentTime, .25);
   // the goal
-  if (play) { const places = SITES.filter(s => !s.home && J.seen.has(s.id)).length; $('goal').textContent = `${places >= 4 && J.got >= 12 ? '★ ' : ''}places ${places} / 4 · films ${J.got} / 12`; $('stat').textContent = `${J.goal ? (J.goal.what ? 'to ' + (J.goal.what.name || 'a film') : 'swimming') + ' · ' : ''}${J.v.length().toFixed(1)} m/s`;
+  if (play) { const places = SITES.filter(s => !s.home && J.seen.has(s.id)).length; $('goal').textContent = `${places >= 4 && J.got >= 12 ? '★ ' : ''}places ${places} / 4 · films ${J.got} / 12`; $('stat').textContent = `${MODE.toUpperCase()} · ${J.inCur ? 'riding a current · ' : ''}${J.goal ? (J.goal.what ? 'to ' + (J.goal.what.name || 'a film') : 'swimming') + ' · ' : ''}${J.v.length().toFixed(1)} m/s`;
     if (!S.done && places >= 4 && J.got >= 12) { S.done = true; say('★ the open water is yours: every place found, a reel of films taken', 4); tone(784, 2, .06); tone(1175, 2.4, .04); buzz([20, 40, 20, 40, 60], .8); try { const Sx = JSON.parse(localStorage.getItem('cj-sealed') || '{}'); Sx['open-water'] = {stars: 3, secs: 0, clips: J.got, t: Date.now()}; localStorage.setItem('cj-sealed', JSON.stringify(Sx)); } catch (e) {} } }
   if (S.sayT && performance.now() > S.sayT) $('say').style.opacity = 0;
   drawGuide(); comp.render(); }
 requestAnimationFrame(frame);
-window.__sea = {J, S, C, SITES, FILMS, begin, stroke, cam, setRig, goTo, pick};
+window.__sea = {J, S, C, SITES, FILMS, begin, stroke, cam, setRig, goTo, pick, setMode, CURR};
 </script></body></html>
