@@ -65,3 +65,6 @@
     console.info('[realfilm] footage for', MODE, 'song', SONG, 'films', F.length, 'clips', clips.length);
   }
 })();
+
+// every bonus piece opens back onto the open water that joins them
+try { const a = document.createElement('a'); a.href = 'sea.html'; a.textContent = '← the open water'; a.style.cssText = 'position:fixed;left:14px;bottom:max(12px,env(safe-area-inset-bottom));z-index:9999;font:300 12px "JetBrains Mono",monospace;color:#f0a35a;text-decoration:none;text-shadow:0 0 6px #000;opacity:.85'; document.body.appendChild(a); } catch (e) {}

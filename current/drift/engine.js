@@ -582,7 +582,7 @@ export async function play(L, ALL) {
     snM.uniforms.uScale.value = us; snM.uniforms.uHigh.value = AU.high(); pulseMat.uniforms.uScale.value = us; if (surfMat) { surfMat.uniforms.uScale.value = us; surfMat.uniforms.uTime.value = T; }
     for (const m of [fishPts, dlPts, spkPts, combPts, shrPts, RAY && RAY.m, ANG && ANG.mb, ANG && ANG.mg, ANG && ANG.lure, ...(PR ? PR.meshes : [])]) if (m) { m.material.uniforms.uScale.value = us; if (m.material.uniforms.uTime) m.material.uniforms.uTime.value = T; }
     const bu = bellM.uniforms; bu.uPulse.value = J.ph; bu.uTime.value = T; bu.uGlow.value = J.glow + (1 - AU.phase()) * .15; bu.uHurt.value = J.hurt; bu.uFray.value = 1 - J.mem / 100; bu.uScale.value = ps * .0095;
-    if (RIG) { RIG.update({t: T, ph: J.ph, glow: J.glow + (1 - AU.phase()) * .15, hurt: J.hurt, scale: ps * .0095, lit: ARMS.length});
+    if (RIG) { RIG.update({t: T, dt: real, cam: camera.position, ph: J.ph, glow: J.glow + (1 - AU.phase()) * .15, hurt: J.hurt, scale: ps * .0095, lit: ARMS.length});
       if (RT - (G.rfT || 0) > .2) { G.rfT = RT; let c = null; for (let i = CUT.length - 1; i >= 0; i--) if (!CUT[i].lost) { c = CUT[i]; break; }   // the jellies that carry a film show the one you took last
         if (c && drawFrame(rgx, c.film, c.fi + Math.floor(RT * fps(FILMS[c.film])) % BLOCK, 160, 120)) { rtex.needsUpdate = true; if (!G_rf) { RIG.setFilm(rtex); G_rf = 1; } } else if (!c && G_rf) { RIG.setFilm(null); G_rf = 0; } } }
     AU.speed(Math.hypot(J.vu, J.vw)); params.needsUpdate = true;

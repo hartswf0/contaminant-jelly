@@ -17,23 +17,48 @@ export const RIGS = [
 const PULSE = `float c(float ph){ ph = fract(ph); return ph < .28 ? sin(ph / .28 * 1.5708) : 1. - smoothstep(0., 1., (ph - .28) / .72); }`;
 const pulseC = ph => { ph = ((ph % 1) + 1) % 1; return ph < .28 ? Math.sin(ph / .28 * Math.PI / 2) : 1 - (t => t * t * (3 - 2 * t))((ph - .28) / .72); };
 
-// a ribbon hanging from the bell, swaying; uv.x across (0..1), uv.y from root (0) to tip (1)
+// tentacles are verlet chains in world space: pinned to the rim (which contracts with the stroke), heavy with water drag, trailing behind when the bell moves,
+// stirred by a slow current; they are drawn back in the rig's own space. A ribbon faces the camera; a line is a thread.
+const _v = {};
+function chainSim(THREE, n, len, x0, y0, z0, k) {
+  const X = new Float32Array(n * 3), XP = new Float32Array(n * 3), root = new THREE.Vector3(x0, y0, z0), seg = len / (n - 1), w = new THREE.Vector3(), d = new THREE.Vector3(), sc = new THREE.Vector3(); let init = false;
+  return {X, n, root, k, step(dt, t, pulse, M) {
+    const S = sc.setFromMatrixScale(M).x, L = seg * S; w.set(root.x * (1 - .25 * pulse), root.y + .05 * pulse, root.z * (1 - .25 * pulse)).applyMatrix4(M); d.set(0, -1, 0).transformDirection(M);
+    if (!init) { init = true; for (let i = 0; i < n; i++) { X[i * 3] = XP[i * 3] = w.x + d.x * L * i; X[i * 3 + 1] = XP[i * 3 + 1] = w.y + d.y * L * i; X[i * 3 + 2] = XP[i * 3 + 2] = w.z + d.z * L * i; } }
+    const keep = Math.pow(.12, dt), g = 1.6 * S * dt * dt, fl = .55 * S * dt * dt;
+    for (let i = 1; i < n; i++) { const j = i * 3, f = i / (n - 1);
+      for (let c = 0; c < 3; c++) { const v = (X[j + c] - XP[j + c]) * keep; XP[j + c] = X[j + c]; X[j + c] += v + d.getComponent(c) * g + fl * f * Math.sin(t * (.9 + .17 * c) + i * .45 + k * 1.7 + c * 2.1); } }
+    X[0] = XP[0] = w.x; X[1] = XP[1] = w.y; X[2] = XP[2] = w.z;
+    for (let it = 0; it < 8; it++) for (let i = 0; i < n - 1; i++) { const a = i * 3, b = a + 3, dx = X[b] - X[a], dy = X[b + 1] - X[a + 1], dz = X[b + 2] - X[a + 2], dd = Math.hypot(dx, dy, dz) || 1e-6, e = (dd - L) / dd, wa = i ? .5 : 0, wb = i ? .5 : 1;
+      X[a] += dx * e * wa; X[a + 1] += dy * e * wa; X[a + 2] += dz * e * wa; X[b] -= dx * e * wb; X[b + 1] -= dy * e * wb; X[b + 2] -= dz * e * wb; } }};
+}
 function ribbon(THREE, mat, seg, len, width, x0, z0, k) {
-  const g = new THREE.BufferGeometry(), P = new Float32Array((seg + 1) * 2 * 3), U = new Float32Array((seg + 1) * 2 * 2), C = new Float32Array((seg + 1) * 2 * 3).fill(1), N = new Float32Array((seg + 1) * 2 * 3), I = [];
-  for (let j = 0; j <= seg; j++) { U.set([0, j / seg, 1, j / seg], j * 4); N.set([0, 0, 1, 0, 0, 1], j * 6); if (j < seg) { const a = j * 2; I.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); } }
+  const n = seg + 1, g = new THREE.BufferGeometry(), P = new Float32Array(n * 2 * 3), U = new Float32Array(n * 2 * 2), C = new Float32Array(n * 2 * 3).fill(1), N = new Float32Array(n * 2 * 3), I = [];
+  for (let j = 0; j < n; j++) { U.set([0, j / seg, 1, j / seg], j * 4); N.set([0, 0, 1, 0, 0, 1], j * 6); if (j < seg) { const a = j * 2; I.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); } }
   g.setAttribute('position', new THREE.BufferAttribute(P, 3)); g.setAttribute('uv', new THREE.BufferAttribute(U, 2)); g.setAttribute('color', new THREE.BufferAttribute(C, 3)); g.setAttribute('normal', new THREE.BufferAttribute(N, 3)); g.setIndex(I);
-  const m = new THREE.Mesh(g, mat); m.frustumCulled = false;
-  return {m, update(t, pulse) { for (let j = 0; j <= seg; j++) { const f = j / seg, w = (Math.sin(t * (1.1 + k * .13) - f * 4.2 + k) * .28 * f + Math.sin(t * .5 - f * 2 + k) * .18 * f * f), y = -f * len - pulse * .06 * f, x = x0 * (1 - f * .3) + w, z = z0 + Math.cos(t * .8 - f * 3 + k) * .14 * f, hw = width * (1 - f * .45) / 2, a = Math.atan2(z0, x0) + Math.PI / 2;
-      P.set([x - Math.cos(a) * hw, y, z - Math.sin(a) * hw, x + Math.cos(a) * hw, y, z + Math.sin(a) * hw], j * 6); } g.attributes.position.needsUpdate = true; }};
+  const m = new THREE.Mesh(g, mat); m.frustumCulled = false; const sim = chainSim(THREE, n, len, x0, .02, z0, k), T = new THREE.Vector3(), V = new THREE.Vector3(), Sd = new THREE.Vector3(), A = new THREE.Vector3(), B = new THREE.Vector3(), sc = new THREE.Vector3();
+  return {m, root: sim.root, update() {}, chain(dt, t, pulse, M, inv, cam) { sim.step(dt, t, pulse, M); const X = sim.X, S = sc.setFromMatrixScale(M).x;
+    for (let j = 0; j < n; j++) { const a = Math.min(j, n - 2) * 3; T.set(X[a + 3] - X[a], X[a + 4] - X[a + 1], X[a + 5] - X[a + 2]); A.set(X[j * 3], X[j * 3 + 1], X[j * 3 + 2]);
+      if (cam) V.copy(cam).sub(A); else V.set(0, 0, 1).transformDirection(M); Sd.crossVectors(T, V); if (Sd.lengthSq() < 1e-10) Sd.set(1, 0, 0); Sd.setLength(width * (1 - .45 * j / seg) / 2 * S);
+      B.copy(A).add(Sd).applyMatrix4(inv); A.sub(Sd).applyMatrix4(inv); P.set([A.x, A.y, A.z, B.x, B.y, B.z], j * 6); } g.attributes.position.needsUpdate = true; }};
 }
 function line(THREE, color, opacity, n, len, x0, z0, k) {
   const g = new THREE.BufferGeometry(), P = new Float32Array(n * 3); g.setAttribute('position', new THREE.BufferAttribute(P, 3)); const mat = new THREE.LineBasicMaterial({color, transparent: true, opacity, blending: THREE.AdditiveBlending, depthWrite: false}), l = new THREE.Line(g, mat); l.frustumCulled = false;
-  return {l, mat, update(t, pulse) { for (let j = 0; j < n; j++) { const f = j / (n - 1); P.set([x0 * (1 - f * .25) + Math.sin(t * (1 + k * .07) - f * 4 + k) * .22 * f, -f * len - pulse * .05 * f + .02, z0 * (1 - f * .25) + Math.cos(t * .8 - f * 3 + k) * .16 * f], j * 3); } g.attributes.position.needsUpdate = true; }};
+  const sim = chainSim(THREE, n, len, x0, .02, z0, k), A = new THREE.Vector3();
+  return {l, mat, root: sim.root, update() {}, chain(dt, t, pulse, M, inv) { sim.step(dt, t, pulse, M); for (let j = 0; j < n; j++) { A.set(sim.X[j * 3], sim.X[j * 3 + 1], sim.X[j * 3 + 2]).applyMatrix4(inv); P.set([A.x, A.y, A.z], j * 3); } g.attributes.position.needsUpdate = true; }};
+}
+// the jellies that came without tentacles of their own get the ones their versions swam with: threads in their own colour, a film strand or two
+function threads(THREE, group, parts, n, color, opacity, len, r, y0, strands, mats) {
+  for (let i = 0; i < n; i++) { const a = i / n * 6.283 + .2, L = line(THREE, color, opacity, 22, len * (.8 + .4 * ((i * 7) % 5) / 4), Math.cos(a) * r, Math.sin(a) * r, i); L.root.y = y0; group.add(L.l); parts.push(L); }
+  if (strands) { const m = new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, uniforms: {uT: {value: 0}, uC: {value: new THREE.Color(color)}},
+      vertexShader: 'varying vec2 v; void main(){ v = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }',
+      fragmentShader: `uniform float uT; uniform vec3 uC; varying vec2 v; void main(){ float f = fract(v.y * 26. - uT * .4); if ((v.x < .16 || v.x > .84) && f > .5) discard; float frame = step(.08, fract(v.y * 9. - uT * .15)); vec3 c = uC * (v.x < .16 || v.x > .84 ? .5 : .28 * frame); gl_FragColor = vec4(c * (1. - v.y * .75), 1.); }`});
+    mats.push(m); for (let i = 0; i < strands; i++) { const a = i / strands * 6.283 + 1, R = ribbon(THREE, m, 30, len * 1.15, .16, Math.cos(a) * r * .6, Math.sin(a) * r * .6, i + 9); R.root.y = y0; group.add(R.m); parts.push(R); } }
 }
 const lathe = (THREE, R, H, n = 40) => Array.from({length: n + 1}, (_, i) => { const t = i / n, a = t * Math.PI / 2 * 1.04; return new THREE.Vector2(Math.max(.001, R * Math.sin(a) * (1 + .06 * Math.sin(t * Math.PI))), H * Math.cos(a)); });
 
 export function makeRig(THREE, id) {
-  const group = new THREE.Group(), mats = [], parts = [], filmMats = []; let norm = 1, k = 1;
+  const group = new THREE.Group(), mats = [], parts = [], filmMats = [], inv = new THREE.Matrix4(); let norm = 1, k = 1, lastT = null;
   const pts = (geo, mat) => { const p = new THREE.Points(geo, mat); p.frustumCulled = false; group.add(p); mats.push(mat); return p; };
   const attrs = (n, fill) => { const g = new THREE.BufferGeometry(), P = new Float32Array(n * 3), T = new Float32Array(n), S = new Float32Array(n), L = new Float32Array(n); let m = 0; for (let i = 0; i < n * 4 && m < n; i++) if (fill(m, P, T, S, L) !== false) m++;
     g.setAttribute('position', new THREE.BufferAttribute(P, 3)); g.setAttribute('aT', new THREE.BufferAttribute(T, 1)); g.setAttribute('aS', new THREE.BufferAttribute(S, 1)); g.setAttribute('aL', new THREE.BufferAttribute(L, 1)); g.setDrawRange(0, m); return g; };
@@ -175,12 +200,15 @@ export function makeRig(THREE, id) {
       const g = new THREE.BufferGeometry().setFromPoints(P), orig = g.attributes.position.array.slice(), mat = new THREE.LineBasicMaterial({color: r % 2 === 0 ? 0xfacc15 : 0x38bdf8, transparent: true, opacity: .92}), l = new THREE.Line(g, mat); group.add(l); ribs.push({g, orig}); }
     for (let q = 1; q <= 5; q++) { const th = q / 6 * Math.PI * .68, P = []; for (let s = 0; s <= 48; s++) { const phi = s / 48 * Math.PI * 2, j = Math.sin(s * 5 + q * 2) * .02; P.push(new THREE.Vector3(Math.cos(phi) * Math.sin(th) * (BELL_R + j), Math.cos(th) * BELL_R * .88 - .35, Math.sin(phi) * Math.sin(th) * (BELL_R + j))); } group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(P), new THREE.LineBasicMaterial({color: 0xe2e8f0, transparent: true, opacity: .35}))); }
     const dm = new THREE.MeshBasicMaterial({map: blank, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending}), core = new THREE.Mesh(new THREE.PlaneGeometry(1.2, .9), dm); core.position.set(0, .05, 0); group.add(core); filmMats.push(dm);
-    const cols = [0xfacc15, 0x38bdf8, 0xf472b6, 0x4ade80, 0xfb923c, 0xa78bfa], tl = []; for (let i = 0; i < 12; i++) { const a = i / 12 * 6.283, L = line(THREE, cols[i % 6], .3, 16, 2.6, Math.cos(a) * .65, Math.sin(a) * .65, i); L.l.position.y = -.35; group.add(L.l); parts.push(L); tl.push(L); }
+    const cols = [0xfacc15, 0x38bdf8, 0xf472b6, 0x4ade80, 0xfb923c, 0xa78bfa], tl = []; for (let i = 0; i < 12; i++) { const a = i / 12 * 6.283, L = line(THREE, cols[i % 6], .3, 16, 2.6, Math.cos(a) * .65, Math.sin(a) * .65, i); L.root.y = -.35; group.add(L.l); parts.push(L); tl.push(L); }
     parts.push({update: (t, p, s) => { for (const R of ribs) { const a = R.g.attributes.position.array; for (let i = 0; i < a.length; i += 3) { const y = R.orig[i + 1] + .35, kk = (1 - y / BELL_R) * p * .25; a[i] = R.orig[i] * (1 - kk) + Math.sin(t * 6 + i) * .004; a[i + 2] = R.orig[i + 2] * (1 - kk); a[i + 1] = R.orig[i + 1] + kk * .2; } R.g.attributes.position.needsUpdate = true; }
       tl.forEach((L, i) => L.mat.opacity = i < (s.lit || 0) ? .95 : .3); }});
   }
+  if (id === 'filmbell') threads(THREE, group, parts, 6, 0xffc58a, .3, 2.2, .85, .05, 2, mats);
+  if (id === 'golden') threads(THREE, group, parts, 10, 0xffb347, .32, 2.3, .7, .02, 0, mats);
+  if (id === 'mantle') threads(THREE, group, parts, 8, 0xffa850, .35, 1.8, .45, -.55, 2, mats);
   if (id === 'celluloid') {   // v6 / v7: three celluloid sheets with sprocket holes, contracting one after another (the engine draws its own; this is for the gallery)
-    norm = 1; const BN = 5000, g = attrs(BN, (k2, P, T, S, L) => { const ly = k2 < 1250 ? 0 : k2 < 2900 ? 1 : 2, rad = [.62, .78, .92][ly], t = Math.sqrt(Math.random()), a = t * Math.PI / 2 * 1.05, ph = Math.random() * 6.283;
+    norm = 1; threads(THREE, group, parts, 6, 0xffb35a, .3, 2.2, .78, .02, 2, mats); const BN = 5000, g = attrs(BN, (k2, P, T, S, L) => { const ly = k2 < 1250 ? 0 : k2 < 2900 ? 1 : 2, rad = [.62, .78, .92][ly], t = Math.sqrt(Math.random()), a = t * Math.PI / 2 * 1.05, ph = Math.random() * 6.283;
       if ((t > .86 && Math.floor(ph / 6.283 * 44) % 2 === 0 && Math.random() < .85) || (Math.abs(((ph / 6.283 * 8) % 1) - .5) < .025 && Math.random() < .7)) return false;
       P.set([Math.cos(ph) * rad * Math.sin(a), rad * .8 * Math.cos(a), Math.sin(ph) * rad * Math.sin(a)], k2 * 3); T[k2] = t; S[k2] = Math.random(); L[k2] = ly; });
     pts(g, new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: {uPulse: {value: 0}, uTime: {value: 0}, uScale: {value: 1}, uGlow: {value: 0}, uHurt: {value: 0}},
@@ -190,7 +218,8 @@ export function makeRig(THREE, id) {
         vec3 col = vL < .5 ? vec3(1., .5, .12) : vL < 1.5 ? vec3(1., .72, .3) : vec3(1., .9, .66); if (vL > 1.5) col += vec3(-.05, .03, .08) * sin(vS * 40.); col *= (.45 + .9 * pow(vT, 4.)) * (1. + uGlow) * (vL > 1.5 ? .7 : 1.); col = mix(col, vec3(1., .12, .05), uHurt * .6); gl_FragColor = vec4(col * g * .24, 1.); }`})); }
 
   return {group, norm, k, update(s) { const p = pulseC(s.ph); for (const m of mats) { const u = m.uniforms; if (!u) continue; if (u.uPulse) u.uPulse.value = s.ph; if (u.uP) u.uP.value = p; if (u.uTime) u.uTime.value = s.t; if (u.uT) u.uT.value = s.t; if (u.uGlow) u.uGlow.value = s.glow; if (u.uHurt) u.uHurt.value = s.hurt; if (u.uInk) u.uInk.value = s.hurt * .6; if (u.uScale) u.uScale.value = s.scale * k; }
-      for (const q of parts) q.update(s.t, p, s); },
+      const dt = Math.min(.05, Math.max(0, s.dt ?? (s.t - (lastT ?? s.t)))); lastT = s.t; group.updateWorldMatrix(true, false); const M = group.matrixWorld; inv.copy(M).invert();
+      for (const q of parts) { if (q.chain) q.chain(dt || 1 / 60, s.t, p, M, inv, s.cam); else q.update(s.t, p, s); } },
     setFilm(tex) { for (const m of filmMats) { if (m.uniforms) { if (m.uniforms.uImg) { m.uniforms.uImg.value = tex || blank; } if (m.uniforms.uHasImg) m.uniforms.uHasImg.value = tex ? 1 : 0; if (m.uniforms.uHas) m.uniforms.uHas.value = tex ? 1 : 0; if (m.uniforms.map) m.uniforms.map.value = tex || blank; if (m.uniforms.uA) m.uniforms.uA.value = tex ? .85 : 0; } else { m.map = tex || blank; m.opacity = tex ? .5 : 0; m.needsUpdate = true; } } },
     dispose() { group.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); }); }};
 }
