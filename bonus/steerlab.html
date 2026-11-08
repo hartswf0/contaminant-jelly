@@ -26,7 +26,7 @@ canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-acti
 <div class="ui" id="card"><div class="k" id="ck"></div><h1 id="ch"></h1>
   <div class="brief"><div class="vb" id="cv"></div><div><ol class="how" id="chow"></ol></div></div>
   <p id="cp"></p><div class="rooms" id="rooms"></div>
-  <div class="go">TOUCH TO BEGIN</div><div class="lk">Every room: each finger owns one tentacle until it lifts; double-tap, or space, to stroke; a flick throws an arm. Desktop: hold 1 to 5 to plant fingers at the mouse · R resets · <a href="sea.html">← the open water</a> · <a href="SCION_STEERLAB.md">the theory</a></div></div>
+  <div class="go">TOUCH TO BEGIN</div><div class="lk">Every room: a finger on the bell holds the jelly itself (pull, let go to fling); elsewhere, each finger owns one tentacle until it lifts; double-tap, or space, to stroke; a flick throws an arm. Desktop: hold 1 to 5 to plant fingers at the mouse · R resets · <a href="sea.html">← the open water</a> · <a href="SCION_STEERLAB.md">the theory</a></div></div>
 <script type="module">
 import * as THREE from 'three';
 import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
@@ -55,9 +55,12 @@ const ROOMS = {
   harpoon: {n: 5, name: 'The Harpoon Range', verb: 'CAST', grav: .6, drag: .8, bed: x => -6 + .016 * x * x, slots: 6, rocks: [{x: -12, h: 5}, {x: 4, h: 4}, {x: 16, h: 6}], kelp: [], reels: [[-18, 9], [-4, 11], [9, 9], [22, 12]], film: null,
     start: [-22, 3], exit: [0, 15], needReels: 3, how: ['Flick a finger and lift: the arm is thrown along the flick.', 'A light reel it hooks comes flying back to you; a heavy post it hooks pulls you to it.', 'Haul three reels in; then the way out opens overhead.'],
     line: 'Cast and catch: an arm is also a harpoon.'},
+  fling: {n: 6, name: 'The Fling', verb: 'FLING', grav: .6, drag: .55, bed: x => -6 + .012 * x * x, slots: 5, rocks: [], kelp: [[-27, 6], [27, 6]], reels: [], film: null, rings: [[-14, 7], [0, 11.5], [14, 7]],
+    start: [-24, 3], exit: [24.5, 9], needRings: 3, how: ['Put a finger on the bell itself: you hold the jelly, not an arm.', 'Pull it on its elastic and let go: it flings with the speed you gave it. Arms still hook if you touch anywhere else.', 'Fling through all three rings; then the way out opens.'],
+    line: 'Drag the bell: the most direct steering there is, and the hardest to aim.'},
 };
 const RK = ROOMS[Q.get('room')] ? Q.get('room') : 'halfpipe', RM = ROOMS[RK], X0 = -30, X1 = 30;
-$('ck').textContent = `BONUS · THE STEER LAB · ROOM ${RM.n} OF 5`; $('ch').textContent = RM.name; $('cv').textContent = RM.verb; $('chow').innerHTML = RM.how.map(h => `<li>${h}</li>`).join(''); $('cp').textContent = RM.line; $('rname').textContent = RM.name.toUpperCase();
+$('ck').textContent = `BONUS · THE STEER LAB · ROOM ${RM.n} OF ${Object.keys(ROOMS).length}`; $('ch').textContent = RM.name; $('cv').textContent = RM.verb; $('chow').innerHTML = RM.how.map(h => `<li>${h}</li>`).join(''); $('cp').textContent = RM.line; $('rname').textContent = RM.name.toUpperCase();
 let SEALED = {}; try { SEALED = JSON.parse(localStorage.getItem('cj-sealed') || '{}'); } catch (e) {}
 $('rooms').innerHTML = Object.entries(ROOMS).map(([k, r]) => `<a href="?room=${k}" class="${k === RK ? 'on' : ''}">${r.n} · ${r.verb}${SEALED['steer-' + k] ? '<i>★</i>' : ''}</a>`).join('');
 // ---------------------------------------------------------------- silt: stacked slots of buried film over the bed
@@ -118,7 +121,8 @@ const handAt = u => { u = ((u % 1) + 1) % 1; const ox = FILM.x - 10, oy = FILM.y
 const RAY = RM.ray ? {x: -45, y: 6, vx: 9, pts: cloud(900, darkM()), rim: cloud(160, glowM()), wake: cloud(500, glowM())} : null;
 if (RAY) for (let i = 0; i < 14; i++) { const a = i / 14 * 6.283; ANCH.push({kind: 'ray', dx: Math.cos(a) * 3, dy: Math.sin(a) * .6, x: 0, y: 0, heavy: true, moving: true}); }
 const inWake = (x, y) => RAY && x < RAY.x - 1.5 && x > RAY.x - 16 && Math.abs(y - RAY.y) < 2.6;
-const EXIT = {x: RM.exit[0], y: bed(RM.exit[0]) + (RM.slots * SL) + RM.exit[1], r: 2.4, open: !RM.needReels}; const exitPts = cloud(220, glowM());
+const EXIT = {x: RM.exit[0], y: bed(RM.exit[0]) + (RM.slots * SL) + RM.exit[1], r: 2.4, open: !RM.needReels && !RM.needRings};
+const RINGS = (RM.rings || []).map(([x, dy]) => ({x, y: bed(x) + RM.slots * SL + dy, r: 1.8, done: false, pts: null})); RINGS.forEach(r => r.pts = cloud(160, glowM())); const exitPts = cloud(220, glowM());
 // snow and far silhouettes
 const SNOW = cloud(900, glowM()); { const P = SNOW.geometry.attributes.position.array, C = SNOW.geometry.attributes.aC.array, S = SNOW.geometry.attributes.aS.array; for (let i = 0; i < 900; i++) { P.set([X0 - 10 + Math.random() * 80, -16 + Math.random() * 40, -12 + Math.random() * 16], i * 3); const b = .15 + Math.random() * .35; C.set([b * .8, b, b], i * 3); S[i] = .05 + Math.random() * .05; } upd(SNOW); }
 { const n = 1800, cl = cloud(n, darkM()), P = cl.geometry.attributes.position.array, C = cl.geometry.attributes.aC.array, S = cl.geometry.attributes.aS.array; for (let i = 0; i < n; i++) { const x = X0 - 20 + Math.floor(i / 30) * 1.4 + Math.random(), t = (i % 30) / 30; P.set([x + Math.sin(t * 5 + x) * .6, bed(THREE.MathUtils.clamp(x, -30, 30)) + t * (8 + 6 * Math.abs(Math.sin(x))), -14 - (i % 3) * 3], i * 3); C.set(FOG.clone().multiplyScalar(.7).toArray(), i * 3); S[i] = .6; } upd(cl); }
@@ -149,9 +153,9 @@ const env = {
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0), hitV = new THREE.Vector3();
 const toWorld = (sx, sy) => { ndc.set(sx / innerWidth * 2 - 1, -(sy / innerHeight) * 2 + 1); ray.setFromCamera(ndc, cam); ray.ray.intersectPlane(plane, hitV); return {x: hitV.x, y: hitV.y}; };
 const SCR = new Map();
-const down = (id, sx, sy) => { const f = AR.down(id, toWorld(sx, sy), B, env, T); if (f) SCR.set(id, [sx, sy]); };
-const mv = (id, sx, sy) => { if (!AR.F.has(id)) return; SCR.set(id, [sx, sy]); AR.move(id, toWorld(sx, sy), T); };
-const up = (id, intr) => { SCR.delete(id); AR.up(id, intr, B, env, T); };
+const down = (id, sx, sy) => { const p = toWorld(sx, sy); if (!S.grab && Math.hypot(p.x - B.x, p.y - B.y) < 1.0) { S.grab = {id, p}; SCR.set(id, [sx, sy]); pluck(440, .04); buzz(6); return; } const f = AR.down(id, p, B, env, T); if (f) SCR.set(id, [sx, sy]); };   // a finger on the bell holds the jelly itself
+const mv = (id, sx, sy) => { if (S.grab && S.grab.id === id) { S.grab.p = toWorld(sx, sy); SCR.set(id, [sx, sy]); return; } if (!AR.F.has(id)) return; SCR.set(id, [sx, sy]); AR.move(id, toWorld(sx, sy), T); };
+const up = (id, intr) => { SCR.delete(id); if (S.grab && S.grab.id === id) { S.grab = null; if (!intr && Math.hypot(B.vx, B.vy) > 7) move('flung', [10, 20, 10]); else if (intr) { B.vx *= .3; B.vy *= .3; } return; } AR.up(id, intr, B, env, T); };
 const cv = $('gl');
 cv.addEventListener('pointerdown', e => { if (S.state !== 'play') return; try { cv.setPointerCapture(e.pointerId); } catch (x) {} const now = performance.now();
   if (now - (S.lastTap || 0) < 300 && Math.hypot(e.clientX - S.lx, e.clientY - S.ly) < 40 && !AR.F.size) { stroke(); S.lastTap = 0; return; } S.lastTap = now; S.lx = e.clientX; S.ly = e.clientY; down('p' + e.pointerId, e.clientX, e.clientY); });
@@ -190,6 +194,7 @@ function frame(now) { requestAnimationFrame(frame); const dt = Math.min(1 / 30, 
   if (HAND) { const u = (FILM.k + FILM.t * 8) / NG; const h = handAt(u); HAND.x = h.x; HAND.y = h.y; HAND.ghosts = [1, 2, 3, 4, 5].map(i => ({...handAt(u - i * .05), age: i})); }
   // the arms pull; the bell answers
   const o = AR.step(dt, T, B, env); if (o.snap) { B.vx += o.fx * .14; B.vy += o.fy * .14; B.w += o.tq * .16; }
+  if (S.grab) { const g = S.grab.p; B.vx += (g.x - B.x) * dt * 14; B.vy += (g.y - B.y) * dt * 14; B.vx *= Math.exp(-dt * 2.2); B.vy *= Math.exp(-dt * 2.2); B.w += ((g.x - B.x) * -.25 - B.w) * dt * 2; }   // held: an elastic to the finger
   B.vx += o.fx * dt; B.vy += (o.fy - RM.grav) * dt; B.w += o.tq * dt * 1.4 - Math.sin(B.th) * dt * 1.1; B.vx *= Math.exp(-dt * RM.drag); B.vy *= Math.exp(-dt * RM.drag); B.w *= Math.exp(-dt * 1.6);
   B.x += B.vx * dt; B.y += B.vy * dt; B.th += B.w * dt; const speed = Math.hypot(B.vx, B.vy);
   const s0 = surf(B.x); if (B.y - .55 < s0) { const imp = -B.vy; B.y = s0 + .55; if (imp > 4.5) { move('bell-first into the silt', [20, 30, 40]); thud(Math.min(1, imp / 10)); for (let k = 0; k < Math.min(5, imp * .6); k++) dig(B.x + (Math.random() - .5) * 2, SL * 1.01, B.vx, B.vx, imp); } B.vy = Math.abs(B.vy) * .25; B.vx *= .8; B.w += B.vx * .1; }
@@ -202,6 +207,8 @@ function frame(now) { requestAnimationFrame(frame); const dt = Math.min(1 / 30, 
   if (rel.length && rel[rel.length - 1].ten > 25 && speed > 7 && T - rel[rel.length - 1].t < .3) move('slingshot', [12, 24, 18]); if (Math.abs(B.w) > 6) move('cartwheel');
   if (HAND) { const kinds = AR.arms.filter(a => a.mode === 'latch' && a.anc).map(a => a.anc.type); if (kinds.includes('hand') && kinds.includes('ghost')) move('twice the hand', [8, 20, 8, 20, 8]); }
   if (RK === 'kelp' && AR.arms.filter(a => a.mode === 'latch' && a.anc && a.anc.type === 'kelp').length >= 2) { const ks = new Set(AR.arms.filter(a => a.mode === 'latch' && a.anc && a.anc.type === 'kelp').map(a => a.anc.n.k)); if (ks.size >= 2) move('passed the pull'); }
+  for (const r of RINGS) { if (!r.done && Math.hypot(B.x - r.x, B.y - r.y) < r.r) { r.done = true; const n = RINGS.filter(q => q.done).length; move(`ring ${n} of ${RINGS.length}`, [8, 20, 8]); pluck(660 + n * 120, .05); if (n === RINGS.length && !EXIT.open) { EXIT.open = true; say('the way out has opened', 3); } }
+    const P = r.pts.geometry.attributes.position.array, C = r.pts.geometry.attributes.aC.array, Sz = r.pts.geometry.attributes.aS.array; for (let i = 0; i < 160; i++) { const a = i / 160 * 6.283 + T * .4; P.set([r.x + Math.cos(a) * r.r, r.y + Math.sin(a) * r.r, 0], i * 3); const b = r.done ? .3 : .6 + .4 * Math.sin(T * 4 + i * .2); C.set(r.done ? [.3 * b, .8 * b, .8 * b] : [.95 * b, .7 * b, .35 * b], i * 3); Sz[i] = .24; } upd(r.pts); }
   // the exit
   if (S.state === 'play' && !S.done && EXIT.open && Math.hypot(B.x - EXIT.x, B.y - EXIT.y) < EXIT.r) { S.done = true; const secs = (T - S.t0).toFixed(1), names = [...new Set(S.moves.map(m => m.n.split(' ·')[0]))]; say(`${RM.name}: out in ${secs} s · ${names.length} moves · ${EDIT.length} frames lifted`, 6); buzz([20, 40, 20, 40, 80]); pluck(784, .06); setTimeout(() => pluck(1175, .05), 160);
     try { const Sx = JSON.parse(localStorage.getItem('cj-sealed') || '{}'); Sx['steer-' + RK] = {stars: Math.min(3, names.length), secs: +secs, clips: EDIT.length, t: Date.now()}; localStorage.setItem('cj-sealed', JSON.stringify(Sx)); } catch (e) {}
@@ -236,10 +243,11 @@ function frame(now) { requestAnimationFrame(frame); const dt = Math.min(1 / 30, 
   comp.render(); }
 function drawGuide() { const W = innerWidth, H = innerHeight; if (gd.width !== W || gd.height !== H) { gd.width = W; gd.height = H; } gx.clearRect(0, 0, W, H); if (S.state !== 'play') return;
   for (const [id, f] of AR.F) { const sc = SCR.get(id); if (!sc) continue; gx.strokeStyle = `rgb(${f.col.map(v => v * 255 | 0)})`; gx.lineWidth = 2; gx.beginPath(); gx.arc(sc[0], sc[1], 30, 0, 7); gx.stroke(); if (f.arm.mode === 'reach') { gx.setLineDash([3, 5]); gx.beginPath(); gx.arc(sc[0], sc[1], 38, 0, 7); gx.stroke(); gx.setLineDash([]); } }
+  if (S.grab) { const sc = SCR.get(S.grab.id), V = cam.position.clone().set(B.x, B.y, 0).project(cam), bx = (V.x * .5 + .5) * W, by = (-V.y * .5 + .5) * H; if (sc) { gx.strokeStyle = 'rgba(240,163,90,.8)'; gx.lineWidth = 2; gx.setLineDash([4, 5]); gx.beginPath(); gx.moveTo(bx, by); gx.lineTo(sc[0], sc[1]); gx.stroke(); gx.setLineDash([]); gx.beginPath(); gx.arc(sc[0], sc[1], 22, 0, 7); gx.stroke(); } }
   const left = [...SCR.values()].some(s => s[0] > W / 2); drawPosture(gx, AR.arms, B.th, left ? 86 : W - 86, 118);
   if (EDIT.length) { const n = Math.min(14, EDIT.length), w = 46, h = 34, x0 = W / 2 - n * (w + 3) / 2, y0 = H - h - Math.max(16, H * .03), play = Math.floor(T * 8) % EDIT.length;
     for (let i = 0; i < n; i++) { const e = EDIT[EDIT.length - n + i], im = img(e.f, e.k); if (im.ok) gx.drawImage(im.im, x0 + i * (w + 3), y0, w, h); gx.strokeStyle = e.f === GEST ? 'rgba(240,163,90,.8)' : 'rgba(207,221,232,.25)'; gx.lineWidth = 1; gx.strokeRect(x0 + i * (w + 3), y0, w, h); }
     const e = EDIT[play], im = img(e.f, e.k), mw = 140, mh = 105, mx = left ? 16 : W - mw - 16; if (im.ok) gx.drawImage(im.im, mx, y0 - mh - 10, mw, mh); gx.strokeStyle = 'rgba(240,163,90,.6)'; gx.strokeRect(mx, y0 - mh - 10, mw, mh); gx.fillStyle = 'rgba(207,221,232,.7)'; gx.textAlign = 'left'; gx.font = "300 10px 'JetBrains Mono', monospace"; gx.fillText(`your edit · ${EDIT.length} frames${S.gest ? ` · ${S.gest} of the buried hand` : ''}`, mx, y0 - mh - 16); } }
 requestAnimationFrame(frame);
-window.__lab = {B, AR, env, down, up, mv, toWorld, cam, start, S, EDIT, COL, surf, stroke, REELS, ROCKS, KELP, EXIT, HAND, RAY, RK, FILM, get T() { return T; }};
+window.__lab = {B, AR, env, down, up, mv, RINGS, toWorld, cam, start, S, EDIT, COL, surf, stroke, REELS, ROCKS, KELP, EXIT, HAND, RAY, RK, FILM, get T() { return T; }};
 </script></body></html>
