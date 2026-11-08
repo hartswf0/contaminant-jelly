@@ -20,6 +20,7 @@ h1{margin:0;font:200 clamp(44px,8vw,104px)/1 var(--sans);letter-spacing:.01em;op
 main{position:relative;z-index:1;background:linear-gradient(rgba(2,6,17,0),var(--bg) 26vh);padding:14vh clamp(20px,7vw,96px) 10vh}
 main+main{background:var(--bg);padding-top:6vh}
 .sec{max-width:1240px;margin:0 auto 18vh}.sec h2{margin:0;font:200 clamp(30px,4.4vw,58px)/1.05 var(--sans)}.sec p.l{margin:14px 0 0;max-width:560px;color:var(--dim)}
+.rigsel{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(46%,170px),1fr));gap:24px 16px;margin-top:40px}.rigsel a{display:block;color:inherit;text-decoration:none}.rigsel img{width:100%;aspect-ratio:420/390;object-fit:cover;border-radius:8px;display:block;outline:1px solid rgba(207,221,232,.12);transition:outline-color .3s,transform .3s}.rigsel a:hover img{outline-color:#f0a35a;transform:translateY(-4px)}.rigsel a.mine img{outline:2px solid #f0a35a}.rigsel b{display:block;margin-top:8px;font:300 17px/1.2 Jost,system-ui,sans-serif}.rigsel i{display:block;font:300 11px/1.4 'JetBrains Mono',monospace;color:#55687a;font-style:normal;margin-top:2px}.rigsel a.mine b::after{content:'  · yours';color:#f0a35a;font-size:12px}
 .shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,180px),1fr));gap:44px 28px;margin-top:48px}
 .jar{display:block}.jar .cap{margin-top:10px;text-align:center}.jar .cap b{display:block;font:300 21px/1.2 var(--sans)}.jar .cap i{display:block;font:300 12px/1.4 var(--mono);color:var(--faint);margin-top:4px;font-style:normal}
 .jar .now{position:absolute;left:50%;top:2%;transform:translateX(-50%);font:300 11px var(--mono);color:var(--glow);opacity:0;transition:opacity .4s;white-space:nowrap}.jar.live .now{opacity:.9}
@@ -45,10 +46,12 @@ footer{max-width:1240px;}.bigwm{max-width:1240px;margin:0 auto 26px;font:400 cla
 <body>
 <canvas id="hero" aria-hidden="true"></canvas>
 <header class="land"><div class="top"><div><div class="wm">CONTAMINANT</div><h1>jelly-films</h1></div><a class="idx" href="#shelf">Index</a></div>
-  <a class="go" href="current/drift/"><span>Play The Drifts</span><span aria-hidden="true">→</span></a></header>
+  <a class="go" href="current/drift/characters.html?next=./%3Fv%3Dsilt"><span>Play The Drifts</span><span aria-hidden="true">→</span></a></header>
 <main>
 <section class="sec demo" id="demo"><span class="k">THE CURRENT · A DEMO</span><a class="dv" href="current/v2.html?demo"><video muted loop playsinline autoplay preload="metadata" poster="current/drift/play/demo-v2.jpg" src="current/drift/play/demo-v2.mp4"></video></a>
   <p class="l">The Rising Tube, the second version: a jelly of film rises through the archive's 109 films, clear and playing. <a href="current/v2.html?demo" style="color:var(--glow)">Watch it swim →</a> &nbsp; <a href="#trailer" style="color:var(--dim)">the reel ↓</a></p></section>
+<section class="sec" id="jellies"><span class="k">00 · CHOOSE YOUR JELLY</span><h2>Ten jellies, ten bodies</h2><p class="l">Every version built its own jellyfish; each is kept as it was made, and any of them can swim every level. Choose one, then live its life in <a href="current/drift/#chapters" style="color:#f0a35a">thirteen chapters</a>, swim on into <a href="current/drift/?v=sea-drifts" style="color:#f0a35a">the open sea</a>, and keep <a href="current/drift/reel.html" style="color:#f0a35a">the film you made</a>.</p>
+  <div class="rigsel" id="rigsel"></div></section>
 <section class="sec" id="shelf"><span class="k">01 · THE SHELF</span><h2>Eleven videos, eleven games</h2><p class="l">Each jar holds a film and the game it became. Hover a jar: the film plays in the glass, then the game. Click to swim it.</p>
   <div class="shelf" id="jars"></div></section>
 <section class="sec"><span class="k">02 · THE ARCHIVE</span><h2>From the archive</h2><p class="l">Our own Crash Lab films, the Found Odyssey and the hand-made cineosis; traced doodles and drawn worms; footage sorted by decade, by colour and by subject.</p><div class="shelf" id="arch"></div></section>
@@ -90,6 +93,9 @@ footer{max-width:1240px;}.bigwm{max-width:1240px;margin:0 auto 26px;font:400 cla
 </main>
 <script type="module">
 import {mountHero} from './hero.js';
+import {RIGS} from './current/drift/rigs.js';
+{ let mine = 'celluloid'; try { mine = localStorage.getItem('cj-rig') || 'celluloid'; } catch (e) {}
+  document.getElementById('rigsel').innerHTML = RIGS.map(r => `<a href="current/drift/characters.html?rig=${r.id}&next=./%3Fv%3Dsilt" class="${r.id === mine ? 'mine' : ''}"><img src="labels/rigs/${r.id}.jpg" alt="${r.name}" loading="lazy"><b>${r.name}</b><i>${r.from}</i></a>`).join(''); }
 import {bottle, BOTTLE_CSS, iconFor} from './labels/jarlab.js';
 document.head.insertAdjacentHTML('beforeend', `<style>${BOTTLE_CSS}</style>`); document.body.insertAdjacentHTML('beforeend', '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="jdefs"></defs></svg>');
 // REST: the jelly. A real film lives in its bell.
