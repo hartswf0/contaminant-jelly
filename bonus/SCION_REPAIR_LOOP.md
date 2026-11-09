@@ -66,3 +66,29 @@ Because it reads the live nerve signal, a silenced or cut ring still shows in th
 - **By eye, in motion.** The stills (relaxed and squeezed) now read as a saucer that narrows and deepens with the fringe hanging clear. Nobody has watched it move beside footage.
 - **Weight.** The tentacles hang and trail (they keep a fifth of their speed each step), but there is no measure yet for "weight". A candidate: how far the fringe lags the rim during a squeeze.
 - **The other pages.** The loop measures only the Real Jelly.
+
+## 7 · A second pass: tentacles, propulsion, and the inside of the bell
+**The direction:** "Still not believable: the placement of the tentacles, their weight. And also no propulsion. The other main issue is the video on top and the little geometry in the bell, which make it look cheap. Compare with our other species and their movement loops."
+
+**What our other species do, read from their code** (`current/drift/rigs.js`, `bonus/sea.html`):
+| | the other species | the Real Jelly before | now |
+|---|---|---|---|
+| **tentacle momentum** | keep 12% of their speed per second: they lag, then whip | kept 80% per *frame* step and were then damped again: no momentum, so no weight | the same rule as the other species |
+| **which way they hang** | along the body's own "down", so they trail behind the bell | world-down, weakly | along the body's down, plus a small sink |
+| **flutter** | grows toward the tip | a faint even sway | grows toward the tip |
+| **roots** | on the bell, pulled in 25% by the pulse | on a ring inside the rim; two tentacles shared each root | on the **visible edge** of the skin, evenly spaced, moving with the squeeze |
+| **the stroke** | an impulse of 3.4 to 6.6 units a second, then drag; the lens widens; a wake | a slow even creep | a surge then a glide (see the new measure); the camera lets the jelly pull ahead and catches up; the lens widens a little on each beat |
+
+**Propulsion, measured.** A new measure was added to CHECK: **peak speed / mean speed** over a beat, target 2–9. It read **1.98**: the jelly moved at an almost even speed, which is why it showed no propulsion. More water drag between strokes with a stronger stroke gives **3.06**. The distance target was raised to 0.4–0.9 bell widths per beat, because at a third it read as not moving. This is a judgement by eye; the earlier third was an unsourced estimate. It now travels **0.53**.
+
+**The inside of the bell.**
+- **The four video rectangles are gone.** What the jelly has eaten now shows as colour: the film's colours rise into the gonads.
+- **The gonads are soft light:** four horseshoes of soft splats (the project's own look), not hard tubes.
+- **The canals are faint light,** not dark wires.
+- **The oral arms** are spread wider at the mouth and are softer and paler, with broader frills.
+
+**The final run passed all eight measures** (phone build).
+
+**Not yet judged:**
+- **Motion, by eye.** The stills show the fringe hanging from the edge and flaring with the squeeze. Whether the weight now reads right in motion needs watching.
+- **The oral arms.** They were softened after the last stills and not looked at again.
