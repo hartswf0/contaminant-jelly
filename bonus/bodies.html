@@ -17,7 +17,7 @@ canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-acti
 #card .rooms{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px;max-width:900px}#card .rooms a{font:400 11px Anton,Impact,sans-serif;letter-spacing:.18em;padding:7px 12px;border-radius:14px;color:var(--dim);background:rgba(5,9,9,.55)}#card .rooms a.on{color:#0b1413;background:var(--gold)}#card .rooms a i{font-style:normal;opacity:.6}
 #card .rooms .sep{width:100%;font:300 11px 'JetBrains Mono',monospace;color:#55687a;margin:6px 0 0}
 #next{left:50%;bottom:max(80px,calc(env(safe-area-inset-bottom) + 70px));transform:translateX(-50%);pointer-events:auto;display:none;font:400 13px Anton,Impact,sans-serif;letter-spacing:.24em;background:var(--gold);color:#0b1413;padding:10px 18px;border-radius:18px}
-@media (max-width:640px){#card .brief{flex-direction:column;gap:6px}}
+@media (max-width:640px){#card .brief{flex-direction:column;gap:6px}#card .how li:nth-child(n+2),#card .rooms a i,#card .rooms .sep,#card p{display:none}#card .how{list-style:none;padding:0}#card .lk{font-size:11px}}
 </style></head><body>
 <canvas id="gl" aria-label="A sea in three dimensions, sometimes four: one jellyfish species, steered its own way"></canvas>
 <canvas class="ui" id="guide"></canvas>
@@ -26,7 +26,7 @@ canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-acti
 <div class="ui" id="card"><div class="k" id="ck"></div><h1 id="ch"></h1>
   <div class="brief"><div class="vb" id="cv"></div><div><ol class="how" id="chow"></ol></div></div>
   <p id="cp"></p><div class="rooms" id="rooms"></div>
-  <div class="go">TOUCH TO BEGIN</div><div class="lk">Every species moves its own way; none of them has a joystick in common. Reach the five lights. Each body has its own camera (the chip above the dial changes it; C on a keyboard); the dial turns the view and drifts home, double-tap it to go home now (Q E, V). · <a href="steerlab3d.html">the 3D lab</a> · <a href="sea.html">the open water</a> · <a href="SCION_BODIES.md">the theory</a> · <a href="SCION_CAMERA.md">the camera</a></div></div>
+  <div class="go">TOUCH TO BEGIN</div><div class="lk">Reach the lights. · <a href="steerlab4d.html">the 4D lab</a> · <a href="steerlab3d.html">the 3D lab</a> · <a href="sea.html">the open water</a> · <a href="SCION_BODIES.md">the theory</a> · <a href="SCION_CAMERA.md">the camera</a></div></div>
 <script type="module">
 import * as THREE from 'three';
 import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
@@ -308,7 +308,7 @@ filmbell: {carve: true, cam() { return this.inside() ? {auto: 'eye'} : null; }, 
     if (inn) { const ax = axis(), a = Math.acos(Math.min(1, Math.abs(ax.z))) * 57; label(g, a < 25 ? 'the slice is a frame' : `the slice leans ${a.toFixed(0)}° into time`, W / 2, 96, 'center', 'rgba(255,214,140,.9)'); } }}};
 // ---------------------------------------------------------------- start, reset
 const sp = SP[SID]; sp.init?.(); CAM = makeCam(THREE, cam, {mode: SPI.cam, modes: SPI.cams, yaw: S.yaw, floor: floorY});
-function start() { if (S.state !== 'card') return; S.state = 'play'; $('card').style.opacity = 0; $('card').style.pointerEvents = 'none'; setTimeout(() => $('card').style.display = 'none', 600); $('hud').style.opacity = 1; audio(); S.t0 = T; say(SPI.how[0], 4.5); }
+function start() { if (S.state !== 'card') return; S.state = 'play'; $('card').style.opacity = 0; $('card').style.pointerEvents = 'none'; setTimeout(() => $('card').style.display = 'none', 600); $('hud').style.opacity = 1; audio(); S.t0 = T; say(SPI.how[0], 5); setTimeout(() => say(SPI.how[1], 5), 6000); setTimeout(() => say(SPI.how[2], 5), 12500); }
 $('card').addEventListener('pointerdown', e => { if (e.target.closest('a')) return; start(); });
 function reset() { location.reload(); }
 // ---------------------------------------------------------------- the loop

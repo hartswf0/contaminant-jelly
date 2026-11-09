@@ -42,7 +42,7 @@ export function makeCam(THREE, cam, opt = {}) {
     if (C.floor) want.y = Math.max(want.y, C.floor(want.x, want.z) + 1.5);
     if (!C.init) { C.init = true; C.pos.copy(want); C.look.copy(lookT); }
     const k = 1 - Math.pow(mode === 'eye' ? .002 : .03, dt); C.pos.lerp(want, k); C.look.lerp(lookT, 1 - Math.pow(.02, dt)); cam.position.copy(C.pos); cam.up.copy(UP); cam.lookAt(C.look); cam.updateMatrixWorld(); liveBasis(); }
-  const inDial = (x, y) => Math.hypot(x - D().x, y - D().y) < D().r + 10, inChip = (x, y) => { const c = chip(); return Math.abs(x - c.x) < c.w / 2 && Math.abs(y - c.y) < c.h / 2 + 4; };
+  const inDial = (x, y) => Math.hypot(x - D().x, y - D().y) < D().r + 10, inChip = (x, y) => { if (C.modes.length < 2) return false; const c = chip(); return Math.abs(x - c.x) < c.w / 2 && Math.abs(y - c.y) < c.h / 2 + 4; };
   function cycle() { const i = C.modes.indexOf(C.mode); C.mode = C.modes[(i + 1) % C.modes.length]; C.man.yaw = C.man.pitch = 0; return C.mode; }
   return {C,
     step, cycle, set(m) { if (C.modes.includes(m)) C.mode = m; }, recentre() { C.man.yaw = C.man.pitch = 0; C.man.t = -9; }, zoom(f) { C.zoomK = Math.max(.45, Math.min(2.6, C.zoomK * f)); },
@@ -55,6 +55,7 @@ export function makeCam(THREE, cam, opt = {}) {
     draw(g) { const d = D(), c = chip(), m = C.auto || C.mode, Y = C.yaw + C.man.yaw; g.strokeStyle = 'rgba(207,221,232,.35)'; g.lineWidth = 1.5; g.beginPath(); g.arc(d.x, d.y, d.r, 0, 7); g.stroke();
       g.fillStyle = 'rgba(240,163,90,.85)'; g.beginPath(); g.arc(d.x + Math.sin(Y) * d.r * .7, d.y + Math.cos(Y) * d.r * .7 * Math.cos(C.pitch + C.man.pitch), 6, 0, 7); g.fill();
       if (Math.abs(C.man.yaw) > .05 && m !== 'orbit') { const left = Math.max(0, 2.5 - (C.T - C.man.t)); g.strokeStyle = 'rgba(240,163,90,.5)'; g.beginPath(); g.arc(d.x, d.y, d.r + 5, -Math.PI / 2, -Math.PI / 2 + TAU * left / 2.5); g.stroke(); }
+      if (C.modes.length < 2 && !C.auto) return;
       g.fillStyle = 'rgba(5,9,9,.6)'; g.fillRect(c.x - c.w / 2, c.y - c.h / 2, c.w, c.h); g.strokeStyle = C.auto ? 'rgba(255,214,140,.8)' : 'rgba(207,221,232,.4)'; g.strokeRect(c.x - c.w / 2, c.y - c.h / 2, c.w, c.h);
       g.fillStyle = 'rgba(240,163,90,.95)'; g.font = "400 11px Anton, Impact, sans-serif"; g.textAlign = 'center'; g.fillText(`CAM · ${MODES[m].name}`, c.x, c.y + 4); g.fillStyle = 'rgba(207,221,232,.6)'; g.font = "300 10px 'JetBrains Mono', monospace"; g.fillText(C.auto ? 'the body chose it' : 'tap to change', c.x, c.y - 18); g.fillText('view · double-tap: home', d.x + 26, d.y + d.r + 14); }};
 }

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The Steer Lab 4D · jelly-films</title>
+<meta name="description" content="Every finger is a tentacle, and a tentacle can reach into a fourth direction: grab a stone that lives at another w and it pulls you there.">
+<link rel="stylesheet" href="../fonts/fonts.css">
+<script type="importmap">{"imports":{"three":"../paeleo/scion/videotext/vendor/three.module.min.js","three/addons/":"../paeleo/scion/videotext/vendor/addons/"}}</script>
+<style>
+:root{color-scheme:dark;--gold:#f0a35a;--dim:#8293a4}html,body{margin:0;height:100%;overflow:hidden;background:#0b1413;color:#e6edf3;font:300 15px/1.5 Jost,system-ui,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;overscroll-behavior:none}a{color:var(--gold);text-decoration:none}
+canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.ui{position:fixed;pointer-events:none;transition:opacity .6s}#guide{inset:0;width:100%;height:100%}
+#hud{top:max(14px,env(safe-area-inset-top));left:16px;right:16px;font:400 12px Anton,Impact,sans-serif;letter-spacing:.3em;color:var(--gold);text-shadow:0 0 6px #000;opacity:0}
+#say{left:0;right:0;top:max(42px,calc(env(safe-area-inset-top) + 32px));text-align:center;font:italic clamp(15px,2.2vw,19px)/1.4 Georgia,serif;text-shadow:0 0 8px #000;opacity:0;padding:0 28px}
+#card{inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 9vw;background:radial-gradient(ellipse at 60% 50%,rgba(7,12,11,.1),rgba(7,12,11,.85) 75%);pointer-events:auto}
+#card .k{font:700 11px system-ui;letter-spacing:.3em;color:var(--gold)}#card h1{margin:10px 0 0;font:900 clamp(38px,8vw,80px)/1 system-ui;letter-spacing:.06em}
+#card p{max-width:560px;font:italic clamp(17px,2.4vw,21px)/1.5 Georgia,serif;color:#dfe6e0;margin:18px 0 0}#card .go{margin-top:28px;font:600 15px system-ui;letter-spacing:.14em;color:var(--gold)}
+#card .lk{position:absolute;left:9vw;bottom:max(24px,env(safe-area-inset-bottom));font:300 12px 'JetBrains Mono',monospace;color:#55687a}
+#next{left:50%;bottom:max(80px,calc(env(safe-area-inset-bottom) + 70px));transform:translateX(-50%);pointer-events:auto;display:none;font:400 13px Anton,Impact,sans-serif;letter-spacing:.24em;background:var(--gold);color:#0b1413;padding:11px 20px;border-radius:18px}
+</style></head><body>
+<canvas id="gl" aria-label="Stones in four dimensions; your jellyfish's tentacles reach for them"></canvas>
+<canvas class="ui" id="guide"></canvas>
+<div class="ui" id="hud"></div><div class="ui" id="say"></div><a class="ui" id="next"></a>
+<div class="ui" id="card"><div class="k">BONUS · THE STEER LAB 4D</div><h1>A fourth direction</h1>
+  <p>Every finger is a tentacle. Touch a stone and an arm grabs it. Some stones live in a fourth direction, w; grab one and the arm pulls you there.</p>
+  <div class="go">TOUCH TO BEGIN</div><div class="lk"><a href="steerlab3d.html">the 3D lab</a> · <a href="SCION_STEERLAB4D.md">how it works</a></div></div>
+<script type="module">
+import * as THREE from 'three';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+import {RIGS, makeRig} from '../current/drift/rigs.js';
+import {makeArms3D} from './tentacles3d.js';
+import {makeCam} from './cam3d.js';
+const $ = id => document.getElementById(id), Q = new URLSearchParams(location.search), V3 = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z), UP = V3(0, 1, 0), clamp = THREE.MathUtils.clamp;
+let RID = Q.get('rig'); if (!RID) try { RID = localStorage.getItem('cj-rig'); } catch (e) {} if (!RIGS.some(r => r.id === RID)) RID = 'golden';
+// ---------------------------------------------------------------- three stages, one idea each. A stone is [x, y, z, w, r]: a hypersphere, seen as the sphere where it crosses your w.
+const wall = []; for (let x = -27; x <= 27; x += 6) for (let y = -10; y <= 20; y += 6) wall.push([x, y, 0, 0, 4]);
+const STAGES = [
+  {name: 'THE WALL', hint: 'A wall. Reach for a blue stone: it lives further along w, where the wall is not, and your arm pulls you there.',
+    start: [0, -2, 14], stones: [...wall, [-4, 0, 7, 4.6, 1.5], [4, 2, 6, 4.6, 1.5], [0, -4, 5, 4.6, 1.5], [0, 1, -5, 4.6, 1.5], [-4, 2, -8, 0, 1.6], [4, -2, -9, 0, 1.6]], lights: [[0, 0, -12, 0]]},
+  {name: 'THREE SLICES', hint: 'Three lights, each in its own slice of w. The stones near each light share its w.',
+    start: [0, -2, 12], stones: [[-5, 0, 6, -1.5, 1.6], [-10, 1, 0, -3, 1.8], [-12, -2, -6, -3, 1.6], [0, 2, 0, 0, 1.6], [0, -1, -8, 0, 1.8], [5, 0, 6, 1.5, 1.6], [10, 1, 0, 3, 1.8], [12, -2, -6, 3, 1.6], [0, 4, 6, 0, 1.5]], lights: [[-12, 1, -10, -3], [0, 3, -12, 0], [12, 1, -10, 3]]},
+  {name: 'HANG BETWEEN', hint: 'Nothing lives at w 2, where the last light is. Hold one stone from each side, and hang between them.',
+    start: [0, -2, 12], stones: [[-6, 2, -2, 0, 2], [-7, -3, -6, 0, 1.6], [6, 2, -2, 4, 2], [7, -3, -6, 4, 1.6], [0, -3, 5, 0, 1.4], [0, 3, 5, 4, 1.4]], lights: [[0, -3, 7.5, 2]]}];
+let SK = clamp(+(Q.get('stage') || 1) - 1, 0, STAGES.length - 1);
+// ---------------------------------------------------------------- the water
+const R = new THREE.WebGLRenderer({canvas: $('gl'), antialias: false}); R.setPixelRatio(Math.min(1.6, devicePixelRatio)); R.toneMapping = THREE.ACESFilmicToneMapping;
+const FOG = new THREE.Color('#1a2630'), scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(FOG, .016);
+{ const c = document.createElement('canvas'); c.width = 4; c.height = 256; const g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, '#' + FOG.clone().multiplyScalar(2).getHexString()); gr.addColorStop(.55, '#' + FOG.getHexString()); gr.addColorStop(1, '#' + FOG.clone().multiplyScalar(.3).getHexString()); g.fillStyle = gr; g.fillRect(0, 0, 4, 256); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; scene.background = t; }
+const cam = new THREE.PerspectiveCamera(50, 1, .3, 400); const comp = new EffectComposer(R); comp.addPass(new RenderPass(scene, cam)); comp.addPass(new UnrealBloomPass(new THREE.Vector2(1, 1), .7, .6, .62)); comp.addPass(new OutputPass());
+const U = {uScale: {value: 1}, uFogD: {value: .016}, uFogC: {value: FOG.clone()}};
+const VS = `uniform float uScale, uFogD; uniform vec3 uFogC; attribute vec3 aC; attribute float aS; varying vec3 vC; varying float vF; void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.); float z = -mv.z; vF = 1. - exp(-pow(uFogD * z, 2.)); vC = aC; gl_PointSize = max(1., aS * uScale / z); gl_Position = projectionMatrix * mv; }`;
+const glowM = () => new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: U, vertexShader: VS, fragmentShader: `varying vec3 vC; varying float vF; void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; gl_FragColor = vec4(vC * (1. - vF * .85) * exp(-r2 * 14.), 1.); }`});
+const darkM = () => new THREE.ShaderMaterial({transparent: true, depthWrite: false, uniforms: U, vertexShader: VS, fragmentShader: `uniform vec3 uFogC; varying vec3 vC; varying float vF; void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; gl_FragColor = vec4(mix(vC, uFogC, vF), .9 * exp(-r2 * 10.)); }`});
+const cloud = (n, m) => { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3)); g.setAttribute('aC', new THREE.BufferAttribute(new Float32Array(n * 3), 3)); g.setAttribute('aS', new THREE.BufferAttribute(new Float32Array(n), 1)); const p = new THREE.Points(g, m); p.frustumCulled = false; scene.add(p); return p; };
+const upd = p => ['position', 'aC', 'aS'].forEach(n => p.geometry.attributes[n].needsUpdate = true), A = p => ({P: p.geometry.attributes.position.array, C: p.geometry.attributes.aC.array, S: p.geometry.attributes.aS.array});
+const floorY = (x, z) => -14 + Math.sin(x * .2) * Math.cos(z * .17) * 1.2;
+{ const n = 100 * 100, D = cloud(n, darkM()), d = A(D); let k = 0; for (let i = 0; i < 100; i++) for (let j = 0; j < 100; j++, k++) { const x = (i - 50) * .7, z = (j - 50) * .7; d.P.set([x, floorY(x, z), z], k * 3); d.C.set([.015, .025, .03], k * 3); d.S[k] = Math.hypot(x, z) > 34 ? 0 : 1.5; } upd(D); }
+{ const SN = cloud(1200, glowM()), s = A(SN); for (let i = 0; i < 1200; i++) { s.P.set([(Math.random() - .5) * 70, -14 + Math.random() * 36, (Math.random() - .5) * 70], i * 3); const b = .1 + Math.random() * .16; s.C.set([b * .8, b, b], i * 3); s.S[i] = .08 + Math.random() * .1; } upd(SN); }
+// ---------------------------------------------------------------- the jelly: a body in 3D, plus a w
+const rig = makeRig(THREE, RID); (rig.tentacles || []).forEach(m => m.visible = false); const body = new THREE.Group(); body.add(rig.group); rig.group.scale.setScalar(rig.norm * 1.1); scene.add(body);
+const B = {p: V3(), v: V3(), q: new THREE.Quaternion(), w: V3(), lastStroke: -9}, S = {state: 'card', W: 0, Wv: 0, scr: new Map(), moves: [], got: 0, sayT: 0};
+const AR = makeArms3D(THREE, {n: 6, AN: 16, reach: 9, R: 1.05}), AN = AR.AN, armPts = cloud(AR.NA * (AN + 4), glowM());
+const CAM = makeCam(THREE, cam, {mode: 'chase', modes: ['chase'], yaw: 0, dist: 17, floor: floorY});
+// ---------------------------------------------------------------- the stage: stones (each a sphere where it crosses your w, and a shell of handholds at its own w), lights
+let STONES = [], LIGHTS = [], ANCH = [];
+const sl = (w, r, at) => { const d = at - w; return r * r > d * d ? Math.sqrt(r * r - d * d) : 0; };
+function load(k) { SK = k; const st = STAGES[k]; [...STONES.flatMap(s => [s.body, s.hold]), ...LIGHTS.map(l => l.pts)].forEach(o => { scene.remove(o); o.geometry.dispose(); });
+  STONES = st.stones.map(([x, y, z, w, r]) => ({c: V3(x, y, z), w, r, dir: Array.from({length: 320}, () => V3().randomDirection()), body: cloud(320, darkM()), hold: cloud(48, glowM())}));
+  ANCH = []; STONES.forEach(s => { for (let i = 0; i < 48; i++) ANCH.push({p: s.c.clone().addScaledVector(s.dir[i], s.r + .1), w: s.w, s}); });
+  LIGHTS = st.lights.map(([x, y, z, w]) => ({p: V3(x, y, z), w, got: false, pts: cloud(160, glowM())}));
+  AR.releaseAll(env, T); AR.arms.forEach(a => { a.init = false; a.mode = 'free'; a.anc = null; }); B.p.set(...st.start); B.v.set(0, 0, 0); B.w.set(0, 0, 0); B.q.identity(); S.W = S.Wv = 0; S.got = 0; S.done = false; S.t0 = T; $('hud').textContent = `${k + 1} / ${STAGES.length} · ${st.name}`; $('next').style.display = 'none'; if (S.state === 'play') say(st.hint, 7); }
+// ---------------------------------------------------------------- the arms' world
+const ndc = new THREE.Vector2(), ray = new THREE.Raycaster(), _a = V3(), _b = V3();
+const rayAt = (sx, sy) => { ndc.set(sx / innerWidth * 2 - 1, -(sy / innerHeight) * 2 + 1); ray.setFromCamera(ndc, cam); return ray.ray.clone(); };
+const screen = v => { _a.copy(v).project(cam); return _a.z < 1 ? [(_a.x * .5 + .5) * innerWidth, (-_a.y * .5 + .5) * innerHeight] : null; };
+const near = w => Math.abs(w - S.W) < 5.2;   // a handhold you can still see (and reach) along w
+const env = {screen,
+  pick(r, arm, Bb, o) { let best = null, bs = 1e9; for (const n of ANCH) { if (!near(n.w)) continue; const t = _b.copy(n.p).sub(r.origin).dot(r.direction); if (t < 0) continue; const d = r.distanceToPoint(n.p); if (d < (o.cast ? .7 : 1) * (.9 + t * .04)) { const sc = t + d * 4 + Math.abs(n.w - S.W) * .8; if (sc < bs) { bs = sc; best = {type: 'stone', p: n.p.clone(), k: 60, heavy: true, w: n.w}; } } }
+    if (best) return best; for (let t = 1; t < 60; t += .5) { const p = r.at(t, _b); if (p.y < floorY(p.x, p.z) + .3) { if (p.distanceTo(Bb.p) < AR.REACH * 1.6) return {type: 'floor', p: p.clone(), k: 58, heavy: true}; break; } } return null; },
+  water(r, Bb, depth) { const n = cam.getWorldDirection(V3()), pl = new THREE.Plane().setFromNormalAndCoplanarPoint(n, Bb.p), hit = V3(); if (!r.intersectPlane(pl, hit)) hit.copy(r.at(Bb.p.distanceTo(r.origin), V3())); return hit.addScaledVector(r.direction, depth); },
+  event(name, d) { if (name === 'latch') { const dw = d.an.w !== undefined ? d.an.w - S.W : 0; pluck(Math.abs(dw) > .5 ? 760 : 520, .05); buzz(Math.abs(dw) > .5 ? [8, 16, 8] : 6); if (Math.abs(dw) > .5) say(dw > 0 ? 'a blue stone: it pulls you along w' : 'an amber stone: it pulls you back along w', 3); }
+    else if (name === 'release') { pluck(880, .03); buzz(5); } else if (name === 'slip') { pluck(1200, .03); buzz([8, 16, 8]); say('it slipped'); } else if (name === 'full') say('all six arms are taken'); }};
+// ---------------------------------------------------------------- input: fingers are arms; a finger on the dial turns the view; a double-tap strokes
+const cv = $('gl'), keys = new Set();
+const down = (id, sx, sy) => { if (CAM.dialDown(id, sx, sy)) return; const f = AR.down(id, rayAt(sx, sy), sx, sy, B, env, T); if (f) S.scr.set(id, [sx, sy]); };
+const mv = (id, sx, sy) => { if (CAM.dialMove(id, sx, sy)) return; if (!AR.F.has(id)) return; S.scr.set(id, [sx, sy]); AR.move(id, rayAt(sx, sy), sx, sy, T); };
+const up = (id, intr) => { if (CAM.dialUp(id)) return; S.scr.delete(id); AR.up(id, intr, B, env, T); };
+cv.addEventListener('pointerdown', e => { if (S.state !== 'play') return; try { cv.setPointerCapture(e.pointerId); } catch (x) {} const now = performance.now(); if (now - (S.lastTap || 0) < 300 && Math.hypot(e.clientX - S.lx, e.clientY - S.ly) < 40 && !AR.F.size) { stroke(); S.lastTap = 0; return; } S.lastTap = now; S.lx = e.clientX; S.ly = e.clientY; down('p' + e.pointerId, e.clientX, e.clientY); });
+cv.addEventListener('pointermove', e => { S.mx = e.clientX; S.my = e.clientY; mv('p' + e.pointerId, e.clientX, e.clientY); });
+cv.addEventListener('pointerup', e => up('p' + e.pointerId, false)); cv.addEventListener('pointercancel', e => up('p' + e.pointerId, true)); cv.addEventListener('contextmenu', e => e.preventDefault());
+cv.addEventListener('wheel', e => { e.preventDefault(); CAM.zoom(Math.exp(e.deltaY * .001)); }, {passive: false});
+addEventListener('keydown', e => { if (e.repeat) return; const k = e.key.toLowerCase(); keys.add(k); if (S.state === 'card') { start(); return; } if (k >= '1' && k <= '5') down('k' + k, S.mx ?? innerWidth / 2, S.my ?? innerHeight / 2); if (k === ' ') { e.preventDefault(); stroke(); } if (k === 'x') load(SK); });
+addEventListener('keyup', e => { const k = e.key.toLowerCase(); keys.delete(k); if (k >= '1' && k <= '5') up('k' + k, false); });
+addEventListener('blur', () => { for (const id of [...AR.F.keys()]) up(id, true); });
+// ---------------------------------------------------------------- feedback
+const say = (t, s = 3) => { $('say').textContent = t; $('say').style.opacity = 1; S.sayT = performance.now() + s * 1000; };
+const buzz = p => { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} };
+let T = 0; const move = (n, hp) => { if (S.moves.some(m => m.n === n && T - m.t < 4)) return; S.moves.push({n, t: T}); say(n, 2.4); buzz(hp || 10); };
+let AC = null; const audio = () => { const Ac = window.AudioContext || window.webkitAudioContext; if (!Ac || AC) return; AC = new Ac(); };
+const pluck = (f, g) => { if (!AC) return; const t = AC.currentTime, o = AC.createOscillator(), v = AC.createGain(); o.type = 'triangle'; o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(f * .7, t + .25); v.gain.setValueAtTime(0, t); v.gain.linearRampToValueAtTime(g, t + .01); v.gain.exponentialRampToValueAtTime(.0001, t + .5); o.connect(v).connect(AC.destination); o.start(t); o.stop(t + .6); };
+function stroke() { if (T - B.lastStroke < .35) return; B.lastStroke = T; B.v.addScaledVector(V3(0, 1, 0).applyQuaternion(B.q), 5); pluck(160, .06); buzz(8); }
+function start() { if (S.state !== 'card') return; S.state = 'play'; $('card').style.opacity = 0; $('card').style.pointerEvents = 'none'; setTimeout(() => $('card').style.display = 'none', 600); $('hud').style.opacity = 1; audio(); load(SK); }
+$('card').addEventListener('pointerdown', e => { if (e.target.closest('a')) return; start(); });
+$('next').addEventListener('click', e => { e.preventDefault(); load(SK + 1); });
+// ---------------------------------------------------------------- the loop
+const size = () => { R.setSize(innerWidth, innerHeight, false); comp.setSize(innerWidth, innerHeight); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); }; addEventListener('resize', size); size();
+let last = performance.now(); const gd = $('guide'), gx = gd.getContext('2d'); load(SK);
+function frame(now) { requestAnimationFrame(frame); const dt = Math.min(1 / 30, (now - last) / 1000); last = now; T += dt;
+  // the arms pull in space; an arm holding a stone at another w also pulls you along w, harder the more load it takes
+  const o = AR.step(dt, T, B, env); if (o.snap) { B.v.addScaledVector(o.F, .14); B.w.addScaledVector(o.T, .1); }
+  const held = AR.arms.filter(a => a.mode === 'latch' && a.anc); let pw = 0; for (const a of held) if (a.anc.w !== undefined) pw += (a.anc.w - S.W) * (.6 + Math.min(1.4, a.ten / 15)); S.Wv += pw * dt * .9; S.Wv *= Math.exp(-dt * 1.6); const W0 = S.W; S.W = clamp(S.W + S.Wv * dt, -6, 6);
+  const ws = held.filter(a => a.anc.w !== undefined).map(a => a.anc.w); if (ws.length >= 2 && Math.max(...ws) - Math.min(...ws) > 2.5) move('hanging between two slices', [6, 12, 6]); if (Math.abs(S.Wv) > 1.2) move('folding along w');
+  B.v.addScaledVector(o.F, dt); B.v.y -= .6 * dt; const upv = V3(0, 1, 0).applyQuaternion(B.q); B.w.addScaledVector(o.T, dt * .9).addScaledVector(upv.clone().cross(UP), dt * 1.6); B.w.multiplyScalar(Math.exp(-dt * 1.8)); B.v.multiplyScalar(Math.exp(-dt * .8));
+  B.p.addScaledVector(B.v, dt); const wl = B.w.length(); if (wl > 1e-5) B.q.premultiply(new THREE.Quaternion().setFromAxisAngle(B.w.clone().divideScalar(wl), wl * dt)).normalize();
+  const fy = floorY(B.p.x, B.p.z); if (B.p.y < fy + 1) { B.p.y = fy + 1; B.v.y = Math.abs(B.v.y) * .3; } const rr = Math.hypot(B.p.x, B.p.z); if (rr > 30) { B.p.x *= 30 / rr; B.p.z *= 30 / rr; B.v.x *= -.3; B.v.z *= -.3; } if (B.p.y > 20) { B.p.y = 20; B.v.y = -.3 * Math.abs(B.v.y); }
+  // stones are solid where they cross your w; at another w you pass straight through the place they fill
+  for (const s of STONES) { const r = sl(s.w, s.r, S.W), d = B.p.distanceTo(s.c); if (r > 0 && d < r + 1) { const n = B.p.clone().sub(s.c).normalize(); B.p.copy(s.c).addScaledVector(n, r + 1); B.v.addScaledVector(n, -Math.min(0, B.v.dot(n)) * 1.3); } if (d < s.r && r < d - 1 && Math.abs(S.W - s.w) > 1) move('passed through a stone, in w'); }
+  for (const l of LIGHTS) if (!l.got && Math.abs(S.W - l.w) < .6 && l.p.distanceTo(B.p) < 2.4) { l.got = true; S.got++; pluck(784, .06); buzz([10, 30, 10, 30, 10]); say(S.got < LIGHTS.length ? `light ${S.got} of ${LIGHTS.length}` : 'through', 2.5); }
+  if (S.state === 'play' && !S.done && S.got === LIGHTS.length) { S.done = true; try { const Sx = JSON.parse(localStorage.getItem('cj-sealed') || '{}'); Sx['steer4d-' + (SK + 1)] = {stars: 3, secs: +(T - S.t0).toFixed(1), clips: 0, t: Date.now()}; localStorage.setItem('cj-sealed', JSON.stringify(Sx)); } catch (e) {}
+    const a = $('next'); if (SK + 1 < STAGES.length) { a.textContent = `NEXT · ${STAGES[SK + 1].name} →`; a.href = '#'; } else { a.textContent = 'ALL THREE · BACK TO THE INDEX →'; a.href = '../index.html'; a.onclick = null; $('next').replaceWith(a.cloneNode(true)); } (document.getElementById('next')).style.display = 'block'; }
+  // the camera: behind the jelly, still while an arm is planted, widening to frame what you hold
+  ['q', 'e'].forEach(k => keys.has(k) && CAM.key(k, dt)); CAM.step(dt, {p: B.p, v: B.v, axis: upv, target: null, extra: held.length ? held.map(a => a.anc.p) : null, hush: AR.F.size > 0, carve: false});
+  // draw: each stone as the sphere where it crosses your w (dark), and its handholds as a shell at its own w (blue further on, amber behind, fading with distance)
+  body.position.copy(B.p); body.quaternion.copy(B.q); const ps = innerHeight * R.getPixelRatio(); U.uScale.value = ps * .5 / Math.tan(THREE.MathUtils.degToRad(cam.fov / 2));
+  rig.update({t: T, dt, cam: cam.position, ph: T - B.lastStroke < 1 ? T - B.lastStroke : (T * .35) % 1, glow: .2 + Math.min(1, B.v.length() / 10) * .4, hurt: 0, scale: ps * .0095 * 1.1, lit: held.length});
+  for (const s of STONES) { const r = sl(s.w, s.r, S.W), dw = s.w - S.W, b = A(s.body), h = A(s.hold), seen = Math.max(0, 1 - Math.abs(dw) / 5.2), col = Math.abs(dw) < .5 ? [1, .85, .55] : dw > 0 ? [.35, .6, 1] : [1, .6, .28];
+    for (let i = 0; i < 320; i++) { const d = s.dir[i]; b.P.set([s.c.x + d.x * r, s.c.y + d.y * r, s.c.z + d.z * r], i * 3); b.C.set([.06, .07, .08], i * 3); b.S[i] = r > .05 ? .9 : 0; } upd(s.body);
+    for (let i = 0; i < 48; i++) { const d = s.dir[i]; h.P.set([s.c.x + d.x * (s.r + .1), s.c.y + d.y * (s.r + .1), s.c.z + d.z * (s.r + .1)], i * 3); h.C.set(col.map(v => v * (.15 + .6 * seen)), i * 3); h.S[i] = seen > 0 ? .24 : 0; } upd(s.hold); }
+  const camR = V3(), camU = V3(), camF = cam.getWorldDirection(V3()); camR.crossVectors(camF, UP).normalize(); camU.crossVectors(camR, camF).normalize();
+  for (const l of LIGHTS) { const a = A(l.pts), dw = Math.abs(l.w - S.W), r = 2.2 * Math.sqrt(Math.max(0, 1 - (dw / 2.5) ** 2)), b = l.got ? .15 : dw < .6 ? 1 : .35; for (let i = 0; i < 160; i++) { const t = i / 160 * Math.PI * 2, rr = Math.max(.15, r); a.P.set([l.p.x + (camR.x * Math.cos(t) + camU.x * Math.sin(t)) * rr, l.p.y + (camR.y * Math.cos(t) + camU.y * Math.sin(t)) * rr, l.p.z + (camR.z * Math.cos(t) + camU.z * Math.sin(t)) * rr], i * 3); a.C.set([.95 * b, .7 * b, .38 * b], i * 3); a.S[i] = .3; } upd(l.pts); }
+  AR.chains(dt, T, B);
+  { const a = A(armPts); let k = 0; for (const ar of AR.arms) { const X = ar.X, taut = Math.min(1, ar.ten / 30), owned = ar.owner !== null, wcol = ar.anc && ar.anc.w !== undefined && Math.abs(ar.anc.w - S.W) > .5 ? (ar.anc.w > S.W ? [.35, .6, 1] : [1, .6, .28]) : ar.col;
+      for (let j = 0; j < AN; j++) { const q = j * 3, u = j / (AN - 1); a.P.set([X[q], X[q + 1], X[q + 2]], k * 3); const base = owned ? wcol : [.32, .42, .48], br = owned ? .4 + .6 * taut : .22 + .15 * (1 - u); a.C.set([base[0] * br, base[1] * br, base[2] * br], k * 3); a.S[k] = (.32 - .14 * u) * (1 + .4 * taut); k++; }
+      for (let hh = 0; hh < 4; hh++) { const tip = (AN - 1) * 3; a.P.set([X[tip] + Math.cos(hh * 1.6 + T) * .15, X[tip + 1] + Math.sin(hh * 1.6) * .15, X[tip + 2] + Math.sin(hh * 1.6 + T) * .15], k * 3); a.C.set((owned ? wcol : [.3, .4, .45]).map(v => v * (ar.mode === 'latch' ? .9 : .4)), k * 3); a.S[k] = .14; k++; } } upd(armPts); }
+  drawGuide(); if (S.sayT && performance.now() > S.sayT) $('say').style.opacity = 0; comp.render(); }
+// the only instrument: a w gauge on the right edge (you in gold, the lights, and every held stone)
+function drawGuide() { const W = innerWidth, H = innerHeight; if (gd.width !== W || gd.height !== H) { gd.width = W; gd.height = H; } gx.clearRect(0, 0, W, H); if (S.state !== 'play') return;
+  for (const [id, f] of AR.F) { const sc = S.scr.get(id); if (!sc) continue; gx.strokeStyle = `rgb(${f.col.map(v => v * 255 | 0)})`; gx.lineWidth = 2; gx.beginPath(); gx.arc(sc[0], sc[1], 30, 0, 7); gx.stroke(); if (f.arm.mode === 'reach') { gx.setLineDash([3, 5]); gx.beginPath(); gx.arc(sc[0], sc[1], 38, 0, 7); gx.stroke(); gx.setLineDash([]); } }
+  const x = W - 26, y0 = H * .22, y1 = H * .78, Y = w => y0 + (y1 - y0) * (6 - w) / 12; gx.strokeStyle = 'rgba(207,221,232,.25)'; gx.lineWidth = 1; gx.beginPath(); gx.moveTo(x, y0); gx.lineTo(x, y1); gx.stroke();
+  for (const l of LIGHTS) { gx.strokeStyle = 'rgba(255,214,140,.9)'; gx.lineWidth = 2; gx.beginPath(); gx.arc(x, Y(l.w), 5, 0, 7); if (l.got) gx.stroke(); else { gx.fillStyle = 'rgba(255,214,140,.9)'; gx.fill(); } }
+  for (const a of AR.arms) if (a.mode === 'latch' && a.anc && a.anc.w !== undefined) { gx.fillStyle = a.anc.w > S.W + .5 ? 'rgba(90,150,255,.9)' : a.anc.w < S.W - .5 ? 'rgba(255,150,70,.9)' : 'rgba(207,221,232,.8)'; gx.fillRect(x - 12, Y(a.anc.w) - 1.5, 8, 3); }
+  gx.fillStyle = 'rgba(240,163,90,1)'; gx.fillRect(x - 10, Y(S.W) - 2, 20, 4); gx.fillStyle = 'rgba(207,221,232,.7)'; gx.font = "300 10px 'JetBrains Mono', monospace"; gx.textAlign = 'center'; gx.fillText('w', x, y0 - 10); gx.fillText(S.W.toFixed(1), x, Y(S.W) - 8);
+  CAM.draw(gx); }
+requestAnimationFrame(frame);
+window.__lab4 = {B, S, AR, CAM, env, down, up, mv, screen, load, get STONES() { return STONES; }, get LIGHTS() { return LIGHTS; }, get ANCH() { return ANCH; }, get T() { return T; }};
+</script></body></html>
