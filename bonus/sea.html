@@ -51,7 +51,8 @@ const SITES = [
   {id: 'medusae', name: 'The Medusae Trench', piece: 'Afterlight Medusae', href: 'medusae.html', x: 70, z: 270, col: 0xf59e0b, line: 'a trench lit by golden medusae, all the way down'},
   {id: 'worms', name: 'The Doodle Reef', piece: 'Raw Doodle Worms', href: 'worms.html', x: -210, z: 230, col: 0xf472b6, line: 'a reef drawn by hand, line by line'},
   {id: 'drifts', name: 'The Current', piece: 'The Drifts', href: '../current/drift/', x: 20, z: -20, col: 0xf0a35a, line: 'back to the drifts and the life of a jelly', home: true},
-  {id: 'lab', name: 'The Steer Lab', piece: 'a halfpipe where every finger is a tentacle', href: 'steerlab.html', x: -110, z: 40, col: 0x7fd3d3, line: 'a silt halfpipe where your hand becomes the jelly', room: true}];
+  {id: 'lab', name: 'The Steer Lab', piece: 'a halfpipe where every finger is a tentacle', href: 'steerlab.html', x: -110, z: 40, col: 0x7fd3d3, line: 'a silt halfpipe where your hand becomes the jelly', room: true},
+  {id: 'lab3d', name: 'The Steer Lab 3D', piece: 'four rooms of steering in space, and through a film\'s time', href: 'steerlab3d.html', x: -150, z: 90, col: 0x7fd3d3, line: 'kelp in depth, a film laid out as a coil of its frames, a gyre, reels in the sky', room: true}];
 const rawFloor = (x, z) => { let y = -44 + (fbm(x * .006 + 3, z * .006) - .5) * 46 + (fbm(x * .03, z * .03) - .5) * 6;
   const tr = SITES[2], dt = Math.hypot(x - tr.x, (z - tr.z) * .45); y -= 52 * Math.exp(-dt * dt / 1400);
   const rf = SITES[3], dr = Math.hypot(x - rf.x, z - rf.z); y += 16 * Math.exp(-dr * dr / 2600) * (.6 + .4 * Math.sin(x * .1) * Math.cos(z * .12));

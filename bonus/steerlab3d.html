@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The Steer Lab 3D · jelly-films</title>
+<meta name="description" content="The Steer Lab in three dimensions and a fourth: every finger is a tentacle reaching into space; in the Time-Worm, an arm can hold a moment of a film and steer you by moving through its time.">
+<link rel="stylesheet" href="../fonts/fonts.css">
+<script type="importmap">{"imports":{"three":"../paeleo/scion/videotext/vendor/three.module.min.js","three/addons/":"../paeleo/scion/videotext/vendor/addons/"}}</script>
+<style>
+:root{color-scheme:dark;--gold:#f0a35a;--dim:#8293a4}html,body{margin:0;height:100%;overflow:hidden;background:#0b1413;color:#e6edf3;font:300 15px/1.5 Jost,system-ui,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;overscroll-behavior:none}a{color:var(--gold);text-decoration:none}
+canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.ui{position:fixed;pointer-events:none;transition:opacity .6s}#guide{inset:0;width:100%;height:100%}
+#hud{top:max(14px,env(safe-area-inset-top));left:16px;right:16px;display:flex;justify-content:space-between;font:300 12px 'JetBrains Mono',monospace;color:var(--dim);text-shadow:0 0 6px #000;opacity:0}#hud b{font:400 12px Anton,Impact,sans-serif;letter-spacing:.3em;color:var(--gold);margin-right:10px}
+#say{left:0;right:0;top:max(46px,calc(env(safe-area-inset-top) + 36px));text-align:center;font:italic clamp(14px,2vw,18px) Georgia,serif;text-shadow:0 0 8px #000;opacity:0;padding:0 40px}
+#card{inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 8vw;background:radial-gradient(ellipse at 60% 50%,rgba(7,12,11,.15),rgba(7,12,11,.88) 75%);pointer-events:auto;overflow:auto}
+#card .k{font:700 11px system-ui;letter-spacing:.3em;color:var(--gold)}#card h1{margin:8px 0 0;font:900 clamp(34px,7vw,72px)/1 system-ui;letter-spacing:.08em}
+#card .brief{display:flex;gap:22px;align-items:flex-start;margin-top:14px;max-width:820px}#card .vb{font:400 clamp(44px,8vw,86px)/.9 Anton,Impact,sans-serif;color:var(--gold)}#card .how{margin:0;padding-left:20px;font:300 15px/1.55 Jost,system-ui,sans-serif;color:#dfe6e0}
+#card p{max-width:620px;font:italic 15px/1.55 Georgia,serif;color:#dfe6e0;margin:14px 0 0}#card .go{margin-top:20px;font:600 14px system-ui;letter-spacing:.12em;color:var(--gold)}#card .lk{margin-top:10px;font:300 12px 'JetBrains Mono',monospace;color:#55687a;max-width:780px}
+#card .rooms{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}#card .rooms a{font:400 11px Anton,Impact,sans-serif;letter-spacing:.2em;padding:7px 12px;border-radius:14px;color:var(--dim);background:rgba(5,9,9,.5)}#card .rooms a.on{color:#0b1413;background:var(--gold)}
+#next{left:50%;bottom:max(80px,calc(env(safe-area-inset-bottom) + 70px));transform:translateX(-50%);pointer-events:auto;display:none;font:400 13px Anton,Impact,sans-serif;letter-spacing:.24em;background:var(--gold);color:#0b1413;padding:10px 18px;border-radius:18px}
+@media (max-width:640px){#card .brief{flex-direction:column;gap:6px}}
+</style></head><body>
+<canvas id="gl" aria-label="A room of water in three dimensions: your jellyfish, its tentacles reaching into the space where your fingers touch"></canvas>
+<canvas class="ui" id="guide"></canvas>
+<div class="ui" id="hud"><div><b id="rname">THE STEER LAB 3D</b><span id="moves"></span></div><div id="stat"></div></div>
+<div class="ui" id="say"></div><a class="ui" id="next"></a>
+<div class="ui" id="card"><div class="k" id="ck"></div><h1 id="ch"></h1>
+  <div class="brief"><div class="vb" id="cv"></div><div><ol class="how" id="chow"></ol></div></div>
+  <p id="cp"></p><div class="rooms" id="rooms"></div>
+  <div class="go">TOUCH TO BEGIN</div><div class="lk">In space: touch a thing and an arm reaches it, wherever it is in depth. In open water an arm braces beside the bell; hold the finger still and it pushes deeper. Pull a planted finger toward the bell to haul; lift in turn to peel; flick to throw. A finger on the bell holds the jelly itself. The dial bottom-left turns the view; Q E R F and the wheel too. Desktop: hold 1 to 5 to plant fingers at the mouse. · <a href="steerlab.html">the flat lab</a> · <a href="sea.html">the open water</a> · <a href="SCION_STEERLAB3D.md">the theory</a></div></div>
+<script type="module">
+import * as THREE from 'three';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+import {RIGS, makeRig} from '../current/drift/rigs.js';
+import {makeArms3D} from './tentacles3d.js';
+const $ = id => document.getElementById(id), Q = new URLSearchParams(location.search), CL = '../current/drift/data/crashlab/', GEST = 'cineosis-hand-butter', NG = 64;
+let RID = Q.get('rig'); if (!RID) try { RID = localStorage.getItem('cj-rig'); } catch (e) {} if (!RIGS.some(r => r.id === RID)) RID = 'celluloid';
+const V3 = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z), UP = V3(0, 1, 0);
+// ---------------------------------------------------------------- the rooms: space, and time as a fourth way to move
+const ROOMS = {
+  cathedral: {n: 1, name: 'The Kelp Cathedral', verb: 'SWING', grav: 3, drag: .35, floor: (x, z) => -16 + Math.sin(x * .2) * Math.cos(z * .17) * 1.4, start: [-17, 3, 0], exit: [17, 5, 0],
+    how: ['You are heavy here, and the stalks stand all around you, near and far.', 'Touch a stalk and an arm reaches it in depth; swing under it; let go at the top and reach the next.', 'Turn the view with the dial to see which stalks are close. Cross to the ring on the far side.'], line: 'Swinging, in three dimensions: the next stalk can be behind you as well as ahead.'},
+  worm: {n: 2, name: 'The Time-Worm', verb: 'TIME', grav: .25, drag: .8, floor: (x, z) => -14 + Math.sin(x * .15) * .8, worm: true, start: [7.4, 2.4, -3.6], exit: null,
+    how: ['A film is laid through the water as a coil of its frames: its time is a place. A bright frame is the film playing now.', 'Hook a frame and that arm holds that moment. Slide your finger along the coil and the arm moves through the film\'s time, and drags you with it.', 'When the playing frame catches up with a moment you hold, that arm lets go. Ride the film to its last frame.'], line: 'The fourth dimension: steer by moving through a film\'s time.'},
+  gyre: {n: 3, name: 'The Gyre', verb: 'SPIRAL', grav: .5, drag: .7, floor: (x, z) => -10 + Math.hypot(x, z) * .12, gyre: true, start: [-12, -6, 4], exit: [0, 20, 0],
+    how: ['A vortex turns round the middle of the room and lifts as it turns.', 'Brace an arm in its water and it carries you round and up; hook the floating stones to rest or to swing out of it.', 'Climb the spiral to the ring at the top.'], line: 'A current in three dimensions: round, and up.'},
+  sky: {n: 4, name: 'Harpoon Sky', verb: 'CAST', grav: .5, drag: .8, floor: (x, z) => -12 + Math.cos(x * .1) * Math.sin(z * .12) * 2, sky: true, start: [0, -6, 12], exit: [0, 14, -8], needReels: 4,
+    how: ['Reels float all around, near and far, high and low.', 'Flick a finger at one and lift: the arm is thrown along your line of sight, wherever it is in depth. It comes flying back.', 'Haul four in; then the way out opens overhead.'], line: 'Throwing into depth: aim with the view, not just the finger.'},
+};
+const RK = ROOMS[Q.get('room')] ? Q.get('room') : 'cathedral', RM = ROOMS[RK];
+$('ck').textContent = `BONUS · THE STEER LAB 3D · ROOM ${RM.n} OF 4`; $('ch').textContent = RM.name; $('cv').textContent = RM.verb; $('chow').innerHTML = RM.how.map(h => `<li>${h}</li>`).join(''); $('cp').textContent = RM.line; $('rname').textContent = RM.name.toUpperCase();
+let SEALED = {}; try { SEALED = JSON.parse(localStorage.getItem('cj-sealed') || '{}'); } catch (e) {}
+$('rooms').innerHTML = Object.entries(ROOMS).map(([k, r]) => `<a href="?room=${k}" class="${k === RK ? 'on' : ''}">${r.n} · ${r.verb}${SEALED['steer3d-' + k] ? ' ★' : ''}</a>`).join('');
+// ---------------------------------------------------------------- renderer: the drifts' water
+const R = new THREE.WebGLRenderer({canvas: $('gl'), antialias: false}); R.setPixelRatio(Math.min(1.6, devicePixelRatio)); R.toneMapping = THREE.ACESFilmicToneMapping;
+const FOG = new THREE.Color(RK === 'worm' ? '#1c2a2e' : RK === 'gyre' ? '#18292c' : '#1c2c2a'), scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(FOG, .016);
+{ const c = document.createElement('canvas'); c.width = 4; c.height = 256; const g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, '#' + FOG.clone().multiplyScalar(2).getHexString()); gr.addColorStop(.55, '#' + FOG.getHexString()); gr.addColorStop(1, '#' + FOG.clone().multiplyScalar(.3).getHexString()); g.fillStyle = gr; g.fillRect(0, 0, 4, 256); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; scene.background = t; }
+const cam = new THREE.PerspectiveCamera(50, 1, .3, 400); const comp = new EffectComposer(R); comp.addPass(new RenderPass(scene, cam)); const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), .75, .6, .62); comp.addPass(bloom); comp.addPass(new OutputPass());
+const U = {uScale: {value: 1}, uT: {value: 0}, uFogD: {value: .016}, uFogC: {value: FOG.clone()}};
+const VS = `uniform float uScale, uFogD; uniform vec3 uFogC; attribute vec3 aC; attribute float aS; varying vec3 vC; varying float vF; void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.); float z = -mv.z; vF = 1. - exp(-pow(uFogD * z, 2.)); vC = aC; gl_PointSize = max(1., aS * uScale / z); gl_Position = projectionMatrix * mv; }`;
+const glowM = () => new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: U, vertexShader: VS, fragmentShader: `varying vec3 vC; varying float vF; void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; gl_FragColor = vec4(vC * (1. - vF * .85) * exp(-r2 * 14.), 1.); }`});
+const darkM = () => new THREE.ShaderMaterial({transparent: true, depthWrite: false, uniforms: U, vertexShader: VS, fragmentShader: `uniform vec3 uFogC; varying vec3 vC; varying float vF; void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; gl_FragColor = vec4(mix(vC, uFogC, vF), .9 * exp(-r2 * 10.)); }`});
+const cloud = (n, m) => { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3)); g.setAttribute('aC', new THREE.BufferAttribute(new Float32Array(n * 3), 3)); g.setAttribute('aS', new THREE.BufferAttribute(new Float32Array(n), 1)); const p = new THREE.Points(g, m); p.frustumCulled = false; scene.add(p); return p; };
+const upd = p => ['position', 'aC', 'aS'].forEach(n => p.geometry.attributes[n].needsUpdate = true);
+const bag = () => ({P: [], C: [], S: []}), put = (b, v, c, s) => { b.P.push(v.x, v.y, v.z); b.C.push(...c); b.S.push(s); };
+const bake = (b, m) => { const n = b.S.length, p = cloud(n, m); p.geometry.attributes.position.array.set(b.P); p.geometry.attributes.aC.array.set(b.C); p.geometry.attributes.aS.array.set(b.S); upd(p); return p; };
+const floorY = RM.floor, DARK = [.01, .016, .016];
+// the floor: a field of dark splats, ridges catching light
+{ const D = bag(), G = bag(); for (let i = 0; i < 110; i++) for (let j = 0; j < 110; j++) { const x = (i - 55) * .7 + (Math.random() - .5) * .5, z = (j - 55) * .7 + (Math.random() - .5) * .5, y = floorY(x, z), r = Math.hypot(x, z); if (r > 40) continue; const slope = Math.abs(floorY(x + 1, z) - y) + Math.abs(floorY(x, z + 1) - y);
+    put(D, V3(x, y, z), [.012 + .03 * Math.min(1, slope), .02 + .05 * Math.min(1, slope), .02 + .05 * Math.min(1, slope)], 1.5); if (Math.random() < .03) put(G, V3(x, y + .3, z), Math.random() < .3 ? [1, .6, .3] : [.25, .8, .75], .35); } bake(D, darkM()); bake(G, glowM()); }
+// anchors: points you can reach in space (and, in the Time-Worm, in time)
+const ANCH = [];
+// kelp stalks: columns of dark splats; every metre an anchor
+const KELP = []; { const pos = RK === 'cathedral' ? [[-12, 6], [-6, -8], [-2, 5], [3, -3], [7, 8], [10, -6], [13, 1], [-9, -2], [0, 12], [0, -13], [-14, -9], [14, 10]] : RK === 'gyre' ? [] : [[-20, -15], [18, -14], [-17, 16]];
+  const D = bag(), G = bag(); pos.forEach(([x, z], i) => { const y0 = floorY(x, z), h = RK === 'cathedral' ? 15 + (i * 7) % 6 : 10, k = {x, z, y0, h, nodes: [], ph: i * 1.3}; for (let j = 1; j <= h; j++) { const n = {p: V3(x, y0 + j, z), heavy: true, kind: 'kelp', k, j}; k.nodes.push(n); ANCH.push(n); }
+    for (let s = 0; s < h * 4; s++) put(D, V3(x + (Math.random() - .5) * .25, y0 + s / 4, z + (Math.random() - .5) * .25), DARK, .55); put(G, V3(x, y0 + h, z), [.25, .8, .75], .5); KELP.push(k); }); KELP.cloud = bake(D, darkM()); bake(G, glowM()); }
+// stones: dark splat spheres with their surfaces as anchors (floating in the gyre, standing elsewhere)
+const STONES = []; { const list = RK === 'gyre' ? Array.from({length: 9}, (_, i) => [Math.cos(i * 2.1) * (6 + i % 3 * 3), -6 + i * 2.6, Math.sin(i * 2.1) * (6 + i % 3 * 3), 1.2 + (i % 3) * .4]) : RK === 'sky' ? [[-8, -9, -4, 2], [9, -8, 3, 2.2], [0, -9, -14, 2.5]] : RK === 'worm' ? [[-6, -12, 8, 2]] : [];
+  const D = bag(); list.forEach(([x, y, z, r]) => { const c = V3(x, y, z); for (let i = 0; i < 260; i++) { const v = V3().randomDirection().multiplyScalar(r * (.85 + Math.random() * .15)).add(c); put(D, v, DARK, .7 + Math.random() * .4); } for (let i = 0; i < 40; i++) ANCH.push({p: V3().randomDirection().multiplyScalar(r).add(c), heavy: true, kind: 'stone'}); STONES.push({c, r}); }); if (D.S.length) bake(D, darkM()); }
+// reels: light, floating, glowing; hooked, they come to you
+const REELS = (RK === 'sky' ? [[-12, 2, -6], [10, 6, -10], [-6, -2, 10], [14, -3, 6], [3, 9, 4], [-15, 8, 4], [6, -5, -16]] : RK === 'cathedral' ? [] : RK === 'gyre' ? [] : [[-10, -4, -8]]).map(([x, y, z]) => ({p: V3(x, y, z), v: V3(), home: V3(x, y, z), r: .9, m: .35, got: false, pts: cloud(220, glowM())}));
+// the time-worm: a film's frames laid along a coil; each frame a gaussian tile of its own picture; the frame playing now is bright
+const IMG = Array.from({length: NG}, (_, k) => { const im = new Image(), e = {im, ok: false, tex: null}; im.onload = () => { e.ok = true; e.tex = new THREE.Texture(im); e.tex.colorSpace = THREE.SRGBColorSpace; e.tex.needsUpdate = true; }; im.src = `${CL}${GEST}/f${String(k).padStart(3, '0')}.jpg`; return e; });
+const wormPos = (t, out = V3()) => { const u = Math.max(0, Math.min(NG - 1, t)), a = u / NG * Math.PI * 4.2; return out.set(Math.cos(a) * 10, -8 + u * .34, Math.sin(a) * 10); };
+const tileGeo = (() => { const gx = 14, gy = 10, n = gx * gy, P = new Float32Array(n * 3), Uv = new Float32Array(n * 2); let k = 0; for (let j = 0; j < gy; j++) for (let i = 0; i < gx; i++, k++) { P.set([(i / (gx - 1) - .5) * 2.4, (j / (gy - 1) - .5) * 1.8, 0], k * 3); Uv.set([i / (gx - 1), j / (gy - 1)], k * 2); } const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(P, 3)); g.setAttribute('aUv', new THREE.BufferAttribute(Uv, 2)); return g; })();
+const tileMat = () => new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: {map: {value: new THREE.Texture()}, uScale: U.uScale, uA: {value: .5}, uHot: {value: 0}},
+  vertexShader: `uniform sampler2D map; uniform float uScale; attribute vec2 aUv; varying vec2 vUv; varying float vE; void main(){ vUv = aUv; vec2 q = aUv - .5; vE = smoothstep(.52, .36, length(q * vec2(1., 1.2))); vec4 mv = modelViewMatrix * vec4(position, 1.); gl_PointSize = .26 * uScale / -mv.z; gl_Position = projectionMatrix * mv; }`,
+  fragmentShader: `uniform sampler2D map; uniform float uA, uHot; varying vec2 vUv; varying float vE; void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; vec3 c = texture2D(map, vUv).rgb + vec3(.35, .22, .1) * uHot; gl_FragColor = vec4(c * vE * exp(-r2 * 12.) * uA * .7, 1.); }`});
+const TILES = RM.worm ? Array.from({length: NG}, (_, k) => { const m = new THREE.Points(tileGeo, tileMat()); m.frustumCulled = false; wormPos(k, m.position); scene.add(m); ANCH.push({p: m.position.clone(), kind: 'frame', t: k, heavy: true}); return m; }) : [];
+const WORM = {live: 0};
+// the gyre: a turning, lifting current round the middle
+const gyreAt = (p, out = V3()) => { const r = Math.hypot(p.x, p.z); if (!RM.gyre || r > 18 || p.y > 22) return out.set(0, 0, 0); const sp = 9 * (1 - r / 18); return out.set(-p.z / (r || 1) * sp, 2.6 * (1 - r / 18), p.x / (r || 1) * sp); };
+const gyrePts = RM.gyre ? cloud(1400, glowM()) : null, gyreU = RM.gyre ? Float32Array.from({length: 1400}, () => Math.random()) : null;
+// the exit: a ring of points
+const EXIT = {p: RM.exit ? V3(...RM.exit) : wormPos(NG - 1).add(V3(0, 2.5, 0)), r: 2.4, open: !RM.needReels}, exitPts = cloud(220, glowM());
+const SNOW = cloud(1400, glowM()); { const P = SNOW.geometry.attributes.position.array, C = SNOW.geometry.attributes.aC.array, S = SNOW.geometry.attributes.aS.array; for (let i = 0; i < 1400; i++) { P.set([(Math.random() - .5) * 80, -16 + Math.random() * 44, (Math.random() - .5) * 80], i * 3); const b = .15 + Math.random() * .3; C.set([b * .8, b, b], i * 3); S[i] = .06 + Math.random() * .05; } upd(SNOW); }
+// ---------------------------------------------------------------- the jelly
+const rig = makeRig(THREE, RID); (rig.tentacles || []).forEach(m => m.visible = false); const body = new THREE.Group(); body.add(rig.group); rig.group.scale.setScalar(rig.norm * 1.1); scene.add(body);
+const B = {p: V3(...RM.start), v: V3(), q: new THREE.Quaternion(), w: V3(), lastStroke: -9};
+const AR = makeArms3D(THREE, {n: 6, AN: 16, reach: 8.5, R: 1.05}), AN = AR.AN, armPts = cloud(AR.NA * (AN + 4), glowM());
+const S = {state: 'card', moves: [], sayT: 0, reels: 0, grab: null, yaw: .6, pitch: .25, dist: 17, scr: new Map()};
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), _a = V3(), _b = V3();
+const rayAt = (sx, sy) => { ndc.set(sx / innerWidth * 2 - 1, -(sy / innerHeight) * 2 + 1); ray.setFromCamera(ndc, cam); return ray.ray.clone(); };
+const screen = v => { _a.copy(v).project(cam); return _a.z < 1 ? [(_a.x * .5 + .5) * innerWidth, (-_a.y * .5 + .5) * innerHeight] : null; };
+const env = {
+  screen,
+  // what the finger's ray touches: the nearest anchor to the ray (generous with distance), a reel, or the floor
+  pick(r, arm, Bb, o) { let best = null, bs = 1e9; const tol = d => (o.cast ? .7 : 1) * (.8 + d * .035);
+    for (const re of REELS) { if (re.got) continue; const t = _b.copy(re.p).sub(r.origin).dot(r.direction); if (t < 0) continue; const d = r.distanceToPoint(re.p); if (d < re.r + tol(t) && t < bs) { bs = t; best = {type: 'reel', p: re.p.clone(), k: 34, light: true, obj: re}; } }
+    for (const n of ANCH) { const t = _b.copy(n.p).sub(r.origin).dot(r.direction); if (t < 0) continue; const d = r.distanceToPoint(n.p), lim = n.kind === 'frame' ? 1.5 + t * .03 : tol(t); if (d < lim) { const score = t + d * 4; if (score < bs) { bs = score; best = {type: n.kind, p: n.p.clone(), k: n.kind === 'frame' ? 46 : 62, heavy: true, n, t: n.t, scrub: n.kind === 'frame'}; } } }
+    if (best) return best;
+    for (let t = 1; t < 60; t += .5) { const p = r.at(t, _b); if (p.y < floorY(p.x, p.z) + .3) { if (p.distanceTo(Bb.p) < AR.REACH * 1.6) return {type: 'floor', p: p.clone(), k: 58, heavy: true}; break; } }
+    return null; },
+  // open water: a plane through the bell facing the camera, pushed deeper along your line of sight as you hold still
+  water(r, Bb, depth) { const n = cam.getWorldDirection(V3()), pl = new THREE.Plane().setFromNormalAndCoplanarPoint(n, Bb.p), hit = V3(); if (!r.intersectPlane(pl, hit)) hit.copy(r.at(Bb.p.distanceTo(r.origin), V3())); return hit.addScaledVector(r.direction, depth); },
+  update(an, a, f, dt, T) {
+    if (an.type === 'kelp') an.p.copy(an.n.p); else if (an.type === 'reel') an.p.copy(an.obj.p);
+    else if (an.type === 'frame') { // the fourth dimension: slide the finger along the coil and the held moment moves through the film's time, and the anchor with it
+      if (f) { let bt = an.t, bd = 1e9; for (let k = Math.max(0, Math.floor(an.t) - 10); k <= Math.min(NG - 1, Math.ceil(an.t) + 10); k++) { const d = f.ray.distanceToPoint(wormPos(k, _b)); if (d < bd) { bd = d; bt = k; } } const was = an.t; an.t += THREE.MathUtils.clamp(bt - an.t, -dt * 16, dt * 16); if (Math.floor(an.t) !== Math.floor(was)) a.scrubT = T; }
+      wormPos(an.t, an.p); if (Math.abs(WORM.live - an.t) < .6 && T - (a.caughtT || -9) > 1) { a.caughtT = T; a.mode = 'free'; a.anc = null; env.event('caught up', {arm: a}); } }
+    else if (an.type === 'water' && RM.gyre) { an.p.addScaledVector(gyreAt(an.p, _b), dt * .9); if (gyreAt(an.p, _b).lengthSq() > 4 && T - (S.gyreSaid || -9) > 6) { S.gyreSaid = T; move('borrowed the gyre'); } } },
+  react(an, Fv, dt) { if (an.obj) an.obj.v.addScaledVector(Fv, -dt / an.obj.m); },
+  event(name, d) { if (name === 'latch') { buzz(d.tumbling ? [10, 40, 10] : 6); pluck(d.an.type === 'water' ? 330 : d.an.type === 'frame' ? 660 : 520, .05); if (d.tumbling && d.an.type !== 'water') move('caught the wreck'); if (d.an.type === 'frame') say(`holding frame ${Math.round(d.an.t) + 1} of ${NG}: slide along the coil to move through its time`); }
+    else if (name === 'release') { pluck(880, .03); buzz(5); if (RK === 'cathedral' && B.v.length() > 5) move('swing'); } else if (name === 'slip') { pluck(1200, .03); buzz([8, 16, 8]); say('it slipped'); } else if (name === 'lost') say('lost its grip');
+    else if (name === 'cast') { pluck(640, .04); buzz(6); } else if (name === 'hooked') { buzz([6, 14, 6]); move(d.an.light ? 'harpooned a reel' : 'harpooned'); } else if (name === 'miss') pluck(260, .02);
+    else if (name === 'hauled') { const re = d.an.obj; if (re && !re.got) { re.got = true; S.reels++; move(`reel ${S.reels}${RM.needReels ? ' of ' + RM.needReels : ''}`, [10, 30, 10, 30, 10]); if (RM.needReels && S.reels >= RM.needReels && !EXIT.open) { EXIT.open = true; say('the way out has opened overhead', 3); } } }
+    else if (name === 'caught up') { say('the film caught up with that moment: the arm lets go'); buzz([6, 12, 6]); pluck(990, .04); } else if (name === 'arrived') move('pulled yourself over'); else if (name === 'full') say('all six arms are taken'); } };
+// ---------------------------------------------------------------- input
+const cv = $('gl'), DIAL = () => ({x: 70, y: innerHeight - 90, r: 46});
+const down = (id, sx, sy) => { const D = DIAL(); if (Math.hypot(sx - D.x, sy - D.y) < D.r + 10) { S.dial = {id, x: sx, y: sy}; return; }
+  const bs = screen(B.p); if (!S.grab && bs && Math.hypot(bs[0] - sx, bs[1] - sy) < 46) { S.grab = {id, r: rayAt(sx, sy)}; S.scr.set(id, [sx, sy]); pluck(440, .04); buzz(6); return; }
+  const f = AR.down(id, rayAt(sx, sy), sx, sy, B, env, T); if (f) S.scr.set(id, [sx, sy]); };
+const mv = (id, sx, sy) => { if (S.dial && S.dial.id === id) { S.yaw -= (sx - S.dial.x) * .012; S.pitch = THREE.MathUtils.clamp(S.pitch + (sy - S.dial.y) * .008, -.6, 1.3); S.dial.x = sx; S.dial.y = sy; return; }
+  if (S.grab && S.grab.id === id) { S.grab.r = rayAt(sx, sy); S.scr.set(id, [sx, sy]); return; } if (!AR.F.has(id)) return; S.scr.set(id, [sx, sy]); AR.move(id, rayAt(sx, sy), sx, sy, T); };
+const up = (id, intr) => { S.scr.delete(id); if (S.dial && S.dial.id === id) { S.dial = null; return; } if (S.grab && S.grab.id === id) { S.grab = null; if (!intr && B.v.length() > 7) move('flung'); return; } AR.up(id, intr, B, env, T); };
+cv.addEventListener('pointerdown', e => { if (S.state !== 'play') return; try { cv.setPointerCapture(e.pointerId); } catch (x) {} const now = performance.now();
+  if (now - (S.lastTap || 0) < 300 && Math.hypot(e.clientX - S.lx, e.clientY - S.ly) < 40 && !AR.F.size) { stroke(); S.lastTap = 0; return; } S.lastTap = now; S.lx = e.clientX; S.ly = e.clientY; down('p' + e.pointerId, e.clientX, e.clientY); });
+cv.addEventListener('pointermove', e => { S.mx = e.clientX; S.my = e.clientY; mv('p' + e.pointerId, e.clientX, e.clientY); });
+cv.addEventListener('pointerup', e => up('p' + e.pointerId, false)); cv.addEventListener('pointercancel', e => up('p' + e.pointerId, true)); cv.addEventListener('contextmenu', e => e.preventDefault());
+cv.addEventListener('wheel', e => { e.preventDefault(); S.dist = THREE.MathUtils.clamp(S.dist * Math.exp(e.deltaY * .001), 8, 45); }, {passive: false});
+addEventListener('pointermove', e => { S.mx = e.clientX; S.my = e.clientY; }, {passive: true});
+const keys = new Set(); addEventListener('keydown', e => { if (e.repeat) return; const k = e.key; keys.add(k.toLowerCase()); if (S.state === 'card') { start(); return; } if (k >= '1' && k <= '5') down('k' + k, S.mx ?? innerWidth / 2, S.my ?? innerHeight / 2); if (k === ' ') { e.preventDefault(); stroke(); } if (k.toLowerCase() === 'x') reset(); if (k === 'Escape') location.href = 'steerlab.html'; });
+addEventListener('keyup', e => { keys.delete(e.key.toLowerCase()); if (e.key >= '1' && e.key <= '5') up('k' + e.key, false); });
+addEventListener('blur', () => { for (const id of [...AR.F.keys()]) up(id, true); });
+// ---------------------------------------------------------------- feedback
+const say = (t, s = 2.8) => { $('say').textContent = t; $('say').style.opacity = 1; S.sayT = performance.now() + s * 1000; };
+const buzz = p => { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} };
+const move = (name, hp) => { if (S.moves.some(m => m.n === name && T - m.t < 3)) return; S.moves.push({n: name, t: T}); say(name); buzz(hp || 10); };
+let AC = null; const audio = () => { const A = window.AudioContext || window.webkitAudioContext; if (!A || AC) return; AC = new A(); const nb = AC.createBuffer(1, AC.sampleRate * 4, AC.sampleRate), x = nb.getChannelData(0); let l = 0; for (let i = 0; i < x.length; i++) { l = (l + .02 * (Math.random() * 2 - 1)) / 1.02; x[i] = l * 3; } const ns = AC.createBufferSource(); ns.buffer = nb; ns.loop = true; const lp = AC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 280; const g = AC.createGain(); g.gain.value = .28; ns.connect(lp).connect(g).connect(AC.destination); ns.start(); S.lp = lp; };
+const pluck = (f, g) => { if (!AC) return; const t = AC.currentTime, o = AC.createOscillator(), v = AC.createGain(); o.type = 'triangle'; o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(f * .7, t + .25); v.gain.setValueAtTime(0, t); v.gain.linearRampToValueAtTime(g, t + .01); v.gain.exponentialRampToValueAtTime(.0001, t + .5); o.connect(v).connect(AC.destination); o.start(t); o.stop(t + .6); };
+function stroke() { if (T - B.lastStroke < .35) return; B.lastStroke = T; B.v.addScaledVector(V3(0, 1, 0).applyQuaternion(B.q), 5.5); pluck(160, .06); buzz(8); }
+function start() { if (S.state !== 'card') return; S.state = 'play'; $('card').style.opacity = 0; $('card').style.pointerEvents = 'none'; setTimeout(() => $('card').style.display = 'none', 600); $('hud').style.opacity = 1; audio(); S.t0 = T; say(RM.how[0], 4); }
+$('card').addEventListener('pointerdown', e => { if (e.target.closest('a')) return; start(); });
+function reset() { B.p.set(...RM.start); B.v.set(0, 0, 0); B.w.set(0, 0, 0); B.q.identity(); for (const id of [...AR.F.keys()]) up(id, true); AR.arms.forEach(a => { a.init = false; a.mode = 'free'; a.anc = null; }); S.done = false; S.t0 = T; }
+// ---------------------------------------------------------------- the loop
+const size = () => { R.setSize(innerWidth, innerHeight, false); comp.setSize(innerWidth, innerHeight); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); }; addEventListener('resize', size); size();
+let T = 0, last = performance.now(); const camT = B.p.clone(), gd = $('guide'), gx = gd.getContext('2d');
+function frame(now) { requestAnimationFrame(frame); const dt = Math.min(1 / 30, (now - last) / 1000); last = now; T += dt; U.uT.value = T;
+  KELP.forEach(k => k.nodes.forEach(n => { n.p.x = k.x + Math.sin(T * .7 + k.ph + n.j * .3) * .02 * n.j * n.j * .3; n.p.z = k.z + Math.cos(T * .5 + k.ph + n.j * .2) * .015 * n.j * n.j * .3; }));
+  if (RM.worm) WORM.live = (WORM.live + dt * 2.2) % NG;   // the film plays on through its coil
+  // the arms pull; the bell answers in three dimensions
+  const o = AR.step(dt, T, B, env); if (o.snap) { B.v.addScaledVector(o.F, .14); B.w.addScaledVector(o.T, .1); }
+  if (S.grab) { const p = env.water(S.grab.r, B, 0); B.v.addScaledVector(p.sub(B.p), dt * 14); B.v.multiplyScalar(Math.exp(-dt * 2.2)); }
+  B.v.addScaledVector(o.F, dt); B.v.y -= RM.grav * dt; if (RM.gyre) B.v.lerp(gyreAt(B.p, _b), dt * .5);
+  const upv = V3(0, 1, 0).applyQuaternion(B.q); B.w.addScaledVector(o.T, dt * .9).addScaledVector(upv.clone().cross(UP), dt * 1.6); B.w.multiplyScalar(Math.exp(-dt * 1.8)); B.v.multiplyScalar(Math.exp(-dt * RM.drag));
+  B.p.addScaledVector(B.v, dt); const wl = B.w.length(); if (wl > 1e-5) B.q.premultiply(new THREE.Quaternion().setFromAxisAngle(B.w.clone().divideScalar(wl), wl * dt)).normalize();
+  const fy = floorY(B.p.x, B.p.z); if (B.p.y < fy + 1) { const imp = -B.v.y; B.p.y = fy + 1; B.v.y = Math.abs(B.v.y) * .3; if (imp > 5) move('bell-first into the floor', [20, 30, 40]); }
+  const rr = B.p.length(); if (rr > 34) { B.p.multiplyScalar(34 / rr); B.v.multiplyScalar(-.3); } if (B.p.y > 26) { B.p.y = 26; B.v.y = -Math.abs(B.v.y) * .3; }
+  for (const s of STONES) { const d = B.p.distanceTo(s.c); if (d < s.r + 1.1) { const n = B.p.clone().sub(s.c).normalize(); B.p.copy(s.c).addScaledVector(n, s.r + 1.1); B.v.addScaledVector(n, -Math.min(0, B.v.dot(n)) * 1.4); } }
+  for (const re of REELS) { if (re.got) { re.p.lerp(B.p, dt * 6); continue; } re.v.addScaledVector(re.home.clone().sub(re.p), dt * .2); re.v.y += Math.sin(T * .7 + re.home.x) * dt * .2; re.v.multiplyScalar(Math.exp(-dt * 1.4)); re.p.addScaledVector(re.v, dt); const d = re.p.distanceTo(B.p); if (d < re.r + 1) { const n = re.p.clone().sub(B.p).normalize(); re.p.copy(B.p).addScaledVector(n, re.r + 1); re.v.addScaledVector(n, 3); } }
+  // moves
+  const rel = AR.releases; if (rel.length >= 3 && T - rel[rel.length - 1].t < .15 && T - (S.peelT || -9) > 1.5) { S.peelT = T; move(AR.arms.filter(a => a.mode === 'latch').length === 1 ? 'peel · and the last arm swings you' : 'peel'); }
+  if (B.w.length() > 5) move('tumble'); if (RM.worm) { const held = AR.arms.filter(a => a.mode === 'latch' && a.anc && a.anc.type === 'frame'); if (held.length >= 2 && Math.abs(held[0].anc.t - held[1].anc.t) > 8) move('two moments at once'); if (held.some(a => T - (a.scrubT || -9) < .2) && B.v.length() > 3) move('steering by time'); }
+  if (S.state === 'play' && !S.done && EXIT.open && B.p.distanceTo(EXIT.p) < EXIT.r + .6) { S.done = true; const secs = (T - S.t0).toFixed(1), names = [...new Set(S.moves.map(m => m.n.split(' ·')[0]))]; say(`${RM.name}: through in ${secs} s · ${names.length} moves`, 6); buzz([20, 40, 20, 40, 80]); pluck(784, .06);
+    try { const Sx = JSON.parse(localStorage.getItem('cj-sealed') || '{}'); Sx['steer3d-' + RK] = {stars: Math.min(3, names.length), secs: +secs, clips: 0, t: Date.now()}; localStorage.setItem('cj-sealed', JSON.stringify(Sx)); } catch (e) {}
+    const ks = Object.keys(ROOMS), nx = ks[(ks.indexOf(RK) + 1) % ks.length], a = $('next'); a.href = `?room=${nx}`; a.textContent = `ROOM ${ROOMS[nx].n} · ${ROOMS[nx].verb} →`; a.style.display = 'block'; }
+  // ---- the camera: orbits the bell (dial, Q E R F, wheel), drifting a little behind its motion; it frames the arms you are holding
+  if (keys.has('q')) S.yaw += dt * 1.2; if (keys.has('e')) S.yaw -= dt * 1.2; if (keys.has('r')) S.pitch = Math.min(1.3, S.pitch + dt); if (keys.has('f')) S.pitch = Math.max(-.6, S.pitch - dt);
+  if (!S.dial && B.v.length() > 4 && !AR.F.size) { const want = Math.atan2(-B.v.x, -B.v.z) + Math.PI; let d = want - S.yaw; d = Math.atan2(Math.sin(d), Math.cos(d)); S.yaw += d * dt * .3; }
+  const held = AR.arms.filter(a => a.mode === 'latch' && a.anc), focus = B.p.clone(); held.forEach(a => focus.addScaledVector(a.anc.p, .25 / held.length * held.length / (held.length + 1))); camT.lerp(focus, 1 - Math.pow(.05, dt));
+  const spread = held.reduce((m, a) => Math.max(m, a.anc.p.distanceTo(B.p)), 0), dist = S.dist + spread * .5; cam.position.copy(camT).add(V3(Math.sin(S.yaw) * Math.cos(S.pitch), Math.sin(S.pitch), Math.cos(S.yaw) * Math.cos(S.pitch)).multiplyScalar(dist)); cam.lookAt(camT);
+  // ---- draw
+  body.position.copy(B.p); body.quaternion.copy(B.q); const ps = innerHeight * R.getPixelRatio(), us = ps * .5 / Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)); U.uScale.value = us;
+  rig.update({t: T, dt, cam: cam.position, ph: T - B.lastStroke < 1 ? (T - B.lastStroke) : (T * .35) % 1, glow: .15 + Math.min(1, B.v.length() / 10) * .4, hurt: 0, scale: ps * .0095 * 1.1, lit: held.length});
+  AR.chains(dt, T, B);
+  { const P = armPts.geometry.attributes.position.array, C = armPts.geometry.attributes.aC.array, Sz = armPts.geometry.attributes.aS.array; let k = 0;
+    for (const a of AR.arms) { const X = a.X, taut = Math.min(1, a.ten / 30), owned = a.owner !== null || a.mode === 'losing' || a.mode === 'cast' || (a.anc && a.anc.cast), rip = (T - a.ripple) / .5, shiver = a.slipK > .7 ? (a.slipK - .7) * .25 : 0;
+      for (let j = 0; j < AN; j++) { const q = j * 3, u = j / (AN - 1), bead = taut > .25 ? Math.max(0, 1 - Math.abs(((1 - u) - ((T * 1.6 + a.i * .2) % 1)) * 7)) * taut : 0, rp = rip > 0 && rip < 1 ? Math.max(0, 1 - Math.abs(u - (1 - rip)) * 8) : 0;
+        P.set([X[q] + (Math.random() - .5) * shiver, X[q + 1] + (Math.random() - .5) * shiver, X[q + 2] + (Math.random() - .5) * shiver], k * 3); const base = owned ? a.col : [.32, .42, .48], br = owned ? .35 + .55 * taut + .8 * bead + .9 * rp : .22 + .15 * (1 - u);
+        C.set([base[0] * br + (a.slipK > .7 ? .5 * a.slipK : 0), base[1] * br, base[2] * br], k * 3); Sz[k] = (.32 - .14 * u) * (1 + .4 * taut); k++; }
+      const tip = (AN - 1) * 3; for (let h = 0; h < 4; h++) { P.set([X[tip] + Math.cos(h * 1.6 + T) * .15, X[tip + 1] + Math.sin(h * 1.6) * .15, X[tip + 2] + Math.sin(h * 1.6 + T) * .15], k * 3); C.set((owned ? a.col : [.3, .4, .45]).map(v => v * (a.mode === 'latch' ? .9 : .4)), k * 3); Sz[k] = .14; k++; } } upd(armPts); }
+  REELS.forEach(re => { const P = re.pts.geometry.attributes.position.array, C = re.pts.geometry.attributes.aC.array, Sz = re.pts.geometry.attributes.aS.array, fw = cam.getWorldDirection(V3()), rt = V3().crossVectors(fw, UP).normalize(), upc = V3().crossVectors(rt, fw); for (let i = 0; i < 220; i++) { const ring = i < 140, a = ring ? i / 140 * 6.283 + T * .5 : (i - 140) / 80 * 6.283, rad = ring ? re.r : (i % 4) / 4 * re.r * .8; P.set([re.p.x + (rt.x * Math.cos(a) + upc.x * Math.sin(a)) * rad, re.p.y + (rt.y * Math.cos(a) + upc.y * Math.sin(a)) * rad, re.p.z + (rt.z * Math.cos(a) + upc.z * Math.sin(a)) * rad], i * 3); const g = re.got ? .3 : 1; C.set(ring ? [.95 * g, .75 * g, .4 * g] : [.5 * g, .4 * g, .25 * g], i * 3); Sz[i] = ring ? .22 : .15; } upd(re.pts); re.pts.visible = !(re.got && re.p.distanceTo(B.p) < .6); });
+  { const P = exitPts.geometry.attributes.position.array, C = exitPts.geometry.attributes.aC.array, Sz = exitPts.geometry.attributes.aS.array, fw = cam.getWorldDirection(V3()), rt = V3().crossVectors(fw, UP).normalize(), upc = V3().crossVectors(rt, fw); for (let i = 0; i < 220; i++) { const a = i / 220 * 6.283; P.set([EXIT.p.x + (rt.x * Math.cos(a) + upc.x * Math.sin(a)) * EXIT.r, EXIT.p.y + (rt.y * Math.cos(a) + upc.y * Math.sin(a)) * EXIT.r, EXIT.p.z + (rt.z * Math.cos(a) + upc.z * Math.sin(a)) * EXIT.r], i * 3); const b = EXIT.open ? .55 + .45 * Math.sin(T * 3 + i * .3) : .12; C.set([.95 * b, .65 * b, .35 * b], i * 3); Sz[i] = .3; } upd(exitPts); }
+  TILES.forEach((m, k) => { const e = IMG[k]; if (e.tex && m.material.uniforms.map.value !== e.tex) m.material.uniforms.map.value = e.tex; m.lookAt(cam.position); const dl = Math.abs(((k - WORM.live) % NG + NG) % NG), hot = Math.max(0, 1 - Math.min(dl, NG - dl) / 1.5), held = AR.arms.some(a => a.mode === 'latch' && a.anc && a.anc.type === 'frame' && Math.round(a.anc.t) === k);
+    m.material.uniforms.uHot.value = hot; m.material.uniforms.uA.value = held ? 1.2 : .45 + .6 * hot; });
+  if (gyrePts) { const P = gyrePts.geometry.attributes.position.array, C = gyrePts.geometry.attributes.aC.array, Sz = gyrePts.geometry.attributes.aS.array; for (let i = 0; i < 1400; i++) { gyreU[i] = (gyreU[i] + dt * .02) % 1; const u = gyreU[i], r = 3 + (i % 7) * 2.1, a = u * Math.PI * 8 + i, y = -8 + u * 30; P.set([Math.cos(a) * r, y, Math.sin(a) * r], i * 3); const b = .25 + .3 * (1 - r / 18); C.set([.4 * b, .85 * b, .9 * b], i * 3); Sz[i] = .12; } upd(gyrePts); }
+  drawGuide(); if (S.sayT && performance.now() > S.sayT) $('say').style.opacity = 0;
+  $('moves').textContent = S.moves.length ? '· ' + [...new Set(S.moves.slice(-5).map(m => m.n.split(' ·')[0]))].join(' · ') : ''; $('stat').textContent = `${AR.F.size} finger${AR.F.size === 1 ? '' : 's'} · ${B.v.length().toFixed(1)} m/s · ${Math.round(B.p.y + 16)} m up${RM.needReels ? ` · reels ${S.reels}/${RM.needReels}` : ''}`;
+  if (S.lp && AC) S.lp.frequency.setTargetAtTime(220 + B.v.length() * 40, AC.currentTime, .2);
+  comp.render(); }
+function drawGuide() { const W = innerWidth, H = innerHeight; if (gd.width !== W || gd.height !== H) { gd.width = W; gd.height = H; } gx.clearRect(0, 0, W, H); if (S.state !== 'play') return;
+  // finger rings; a water brace's ring grows with the depth it has pushed to
+  for (const [id, f] of AR.F) { const sc = S.scr.get(id); if (!sc) continue; gx.strokeStyle = `rgb(${f.col.map(v => v * 255 | 0)})`; gx.lineWidth = 2; gx.beginPath(); gx.arc(sc[0], sc[1], 30, 0, 7); gx.stroke(); if (f.depth > .1) { gx.setLineDash([2, 4]); gx.beginPath(); gx.arc(sc[0], sc[1], 30 + f.depth * 5, 0, 7); gx.stroke(); gx.setLineDash([]); gx.fillStyle = gx.strokeStyle; gx.font = "300 10px 'JetBrains Mono', monospace"; gx.textAlign = 'center'; gx.fillText(`+${f.depth.toFixed(1)} m deep`, sc[0], sc[1] + 50 + f.depth * 5); } if (f.arm.mode === 'reach') { gx.setLineDash([3, 5]); gx.beginPath(); gx.arc(sc[0], sc[1], 38, 0, 7); gx.stroke(); gx.setLineDash([]); } }
+  if (S.grab) { const sc = S.scr.get(S.grab.id), bs = screen(B.p); if (sc && bs) { gx.strokeStyle = 'rgba(240,163,90,.8)'; gx.setLineDash([4, 5]); gx.beginPath(); gx.moveTo(bs[0], bs[1]); gx.lineTo(sc[0], sc[1]); gx.stroke(); gx.setLineDash([]); } }
+  // posture from above: the rim's six arms, each a spoke as long as its load
+  const left = [...S.scr.values()].some(s => s[0] > W / 2), cx = left ? 86 : W - 86, cy = 118; gx.fillStyle = 'rgba(5,9,9,.55)'; gx.beginPath(); gx.arc(cx, cy, 64, 0, 7); gx.fill(); gx.strokeStyle = 'rgba(240,163,90,.8)'; gx.lineWidth = 2; gx.beginPath(); gx.arc(cx, cy, 22, 0, 7); gx.stroke();
+  const upv = V3(0, 1, 0).applyQuaternion(B.q); gx.fillStyle = 'rgba(240,163,90,.9)'; gx.beginPath(); gx.arc(cx + upv.x * 18, cy + upv.z * 18, 4, 0, 7); gx.fill();
+  for (const a of AR.arms) { const len = 26 + Math.min(32, a.ten * 1.1), owned = a.owner !== null || (a.anc && a.anc.cast); gx.strokeStyle = owned ? `rgba(${a.col.map(v => v * 255 | 0)},${.5 + Math.min(.5, a.ten / 30)})` : 'rgba(130,147,164,.4)'; gx.lineWidth = owned ? 2 + Math.min(3, a.ten / 12) : 1.2; gx.beginPath(); gx.moveTo(cx + Math.sin(a.a) * 22, cy + Math.cos(a.a) * 22); gx.lineTo(cx + Math.sin(a.a) * len, cy + Math.cos(a.a) * len); gx.stroke(); if (a.slipK > .7) { gx.fillStyle = 'rgba(255,90,70,.9)'; gx.beginPath(); gx.arc(cx + Math.sin(a.a) * len, cy + Math.cos(a.a) * len, 4, 0, 7); gx.fill(); } }
+  gx.fillStyle = 'rgba(207,221,232,.6)'; gx.font = "300 10px 'JetBrains Mono', monospace"; gx.textAlign = 'center'; gx.fillText('posture · tilt dot', cx, cy + 78);
+  // the view dial
+  const D = DIAL(); gx.strokeStyle = 'rgba(207,221,232,.35)'; gx.lineWidth = 1.5; gx.beginPath(); gx.arc(D.x, D.y, D.r, 0, 7); gx.stroke(); gx.fillStyle = 'rgba(240,163,90,.8)'; gx.beginPath(); gx.arc(D.x + Math.sin(S.yaw) * D.r * .7, D.y + Math.cos(S.yaw) * D.r * .7 * Math.cos(S.pitch), 6, 0, 7); gx.fill(); gx.fillStyle = 'rgba(207,221,232,.6)'; gx.fillText('view', D.x, D.y + D.r + 14);
+  // the fourth dimension: the film's timeline, the playing frame, and every moment an arm holds
+  if (RM.worm) { const x0 = W * .2, x1 = W * .8, y = H - 34, X = t => x0 + (x1 - x0) * t / (NG - 1); gx.strokeStyle = 'rgba(207,221,232,.3)'; gx.beginPath(); gx.moveTo(x0, y); gx.lineTo(x1, y); gx.stroke(); gx.fillStyle = 'rgba(207,221,232,.9)'; gx.fillRect(X(WORM.live) - 1, y - 9, 2, 18); gx.fillText('now', X(WORM.live), y - 13);
+    AR.arms.forEach(a => { if (a.mode === 'latch' && a.anc && a.anc.type === 'frame') { gx.fillStyle = `rgb(${a.col.map(v => v * 255 | 0)})`; gx.beginPath(); gx.arc(X(a.anc.t), y, 6, 0, 7); gx.fill(); const e = IMG[Math.round(a.anc.t)]; if (e.ok) gx.drawImage(e.im, X(a.anc.t) - 30, y - 72, 60, 45); } }); gx.fillStyle = 'rgba(207,221,232,.6)'; gx.textAlign = 'left'; gx.fillText(`time · frame ${Math.round(WORM.live) + 1} of ${NG} playing`, x0, y + 18); } }
+requestAnimationFrame(frame);
+window.__lab3 = {B, AR, env, down, up, mv, rayAt, cam, start, S, REELS, KELP, TILES, WORM, EXIT, wormPos, screen, get T() { return T; }};
+</script></body></html>
