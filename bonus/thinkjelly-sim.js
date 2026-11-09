@@ -9,7 +9,7 @@ export function makeNerve(o = {}) {
   const PER = o.periods || [2.35, 1.9, 2.6, 2.1, 1.62, 2.45, 2.0, 2.8];   // seconds; pacemaker 5 (index 4) is the fastest
   const M = {N, NR, LOOP, t: 0, warm: 1, act: new Float32Array(N), dact: new Float32Array(N), tw: new Float32Array(N).fill(-9), ref: new Float32Array(N), at: new Float32Array(N).fill(Infinity),
     cuts: new Set(), rh: PER.map((p, i) => ({i, node: Math.round(i * N / NR) % N, period: p, charge: (i * .37) % 1 * .6, silent: false, last: -9, led: 0})), events: [], pulses: []};
-  const twitch = a => a < 0 ? 0 : a < .1 ? a / .1 : Math.exp(-(a - .1) / .32);
+  const RISE = o.rise || .1, FALL = o.fall || .32, twitch = a => a < 0 ? 0 : a < RISE ? .5 - .5 * Math.cos(Math.PI * a / RISE) : Math.exp(-(a - RISE) / FALL);   // how long the muscle takes to pull, and to let go
   const cutBetween = (a, b) => M.cuts.has(Math.min(a, b) === 0 && Math.max(a, b) === N - 1 ? N - 1 : Math.min(a, b));   // gap g lies between node g and g + 1
   function fire(n, kind, block) { const t = M.t; if (t < M.ref[n]) return false; M.ref[n] = t + REFR; M.tw[n] = t; M.at[n] = Infinity;
     for (const d of [1, -1]) { if (block === d) continue; const m = (n + d + N) % N; if (cutBetween(n, m) || t + DELAY < M.ref[m]) continue; M.at[m] = Math.min(M.at[m], t + DELAY); }

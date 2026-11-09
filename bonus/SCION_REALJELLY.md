@@ -136,6 +136,46 @@ Each was missing; each is now built.
 - whether the jelly's behaviours (the wall, the wreck shot) still read well in the larger tank;
 - frame rate on a phone.
 
+## 5d · Against a real moon jelly: what was wrong, and what changed
+**The direction** (with two phone screenshots): "It just doesn't look believable, the texture and motion. Can we compare with a reference video to see what we have wrong with our motion and jelly consistency and the behaviour of the arms, their weight or physics? Find videos of real jellyfish swimming to compare against." And then: "It seems frozen or stalled."
+
+**What could and could not be done here.** The session cannot play video. The comparison is therefore against published descriptions and measurements of *Aurelia aurita*, and against numbers measured from our own running animal. Sources:
+- **Gemmell et al., PNAS 2013** (passive energy recapture): the pause after the bell reopens, and the vortex that pushes during it.
+- **Costello et al.**, on turning and bell kinematics.
+- **Villanueva et al.**: the passive flexible flap at the bell margin.
+- **A 2026 preprint:** mature *A. aurita* pulses at about 0.24 ± 0.11 Hz in natural swimming.
+
+The anatomy rows (many short marginal tentacles, four long oral arms, four horseshoe gonads, a shallow saucer bell) are standard descriptions, stated from general knowledge and not from a source fetched in this session.
+
+| | a real moon jelly | ours before | ours now |
+|---|---|---|---|
+| **beat** | about 14 a minute (0.24 Hz), range 8 to 21 | 40 to 47 a minute | **17 to 18** |
+| **the pulse** | a muscle-driven squeeze, a slower elastic reopening, then a pause | a 0.1 s snap, then decay | a squeeze of about half a second, a slower release, a pause of 2 s or more |
+| **bell shape** | a shallow saucer (height about a third of width) | a dome: height 0.52 of width | **0.38** |
+| **squeezing** | the bell narrows and deepens | it got *flatter* (0.52 → 0.40): the wrong way | it deepens (0.38 → 0.42); the bell narrows 11% |
+| **the margin** | a thin passive flap that sweeps in and down | rigid | a flap on the skin that follows the muscle |
+| **tentacles** | a fringe of hundreds, short and fine | 32, each three-quarters of the bell's width, floating in loops above the bell | **96, each under a fifth of the bell's width**, hanging and trailing; water is thick to them (they keep little speed) |
+| **oral arms** | four, long, frilled, heavy | four ribbons | four broad frilled ribbons, heavier and more damped |
+| **flesh** | soft, milky, translucent; four pale gonads show through | a glossy glass dome with coloured dots on it | matte and wet, no hard gloss; four pale horseshoe gonads; the pacemaker dots and the swum-path line are hidden outside the lab views |
+| **distance per beat** | about a third of a bell width (an estimate from typical speeds, not from a fetched source) | 0.37 | 0.74 was measured after the pulse was slowed; the thrust was then cut to 0.42 of that. Not re-measured. |
+
+**"Frozen or stalled":** the page was too heavy for a phone. Phones now get a lighter build:
+- a coarser body (912 tetrahedra instead of 1,686);
+- no refraction pass for the bell;
+- a third of the light shafts and marine snow;
+- fewer pixels;
+- and the page lowers its resolution further if frames stay slow.
+
+In this session's GPU-less browser at phone size, a frame took 56 ms after the page had lowered its resolution to its floor of 0.6×; the floor was then raised to 0.8×, for sharpness. A real phone has a GPU; its frame rate is not measured.
+
+**A bug made and caught while doing this:** a comment inserted mid-line disabled the animation loop in the working copy (the clock stayed at zero). It was found by the phone test before any push.
+
+**Not yet judged:**
+- **By eye, against video.** The numbers now sit in the real range, but whether it *looks* alive needs someone to watch it beside footage. Good references to watch:
+  - the supplementary movies of Gemmell et al. 2013 (PNAS);
+  - any aquarium footage of moon jellies from the side.
+- **Still simplified.** The water is a thrust model, so the bell does not feel drag across its surface, and the margin's flap is drawn, not simulated.
+
 ## 5a · What is not built
 - **Real fluid:** the water is a thrust model with drawn vortex rings, not a fluid simulation.
 - **Seeing:** the eyes sense the light's direction and the wall's nearness; they do not form images.
