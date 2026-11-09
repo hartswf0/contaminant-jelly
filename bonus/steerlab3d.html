@@ -25,7 +25,7 @@ canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-acti
 <div class="ui" id="card"><div class="k" id="ck"></div><h1 id="ch"></h1>
   <div class="brief"><div class="vb" id="cv"></div><div><ol class="how" id="chow"></ol></div></div>
   <p id="cp"></p><div class="rooms" id="rooms"></div>
-  <div class="go">TOUCH TO BEGIN</div><div class="lk">In space: touch a thing and an arm reaches it, wherever it is in depth. In open water an arm braces beside the bell; hold the finger still and it pushes deeper. Pull a planted finger toward the bell to haul; lift in turn to peel; flick to throw. A finger on the bell holds the jelly itself. The dial bottom-left turns the view; Q E R F and the wheel too. Desktop: hold 1 to 5 to plant fingers at the mouse. · <a href="steerlab.html">the flat lab</a> · <a href="sea.html">the open water</a> · <a href="bodies.html">ten bodies →</a> · <a href="SCION_STEERLAB3D.md">the theory</a></div></div>
+  <div class="go">TOUCH TO BEGIN</div><div class="lk">In space: touch a thing and an arm reaches it, wherever it is in depth. In open water an arm braces beside the bell; hold the finger still and it pushes deeper. Pull a planted finger toward the bell to haul; lift in turn to peel; flick to throw. A finger on the bell holds the jelly itself. The camera chip above the dial changes the camera (C); the dial turns the view and drifts home, double-tap it for home now (Q E, V, the wheel to zoom). The view never turns while an arm is planted. Desktop: hold 1 to 5 to plant fingers at the mouse. · <a href="steerlab.html">the flat lab</a> · <a href="sea.html">the open water</a> · <a href="bodies.html">ten bodies →</a> · <a href="SCION_STEERLAB3D.md">the theory</a> · <a href="SCION_CAMERA.md">the camera</a></div></div>
 <script type="module">
 import * as THREE from 'three';
 import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
@@ -34,6 +34,7 @@ import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RIGS, makeRig} from '../current/drift/rigs.js';
 import {makeArms3D} from './tentacles3d.js';
+import {makeCam, MODES} from './cam3d.js';
 const $ = id => document.getElementById(id), Q = new URLSearchParams(location.search), CL = '../current/drift/data/crashlab/', GEST = 'cineosis-hand-butter', NG = 64;
 let RID = Q.get('rig'); if (!RID) try { RID = localStorage.getItem('cj-rig'); } catch (e) {} if (!RIGS.some(r => r.id === RID)) RID = 'celluloid';
 const V3 = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z), UP = V3(0, 1, 0);
@@ -127,20 +128,20 @@ const env = {
     else if (name === 'hauled') { const re = d.an.obj; if (re && !re.got) { re.got = true; S.reels++; move(`reel ${S.reels}${RM.needReels ? ' of ' + RM.needReels : ''}`, [10, 30, 10, 30, 10]); if (RM.needReels && S.reels >= RM.needReels && !EXIT.open) { EXIT.open = true; say('the way out has opened overhead', 3); } } }
     else if (name === 'caught up') { say('the film caught up with that moment: the arm lets go'); buzz([6, 12, 6]); pluck(990, .04); } else if (name === 'arrived') move('pulled yourself over'); else if (name === 'full') say('all six arms are taken'); } };
 // ---------------------------------------------------------------- input
-const cv = $('gl'), DIAL = () => ({x: 70, y: innerHeight - 90, r: 46});
-const down = (id, sx, sy) => { const D = DIAL(); if (Math.hypot(sx - D.x, sy - D.y) < D.r + 10) { S.dial = {id, x: sx, y: sy}; return; }
+const cv = $('gl'), CAM = makeCam(THREE, cam, {mode: {cathedral: 'chase', worm: 'frame', gyre: 'side', sky: 'frame'}[RK], modes: ['chase', 'frame', 'side', 'top', 'orbit'], yaw: .6, dist: 17, floor: floorY});
+const down = (id, sx, sy) => { const r = CAM.dialDown(id, sx, sy); if (r) { if (r === 'chip') say(MODES[CAM.C.mode].line); return; }
   const bs = screen(B.p); if (!S.grab && bs && Math.hypot(bs[0] - sx, bs[1] - sy) < 46) { S.grab = {id, r: rayAt(sx, sy)}; S.scr.set(id, [sx, sy]); pluck(440, .04); buzz(6); return; }
   const f = AR.down(id, rayAt(sx, sy), sx, sy, B, env, T); if (f) S.scr.set(id, [sx, sy]); };
-const mv = (id, sx, sy) => { if (S.dial && S.dial.id === id) { S.yaw -= (sx - S.dial.x) * .012; S.pitch = THREE.MathUtils.clamp(S.pitch + (sy - S.dial.y) * .008, -.6, 1.3); S.dial.x = sx; S.dial.y = sy; return; }
+const mv = (id, sx, sy) => { if (CAM.dialMove(id, sx, sy)) return;
   if (S.grab && S.grab.id === id) { S.grab.r = rayAt(sx, sy); S.scr.set(id, [sx, sy]); return; } if (!AR.F.has(id)) return; S.scr.set(id, [sx, sy]); AR.move(id, rayAt(sx, sy), sx, sy, T); };
-const up = (id, intr) => { S.scr.delete(id); if (S.dial && S.dial.id === id) { S.dial = null; return; } if (S.grab && S.grab.id === id) { S.grab = null; if (!intr && B.v.length() > 7) move('flung'); return; } AR.up(id, intr, B, env, T); };
+const up = (id, intr) => { if (CAM.dialUp(id)) return; S.scr.delete(id); if (S.grab && S.grab.id === id) { S.grab = null; if (!intr && B.v.length() > 7) move('flung'); return; } AR.up(id, intr, B, env, T); };
 cv.addEventListener('pointerdown', e => { if (S.state !== 'play') return; try { cv.setPointerCapture(e.pointerId); } catch (x) {} const now = performance.now();
   if (now - (S.lastTap || 0) < 300 && Math.hypot(e.clientX - S.lx, e.clientY - S.ly) < 40 && !AR.F.size) { stroke(); S.lastTap = 0; return; } S.lastTap = now; S.lx = e.clientX; S.ly = e.clientY; down('p' + e.pointerId, e.clientX, e.clientY); });
 cv.addEventListener('pointermove', e => { S.mx = e.clientX; S.my = e.clientY; mv('p' + e.pointerId, e.clientX, e.clientY); });
 cv.addEventListener('pointerup', e => up('p' + e.pointerId, false)); cv.addEventListener('pointercancel', e => up('p' + e.pointerId, true)); cv.addEventListener('contextmenu', e => e.preventDefault());
-cv.addEventListener('wheel', e => { e.preventDefault(); S.dist = THREE.MathUtils.clamp(S.dist * Math.exp(e.deltaY * .001), 8, 45); }, {passive: false});
+cv.addEventListener('wheel', e => { e.preventDefault(); CAM.zoom(Math.exp(e.deltaY * .001)); }, {passive: false});
 addEventListener('pointermove', e => { S.mx = e.clientX; S.my = e.clientY; }, {passive: true});
-const keys = new Set(); addEventListener('keydown', e => { if (e.repeat) return; const k = e.key; keys.add(k.toLowerCase()); if (S.state === 'card') { start(); return; } if (k >= '1' && k <= '5') down('k' + k, S.mx ?? innerWidth / 2, S.my ?? innerHeight / 2); if (k === ' ') { e.preventDefault(); stroke(); } if (k.toLowerCase() === 'x') reset(); if (k === 'Escape') location.href = 'steerlab.html'; });
+const keys = new Set(); addEventListener('keydown', e => { if (e.repeat) return; const k = e.key; keys.add(k.toLowerCase()); if (S.state === 'card') { start(); return; } if (k >= '1' && k <= '5') down('k' + k, S.mx ?? innerWidth / 2, S.my ?? innerHeight / 2); if (k === ' ') { e.preventDefault(); stroke(); } if (k.toLowerCase() === 'x') reset(); if (k.toLowerCase() === 'c') say(MODES[CAM.cycle()].line); if (k.toLowerCase() === 'v') CAM.recentre(); if (k === 'Escape') location.href = 'steerlab.html'; });
 addEventListener('keyup', e => { keys.delete(e.key.toLowerCase()); if (e.key >= '1' && e.key <= '5') up('k' + e.key, false); });
 addEventListener('blur', () => { for (const id of [...AR.F.keys()]) up(id, true); });
 // ---------------------------------------------------------------- feedback
@@ -175,11 +176,10 @@ function frame(now) { requestAnimationFrame(frame); const dt = Math.min(1 / 30, 
   if (S.state === 'play' && !S.done && EXIT.open && B.p.distanceTo(EXIT.p) < EXIT.r + .6) { S.done = true; const secs = (T - S.t0).toFixed(1), names = [...new Set(S.moves.map(m => m.n.split(' ·')[0]))]; say(`${RM.name}: through in ${secs} s · ${names.length} moves`, 6); buzz([20, 40, 20, 40, 80]); pluck(784, .06);
     try { const Sx = JSON.parse(localStorage.getItem('cj-sealed') || '{}'); Sx['steer3d-' + RK] = {stars: Math.min(3, names.length), secs: +secs, clips: 0, t: Date.now()}; localStorage.setItem('cj-sealed', JSON.stringify(Sx)); } catch (e) {}
     const ks = Object.keys(ROOMS), nx = ks[(ks.indexOf(RK) + 1) % ks.length], a = $('next'); a.href = `?room=${nx}`; a.textContent = `ROOM ${ROOMS[nx].n} · ${ROOMS[nx].verb} →`; a.style.display = 'block'; }
-  // ---- the camera: orbits the bell (dial, Q E R F, wheel), drifting a little behind its motion; it frames the arms you are holding
-  if (keys.has('q')) S.yaw += dt * 1.2; if (keys.has('e')) S.yaw -= dt * 1.2; if (keys.has('r')) S.pitch = Math.min(1.3, S.pitch + dt); if (keys.has('f')) S.pitch = Math.max(-.6, S.pitch - dt);
-  if (!S.dial && B.v.length() > 4 && !AR.F.size) { const want = Math.atan2(-B.v.x, -B.v.z) + Math.PI; let d = want - S.yaw; d = Math.atan2(Math.sin(d), Math.cos(d)); S.yaw += d * dt * .3; }
-  const held = AR.arms.filter(a => a.mode === 'latch' && a.anc), focus = B.p.clone(); held.forEach(a => focus.addScaledVector(a.anc.p, .25 / held.length * held.length / (held.length + 1))); camT.lerp(focus, 1 - Math.pow(.05, dt));
-  const spread = held.reduce((m, a) => Math.max(m, a.anc.p.distanceTo(B.p)), 0), dist = S.dist + spread * .5; cam.position.copy(camT).add(V3(Math.sin(S.yaw) * Math.cos(S.pitch), Math.sin(S.pitch), Math.cos(S.yaw) * Math.cos(S.pitch)).multiplyScalar(dist)); cam.lookAt(camT);
+  // ---- the camera (cam3d.js): it never turns while an arm is planted (the arms are aimed through it); it frames what you hold
+  ['q', 'e'].forEach(k => keys.has(k) && CAM.key(k, dt)); const held = AR.arms.filter(a => a.mode === 'latch' && a.anc);
+  const tgt = RM.worm ? wormPos(WORM.live) : RM.sky ? (REELS.filter(r => !r.got).sort((a, b) => a.p.distanceTo(B.p) - b.p.distanceTo(B.p))[0]?.p || EXIT.p) : EXIT.p;
+  CAM.step(dt, {p: B.p, v: B.v, axis: V3(0, 1, 0).applyQuaternion(B.q), target: EXIT.open || RM.worm || RM.sky ? tgt : null, extra: held.length ? held.map(a => a.anc.p) : null, hush: AR.F.size > 0 || !!S.grab, carve: false});
   // ---- draw
   body.position.copy(B.p); body.quaternion.copy(B.q); const ps = innerHeight * R.getPixelRatio(), us = ps * .5 / Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)); U.uScale.value = us;
   rig.update({t: T, dt, cam: cam.position, ph: T - B.lastStroke < 1 ? (T - B.lastStroke) : (T * .35) % 1, glow: .15 + Math.min(1, B.v.length() / 10) * .4, hurt: 0, scale: ps * .0095 * 1.1, lit: held.length});
@@ -209,10 +209,10 @@ function drawGuide() { const W = innerWidth, H = innerHeight; if (gd.width !== W
   for (const a of AR.arms) { const len = 26 + Math.min(32, a.ten * 1.1), owned = a.owner !== null || (a.anc && a.anc.cast); gx.strokeStyle = owned ? `rgba(${a.col.map(v => v * 255 | 0)},${.5 + Math.min(.5, a.ten / 30)})` : 'rgba(130,147,164,.4)'; gx.lineWidth = owned ? 2 + Math.min(3, a.ten / 12) : 1.2; gx.beginPath(); gx.moveTo(cx + Math.sin(a.a) * 22, cy + Math.cos(a.a) * 22); gx.lineTo(cx + Math.sin(a.a) * len, cy + Math.cos(a.a) * len); gx.stroke(); if (a.slipK > .7) { gx.fillStyle = 'rgba(255,90,70,.9)'; gx.beginPath(); gx.arc(cx + Math.sin(a.a) * len, cy + Math.cos(a.a) * len, 4, 0, 7); gx.fill(); } }
   gx.fillStyle = 'rgba(207,221,232,.6)'; gx.font = "300 10px 'JetBrains Mono', monospace"; gx.textAlign = 'center'; gx.fillText('posture · tilt dot', cx, cy + 78);
   // the view dial
-  const D = DIAL(); gx.strokeStyle = 'rgba(207,221,232,.35)'; gx.lineWidth = 1.5; gx.beginPath(); gx.arc(D.x, D.y, D.r, 0, 7); gx.stroke(); gx.fillStyle = 'rgba(240,163,90,.8)'; gx.beginPath(); gx.arc(D.x + Math.sin(S.yaw) * D.r * .7, D.y + Math.cos(S.yaw) * D.r * .7 * Math.cos(S.pitch), 6, 0, 7); gx.fill(); gx.fillStyle = 'rgba(207,221,232,.6)'; gx.fillText('view', D.x, D.y + D.r + 14);
+  CAM.draw(gx); gx.font = "300 10px 'JetBrains Mono', monospace"; gx.textAlign = 'center';
   // the fourth dimension: the film's timeline, the playing frame, and every moment an arm holds
   if (RM.worm) { const x0 = W * .2, x1 = W * .8, y = H - 34, X = t => x0 + (x1 - x0) * t / (NG - 1); gx.strokeStyle = 'rgba(207,221,232,.3)'; gx.beginPath(); gx.moveTo(x0, y); gx.lineTo(x1, y); gx.stroke(); gx.fillStyle = 'rgba(207,221,232,.9)'; gx.fillRect(X(WORM.live) - 1, y - 9, 2, 18); gx.fillText('now', X(WORM.live), y - 13);
     AR.arms.forEach(a => { if (a.mode === 'latch' && a.anc && a.anc.type === 'frame') { gx.fillStyle = `rgb(${a.col.map(v => v * 255 | 0)})`; gx.beginPath(); gx.arc(X(a.anc.t), y, 6, 0, 7); gx.fill(); const e = IMG[Math.round(a.anc.t)]; if (e.ok) gx.drawImage(e.im, X(a.anc.t) - 30, y - 72, 60, 45); } }); gx.fillStyle = 'rgba(207,221,232,.6)'; gx.textAlign = 'left'; gx.fillText(`time · frame ${Math.round(WORM.live) + 1} of ${NG} playing`, x0, y + 18); } }
 requestAnimationFrame(frame);
-window.__lab3 = {B, AR, env, down, up, mv, rayAt, cam, start, S, REELS, KELP, TILES, WORM, EXIT, wormPos, screen, get T() { return T; }};
+window.__lab3 = {CAM, B, AR, env, down, up, mv, rayAt, cam, start, S, REELS, KELP, TILES, WORM, EXIT, wormPos, screen, get T() { return T; }};
 </script></body></html>
