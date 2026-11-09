@@ -21,6 +21,7 @@ export function makeNerve(o = {}) {
     for (const r of M.rh) { if (r.silent) continue; r.charge += dt * M.warm / r.period; if (r.charge >= 1) { if (!fire(r.node, 'lead')) r.charge = .97; } }
     for (let pass = 0; pass < 3; pass++) for (let n = 0; n < N; n++) if (M.at[n] <= t) { M.at[n] = Infinity; fire(n, 'wave'); }
     for (let n = 0; n < N; n++) { const a = twitch(t - M.tw[n]); M.dact[n] = (a - M.act[n]) / Math.max(dt, 1e-4); M.act[n] = a; } };
+  M.twitchAt = (n, lag) => twitch(M.t - M.tw[n] - lag);   // the muscle's pull at a stretch of ring, as it was `lag` seconds ago
   M.stimulate = i => fire(M.rh[i].node, 'lead');                       // a touch makes a pacemaker fire now
   M.oneWay = n => { fire(n, 'wave', -1); M.ref[(n - 1 + N) % N] = M.t + REFR; };   // start a wave that can only go one way round
   // beats a minute over the last 12 s; two pacemakers firing within 0.6 s of each other are one beat (a new leader takes a few beats to capture the rest)
