@@ -8,7 +8,7 @@
 - **Variables:** every number that shapes the view is a variable you can see and move.
 - **Lenses:** the variables are grouped into nine lenses. Each lens is a way of thinking with the camera: what is the camera, in relation to the jelly?
 
-**Where:** `bonus/sea.html`. The **CAMERA ·** button sits at the top right. C on a keyboard cycles the lenses, and `?cam=<lens>` opens with one. Your settings are remembered (`cj-sea-cam`).
+**Where:** `bonus/sea.html`. The camera now lives in the world (§5); the slider panel is a tuning tool behind `?camdev=1`.
 
 ## 1 · The variables
 | variable | what it changes | range |
@@ -62,10 +62,47 @@
 
 **Distances run long in the test.** Distances sat 6–13 m longer than each lens's setting. Part of that is the zoom bar's starting point; part is the camera's spring lag behind a jelly forced to a constant 9 m/s. In play the jelly accelerates and coasts, so the gap is smaller. Feel on a real phone is not yet judged.
 
+## 5 · The camera in the world (no panel)
+**The direction:** "The camera controls cover what they control. Keep them in the game, more diegetic, in the world: see the vision. The camera is the game; the game and the camera are all the same."
+
+**The principle:**
+- **Nothing about the camera sits over the water.** There is no panel and no button.
+- **Choosing how you see is part of exploring:** you find lenses, you swim into other cameras' gaze, you ride with a creature that sees.
+
+**Your own lenses are glass shells:**
+- **Collecting:** CHASE is yours from the start. LEAD, SHOULDER, PROFILE, WIDE and BELL-EYE drift in the water near the start as glowing shells, each labelled in the water. Swim through one to keep it; it says what kind of camera it is.
+- **Orbiting:** the lenses you own orbit your bell as small orbs, and the one you are using glows brighter. Your inventory is visible on your body.
+- **Choosing:** hold your finger on the bell (half a second, without moving). The orbs open into a ring around it; drag toward one and let go.
+- **Remembered:** your lenses are saved (`cj-sea-lenses`). C on a keyboard cycles them.
+
+**Placed cameras stand in the sea, and show their gaze** (Stunt Island's cameras, made into places):
+- **Three tripods,** on three splayed legs, each with a lens at the top. Each shows a cone of light where it is looking. Swim into a tripod's light and it takes the view: a hard cut to the post, a 46° lens, watching you. Swim out of the light and the view eases back to your own lens ("the view is yours again").
+- **The spyglass,** a long tube of rings on a ridge, with a narrow cone reaching 120 m. Inside it, the view is a 13° lens from the ridge: you become a far figure in the wildlife cameraman's eye.
+- **The ray,** a manta of light slowly circling high over the start. Swim up to it (within 10 m) and you see what it sees: the view rides just above it as it circles. It lets go when you are 46 m away.
+
+**Labels are in the water:**
+- "a tripod · swim into its light";
+- "the tripod is filming you";
+- "the ray · swim up to it to see what it sees".
+
+**The vision is visible:** every placed camera's frame is drawn as light in the sea, so you can see where you would be filmed before you are, and swim into the frame on purpose.
+
+**Tested (simulated input):**
+| test | result |
+|---|---|
+| Starting | only CHASE owned; no camera button in the interface |
+| Swimming through the LEAD shell | LEAD collected, and the view switched to it |
+| Holding the bell 1.6 s with real mouse input | the ring opened; dragging up selected the top orb (CHASE); letting go chose it |
+| Inside a tripod's cone | the view cut to the post (0.00 m from its lens), at 46° |
+| Inside the spyglass's cone | the view was from the spyglass, at 13° |
+| Reaching the ray | its view; swimming far away gave the view back |
+| Into a second tripod's light, then out behind it | it filmed, then let go |
+
+**Fixed along the way:**
+- **The ring's hint overlapped the bottom orb's label.** The "drag to a lens" hint now sits below the ring.
+
 ## 4 · Next
-- **Let a lens be chosen by a place:**
-  - TRIPOD at the reef crossings;
-  - DRONE over the currents;
-  - LONG LENS near the predators.
+- **More placed cameras by place:** tripods at the reef crossings and a spyglass near the predators. The tripods, spyglass and ray near the start are the first.
+- **A lens that fits a mode:** e.g. PROFILE offered when you take up REINS.
 - **Record a swim in the open water for the Director** (as in Four-Space), so any lens can film it afterward.
 - **Show the variables on the glass while the panel is open:** draw the window and the look-ahead point.
