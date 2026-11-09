@@ -92,3 +92,40 @@ Because it reads the live nerve signal, a silenced or cut ring still shows in th
 **Not yet judged:**
 - **Motion, by eye.** The stills show the fringe hanging from the edge and flaring with the squeeze. Whether the weight now reads right in motion needs watching.
 - **The oral arms.** They were softened after the last stills and not looked at again.
+
+## 8 · A third pass: the oral arms, a white rod, and the sampler
+**The direction:** "Take new stills of the oral arms and test the sampler."
+
+**The oral arms.** In the first new stills they read as grey smoke. They are now more opaque and pinker, and read as four soft frilled columns hanging from the mouth.
+
+**A white beaded rod under the mouth** (found in the stills; no measure in CHECK caught it).
+| guess | test | result |
+|---|---|---|
+| stung plankton travelling to the mouth in a straight line | gave their path a wobble; re-shot | rod still there: wrong |
+| the bell's inflow gathering plankton to one point | faded the inflow near the mouth; re-shot | rod still there: wrong |
+| (stopped guessing) which object holds a vertical column of points? | counted, per object, the points sharing one spot | **the plankton: 81 of 420 in one column at the origin** |
+
+**The cause:** the plankton were never scattered at the start. All 420 began at the origin, where the jelly begins, and the inflow drew them out into a string. They are now scattered on the first frame. The rod is gone. The two changes made on the wrong guesses were kept: neither does harm.
+
+**The lesson for the loop:** step 4 says to name the one cause the failing measure points to. With no measure there was only a guess, twice. Ask the running scene what the thing *is* before changing anything.
+
+**The sampler** (`?sampler`; simulated browser, real clicks and keys):
+| test | result |
+|---|---|
+| opens | the panel shows the bank loaded and eight pads |
+| pad 1 | plays the first slice (0.9 s) and fires pacemaker 1 |
+| key 5 | plays the fifth slice |
+| a tap on the rim | plays the slice of the nearest pacemaker |
+| SOUND off | no voices |
+| DRIFT | the jelly's own beats play the pads: three voices in 9 s, all the leader's |
+| LOAD AUDIO (a 2 s file) | cut into eight slices of 0.25 s |
+| TREBLO BANK | restores the bank |
+| FILM | closes the sampler |
+| errors | none |
+
+**After these changes the check still passed all eight measures** (phone build).
+
+**Not yet judged:**
+- **The sampler by ear.** This machine cannot listen.
+- **The oral arms in motion.**
+- **The plankton up close.** In the stills some specks read as small squares, not soft dots.
