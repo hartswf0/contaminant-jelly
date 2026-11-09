@@ -1,8 +1,2 @@
 current/drift/play/f_*/
 labels/__pycache__/
-
-# Fab (Quixel) source scans: licensed for use, not for redistribution; kept out of the public repository.
-# (assets/fab/ also holds CC0 substitutes, which are published.)
-assets/fab/thai-beach-rock.glb
-assets/fab/thai-beach-coral.glb
-assets/fab/thai-beach-sand/

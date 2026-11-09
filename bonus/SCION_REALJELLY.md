@@ -108,7 +108,33 @@ Each was missing; each is now built.
 - **Frame rate on a phone.** This adds shader work to every surface, and the shafts and snow overdraw.
 - **Whether the tentacles now read as good in motion.** I have only stills.
 
-**"Include them all":** every asset in both packs is used in the scene. On the public site that is every CC0 asset. The three Quixel scans (Thai Beach rock, coral, sand) are in the scene only where the files exist locally, because their own note says to keep them out of the public repository. Publishing them is the owner's decision, to be checked against the Fab licence.
+## 5c · One scale, and the Quixel scans published
+**The direction:** "Un-ignore the Quixel scans and include them on the public site. The barrels are scaled wrong and the other stuff looks wrong too. Further: 404."
+
+**The scale was wrong because the scene had none.** The jelly's bell is 2 units wide and the barrel was 1.6 units tall, so the jelly read as over a metre across beside a 93 cm drum. The scene now has one scale: **1 unit = 25 cm.**
+
+| thing | real size | in the scene |
+|---|---|---|
+| the jelly | a 50 cm moon jelly | 2 units wide (unchanged) |
+| a barrel | 93 cm tall | 3.7 units (was 1.6); three of them: on its side, upright and half sunk, rolled away |
+| the hull | a section of a small ship, 3.2 m across and 6 m long | radius 6.5, length 24 (was 2.7 and 10); the ribs, the breach and the fallen deck plate scaled with it |
+| the tank | 11 m across, 4.5 m deep | radius 22 (was 10) |
+| the Quixel beach rock | 1.5 m | five, at 0.65 to 1.25 times true size |
+| the Quixel coral | 30 cm | nine, around the rocks, at about true size |
+| the CC0 coast rocks | pieces of a 20 to 60 m scan | used as low outcrops of a shelf, scaled down |
+
+**The Quixel scans are published,** by the owner's instruction: `assets/fab/thai-beach-rock.glb`, `thai-beach-coral.glb` and `thai-beach-sand/` are no longer ignored. The public scene now has both sets of rocks, the corals, and the beach sand on the floor.
+
+**Also fixed:**
+- **Plankton drew as hard squares** close to the camera; they are soft round specks now.
+
+**The 404:** every Pages deployment that completed succeeded, and all the files the page needs are in the repository. The deployment that first carried `realjelly.html` was cancelled when the next push arrived, so the page did not exist on the site for about nine minutes (21:24 to 21:33 UTC). The live site cannot be reached from the build session to confirm it now loads.
+
+**Tested:** the rescaled scene loads with every asset and no errors. Screenshots show the barrel larger than the jelly, the hull's ribs arching over it, and the rocks and coral on the bed.
+
+**Not yet judged:**
+- whether the jelly's behaviours (the wall, the wreck shot) still read well in the larger tank;
+- frame rate on a phone.
 
 ## 5a · What is not built
 - **Real fluid:** the water is a thrust model with drawn vortex rings, not a fluid simulation.
