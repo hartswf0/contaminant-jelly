@@ -17,13 +17,19 @@ canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-acti
 #rec{top:calc(11vh + 12px);left:18px;font:300 11px 'JetBrains Mono',monospace;color:#e6edf3;opacity:0;pointer-events:none;text-shadow:0 0 6px #000}body.film #rec{opacity:.85}#rec b{color:#ff5a48}
 @media (max-width:640px){#what{display:none}#top{font-size:10px}#bar button{font-size:10px;padding:6px 8px}}
 #start{inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 9vw;background:rgba(7,12,11,.82);cursor:pointer}#start .k{font:700 11px system-ui;letter-spacing:.3em;color:var(--gold)}#start h1{margin:10px 0 0;font:900 clamp(34px,7vw,72px)/1 system-ui;letter-spacing:.05em}#start p{max-width:580px;font:italic clamp(16px,2.2vw,20px)/1.5 Georgia,serif;color:#dfe6e0;margin:16px 0 0}#start .go{margin-top:24px;font:600 15px system-ui;letter-spacing:.14em;color:var(--gold)}
+#sampler-panel[hidden]{display:none}#sampler-panel{padding:7px 10px;background:#081a20e8;border:1px solid #355966;border-radius:14px;max-width:680px;text-align:center}#sampler-panel output{display:block;color:#c1e4e3;font:11px system-ui;margin:4px}#bar #sampler-panel button{color:#b9dce0}#bar #sampler-panel button.on{color:#081a20;background:#93e5dc}#sampler-panel input[type=file]{position:absolute;width:1px;height:1px;opacity:0}#sampler-panel label:focus-within{outline:2px solid #93e5dc}
 </style></head><body>
 <canvas id="gl" aria-label="A moon jellyfish with its pacemakers, nerve ring and muscle visible, swimming"></canvas><canvas class="ui" id="ov"></canvas>
 <div class="ui" id="top"><div><b>THE REAL JELLY</b><span id="what"></span></div><div id="stat"></div></div>
 <div class="ui" id="say"></div>
 <div class="ui" id="bar">
-  <div class="row"><button id="film" class="on">FILM ▶</button><span class="l">see</span><button data-v="flesh" class="on">FLESH</button><button data-v="nerve">NERVES</button><button data-v="muscle">MUSCLE</button><button data-v="strain">STRAIN</button><button id="labb">LAB</button><button id="snd" class="on">SOUND</button></div>
+  <div class="row"><button id="film" class="on">FILM ▶</button><span class="l">see</span><button data-v="flesh" class="on">FLESH</button><button data-v="nerve">NERVES</button><button data-v="muscle">MUSCLE</button><button data-v="strain">STRAIN</button><button id="labb">LAB</button><button id="snd" class="on">SOUND</button><button id="sampler" aria-controls="sampler-panel" aria-pressed="false">SAMPLER</button></div>
   <div class="row" id="lab" style="display:none"><span class="l">touch to</span><button id="chk">CHECK</button><button data-t="stim" class="on">FIRE</button><button data-t="silence">SILENCE</button><button data-t="cut">CUT THE RING</button><span class="l">try</span><button data-p="intact">INTACT</button><button data-p="one">ONE PACEMAKER</button><button data-p="trap">TRAPPED WAVE</button><button id="undo">UNDO</button><label>cold <input type="range" id="warm" min="50" max="200" value="100"> warm</label><label>soft <input type="range" id="firm" min="15" max="90" value="50"> firm</label></div>
+  <section id="sampler-panel" aria-label="Jelly sampler" hidden>
+    <div class="row" data-pads></div>
+    <div class="row"><button type="button" data-drift aria-pressed="false">DRIFT</button><label>LOAD AUDIO<input type="file" accept="audio/*" aria-label="Load audio and split it into eight slices"></label><button type="button" data-reset>TREBLO BANK</button></div>
+    <output aria-live="polite">Tap a rim node or play 1–8</output>
+  </section>
 </div>
 <div class="ui" id="lb1"></div><div class="ui" id="lb2"></div><div class="ui" id="cap"></div><div class="ui" id="rec"></div>
 <div class="ui" id="start"><div class="k">BONUS · THE REAL JELLY · THE JELLY REEL</div><h1>A jelly, from the inside</h1><p>No brain: eight clocks, a nerve ring, a little muscle, a spring of jelly, and the water. It rights itself, follows the light, stings and eats, and learns the wall. Tap the water to move the light; tap the jelly to touch it; or press FILM and watch.</p><div class="go">TOUCH TO BEGIN · WITH SOUND</div></div>
@@ -32,6 +38,7 @@ import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {makeGel} from './jellyjar-sim.js';
 import {makeNerve} from './thinkjelly-sim.js';
+import {makeJellySampler} from './realjelly-sampler.js';
 const $ = id => document.getElementById(id), V3 = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z), TAU = Math.PI * 2;
 // ================================================================ the animal: jelly (a tetrahedral soft body), muscle (its rim edges, which shorten), nerves (a ring and eight pacemakers)
 // phones get a lighter build: a coarser body, no refraction pass, fewer shafts and flecks, fewer pixels
@@ -228,10 +235,14 @@ const SHOTS = [
   {min: 14, view: 'flesh', dist: 17, pitch: .16, cap: 'On the seabed, a wreck. Put the light inside it, and the jelly goes down to look for the way in.', pre: () => LIGHT.set(9.6, TANK.y0 + 3.2, -1.6)},
   {min: 12, view: 'nerve', dist: 13, pitch: .7, cap: 'A box jelly learns in minutes to keep off a wall it has bumped into. So does this one: every bump teaches it to turn sooner.', pre: () => { const a = Math.atan2(COM.z, COM.x); LIGHT.set(Math.cos(a) * (TANK.r + 4), COM.y, Math.sin(a) * (TANK.r + 4)); }},
   {min: 7, view: 'flesh', dist: 10, pitch: .3, cap: 'No brain. A ring, eight clocks, a spring, and the water.', pre: () => LIGHT.set(0, 8, 0)}];
-function startFilm() { S.film = {i: -1, t0: T, beat: false}; document.body.classList.add('film'); $('camp')?.remove(); nextShot(); }
+function startFilm() { if (sampler.active) setSampler(false); S.film = {i: -1, t0: T, beat: false}; document.body.classList.add('film'); $('camp')?.remove(); nextShot(); }
 function nextShot() { const f = S.film; f.i++; if (f.i >= SHOTS.length) { stopFilm(true); return; } const sh = SHOTS[f.i]; f.t0 = T; sh.pre && sh.pre(); setView(sh.view); S.dist = sh.dist; S.pitch = sh.pitch; S.yaw += 1.1; camT.copy(COM); $('cap').textContent = sh.cap; }
 function stopFilm(done) { if (!S.film) return; S.film = null; document.body.classList.remove('film'); setView('flesh'); S.dist = 6.5; S.pitch = .4; if (done) say('That was the Jelly Reel. Now it is yours: tap the water to move the light, tap the jelly to touch it.', 6); }
-function onTap(x, y) { if (S.film) { stopFilm(false); say('The film is stopped. Tap the water to move the light; tap the jelly to touch it.', 4); return; } if (S.lab) { tapAt(x, y); return; }
+function onTap(x, y) { if (S.film) { stopFilm(false); say('The film is stopped. Tap the water to move the light; tap the jelly to touch it.', 4); return; } if (sampler.active) {
+    let hit = -1, nearest = 38;
+    rhoW.forEach((point, i) => { const p = scr(point); if (!p) return; const d = Math.hypot(x - p[0], y - p[1]); if (d < nearest) { hit = i; nearest = d; } });
+    if (hit >= 0) { playPad(hit); return; }
+  } else if (S.lab) { tapAt(x, y); return; }
   ndc.set(x / innerWidth * 2 - 1, -(y / innerHeight) * 2 + 1); ray.setFromCamera(ndc, cam); bellGeo.computeBoundingSphere(); if (ray.intersectObject(bell).length) { flare(1); NV.stimulate(Math.floor(Math.random() * 8)); try { navigator.vibrate && navigator.vibrate([8, 20, 8]); } catch (e) {} say('Touched: light runs down its canals, and it pulses to get away.', 3); return; }
   const p = V3(); if (ray.ray.intersectPlane(new THREE.Plane().setFromNormalAndCoplanarPoint(cam.getWorldDirection(V3()), COM), p)) { p.sub(COM).clampLength(0, 9).add(COM); LIGHT.copy(p); say('The light is there now. Its eyes are on the rim: the side away from the light pulls harder, and it turns.', 4); } }
 // ================================================================ CHECK: measure the running animal against target ranges, beat by beat. This is the instrument of the repair loop (SCION_REPAIR_LOOP.md).
@@ -247,6 +258,33 @@ function drawCheck() { if (!CK.on) return; const x = 12, y0 = 84; g2.fillStyle =
   TARGET.forEach(([k, name, lo, hi], i) => { const v = CK.out[k], ok = v !== undefined && v >= lo && v <= hi; g2.fillStyle = v === undefined ? '#8293a4' : ok ? '#8fe0a0' : '#ff7a66'; g2.fillText(`${v === undefined ? '·' : ok ? '✓' : '✗'} ${name}`, x, y0 + 12 + i * 16); g2.textAlign = 'right'; g2.fillText(`${v === undefined ? '—' : v.toFixed(v < 10 ? 2 : 0)}  (${lo}–${hi})`, 318, y0 + 12 + i * 16); g2.textAlign = 'left'; }); }
 // ================================================================ interfering, and taking it back
 const S = {film: null, lab: false, view: 'flesh', tool: 'stim', yaw: .5, pitch: .5, dist: 6.2, drag: null, undo: [], sayT: 0, hist: [], act: [], started: false, pinch: null, ptrs: new Map()};
+const sampler = makeJellySampler($('sampler-panel'), () => AC, () => bus, playPad, () => sndOn);
+function setSampler(on) {
+  if (on && S.film) stopFilm(false);
+  sampler.setEnabled(on);
+  $('sampler').classList.toggle('on', on);
+  $('sampler').setAttribute('aria-pressed', on);
+  if (on) {
+    S.lab = false;
+    $('lab').style.display = 'none';
+    $('labb').classList.remove('on');
+    setView('nerve');
+    if (watG) watG.gain.value = 0;
+    say('Each pacemaker holds a sample. Tap the rim or play pads 1–8. DRIFT lets the jelly play its own pulses.', 5);
+  } else if (watG) watG.gain.value = sndOn ? .12 : 0;
+}
+function playPad(i) {
+  if (!sampler.active) return;
+  AC?.resume().catch(() => {});
+  const p = scr(rhoW[i]);
+  sampler.play(i, p ? p[0] / innerWidth * 2 - 1 : 0);
+  NV.stimulate(i);
+  flare(.65);
+}
+addEventListener('keydown', e => {
+  if (!sampler.active || e.repeat || e.altKey || e.ctrlKey || e.metaKey || e.target instanceof HTMLInputElement) return;
+  if (/^[1-8]$/.test(e.key)) { e.preventDefault(); playPad(Number(e.key) - 1); }
+});
 const say = (t, s = 4.5) => { $('say').textContent = t; $('say').style.opacity = 1; S.sayT = performance.now() + s * 1000; };
 const act = (doIt, undoIt, text) => { doIt(); S.undo.push(undoIt); if (S.undo.length > 40) S.undo.shift(); if (text) say(text); try { navigator.vibrate && navigator.vibrate(8); } catch (e) {} };
 function tapAt(x, y) { let br = -1, bd = 36; rhoW.forEach((p, i) => { const s = scr(p); if (!s) return; const d = Math.hypot(s[0] - x, s[1] - y); if (d < bd) { bd = d; br = i; } });
@@ -262,9 +300,9 @@ const snapshot = () => ({cuts: [...NV.cuts], silent: NV.rh.map(r => r.silent), a
 $('bar').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.v) { S.view = b.dataset.v; document.querySelectorAll('[data-v]').forEach(q => q.classList.toggle('on', q === b)); say({flesh: 'Flesh: the animal as you would see it. Everything else is still happening.', nerve: 'Nerves: the ring, the signal running round it, and each pacemaker filling until it fires.', muscle: 'Muscle: the fibres round the rim; bright ones are twitching, and shorter.', strain: 'Strain: where the jelly is stretched (warm) and squeezed (cold). The squeeze stores the spring that reopens the bell.'}[S.view]); }
   if (b.dataset.t) { S.tool = b.dataset.t; document.querySelectorAll('[data-t]').forEach(q => q.classList.toggle('on', q === b)); say({stim: 'Touch a pacemaker to make it fire now.', silence: 'Touch a pacemaker to silence it, or wake it.', cut: 'Touch the ring between two pacemakers to cut it, or join it.'}[S.tool], 3); }
   if (b.dataset.p) PRESET[b.dataset.p](); if (b.id === 'undo') { const u = S.undo.pop(); if (u) { u(); say('Undone.', 1.5); } else say('Nothing to undo.', 1.5); }
-  if (b.id === 'chk') { CK.on = !CK.on; b.classList.toggle('on', CK.on); say(CK.on ? 'Check: the running animal, measured each beat against a real moon jelly. Red is out of range.' : '', 4); } if (b.id === 'film') startFilm(); if (b.id === 'labb') { S.lab = !S.lab; b.classList.toggle('on', S.lab); $('lab').style.display = S.lab ? 'flex' : 'none'; say(S.lab ? 'The lab: fire or silence a pacemaker, cut the nerve ring, undo.' : 'Tap the water to move the light; tap the jelly to touch it.', 3.5); } if (b.id === 'snd') { sndOn = !sndOn; b.classList.toggle('on', sndOn); if (watG) watG.gain.value = sndOn ? .12 : 0; } });
+  if (b.id === 'chk') { CK.on = !CK.on; b.classList.toggle('on', CK.on); say(CK.on ? 'Check: the running animal, measured each beat against a real moon jelly. Red is out of range.' : '', 4); } if (b.id === 'sampler') setSampler(!sampler.active); if (b.id === 'film') startFilm(); if (b.id === 'labb') { if (sampler.active) setSampler(false); S.lab = !S.lab; b.classList.toggle('on', S.lab); $('lab').style.display = S.lab ? 'flex' : 'none'; say(S.lab ? 'The lab: fire or silence a pacemaker, cut the nerve ring, undo.' : 'Tap the water to move the light; tap the jelly to touch it.', 3.5); } if (b.id === 'snd') { sndOn = !sndOn; b.classList.toggle('on', sndOn); if (!sndOn) sampler.stop(); if (watG) watG.gain.value = sndOn && !sampler.active ? .12 : 0; } });
 $('warm').addEventListener('input', e => { NV.warm = e.target.value / 100; }); $('firm').addEventListener('input', e => { G.firm = e.target.value / 100; });
-$('start').addEventListener('pointerdown', () => { $('start').style.display = 'none'; S.started = true; audio(); startFilm(); });
+$('start').addEventListener('pointerdown', () => { $('start').style.display = 'none'; S.started = true; audio(); if (new URLSearchParams(location.search).has('sampler')) setSampler(true); else startFilm(); });
 const cv = $('gl'), scr = v => { const p = v.clone().project(cam); return p.z < 1 ? [(p.x * .5 + .5) * innerWidth, (-p.y * .5 + .5) * innerHeight] : null; };
 cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); S.ptrs.set(e.pointerId, [e.clientX, e.clientY]); if (S.ptrs.size === 2) { const [a, b] = [...S.ptrs.values()]; S.pinch = {d: Math.hypot(a[0] - b[0], a[1] - b[1]), dist: S.dist}; S.drag = null; return; } S.drag = {id: e.pointerId, x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY, t: performance.now()}; });
 cv.addEventListener('pointermove', e => { if (S.ptrs.has(e.pointerId)) S.ptrs.set(e.pointerId, [e.clientX, e.clientY]); if (S.pinch && S.ptrs.size === 2) { const [a, b] = [...S.ptrs.values()]; S.dist = Math.max(2.4, Math.min(16, S.pinch.dist * S.pinch.d / Math.max(20, Math.hypot(a[0] - b[0], a[1] - b[1])))); return; } const d = S.drag; if (!d || d.id !== e.pointerId) return; S.yaw -= (e.clientX - d.x) * .006; S.pitch = Math.max(-1.2, Math.min(1.3, S.pitch + (e.clientY - d.y) * .004)); d.x = e.clientX; d.y = e.clientY; });
@@ -276,8 +314,8 @@ const ov = $('ov'), g2 = ov.getContext('2d'), rhoW = NV.rh.map(() => V3()), camT
 function frame(now) { requestAnimationFrame(frame); const raw = (now - last) / 1000, dt = Math.max(0, Math.min(1 / 30, raw)); last = now; if (S.started && raw < 1) { S.ft = (S.ft || .03) * .95 + raw * .05; S.ftN = (S.ftN || 0) + 1; if (S.ftN > 45 && S.ft > .05 && PR > .8) { PR = Math.max(.8, PR * .85); R.setPixelRatio(PR); size(); S.ftN = 0; } } /* if frames are slow, draw fewer pixels until they are not */  if (!S.started) { R.render(scene, cam); return; } T += dt; body(dt); chains(dt); unclip(); check(dt); plankton(dt); rings(dt); let beat = false;
   // events become sound and score
   let meanA = 0; for (let n = 0; n < NN; n++) meanA += NV.act[n]; meanA /= NN; S.act.push([T, meanA]); while (S.act.length && T - S.act[0][0] > 14) S.act.shift();
-  for (const ev of NV.events) { if (ev.kind === 'node') { if (ev.n % 2 === 0) { const s = scr(V3(ringW[ev.n * 3], ringW[ev.n * 3 + 1], ringW[ev.n * 3 + 2])); grain(s ? Math.max(-1, Math.min(1, s[0] / innerWidth * 2 - 1)) : 0); } continue; } const s = scr(rhoW[ev.r]), pan = s ? Math.max(-1, Math.min(1, s[0] / innerWidth * 2 - 1)) : 0; S.hist.push({t: T, r: ev.r, lead: ev.kind === 'lead', silent: ev.silent}); if (ev.kind === 'lead') { pluck(ev.r, pan, 1); thump(); beat = true; spawnRing(0); S.ringB = false; checkBeat(); } else pluck(ev.r, pan, ev.silent ? .1 : .22); }
-  while (S.hist.length && T - S.hist[0].t > 14) S.hist.shift(); if (musG && AC) { musG.gain.setTargetAtTime(sndOn ? meanA * .22 : 0, AC.currentTime, .03); musO.frequency.setTargetAtTime(46 + meanA * 22, AC.currentTime, .05); const sp = Math.hypot(G.V[apex * 3], G.V[apex * 3 + 1], G.V[apex * 3 + 2]); watF.frequency.setTargetAtTime(160 + sp * 500, AC.currentTime, .2); }
+  for (const ev of NV.events) { if (ev.kind === 'node') { if (!sampler.active && ev.n % 2 === 0) { const s = scr(V3(ringW[ev.n * 3], ringW[ev.n * 3 + 1], ringW[ev.n * 3 + 2])); grain(s ? Math.max(-1, Math.min(1, s[0] / innerWidth * 2 - 1)) : 0); } continue; } const s = scr(rhoW[ev.r]), pan = s ? Math.max(-1, Math.min(1, s[0] / innerWidth * 2 - 1)) : 0; S.hist.push({t: T, r: ev.r, lead: ev.kind === 'lead', silent: ev.silent}); if (ev.kind === 'lead') { if (sampler.active) { if (sampler.drifting) sampler.play(ev.r, pan, .8, 1 + meanA * .18); } else { pluck(ev.r, pan, 1); thump(); } beat = true; spawnRing(0); S.ringB = false; checkBeat(); } else if (!sampler.active) pluck(ev.r, pan, ev.silent ? .1 : .22); }
+  while (S.hist.length && T - S.hist[0].t > 14) S.hist.shift(); if (musG && AC) { musG.gain.setTargetAtTime(sndOn && !sampler.active ? meanA * .22 : 0, AC.currentTime, .03); musO.frequency.setTargetAtTime(46 + meanA * 22, AC.currentTime, .05); const sp = Math.hypot(G.V[apex * 3], G.V[apex * 3 + 1], G.V[apex * 3 + 2]); watF.frequency.setTargetAtTime(160 + sp * 500, AC.currentTime, .2); }
   if (!S.ringB && RECOIL > .5) { S.ringB = true; spawnRing(1); }
   if (S.film) { const sh = SHOTS[S.film.i], el = T - S.film.t0; S.yaw += dt * .09; $('rec').innerHTML = `<b>●</b> JELLY REEL · shot ${S.film.i + 1} of ${SHOTS.length} · ${Math.floor(T / 60)}:${String(Math.floor(T % 60)).padStart(2, '0')}`; if ((el > sh.min && beat) || el > sh.min + 3.5) nextShot(); }
   // geometry
