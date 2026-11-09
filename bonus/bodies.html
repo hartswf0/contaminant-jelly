@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ten Bodies · jelly-films</title>
+<meta name="description" content="Ten species of jelly, ten ways to move: squeeze, flee, sequence, roll, ride the layers, draw the water, pour yourself, rewind your own past, fold into a fourth dimension, slice a film's spacetime.">
+<link rel="stylesheet" href="../fonts/fonts.css">
+<script type="importmap">{"imports":{"three":"../paeleo/scion/videotext/vendor/three.module.min.js","three/addons/":"../paeleo/scion/videotext/vendor/addons/"}}</script>
+<style>
+:root{color-scheme:dark;--gold:#f0a35a;--dim:#8293a4}html,body{margin:0;height:100%;overflow:hidden;background:#0b1413;color:#e6edf3;font:300 15px/1.5 Jost,system-ui,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;overscroll-behavior:none}a{color:var(--gold);text-decoration:none}
+canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.ui{position:fixed;pointer-events:none;transition:opacity .6s}#guide{inset:0;width:100%;height:100%}
+#hud{top:max(14px,env(safe-area-inset-top));left:16px;right:16px;display:flex;justify-content:space-between;font:300 12px 'JetBrains Mono',monospace;color:var(--dim);text-shadow:0 0 6px #000;opacity:0}#hud b{font:400 12px Anton,Impact,sans-serif;letter-spacing:.3em;color:var(--gold);margin-right:10px}
+#say{left:0;right:0;top:max(46px,calc(env(safe-area-inset-top) + 36px));text-align:center;font:italic clamp(14px,2vw,18px) Georgia,serif;text-shadow:0 0 8px #000;opacity:0;padding:0 40px}
+#card{inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 8vw;background:radial-gradient(ellipse at 60% 50%,rgba(7,12,11,.15),rgba(7,12,11,.9) 75%);pointer-events:auto;overflow:auto}
+#card .k{font:700 11px system-ui;letter-spacing:.3em;color:var(--gold)}#card h1{margin:8px 0 0;font:900 clamp(32px,6.4vw,68px)/1 system-ui;letter-spacing:.06em}
+#card .brief{display:flex;gap:22px;align-items:flex-start;margin-top:14px;max-width:860px}#card .vb{font:400 clamp(44px,8vw,86px)/.9 Anton,Impact,sans-serif;color:var(--gold)}#card .how{margin:0;padding-left:20px;font:300 15px/1.55 Jost,system-ui,sans-serif;color:#dfe6e0}
+#card p{max-width:640px;font:italic 15px/1.55 Georgia,serif;color:#dfe6e0;margin:14px 0 0}#card .go{margin-top:18px;font:600 14px system-ui;letter-spacing:.12em;color:var(--gold)}#card .lk{margin-top:10px;font:300 12px 'JetBrains Mono',monospace;color:#55687a;max-width:780px}
+#card .rooms{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px;max-width:900px}#card .rooms a{font:400 11px Anton,Impact,sans-serif;letter-spacing:.18em;padding:7px 12px;border-radius:14px;color:var(--dim);background:rgba(5,9,9,.55)}#card .rooms a.on{color:#0b1413;background:var(--gold)}#card .rooms a i{font-style:normal;opacity:.6}
+#card .rooms .sep{width:100%;font:300 11px 'JetBrains Mono',monospace;color:#55687a;margin:6px 0 0}
+#next{left:50%;bottom:max(80px,calc(env(safe-area-inset-bottom) + 70px));transform:translateX(-50%);pointer-events:auto;display:none;font:400 13px Anton,Impact,sans-serif;letter-spacing:.24em;background:var(--gold);color:#0b1413;padding:10px 18px;border-radius:18px}
+@media (max-width:640px){#card .brief{flex-direction:column;gap:6px}}
+</style></head><body>
+<canvas id="gl" aria-label="A sea in three dimensions, sometimes four: one jellyfish species, steered its own way"></canvas>
+<canvas class="ui" id="guide"></canvas>
+<div class="ui" id="hud"><div><b id="rname">TEN BODIES</b><span id="moves"></span></div><div id="stat"></div></div>
+<div class="ui" id="say"></div><a class="ui" id="next"></a>
+<div class="ui" id="card"><div class="k" id="ck"></div><h1 id="ch"></h1>
+  <div class="brief"><div class="vb" id="cv"></div><div><ol class="how" id="chow"></ol></div></div>
+  <p id="cp"></p><div class="rooms" id="rooms"></div>
+  <div class="go">TOUCH TO BEGIN</div><div class="lk">Every species moves its own way; none of them has a joystick in common. Reach the five lights. The dial at the bottom left turns the view (Q E too). · <a href="steerlab3d.html">the 3D lab</a> · <a href="sea.html">the open water</a> · <a href="SCION_BODIES.md">the theory</a></div></div>
+<script type="module">
+import * as THREE from 'three';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+import {RIGS, makeRig} from '../current/drift/rigs.js';
+const $ = id => document.getElementById(id), Q = new URLSearchParams(location.search), CL = '../current/drift/data/crashlab/', GEST = 'cineosis-hand-butter', NG = 64;
+const V3 = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z), UP = V3(0, 1, 0), clamp = THREE.MathUtils.clamp, TAU = Math.PI * 2;
+// ---------------------------------------------------------------- ten species, ten bodies, ten ways to move. Each borrows its verb from the animal (or the rig) itself.
+const SPEC = {
+  glass: {verb: 'PULSE', dim: 3, line: 'A moon jelly is a muscle around a mouth. It has no stick and no rudder: only the squeeze.',
+    how: ['Press and hold to squeeze the bell; the longer you hold, the harder the jet. Let go and it jets.', 'Where you press is the side you squeeze from: the bell turns away from your finger while you hold.', 'Squeeze again as the bell springs back open (the rim flashes) and the stroke is resonant: half as strong again.'],
+    gates: [[0, -4, -14], [12, 2, -6], [6, 8, 10], [-10, 4, 8], [-8, -6, -8]]},
+  mantle: {verb: 'FLEE', dim: 3, line: 'The sewer creature will not be told where to go. It can only be frightened, and it gets used to you.',
+    how: ['A touch is a threat in the water. The creature flees from it, head first, turning before it can run.', 'A fresh touch close by startles it; a finger held long becomes familiar, and frightens it less.', 'Herd it with two fingers: one behind, one beside.'],
+    gates: [[10, -6, -6], [16, -2, 8], [2, -8, 14], [-12, -4, 6], [-6, 2, -12]]},
+  celluloid: {verb: 'SEQUENCE', dim: 3, line: 'Three sheets of celluloid, contracting one after another. The order is the steering.',
+    how: ['The screen is three sheets: left, centre, right. Tap one and it strokes.', 'A stroke on the left turns you right; on the right, left; the centre sends you away from the view.', 'Left, centre, right in a beat is a wave: a long corkscrew stroke. Right, centre, left is a back-wave.'],
+    gates: [[0, 0, -12], [10, 6, -4], [0, 10, 6], [-10, 4, 0], [-4, -6, -10]]},
+  reel: {verb: 'ROLL', dim: 3, line: 'A reel is a wheel. It rolls along the floor, and a wheel is steered by leaning.',
+    how: ['Circle a finger round the reel, clockwise to roll forward; the faster you circle, the faster it spins.', 'Circle to the right of the reel to lean it right, and it turns right; or hold a second finger and slide it.', 'Flick up to hop over a ridge. Downhill rolls you faster.'],
+    gates: [[0, 0, -14], [14, 0, -6], [12, 0, 10], [-6, 0, 14], [-14, 0, 0]], floor: true},
+  medusa: {verb: 'LAYERS', dim: 3, line: 'The medusa cannot swim sideways at all. The water does it, and every depth flows a different way.',
+    how: ['Each depth of water flows its own way (the column of arrows on the right). You only choose which to sit in.', 'Drag up or down on the left to rise or sink. Drag on the right to let your long tentacles down into a deeper layer, like a sea anchor.', 'You drift as a blend of the two layers you touch: the bell\'s and the tentacles\'.'],
+    gates: [[14, -8, 0], [10, 0, -14], [-8, -4, -12], [-14, 6, 6], [4, 4, 14]]},
+  doodle: {verb: 'DRAW', dim: 3, line: 'The doodle jelly does not swim. You draw the water, and the water carries it.',
+    how: ['Draw a line in the water and it becomes a current, flowing the way you drew it. Six at most; each fades.', 'Draw a loop and it becomes a whirl. Turn the view to draw in another plane.', 'A tap on the jelly is a small nudge.'],
+    gates: [[8, 0, -8], [14, 4, 6], [0, 6, 14], [-12, 0, 6], [-8, -6, -10]]},
+  veil: {verb: 'POUR', dim: 3, line: 'The fleck veil is twenty-four thousand flecks that agree to be one animal. It can disagree.',
+    how: ['Touch the water and the flecks stream toward your finger: you pour the animal there.', 'Lift and the flecks gather again wherever most of them are.', 'The grilles stop the bell itself, but a fleck streaming out ahead slips through the gaps: pour from far enough away and the animal follows itself through.'],
+    gates: [[-10, -2, 0], [0, 0, 8], [10, 2, -4], [17, -4, 8]], start: [-17, -2, 0], yaw: -Math.PI / 2},
+  sentinel: {verb: 'REWIND', dim: 4, line: 'The Sentinel trails its own past as a worm of light. That past is a place it can go back to.',
+    how: ['Swim with a finger: push from where you touched. The gold worm behind you is your past.', 'Touch the worm and slide along it: you go back in time, and so do the gates, which open and close on a clock.', 'Let go and a new timeline begins; the old one goes on as a blue ghost. Touch the ghost to ride your past self.'],
+    gates: [[0, -2, -12], [12, 2, -2], [4, 6, 12], [-10, 0, 6]]},
+  golden: {verb: 'FOLD', dim: 4, line: 'The Golden Splat has a fourth direction to swim in. You see the three-dimensional slice of the world where it is.',
+    how: ['Swim with a finger, as the Sentinel does. Drag the strip on the right edge (or twist two fingers) to move in w, the fourth direction.', 'A stone in four dimensions is a sphere that grows and shrinks as you pass through w; blue ghosts are its slice further on, amber behind.', 'The lights are at different w. A stone in your way may not be there a little further along w.'],
+    gates: [[0, -2, -12, 0], [12, 0, -2, 3], [6, 4, 12, -3], [-10, 2, 6, 5], [-12, -4, -8, -4]]},
+  filmbell: {verb: 'SLICE', dim: 4, line: 'A film is a block of space and time. The Film Bell swims inside it, and sees only the slice it cuts.',
+    how: ['The block ahead is a whole film: across and up are the picture, the long way is its time.', 'Swim with a finger. Where you are along the block is the moment; the bell\'s heading is the angle of the slice. Swim straight through and you see frames; swim sideways and you see time.', 'Find the four marked moments (the strip at the foot).'],
+    gates: [[-6, -2, 8], [5, 3, 24], [-3, 4, 40], [6, -5, 56]], start: [0, -2, -30], yaw: Math.PI}};
+const ORDER = Object.keys(SPEC);
+let SID = Q.get('sp'); if (!SPEC[SID]) { try { SID = localStorage.getItem('cj-rig'); } catch (e) {} } if (!SPEC[SID]) SID = 'glass';
+try { localStorage.setItem('cj-rig', SID); } catch (e) {}
+const SPI = SPEC[SID], RIG = RIGS.find(r => r.id === SID) || {name: SID};
+let SEALED = {}; try { SEALED = JSON.parse(localStorage.getItem('cj-sealed') || '{}'); } catch (e) {}
+$('ck').textContent = `BONUS · TEN BODIES · ${ORDER.indexOf(SID) + 1} OF 10${SPI.dim === 4 ? ' · FOUR DIMENSIONS' : ''}`; $('ch').textContent = RIG.name; $('cv').textContent = SPI.verb; $('chow').innerHTML = SPI.how.map(h => `<li>${h}</li>`).join(''); $('cp').textContent = SPI.line; $('rname').textContent = `${RIG.name.toUpperCase()} · ${SPI.verb}`;
+$('rooms').innerHTML = ORDER.map((k, i) => (i === 7 ? '<div class="sep">four dimensions: your past · a fourth direction · a film\'s time</div>' : '') + `<a href="?sp=${k}" class="${k === SID ? 'on' : ''}">${SPEC[k].verb} <i>${(RIGS.find(r => r.id === k) || {name: k}).name.replace(/^The /, '')}</i>${SEALED['body-' + k] ? ' ★' : ''}</a>`).join('');
+// ---------------------------------------------------------------- the water
+const R = new THREE.WebGLRenderer({canvas: $('gl'), antialias: false}); R.setPixelRatio(Math.min(1.6, devicePixelRatio)); R.toneMapping = THREE.ACESFilmicToneMapping;
+const FOG = new THREE.Color(SPI.dim === 4 ? '#1a2630' : '#1c2c2a'), scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(FOG, .016);
+{ const c = document.createElement('canvas'); c.width = 4; c.height = 256; const g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, '#' + FOG.clone().multiplyScalar(2).getHexString()); gr.addColorStop(.55, '#' + FOG.getHexString()); gr.addColorStop(1, '#' + FOG.clone().multiplyScalar(.3).getHexString()); g.fillStyle = gr; g.fillRect(0, 0, 4, 256); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; scene.background = t; }
+const cam = new THREE.PerspectiveCamera(50, 1, .3, 400); const comp = new EffectComposer(R); comp.addPass(new RenderPass(scene, cam)); const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), .7, .6, .62); comp.addPass(bloom); comp.addPass(new OutputPass());
+const U = {uScale: {value: 1}, uT: {value: 0}, uFogD: {value: .016}, uFogC: {value: FOG.clone()}};
+const VS = `uniform float uScale, uFogD; uniform vec3 uFogC; attribute vec3 aC; attribute float aS; varying vec3 vC; varying float vF; void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.); float z = -mv.z; vF = 1. - exp(-pow(uFogD * z, 2.)); vC = aC; gl_PointSize = max(1., aS * uScale / z); gl_Position = projectionMatrix * mv; }`;
+const glowM = () => new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: U, vertexShader: VS, fragmentShader: `varying vec3 vC; varying float vF; void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; gl_FragColor = vec4(vC * (1. - vF * .85) * exp(-r2 * 14.), 1.); }`});
+const darkM = () => new THREE.ShaderMaterial({transparent: true, depthWrite: false, uniforms: U, vertexShader: VS, fragmentShader: `uniform vec3 uFogC; varying vec3 vC; varying float vF; void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; gl_FragColor = vec4(mix(vC, uFogC, vF), .9 * exp(-r2 * 10.)); }`});
+const cloud = (n, m) => { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3)); g.setAttribute('aC', new THREE.BufferAttribute(new Float32Array(n * 3), 3)); g.setAttribute('aS', new THREE.BufferAttribute(new Float32Array(n), 1)); const p = new THREE.Points(g, m); p.frustumCulled = false; scene.add(p); return p; };
+const upd = p => ['position', 'aC', 'aS'].forEach(n => p.geometry.attributes[n].needsUpdate = true);
+const A = p => ({P: p.geometry.attributes.position.array, C: p.geometry.attributes.aC.array, S: p.geometry.attributes.aS.array});
+const floorY = SPI.floor ? (x, z) => -12 + Math.sin(x * .16) * Math.cos(z * .13) * 2.2 + Math.max(0, 1.6 - Math.abs(Math.hypot(x, z) - 9) ) * 1.1 : (x, z) => -16 + Math.sin(x * .2) * Math.cos(z * .17) * 1.4;
+{ const n = 110 * 110, D = cloud(n, darkM()), G = cloud(400, glowM()), d = A(D), g = A(G); let k = 0, kg = 0; for (let i = 0; i < 110; i++) for (let j = 0; j < 110; j++, k++) { const x = (i - 55) * .7 + (Math.random() - .5) * .5, z = (j - 55) * .7 + (Math.random() - .5) * .5, y = floorY(x, z), sl = Math.min(1, Math.abs(floorY(x + 1, z) - y) + Math.abs(floorY(x, z + 1) - y)); d.P.set([x, y, z], k * 3); d.C.set([.012 + .03 * sl, .02 + .05 * sl, .02 + .05 * sl], k * 3); d.S[k] = Math.hypot(x, z) > 40 ? 0 : 1.5;
+    if (kg < 400 && Math.random() < .035) { g.P.set([x, y + .3, z], kg * 3); g.C.set(Math.random() < .3 ? [1, .6, .3] : [.25, .8, .75], kg * 3); g.S[kg] = .35; kg++; } } upd(D); upd(G); }
+const SNOW = cloud(1400, glowM()); { const s = A(SNOW); for (let i = 0; i < 1400; i++) { s.P.set([(Math.random() - .5) * 80, -16 + Math.random() * 44, (Math.random() - .5) * 80], i * 3); const b = .1 + Math.random() * .18; s.C.set([b * .8, b, b], i * 3); s.S[i] = .08 + Math.random() * .1; } upd(SNOW); }
+// ---------------------------------------------------------------- the jelly
+const rig = makeRig(THREE, SID), body = new THREE.Group(); body.add(rig.group); rig.group.scale.setScalar(rig.norm * 1.1); scene.add(body);
+const B = {p: V3(...(SPI.start || [0, -4, 18])), v: V3(), q: new THREE.Quaternion(), w: V3()};
+const S = {state: 'card', moves: [], sayT: 0, yaw: SPI.yaw ?? 0, pitch: .25, dist: 15, scr: new Map(), got: 0, follow: 0};
+const IMG = Array.from({length: NG}, (_, k) => { const im = new Image(), e = {im, ok: false, tex: null}; im.onload = () => { e.ok = true; e.tex = new THREE.Texture(im); e.tex.colorSpace = THREE.SRGBColorSpace; e.tex.needsUpdate = true; if (SID === 'filmbell') volAdd(k, im); }; if (SID === 'filmbell') im.src = `${CL}${GEST}/f${String(k).padStart(3, '0')}.jpg`; return e; });
+// ---------------------------------------------------------------- shared helpers: the view's axes, the water plane through the bell, a bell that turns toward a direction
+const camR = V3(), camU = V3(), camF = V3(), camFh = V3(), ndc = new THREE.Vector2(), ray = new THREE.Raycaster(), _a = V3(), _b = V3(), _c = V3();
+const camBasis = () => { cam.getWorldDirection(camF); camR.crossVectors(camF, UP).normalize(); camU.crossVectors(camR, camF).normalize(); camFh.set(camF.x, 0, camF.z).normalize(); };
+const rayAt = (sx, sy) => { ndc.set(sx / innerWidth * 2 - 1, -(sy / innerHeight) * 2 + 1); ray.setFromCamera(ndc, cam); return ray.ray.clone(); };
+const screen = v => { _a.copy(v).project(cam); return _a.z < 1 ? [(_a.x * .5 + .5) * innerWidth, (-_a.y * .5 + .5) * innerHeight] : null; };
+const waterAt = (sx, sy, at = B.p) => { const r = rayAt(sx, sy), pl = new THREE.Plane().setFromNormalAndCoplanarPoint(cam.getWorldDirection(V3()), at), hit = V3(); if (!r.intersectPlane(pl, hit)) hit.copy(r.at(at.distanceTo(r.origin), V3())); return hit; };
+// the level of the jelly: a finger's ray meets the horizontal plane through the bell, so higher on the screen is further away (else the plane facing the view)
+const levelAt = (sx, sy) => { const r = rayAt(sx, sy), hit = V3(); if (r.intersectPlane(new THREE.Plane(UP.clone(), -B.p.y), hit) && hit.distanceTo(B.p) < 30) return hit; return waterAt(sx, sy); };
+const axis = () => V3(0, 1, 0).applyQuaternion(B.q);
+const aim = (dir, dt, k) => { if (dir.lengthSq() < 1e-6) return; B.q.slerp(new THREE.Quaternion().setFromUnitVectors(UP, dir.clone().normalize()), 1 - Math.exp(-dt * k)); };
+const scr2world = (dx, dy) => V3().addScaledVector(camR, dx).addScaledVector(camU, -dy);
+// the floating stick, shared by the species whose experiment lies elsewhere (the Sentinel, the Golden Splat, the Film Bell)
+const glide = {id: null, x0: 0, y0: 0, x: 0, y: 0,
+  down(id, x, y) { if (this.id) return false; this.id = id; this.x0 = this.x = x; this.y0 = this.y = y; return true; },
+  move(id, x, y) { if (id === this.id) { this.x = x; this.y = y; } }, up(id) { if (id === this.id) this.id = null; },
+  step(dt, power = 9) { let sx = 0, sy = 0, on = false; if (this.id) { sx = (this.x - this.x0) / 90; sy = (this.y - this.y0) / 90; on = true; } if (keys.has('a')) sx -= 1, on = true; if (keys.has('d')) sx += 1, on = true; if (keys.has('w')) on = true; if (keys.has('r')) sy -= 1, on = true; if (keys.has('f')) sy += 1, on = true; if (!on) return false;
+    const m = Math.hypot(sx, sy); if (m > 1) { sx /= m; sy /= m; } const d = camFh.clone().addScaledVector(camR, sx * 1.5).addScaledVector(UP, -sy * 1.5).normalize(); aim(d, dt, 3); B.v.addScaledVector(axis(), power * (.4 + .6 * Math.min(1, m)) * dt); S.follow = 1.4; return true; },
+  draw(g) { if (!this.id) return; g.strokeStyle = 'rgba(207,221,232,.35)'; g.lineWidth = 1.5; g.beginPath(); g.arc(this.x0, this.y0, 90, 0, 7); g.stroke(); const dx = this.x - this.x0, dy = this.y - this.y0, m = Math.hypot(dx, dy), k = m > 90 ? 90 / m : 1; g.fillStyle = 'rgba(240,163,90,.85)'; g.beginPath(); g.arc(this.x0 + dx * k, this.y0 + dy * k, 12, 0, 7); g.fill(); }};
+// ---------------------------------------------------------------- the lights: five to reach (four in the Sentinel's and the Film Bell's worlds)
+const ringPts = (p, r, n, col, P, C, Sz, k0, sz = .3) => { for (let i = 0; i < n; i++) { const a = i / n * TAU; P.set([p.x + (camR.x * Math.cos(a) + camU.x * Math.sin(a)) * r, p.y + (camR.y * Math.cos(a) + camU.y * Math.sin(a)) * r, p.z + (camR.z * Math.cos(a) + camU.z * Math.sin(a)) * r], (k0 + i) * 3); C.set(col, (k0 + i) * 3); Sz[k0 + i] = sz; } };
+const GATES = SPI.gates.map(([x, y, z, w], i) => ({p: V3(x, SPI.floor ? floorY(x, z) + 1.6 : y, z), w: w || 0, got: false, i, om: .5 + i * .17, ph: i * 1.9, pts: cloud(160, glowM())}));
+if (SID === 'filmbell') GATES.forEach(g => { g.k = g.p.z; g.p.z = -24 + g.k * .75; });
+const gateOpen = g => SID !== 'sentinel' || Math.sin(SP.sentinel.Tw * g.om + g.ph) > .15;
+// ---------------------------------------------------------------- input
+const cv = $('gl'), DIAL = () => ({x: 70, y: innerHeight - 90, r: 46}), keys = new Set();
+const down = (id, sx, sy) => { const D = DIAL(); if (Math.hypot(sx - D.x, sy - D.y) < D.r + 10) { S.dial = {id, x: sx, y: sy}; return; } S.scr.set(id, [sx, sy]); SP[SID].down(id, sx, sy); };
+const mv = (id, sx, sy) => { if (S.dial && S.dial.id === id) { S.yaw -= (sx - S.dial.x) * .012; S.pitch = clamp(S.pitch + (sy - S.dial.y) * .008, -.6, 1.3); S.dial.x = sx; S.dial.y = sy; return; } if (!S.scr.has(id)) return; S.scr.set(id, [sx, sy]); SP[SID].move(id, sx, sy); };
+const up = (id, intr) => { if (S.dial && S.dial.id === id) { S.dial = null; return; } if (!S.scr.has(id)) return; S.scr.delete(id); SP[SID].up(id, intr); };
+cv.addEventListener('pointerdown', e => { if (S.state !== 'play') return; try { cv.setPointerCapture(e.pointerId); } catch (x) {} down('p' + e.pointerId, e.clientX, e.clientY); });
+cv.addEventListener('pointermove', e => mv('p' + e.pointerId, e.clientX, e.clientY));
+cv.addEventListener('pointerup', e => up('p' + e.pointerId, false)); cv.addEventListener('pointercancel', e => up('p' + e.pointerId, true)); cv.addEventListener('contextmenu', e => e.preventDefault());
+cv.addEventListener('wheel', e => { e.preventDefault(); S.dist = clamp(S.dist * Math.exp(e.deltaY * .001), 7, 40); }, {passive: false});
+addEventListener('keydown', e => { if (e.repeat) return; const k = e.key.toLowerCase(); keys.add(k); if (S.state === 'card') { start(); return; } if (k === ' ') e.preventDefault(); if (k === 'x') reset(); if (k === 'escape') location.href = 'steerlab3d.html'; SP[SID].key?.(k, true); });
+addEventListener('keyup', e => { const k = e.key.toLowerCase(); keys.delete(k); SP[SID].key?.(k, false); });
+addEventListener('blur', () => { for (const id of [...S.scr.keys()]) up(id, true); });
+// ---------------------------------------------------------------- feedback
+const say = (t, s = 2.8) => { $('say').textContent = t; $('say').style.opacity = 1; S.sayT = performance.now() + s * 1000; };
+const buzz = p => { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} };
+let T = 0; const move = (name, hp) => { if (S.moves.some(m => m.n === name && T - m.t < 3)) return; S.moves.push({n: name, t: T}); say(name); buzz(hp || 10); };
+let AC = null; const audio = () => { const Ac = window.AudioContext || window.webkitAudioContext; if (!Ac || AC) return; AC = new Ac(); const nb = AC.createBuffer(1, AC.sampleRate * 4, AC.sampleRate), x = nb.getChannelData(0); let l = 0; for (let i = 0; i < x.length; i++) { l = (l + .02 * (Math.random() * 2 - 1)) / 1.02; x[i] = l * 3; } const ns = AC.createBufferSource(); ns.buffer = nb; ns.loop = true; const lp = AC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 280; const g = AC.createGain(); g.gain.value = .28; ns.connect(lp).connect(g).connect(AC.destination); ns.start(); S.lp = lp; };
+const pluck = (f, g) => { if (!AC) return; const t = AC.currentTime, o = AC.createOscillator(), v = AC.createGain(); o.type = 'triangle'; o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(f * .7, t + .25); v.gain.setValueAtTime(0, t); v.gain.linearRampToValueAtTime(g, t + .01); v.gain.exponentialRampToValueAtTime(.0001, t + .5); o.connect(v).connect(AC.destination); o.start(t); o.stop(t + .6); };
+const label = (g, t, x, y, al = 'center', c = 'rgba(207,221,232,.6)') => { g.fillStyle = c; g.font = "300 10px 'JetBrains Mono', monospace"; g.textAlign = al; g.fillText(t, x, y); };
+const rgb = (c, a = 1) => `rgba(${c.map(v => v * 255 | 0)},${a})`;
+// ================================================================ THE TEN BODIES
+// the film's spacetime volume, for the Film Bell: 32 x 24 samples of each of 64 frames
+const VX = 32, VY = 24, VOL = new Uint8Array(NG * VX * VY * 3), volC = document.createElement('canvas'); volC.width = VX; volC.height = VY; const volX = volC.getContext('2d', {willReadFrequently: true});
+let volBlock = null; function volAdd(k, im) { volX.drawImage(im, 0, 0, VX, VY); const d = volX.getImageData(0, 0, VX, VY).data; for (let j = 0; j < VY; j++) for (let i = 0; i < VX; i++) { const s = (j * VX + i) * 4, o = ((k * VY + (VY - 1 - j)) * VX + i) * 3; VOL[o] = d[s]; VOL[o + 1] = d[s + 1]; VOL[o + 2] = d[s + 2]; } if (volBlock) volBlock.fill(k); }
+const SP = {
+// ---- 1 · PULSE: the squeeze. Hold to charge the bell; the side you press is the side that squeezes; release jets along the bell's axis; a squeeze on the rebound is resonant.
+glass: {f: null, lastP: -9, res: 0,
+  down(id, x, y) { if (this.f) return; this.f = {id, x, y, t0: T}; pluck(180, .03); },
+  move(id, x, y) { if (this.f && this.f.id === id) { this.f.x = x; this.f.y = y; } },
+  up(id, intr) { if (!this.f || this.f.id !== id) return; const c = Math.min(1, (T - this.f.t0) / .9); this.f = null; if (!intr) this.fire(c); },
+  key(k, d) { if (k !== ' ') return; const bs = screen(B.p) || [innerWidth / 2, innerHeight / 2]; if (d) this.down('kspace', bs[0], bs[1]); else this.up('kspace', false); },
+  dir() { const bs = screen(B.p); if (!bs) return axis(); const dx = bs[0] - this.f.x, dy = bs[1] - this.f.y, d = Math.hypot(dx, dy); if (d < 40) return axis(); return scr2world(dx / d, dy / d).addScaledVector(camF, .35).normalize(); },
+  resWin() { const s = T - this.lastP; return s > .5 && s < .9; },
+  fire(c) { const res = this.resWin(); this.res = res ? this.res + 1 : 0; B.v.addScaledVector(axis(), (2.5 + 10 * c) * (res ? 1.5 : 1)); this.lastP = T; pluck(res ? 520 : 300, .06); buzz(res ? [8, 20, 8] : 10); if (res) move(this.res >= 3 ? `resonant ×${this.res}` : 'resonant'); else if (c > .95) move('full squeeze'); },
+  step(dt) { if (this.f) aim(this.dir(), dt, 1.2 + 2.4 * Math.min(1, (T - this.f.t0) / .9)); B.v.y -= .5 * dt; B.v.multiplyScalar(Math.exp(-dt * .9)); },
+  ph() { if (this.f) return .28 * Math.min(1, (T - this.f.t0) / .9); const s = T - this.lastP; return s < .9 ? .28 + s / .9 * .72 : 0; },
+  hud(g) { const bs = screen(B.p); if (!bs) return; const res = this.resWin(); g.strokeStyle = res ? 'rgba(255,214,140,.95)' : 'rgba(207,221,232,.25)'; g.lineWidth = res ? 3 : 1.5; g.beginPath(); g.arc(bs[0], bs[1], 56, 0, 7); g.stroke(); if (res) label(g, 'squeeze now', bs[0], bs[1] + 74, 'center', 'rgba(255,214,140,.95)');
+    if (this.f) { const c = Math.min(1, (T - this.f.t0) / .9); g.strokeStyle = 'rgba(240,163,90,.9)'; g.lineWidth = 3; g.beginPath(); g.arc(bs[0], bs[1], 56 - 26 * c, -Math.PI / 2, -Math.PI / 2 + TAU * c); g.stroke(); g.setLineDash([3, 5]); g.lineWidth = 1.5; g.beginPath(); g.moveTo(this.f.x, this.f.y); g.lineTo(bs[0], bs[1]); g.stroke(); g.setLineDash([]); label(g, c > .95 ? 'full · let go' : 'squeezing', bs[0], bs[1] - 70); } }},
+// ---- 2 · FLEE: you are a threat, not a pilot. It turns its head away from you before it can run; held fingers become familiar.
+mantle: {th: new Map(),
+  down(id, x, y) { const p = levelAt(x, y), d = p.distanceTo(B.p); this.th.set(id, {x, y, p, t0: T}); if (d < 7) { B.v.addScaledVector(B.p.clone().sub(p).normalize(), 6 * (1 - d / 8)); move('startled', [6, 10, 6]); pluck(900, .03); } },
+  move(id, x, y) { const f = this.th.get(id); if (f) { f.x = x; f.y = y; f.p = levelAt(x, y); } }, up(id) { this.th.delete(id); },
+  hab: f => Math.max(.22, 1 - (T - f.t0) * .22),
+  step(dt) { const want = V3(); for (const f of this.th.values()) { const dv = B.p.clone().sub(f.p), d = Math.max(.6, dv.length()); want.addScaledVector(dv.normalize(), this.hab(f) * 18 / (1 + d * d / 22)); }
+    const m = want.length(); if (m > .05) { aim(want, dt, 2.6); const ax = axis(); B.v.addScaledVector(ax, Math.min(14, m) * Math.max(.12, ax.dot(want) / m) * dt); S.follow = .7; }
+    B.v.multiplyScalar(Math.exp(-dt * .8)); B.v.y -= .3 * dt; if (this.th.size >= 2 && B.v.length() > 3) move('herded'); },
+  hud(g) { for (const f of this.th.values()) { const h = this.hab(f); g.strokeStyle = `rgba(255,120,90,${.25 + .6 * h})`; g.lineWidth = 2; for (let r = 0; r < 3; r++) { const rr = 20 + ((T * 40 + r * 22) % 66); g.globalAlpha = 1 - rr / 86; g.beginPath(); g.arc(f.x, f.y, rr, 0, 7); g.stroke(); } g.globalAlpha = 1; label(g, h < .4 ? 'familiar' : 'a threat', f.x, f.y + 100); } }},
+// ---- 3 · SEQUENCE: three sheets, three bands of the screen. A stroke turns you away from its sheet; their order is the steering.
+celluloid: {taps: [], fl: [-9, -9, -9],
+  band: x => x < innerWidth / 3 ? 0 : x < innerWidth * 2 / 3 ? 1 : 2,
+  down(id, x, y) { this.tap(this.band(x)); }, move() {}, up() {},
+  key(k, d) { if (!d) return; const i = {'1': 0, '2': 1, '3': 2, j: 0, k: 1, l: 2}[k]; if (i !== undefined) this.tap(i); },
+  tap(i) { camBasis(); this.fl[i] = T; this.taps.push({i, t: T}); this.taps = this.taps.filter(t => T - t.t < 1.3).slice(-3); const ax = axis(), turn = t => { const r = V3().crossVectors(ax, t); if (r.lengthSq() > 1e-4) B.w.addScaledVector(r.normalize(), 1.7); };
+    B.v.addScaledVector(ax, 2.6); if (i === 0) turn(camR); if (i === 2) turn(camR.clone().negate()); if (i === 1) turn(camFh);
+    const s = this.taps.map(t => t.i).join(''); if (s === '012' || s === '210') { const fw = s === '012'; B.v.addScaledVector(ax, fw ? 8 : -5); B.w.addScaledVector(ax, fw ? -4 : 4); move(fw ? 'wave' : 'back-wave', [6, 8, 6, 8, 6]); this.taps = []; }
+    else if (this.taps.length >= 2 && this.taps.at(-1).i === this.taps.at(-2).i && this.taps.at(-1).t - this.taps.at(-2).t < .35) move('flutter');
+    pluck([392, 494, 587][i], .05); buzz(8); },
+  step(dt) { B.w.multiplyScalar(Math.exp(-dt * 1.6)); B.v.multiplyScalar(Math.exp(-dt * .7)); B.v.y -= .35 * dt; if (B.v.length() > 2) S.follow = .5; },
+  ph() { const l = Math.max(...this.fl); return T - l < .9 ? (T - l) / .9 : 0; },
+  hud(g) { const W = innerWidth, H = innerHeight, names = ['LEFT SHEET · turns you right', 'CENTRE SHEET · away from you', 'RIGHT SHEET · turns you left'], cols = [[1, .64, .3], [.35, .9, .9], [.98, .45, .7]];
+    for (let i = 0; i < 3; i++) { const x0 = W * i / 3, a = Math.max(0, 1 - (T - this.fl[i]) / .5); const xa = i ? x0 + 4 : 132; g.fillStyle = rgb(cols[i], .04 + .16 * a); g.fillRect(xa, H - 64, x0 + W / 3 - 4 - xa, 52); label(g, names[i], (xa + x0 + W / 3 - 4) / 2, H - 34, 'center', rgb(cols[i], .55 + .4 * a)); if (i) { g.strokeStyle = 'rgba(207,221,232,.08)'; g.beginPath(); g.moveTo(x0, 70); g.lineTo(x0, H - 70); g.stroke(); } }
+    this.taps.forEach((t, k) => { g.fillStyle = rgb(cols[t.i], .9); g.beginPath(); g.arc(W / 2 - 20 + k * 20, H - 80, 5, 0, 7); g.fill(); }); label(g, 'left · centre · right = a wave', W / 2, H - 92); }},
+// ---- 4 · ROLL: a wheel on the floor. Circle a finger to spin it; lean it to turn; flick up to hop.
+reel: {psi: Math.PI, om: 0, lean: 0, al: 0, air: false, f: null, f2: null, circ: [],
+  down(id, x, y) { if (!this.f) this.f = {id, x, y, a: null, hx: [{x, y, t: performance.now()}]}; else if (!this.f2) this.f2 = {id, x, x0: x}; },
+  move(id, x, y) { const f = this.f; if (f && f.id === id) { const bs = screen(B.p) || [innerWidth / 2, innerHeight / 2], a = Math.atan2(y - bs[1], x - bs[0]); if (f.a !== null && Math.hypot(x - bs[0], y - bs[1]) > 24) { let d = a - f.a; d = Math.atan2(Math.sin(d), Math.cos(d)); this.om += d * 2.4; } f.a = a; f.x = x; f.y = y; const n = performance.now(); f.hx.push({x, y, t: n}); while (f.hx.length > 2 && n - f.hx[0].t > 140) f.hx.shift(); this.circ.push([x, y]); if (this.circ.length > 40) this.circ.shift(); }
+    if (this.f2 && this.f2.id === id) this.f2.x = x; },
+  up(id, intr) { if (this.f && this.f.id === id) { const h = this.f.hx, h0 = h[0], h1 = h[h.length - 1], vy = (h1.y - h0.y) / Math.max(16, h1.t - h0.t) * 1000; if (!intr && vy < -900 && !this.air) { this.air = true; B.v.y = 7.5; move('hop'); pluck(700, .04); } this.f = null; this.circ = []; } if (this.f2 && this.f2.id === id) this.f2 = null; },
+  step(dt) { const bs = screen(B.p); let want = 0; if (this.f2) want = clamp((this.f2.x - this.f2.x0) / 120, -1, 1) * .7; else if (this.f && this.circ.length > 10 && bs) { const cx = this.circ.reduce((s, c) => s + c[0], 0) / this.circ.length; want = clamp((cx - bs[0]) / 140, -1, 1) * .6; }
+    if (keys.has('a')) want = -.6; if (keys.has('d')) want = .6; if (keys.has('w')) this.om += dt * 9; if (keys.has('s')) this.om -= dt * 9; if (keys.has(' ') && !this.air) { this.air = true; B.v.y = 7.5; move('hop'); }
+    this.lean += (want - this.lean) * (1 - Math.exp(-dt * 4)); this.om = clamp(this.om * Math.exp(-dt * (this.air ? .1 : .3)), -16, 16);
+    const sp = this.om * .75, f = V3(Math.sin(this.psi), 0, Math.cos(this.psi)); this.psi -= this.lean * sp * .22 * dt; this.al += sp * dt / 1.4;
+    if (!this.air) { const slope = (floorY(B.p.x + f.x * .5, B.p.z + f.z * .5) - floorY(B.p.x - f.x * .5, B.p.z - f.z * .5)); this.om -= slope * dt * 6; B.v.set(f.x * sp, 0, f.z * sp); } else { B.v.x = f.x * sp; B.v.z = f.z * sp; B.v.y -= 6 * dt; }
+    if (Math.abs(sp) > 5) move('rolling'); if (Math.abs(this.lean) > .4 && Math.abs(sp) > 3) move('leaned into a turn'); S.follow = Math.abs(sp) > 1 ? 1.2 : 0;
+    const qY = new THREE.Quaternion().setFromAxisAngle(UP, this.psi), qZ = new THREE.Quaternion().setFromAxisAngle(V3(0, 0, 1), Math.PI / 2), qS = new THREE.Quaternion().setFromAxisAngle(UP, -this.al), qL = new THREE.Quaternion().setFromAxisAngle(f, -this.lean); B.q.copy(qL).multiply(qY).multiply(qZ).multiply(qS); },
+  post() { const fy = floorY(B.p.x, B.p.z) + 1.5; if (!this.air || B.p.y < fy) { if (this.air && B.v.y < -5) move('landed', [10, 20]); this.air = false; B.p.y = fy; B.v.y = 0; } },
+  hud(g) { if (this.circ.length > 2) { g.strokeStyle = 'rgba(240,163,90,.5)'; g.lineWidth = 2; g.beginPath(); this.circ.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.stroke(); } const bs = screen(B.p); if (bs) { g.strokeStyle = 'rgba(207,221,232,.4)'; g.lineWidth = 2; g.beginPath(); g.moveTo(bs[0], bs[1] - 60); g.lineTo(bs[0] + Math.sin(this.lean) * 60, bs[1] - 60 + (1 - Math.cos(this.lean)) * 60); g.stroke(); label(g, `spin ${this.om.toFixed(1)} · lean ${(this.lean * 57).toFixed(0)}°`, bs[0], bs[1] + 70); }
+    if (this.f2) { g.strokeStyle = 'rgba(53,230,230,.6)'; g.beginPath(); g.moveTo(this.f2.x0, innerHeight - 120); g.lineTo(this.f2.x, innerHeight - 120); g.stroke(); } }},
+// ---- 5 · LAYERS: the water does the swimming; every depth flows a different way (a spiral with depth). Choose the bell's depth and how far down the tentacles reach, and drift on the blend.
+medusa: {L: 2, ty: null, fb: null, ft: null, line: null,
+  cur(y, out = V3()) { if (y > 13) return out.set(0, 0, 0); const a = (y + 14) * .28; return out.set(Math.cos(a) * 3.4, 0, Math.sin(a) * 3.4); },
+  down(id, x, y) { if (x < innerWidth / 2) this.fb = {id, y0: y, y, b0: this.ty ?? B.p.y}; else this.ft = {id, y0: y, y, L0: this.L}; },
+  move(id, x, y) { if (this.fb && this.fb.id === id) this.fb.y = y; if (this.ft && this.ft.id === id) this.ft.y = y; },
+  up(id) { if (this.fb && this.fb.id === id) this.fb = null; if (this.ft && this.ft.id === id) this.ft = null; },
+  drogue() { return Math.max(floorY(B.p.x, B.p.z) + .5, B.p.y - this.L); },
+  step(dt) { if (this.fb) this.ty = clamp(this.fb.b0 - (this.fb.y - this.fb.y0) * .06, -13, 14); if (this.ft) this.L = clamp(this.ft.L0 + (this.ft.y - this.ft.y0) * .05, .5, 16);
+    if (keys.has('arrowup') || keys.has('r')) this.ty = Math.min(14, (this.ty ?? B.p.y) + dt * 3); if (keys.has('arrowdown') || keys.has('f')) this.ty = Math.max(-13, (this.ty ?? B.p.y) - dt * 3); if (keys.has('z')) this.L = Math.max(.5, this.L - dt * 4); if (keys.has('c')) this.L = Math.min(16, this.L + dt * 4);
+    const ty = this.ty ?? B.p.y; B.v.y += (clamp((ty - B.p.y) * .8, -1.6, 1.6) - B.v.y) * Math.min(1, dt * 2); const wd = this.L / 3, u = this.cur(B.p.y).addScaledVector(this.cur(this.drogue()), wd).divideScalar(1 + wd);
+    B.v.x += (u.x - B.v.x) * Math.min(1, dt * 1.2); B.v.z += (u.z - B.v.z) * Math.min(1, dt * 1.2); if (Math.hypot(B.v.x, B.v.z) > 2.2) { aim(V3(B.v.x * .3, 1, B.v.z * .3), dt, 1); S.follow = .25; } else aim(UP, dt, 1);
+    if (this.L > 7) move('sea anchor'); if (Math.abs(this.drogue() - B.p.y) > 3 && Math.hypot(B.v.x, B.v.z) > 2) move('rode two layers at once');
+    if (!this.line) this.line = cloud(60, glowM()); const l = A(this.line), y1 = this.drogue(); for (let i = 0; i < 60; i++) { const u2 = i / 59; l.P.set([B.p.x + Math.sin(T + u2 * 6) * .2 * u2, B.p.y - .6 - (B.p.y - .6 - y1) * u2, B.p.z + Math.cos(T * .8 + u2 * 5) * .2 * u2], i * 3); l.C.set([.55, .6, .7].map(v => v * (.35 + .4 * u2)), i * 3); l.S[i] = .14 + .1 * u2; } upd(this.line); },
+  snow(P, i, dt) { const u = this.cur(P[i * 3 + 1], _c); P[i * 3] += u.x * dt; P[i * 3 + 2] += u.z * dt; if (Math.abs(P[i * 3]) > 40) P[i * 3] *= -.98; if (Math.abs(P[i * 3 + 2]) > 40) P[i * 3 + 2] *= -.98; },
+  hud(g) { const W = innerWidth, H = innerHeight, x = W - 54, yOf = y => H * .16 + (13 - y) / 27 * H * .62; camBasis();
+    for (let y = -13; y <= 13; y += 2) { const u = this.cur(y), dx = u.dot(camR), dz = u.dot(camFh), Y = yOf(y), m = Math.hypot(dx, dz) || 1; g.strokeStyle = 'rgba(120,200,210,.55)'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(x - dx / m * 12, Y + dz / m * 12); g.lineTo(x + dx / m * 12, Y - dz / m * 12); g.stroke(); g.beginPath(); g.arc(x + dx / m * 12, Y - dz / m * 12, 2.5, 0, 7); g.fill(); }
+    g.fillStyle = 'rgba(240,163,90,.95)'; g.beginPath(); g.arc(x - 22, yOf(B.p.y), 5, 0, 7); g.fill(); label(g, 'bell', x - 32, yOf(B.p.y) + 3, 'right'); g.fillStyle = 'rgba(200,210,230,.9)'; g.beginPath(); g.arc(x - 22, yOf(this.drogue()), 4, 0, 7); g.fill(); label(g, 'tentacles', x - 32, yOf(this.drogue()) + 3, 'right');
+    g.strokeStyle = 'rgba(200,210,230,.4)'; g.beginPath(); g.moveTo(x - 22, yOf(B.p.y)); g.lineTo(x - 22, yOf(this.drogue())); g.stroke(); label(g, 'the water, by depth', x, H * .16 - 14);
+    const v = V3(B.v.x, 0, B.v.z), dx = v.dot(camR), dz = v.dot(camFh), bs = screen(B.p); if (bs) { g.strokeStyle = 'rgba(240,163,90,.8)'; g.lineWidth = 2.5; g.beginPath(); g.moveTo(bs[0], bs[1]); g.lineTo(bs[0] + dx * 18, bs[1] - dz * 18); g.stroke(); label(g, 'drift', bs[0] + dx * 18, bs[1] - dz * 18 - 8); }
+    label(g, '↕ drag here: the bell', W * .25, H - 30); label(g, '↕ drag here: the tentacles', W * .75, H - 30); }},
+// ---- 6 · DRAW: strokes drawn in the water become currents; the jelly is only carried.
+doodle: {strokes: [], cur: new Map(), pts: null,
+  down(id, x, y) { const bs = screen(B.p); if (bs && Math.hypot(bs[0] - x, bs[1] - y) < 40) { B.v.addScaledVector(axis(), 3); move('a nudge'); return; } this.cur.set(id, {pts: [waterAt(x, y)]}); },
+  move(id, x, y) { const c = this.cur.get(id); if (!c) return; const p = waterAt(x, y); if (p.distanceTo(c.pts.at(-1)) > .45) c.pts.push(p); },
+  up(id) { const c = this.cur.get(id); this.cur.delete(id); if (!c || c.pts.length < 3) return; let len = 0; for (let i = 1; i < c.pts.length; i++) len += c.pts[i].distanceTo(c.pts[i - 1]); if (len < 2) return; const loop = len > 8 && c.pts[0].distanceTo(c.pts.at(-1)) < 2.6; if (loop) c.pts.push(c.pts[0].clone()); this.strokes.push({pts: c.pts, t0: T, loop}); if (this.strokes.length > 6) this.strokes.shift(); move(loop ? 'drew a whirl' : 'drew a current'); pluck(loop ? 660 : 440, .04); },
+  field(p, out) { out.set(0, 0, 0); for (const s of this.strokes) { const life = Math.max(0, 1 - (T - s.t0) / 16); if (!life) continue; for (let i = 0; i < s.pts.length - 1; i++) { const a = s.pts[i], b = s.pts[i + 1], ab = _b.copy(b).sub(a), L2 = ab.lengthSq() || 1, t = clamp(_c.copy(p).sub(a).dot(ab) / L2, 0, 1), cp = _c.copy(a).addScaledVector(ab, t), d = cp.distanceTo(p); if (d < 2.8) { const w = (1 - d / 2.8) * life; out.addScaledVector(ab, 7.5 * w / Math.sqrt(L2)); out.addScaledVector(cp.sub(p), w * 1.4); } } } return out; },
+  step(dt) { this.strokes = this.strokes.filter(s => T - s.t0 < 16); const u = this.field(B.p, V3()); if (u.lengthSq() > .04) { B.v.lerp(u, Math.min(1, dt * 2.5)); S.follow = .6; if (u.length() > 6) move('carried'); } B.v.multiplyScalar(Math.exp(-dt * .5)); B.v.y -= .25 * dt; if (B.v.length() > 1) aim(B.v, dt, 2);
+    if (!this.pts) this.pts = cloud(6 * 420 + 300, glowM()); const P = A(this.pts); let k = 0; const put = (p, c, s) => { if (k >= 6 * 420 + 300) return; P.P.set([p.x, p.y, p.z], k * 3); P.C.set(c, k * 3); P.S[k] = s; k++; };
+    for (const s of [...this.strokes, ...[...this.cur.values()].map(c => ({pts: c.pts, t0: T, live: true}))]) { const life = s.live ? .8 : Math.max(0, 1 - (T - s.t0) / 16); let acc = 0; for (let i = 0; i < s.pts.length - 1 && k < 6 * 420; i++) { const a = s.pts[i], b = s.pts[i + 1], L = a.distanceTo(b); for (let u = 0; u < L; u += .22) { const q = _b.copy(a).lerp(b, u / L), bead = Math.max(0, 1 - Math.abs(((acc + u) * .5 - T * 2.2) % 3 - 1.5) * 3); put(q, [(.9 + .1 * bead) * life * (.35 + bead), .7 * life * (.3 + bead * .6), .35 * life * (.4 + bead * .5)], .22 + .2 * bead); } acc += L; } }
+    while (k < 6 * 420 + 300) { P.S[k] = 0; k++; } upd(this.pts); },
+  hud(g) { label(g, `${this.strokes.length} of 6 currents`, innerWidth / 2, innerHeight - 30); }},
+// ---- 7 · POUR: the body is a cloud of flecks held together. A finger pulls a stream of them; release and they gather where most of them are. Only a poured body passes the grilles.
+veil: {N: 900, fs: new Map(), spread: 1, own: true, walls: [-6, 5],
+  init() { const N = this.N; this.X = new Float32Array(N * 3); this.Vv = new Float32Array(N * 3); this.H = Array.from({length: N}, () => { const v = V3().randomDirection(); v.y = Math.abs(v.y) * .7 - .1; return v.multiplyScalar(.8 + Math.random() * .5); }); for (let i = 0; i < N; i++) this.X.set([B.p.x + this.H[i].x, B.p.y + this.H[i].y, B.p.z + this.H[i].z], i * 3); this.pts = cloud(N, glowM());
+    this.walls.forEach(wx => { const W = cloud(5200, darkM()), Gl = cloud(500, glowM()), a = A(W), gl = A(Gl); let k = 0, kg = 0; for (let z = -40; z <= 40; z += .5) for (let y = -16; y <= 26; y += 2.4) { if (k < 5200) { a.P.set([wx, y, z], k * 3); a.C.set([.02, .035, .04], k * 3); a.S[k] = .9; k++; } } for (let y = -16; y <= 26; y += .5) for (let z = -40; z <= 40; z += 3) { if (k < 5200) { a.P.set([wx, y, z], k * 3); a.C.set([.02, .035, .04], k * 3); a.S[k] = .9; k++; } } for (let i = 0; i < 500; i++) { gl.P.set([wx, -16 + Math.random() * 42, -40 + Math.random() * 80], i * 3); gl.C.set([.25, .8, .75].map(v => v * .4), i * 3); gl.S[i] = .25; } upd(W); upd(Gl); }); },
+  down(id, x, y) { this.fs.set(id, {x, y, p: levelAt(x, y)}); }, move(id, x, y) { const f = this.fs.get(id); if (f) { f.x = x; f.y = y; f.p = levelAt(x, y); } }, up(id) { this.fs.delete(id); },
+  step(dt) { const N = this.N, X = this.X, Vv = this.Vv, n = this.fs.size, coh = n ? .35 : 3.2, F = [...this.fs.values()].map(f => f.p), c = V3(); for (let i = 0; i < N; i++) c.x += X[i * 3], c.y += X[i * 3 + 1], c.z += X[i * 3 + 2]; c.divideScalar(N);
+    const prev = B.p.clone(); B.p.copy(c); let sp = 0; for (let i = 0; i < N; i++) { const o = i * 3, h = this.H[i]; let ax = (c.x + h.x - X[o]) * coh, ay = (c.y + h.y - X[o + 1]) * coh, az = (c.z + h.z - X[o + 2]) * coh;
+      if (n) { let bd = 1e9, bf = null; for (const f of F) { const d = Math.hypot(f.x - X[o], f.y - X[o + 1], f.z - X[o + 2]); if (d < bd) { bd = d; bf = f; } } const k = 34 * (.15 + 1.7 * ((i * 7919) % 101) / 101) / Math.max(.4, bd) * Math.min(1, bd / 1.5); ax += (bf.x - X[o]) * k; ay += (bf.y - X[o + 1]) * k; az += (bf.z - X[o + 2]) * k; }
+      Vv[o] = (Vv[o] + ax * dt) * Math.exp(-dt * 2.4); Vv[o + 1] = (Vv[o + 1] + ay * dt - .2 * dt) * Math.exp(-dt * 2.4); Vv[o + 2] = (Vv[o + 2] + az * dt) * Math.exp(-dt * 2.4);
+      const nx = X[o] + Vv[o] * dt; for (const wx of this.walls) if ((X[o] - wx) * (nx - wx) < 0 && Math.hypot(X[o] - c.x, X[o + 1] - c.y, X[o + 2] - c.z) < 1.8) { Vv[o] *= -.4; } X[o] += Vv[o] * dt; X[o + 1] = Math.max(floorY(X[o], X[o + 2]) + .3, X[o + 1] + Vv[o + 1] * dt); X[o + 2] += Vv[o + 2] * dt;
+      sp += (X[o] - c.x) ** 2 + (X[o + 1] - c.y) ** 2 + (X[o + 2] - c.z) ** 2; }
+    const was = this.spread; this.spread = Math.sqrt(sp / N); B.v.copy(c).sub(prev).divideScalar(Math.max(dt, 1e-3)); if (B.v.length() > 1.5) { S.follow = .8; aim(B.v, dt, 1.5); }
+    for (const wx of this.walls) if ((prev.x - wx) * (c.x - wx) < 0) move('poured through', [8, 16, 8, 16]); if (was > 2.4 && this.spread < 1.3) move('gathered'); if (this.spread > 3) move('poured');
+    const P = A(this.pts), cohesive = clamp(1.6 - this.spread / 1.6, 0, 1); for (let i = 0; i < N; i++) { P.P.set([X[i * 3], X[i * 3 + 1], X[i * 3 + 2]], i * 3); const b = .25 + .5 * (1 - cohesive); P.C.set([.35 * b, .6 * b, 1 * b], i * 3); P.S[i] = .16; } upd(this.pts); rig.group.scale.setScalar(rig.norm * 1.1 * Math.max(.05, cohesive)); },
+  hud(g) { const W = innerWidth, x0 = W / 2 - 90, y = innerHeight - 34, u = clamp((this.spread - .9) / 3, 0, 1); g.strokeStyle = 'rgba(207,221,232,.3)'; g.beginPath(); g.moveTo(x0, y); g.lineTo(x0 + 180, y); g.stroke(); g.fillStyle = this.spread < 1.7 ? 'rgba(240,163,90,.95)' : 'rgba(90,150,255,.95)'; g.beginPath(); g.arc(x0 + 180 * u, y, 6, 0, 7); g.fill(); label(g, 'whole', x0 - 8, y + 3, 'right'); label(g, 'poured', x0 + 188, y + 3, 'left'); label(g, this.spread < 1.7 ? 'whole: a grille stops it' : 'streaming: the leaders slip through', W / 2, y - 12);
+    for (const f of this.fs.values()) { g.strokeStyle = 'rgba(90,150,255,.7)'; g.lineWidth = 2; g.beginPath(); g.arc(f.x, f.y, 26, 0, 7); g.stroke(); } }},
+// ---- 8 · REWIND (4D: your own past). The trail is history. Touch it and slide: you and the world's clock go back. Let go: a new timeline; the old one replays as a ghost you can ride.
+sentinel: {H: [], ghosts: [], rew: null, ride: null, Tw: 0, recT: 0, own: false,
+  init() { this.trail = cloud(1200, glowM()); this.gpts = cloud(3 * 600 + 3 * 140, glowM()); },
+  nearTrail(x, y, lo = 0, hi = this.H.length - 12) { let bk = -1, bd = 30; for (let k = Math.max(0, lo); k < Math.min(hi, this.H.length); k += 2) { const s = screen(this.H[k].p); if (!s) continue; const d = Math.hypot(s[0] - x, s[1] - y); if (d < bd) { bd = d; bk = k; } } return bk; },
+  ghostAt(g) { const H = g.H; if (!H.length || this.Tw < H[0].Tw || this.Tw > H.at(-1).Tw) return null; let lo = 0, hi = H.length - 1; while (hi - lo > 1) { const m = (lo + hi) >> 1; if (H[m].Tw < this.Tw) lo = m; else hi = m; } return H[lo]; },
+  down(id, x, y) { const k = this.nearTrail(x, y); if (k >= 0) { this.rew = {id, k}; move('rewind', [4, 8, 4, 8]); pluck(330, .05); return; }
+    for (const g of this.ghosts) { const h = this.ghostAt(g), s = h && screen(h.p); if (s && Math.hypot(s[0] - x, s[1] - y) < 44) { this.ride = {id, g}; move('rode your past self', [8, 20, 8]); return; } } glide.down(id, x, y); },
+  move(id, x, y) { if (this.rew && this.rew.id === id) { const k = this.nearTrail(x, y, this.rew.k - 90, this.rew.k + 90); if (k >= 0) this.rew.k = k; return; } glide.move(id, x, y); },
+  up(id) { if (this.rew && this.rew.id === id) { const k = this.rew.k, fut = this.H.slice(k + 1); if (fut.length > 10) { this.ghosts.push({H: fut}); if (this.ghosts.length > 3) this.ghosts.shift(); move('a new timeline', [10, 20, 10]); } this.H.length = k + 1; this.rew = null; return; } if (this.ride && this.ride.id === id) { this.ride = null; return; } glide.up(id); },
+  step(dt) { this.own = !!this.rew; if (this.rew) { const h = this.H[this.rew.k]; B.p.copy(h.p); B.v.copy(h.v); B.q.copy(h.q); this.Tw = h.Tw; }
+    else { this.Tw += dt; if (this.ride) { const h = this.ghostAt(this.ride.g); if (h) { B.v.lerp(h.v, Math.min(1, dt * 4)); B.p.lerp(h.p, Math.min(1, dt * 2.5)); B.q.slerp(h.q, Math.min(1, dt * 3)); } else { this.ride = null; say('the ghost ran out of past'); } } glide.step(dt, 10); B.v.multiplyScalar(Math.exp(-dt * .9)); B.v.y -= .2 * dt;
+      this.recT += dt; if (this.recT > .05) { this.recT = 0; this.H.push({p: B.p.clone(), v: B.v.clone(), q: B.q.clone(), Tw: this.Tw}); if (this.H.length > 1200) this.H.shift(); }
+      for (const g of this.ghosts) { const h = this.ghostAt(g); if (h && h.p.distanceTo(B.p) < 1.6 && !this.ride) move('met yourself'); } }
+    // gates on a clock: a shut gate is a wall
+    for (const g of GATES) if (!g.got && !gateOpen(g) && g.p.distanceTo(B.p) < 2.6) { const n = B.p.clone().sub(g.p).normalize(); B.p.copy(g.p).addScaledVector(n, 2.6); B.v.addScaledVector(n, -Math.min(0, B.v.dot(n)) * 1.5); if (T - (this.shutT || -9) > 3) { this.shutT = T; say('shut: go back along your trail and come at it when it opens'); buzz([20, 10, 20]); } }
+    const P = A(this.trail), H = this.H, n = H.length; for (let i = 0; i < 1200; i++) { if (i < n) { const h = H[i], age = (n - i) / n, bead = i % 20 === 0 ? 1 : 0, sel = this.rew && Math.abs(i - this.rew.k) < 3 ? 1 : 0; P.P.set([h.p.x, h.p.y, h.p.z], i * 3); const b = (.15 + .45 * (1 - age)) * (1 + bead * 1.5 + sel * 3); P.C.set([b, .7 * b, .3 * b], i * 3); P.S[i] = .2 + bead * .15 + sel * .3; } else P.S[i] = 0; } upd(this.trail);
+    const G = A(this.gpts); let k = 0; for (let gi = 0; gi < 3; gi++) { const g = this.ghosts[gi]; for (let i = 0; i < 600; i++, k++) { const h = g && g.H[Math.floor(i / 600 * g.H.length)]; if (h) { G.P.set([h.p.x, h.p.y, h.p.z], k * 3); G.C.set([.12, .25, .5], k * 3); G.S[k] = .18; } else G.S[k] = 0; } }
+    for (let gi = 0; gi < 3; gi++) { const g = this.ghosts[gi], h = g && this.ghostAt(g); for (let i = 0; i < 140; i++, k++) { if (h) { const d = _b.set(Math.sin(i * 2.4) * Math.cos(i * .7), Math.cos(i * 2.4) * .6, Math.sin(i * 2.4) * Math.sin(i * .7)).multiplyScalar(1.1); G.P.set([h.p.x + d.x, h.p.y + d.y, h.p.z + d.z], k * 3); G.C.set([.3, .55, 1].map(v => v * .5), k * 3); G.S[k] = .3; } else G.S[k] = 0; } } upd(this.gpts); },
+  hud(g) { glide.draw(g); const W = innerWidth, x0 = W * .2, x1 = W * .8, y = innerHeight - 34, t0 = this.H.length ? this.H[0].Tw : 0, tMax = Math.max(this.Tw, ...this.ghosts.map(gg => gg.H.at(-1).Tw), t0 + 1), X = t => x0 + (x1 - x0) * (t - t0) / (tMax - t0);
+    g.strokeStyle = 'rgba(207,221,232,.25)'; g.lineWidth = 1; g.beginPath(); g.moveTo(x0, y); g.lineTo(x1, y); g.stroke(); this.ghosts.forEach((gg, i) => { g.strokeStyle = 'rgba(90,150,255,.7)'; g.lineWidth = 3; g.beginPath(); g.moveTo(X(Math.max(t0, gg.H[0].Tw)), y + 6 + i * 4); g.lineTo(X(gg.H.at(-1).Tw), y + 6 + i * 4); g.stroke(); });
+    g.fillStyle = this.rew ? 'rgba(255,214,140,1)' : 'rgba(240,163,90,.9)'; g.fillRect(X(this.Tw) - 1.5, y - 10, 3, 20); label(g, this.rew ? 'going back' : 'now', X(this.Tw), y - 14); label(g, 'world time', x0, y + 20, 'left');
+    for (const gt of GATES) { if (gt.got) continue; const s = screen(gt.p); if (!s) continue; const open = gateOpen(gt), ph = (this.Tw * gt.om + gt.ph) % TAU; g.strokeStyle = open ? 'rgba(255,214,140,.9)' : 'rgba(207,221,232,.35)'; g.lineWidth = 2; g.beginPath(); g.moveTo(s[0], s[1]); g.lineTo(s[0] + Math.cos(ph) * 18, s[1] + Math.sin(ph) * 18); g.stroke(); label(g, open ? 'open' : 'shut', s[0], s[1] + 34); } }},
+// ---- 9 · FOLD (4D: a fourth direction). The jelly has a w; every stone is a hypersphere whose slice grows and shrinks with w; the lights sit at different w.
+golden: {W: 0, wv: 0, fw: null, tw: null,
+  init() { const L = [[4, -3, -4, 0, 5], [-4, 0, -6, 0, 4.5], [8, -1, 4, 1.5, 4], [0, 2, 6, -1, 5], [-8, -2, 2, 2, 4], [10, 2, -8, -2, 4], [-6, 4, -12, 4, 4], [0, -6, 0, -3, 5], [-12, 0, -4, 0, 4]]; this.stones = L.map(([x, y, z, w, r]) => ({c: V3(x, y, z), w, r, pts: cloud(420, glowM()), dir: Array.from({length: 420}, () => V3().randomDirection())})); },
+  sl(w, r, at = this.W) { const d = at - w; return r * r - d * d > 0 ? Math.sqrt(r * r - d * d) : 0; },
+  down(id, x, y) { if (x > innerWidth - 74) { this.fw = {id, y0: y, y, W0: this.W}; return; } if (glide.id && !this.tw) { const s = [glide.x, glide.y]; this.tw = {id, a: Math.atan2(y - s[1], x - s[0])}; return; } glide.down(id, x, y); },
+  move(id, x, y) { if (this.fw && this.fw.id === id) { this.fw.y = y; return; } if (this.tw && this.tw.id === id) { const a = Math.atan2(y - glide.y, x - glide.x); let d = a - this.tw.a; d = Math.atan2(Math.sin(d), Math.cos(d)); this.wv += d * 9; this.tw.a = a; return; } glide.move(id, x, y); },
+  up(id) { if (this.fw && this.fw.id === id) { this.fw = null; return; } if (this.tw && this.tw.id === id) { this.tw = null; return; } glide.up(id); },
+  key(k, d) {},
+  step(dt) { if (this.fw) { const want = clamp(this.fw.W0 - (this.fw.y - this.fw.y0) * .03, -7, 7); this.wv += (want - this.W) * dt * 8; } if (keys.has('z')) this.wv -= dt * 6; if (keys.has('c')) this.wv += dt * 6;
+    this.wv *= Math.exp(-dt * 3); const W0 = this.W; this.W = clamp(this.W + this.wv * dt, -7, 7); if (Math.abs(this.wv) > 1.2) move('slipped along w');
+    glide.step(dt, 9); B.v.multiplyScalar(Math.exp(-dt * .9)); B.v.y -= .2 * dt;
+    for (const s of this.stones) { const r = this.sl(s.w, s.r), d = B.p.distanceTo(s.c); if (r > 0 && d < r + 1) { const n = B.p.clone().sub(s.c).normalize(); B.p.copy(s.c).addScaledVector(n, r + 1); B.v.addScaledVector(n, -Math.min(0, B.v.dot(n)) * 1.3); } if (d < s.r - .5 && r < d - 1) { if (!s.inside) { s.inside = true; move('passed beside a stone, in w'); } } else s.inside = false;
+      const P = A(s.pts), dw = this.W - s.w, r1 = this.sl(s.w, s.r, this.W + 1.6), r0 = this.sl(s.w, s.r, this.W - 1.6); for (let i = 0; i < 420; i++) { const dir = s.dir[i], which = i < 300 ? 0 : i < 360 ? 1 : 2, rr = which === 0 ? r : which === 1 ? r1 : r0; P.P.set([s.c.x + dir.x * rr, s.c.y + dir.y * rr, s.c.z + dir.z * rr], i * 3);
+        const col = which === 0 ? [.55, .42, .2].map(v => v * (.5 + .5 * (1 - Math.abs(dw) / s.r))) : which === 1 ? [.12, .25, .6] : [.5, .28, .1]; P.C.set(col, i * 3); P.S[i] = rr > 0 ? (which ? .16 : .3) : 0; } upd(s.pts); } },
+  hud(g) { glide.draw(g); const W = innerWidth, H = innerHeight, x = W - 36, yOf = w => H * .5 - w / 7 * H * .34; g.fillStyle = 'rgba(5,9,9,.5)'; g.fillRect(W - 74, H * .12, 74, H * .76); g.strokeStyle = 'rgba(207,221,232,.3)'; g.beginPath(); g.moveTo(x, yOf(7)); g.lineTo(x, yOf(-7)); g.stroke();
+    this.stones.forEach((s, i) => { g.strokeStyle = 'rgba(200,170,110,.35)'; g.lineWidth = 2; const xx = W - 66 + (i % 4) * 6; g.beginPath(); g.moveTo(xx, yOf(s.w + s.r)); g.lineTo(xx, yOf(s.w - s.r)); g.stroke(); });
+    GATES.forEach(gt => { g.strokeStyle = 'rgba(255,214,140,.9)'; g.lineWidth = 2; g.beginPath(); g.arc(x, yOf(gt.w), 5, 0, 7); gt.got ? g.stroke() : (g.fillStyle = 'rgba(255,214,140,.9)', g.fill()); });
+    g.fillStyle = 'rgba(240,163,90,1)'; g.fillRect(x - 14, yOf(this.W) - 2, 28, 4); label(g, `w ${this.W.toFixed(1)}`, x, yOf(this.W) - 8); label(g, 'w', x, H * .12 - 6); label(g, 'drag', x, H * .88 + 14);
+    if (this.tw && glide.id) { g.strokeStyle = 'rgba(90,150,255,.7)'; g.setLineDash([3, 5]); g.beginPath(); g.moveTo(glide.x, glide.y); const s = S.scr.get(this.tw.id); if (s) g.lineTo(s[0], s[1]); g.stroke(); g.setLineDash([]); label(g, 'twist: w', glide.x, glide.y - 104); } }},
+// ---- 10 · SLICE (4D: a film's spacetime). The film is a block: picture across, time along. The bell's position is the moment and its heading is the angle of the slice it sees.
+filmbell: {init() { const n = VX * VY * NG, pts = cloud(n, null); const mat = new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: {...U, uN: {value: V3(0, 0, 1)}, uP: {value: V3()}},
+      vertexShader: `uniform float uScale, uFogD; uniform vec3 uN, uP; attribute vec3 aC; attribute float aS; varying vec3 vC; varying float vF, vH; void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.); float z = -mv.z; vF = 1. - exp(-pow(uFogD * z, 2.)); float d = dot(position - uP, uN); vH = exp(-d * d / .3) * step(length(position - uP), 16.); vC = aC * smoothstep(2.5, 9., z); gl_PointSize = max(1., aS * (.7 + vH * .6) * uScale / z); gl_Position = projectionMatrix * mv; }`,
+      fragmentShader: `varying vec3 vC; varying float vF, vH; void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; gl_FragColor = vec4(vC * (.005 + .6 * vH) * (1. - vF * .8) * exp(-r2 * 14.), 1.); }`}); pts.material = mat; this.mat = mat; this.blk = pts;
+    const a = A(pts); let k = 0; for (let t = 0; t < NG; t++) for (let j = 0; j < VY; j++) for (let i = 0; i < VX; i++, k++) { a.P.set([(i / (VX - 1) - .5) * 24 + (Math.random() - .5) * .3, (j / (VY - 1) - .5) * 18 - 1 + (Math.random() - .5) * .3, -24 + t * .75 + (Math.random() - .5) * .3], k * 3); a.S[k] = .75; } upd(pts);
+    volBlock = {fill: t => { const c = pts.geometry.attributes.aC.array; for (let j = 0; j < VY; j++) for (let i = 0; i < VX; i++) { const o = ((t * VY + j) * VX + i) * 3; c[o] = VOL[o] / 255; c[o + 1] = VOL[o + 1] / 255; c[o + 2] = VOL[o + 2] / 255; } pts.geometry.attributes.aC.needsUpdate = true; }};
+    IMG.forEach((e, k) => { if (e.ok) volBlock.fill(k); }); this.still = 0; },
+  t() { return clamp((B.p.z + 24) / .75, 0, NG - 1); }, inside() { return Math.abs(B.p.x) < 12 && Math.abs(B.p.y + 1) < 9 && B.p.z > -24 && B.p.z < 24; },
+  down(id, x, y) { glide.down(id, x, y); }, move(id, x, y) { glide.move(id, x, y); }, up(id) { glide.up(id); },
+  step(dt) { glide.step(dt, 8); B.v.multiplyScalar(Math.exp(-dt * 1.1)); const ax = axis(); this.mat.uniforms.uN.value.copy(ax); this.mat.uniforms.uP.value.copy(B.p);
+    const k = Math.round(this.t()); if (this.inside() && IMG[k].tex && this.lastK !== k) { this.lastK = k; rig.setFilm?.(IMG[k].tex); }
+    S.dist += ((this.inside() ? 9 : 15) - S.dist) * Math.min(1, dt); if (this.inside()) { const tilt = Math.abs(ax.z); if (tilt < .6 && B.v.length() > 1.5) move('slit-scan: one picture from many moments'); if (B.v.z < -2) move('ran time backward'); if (B.v.length() < .5) { this.still += dt; if (this.still > 2) move('held a moment'); } else this.still = 0; } },
+  hud(g) { glide.draw(g); const W = innerWidth, x0 = W * .2, x1 = W * .8, y = innerHeight - 34, X = t => x0 + (x1 - x0) * t / (NG - 1); g.strokeStyle = 'rgba(207,221,232,.3)'; g.beginPath(); g.moveTo(x0, y); g.lineTo(x1, y); g.stroke();
+    GATES.forEach(gt => { const e = IMG[gt.k]; g.globalAlpha = gt.got ? .35 : 1; if (e && e.ok) g.drawImage(e.im, X(gt.k) - 26, y - 56, 52, 39); g.strokeStyle = gt.got ? 'rgba(207,221,232,.4)' : 'rgba(255,214,140,.9)'; g.strokeRect(X(gt.k) - 26, y - 56, 52, 39); g.globalAlpha = 1; label(g, gt.got ? 'found' : `frame ${gt.k + 1}`, X(gt.k), y - 60); });
+    const inn = this.inside(); g.fillStyle = 'rgba(240,163,90,.95)'; g.fillRect(X(this.t()) - 1.5, y - 9, 3, 18); label(g, inn ? `you are at frame ${Math.round(this.t()) + 1}` : 'outside the film', X(this.t()), y + 18);
+    if (inn) { const ax = axis(), a = Math.acos(Math.min(1, Math.abs(ax.z))) * 57; label(g, a < 25 ? 'the slice is a frame' : `the slice leans ${a.toFixed(0)}° into time`, W / 2, 96, 'center', 'rgba(255,214,140,.9)'); } }}};
+// ---------------------------------------------------------------- start, reset
+const sp = SP[SID]; sp.init?.(); const camT = B.p.clone();
+function start() { if (S.state !== 'card') return; S.state = 'play'; $('card').style.opacity = 0; $('card').style.pointerEvents = 'none'; setTimeout(() => $('card').style.display = 'none', 600); $('hud').style.opacity = 1; audio(); S.t0 = T; say(SPI.how[0], 4.5); }
+$('card').addEventListener('pointerdown', e => { if (e.target.closest('a')) return; start(); });
+function reset() { location.reload(); }
+// ---------------------------------------------------------------- the loop
+const size = () => { R.setSize(innerWidth, innerHeight, false); comp.setSize(innerWidth, innerHeight); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); }; addEventListener('resize', size); size();
+let last = performance.now(); const gd = $('guide'), gx = gd.getContext('2d');
+function frame(now) { requestAnimationFrame(frame); const dt = Math.min(1 / 30, (now - last) / 1000); last = now; T += dt; U.uT.value = T; camBasis();
+  S.follow = 0; if (S.state === 'play') sp.step(dt);
+  if (!sp.own) { const wl = B.w.length(); if (wl > 1e-5) B.q.premultiply(new THREE.Quaternion().setFromAxisAngle(B.w.clone().divideScalar(wl), wl * dt)).normalize(); B.p.addScaledVector(B.v, dt); }
+  sp.post?.(); if (!SPI.floor) { const fy = floorY(B.p.x, B.p.z); if (B.p.y < fy + 1) { B.p.y = fy + 1; if (B.v.y < -4) move('bell-first into the floor', [20, 30]); B.v.y = Math.abs(B.v.y) * .3; } }
+  const rh = Math.hypot(B.p.x, B.p.z); if (rh > 38) { B.p.x *= 38 / rh; B.p.z *= 38 / rh; B.v.x *= -.3; B.v.z *= -.3; } if (B.p.y > 26) { B.p.y = 26; B.v.y = -Math.abs(B.v.y) * .3; }
+  // the lights
+  for (const g of GATES) { if (g.got) continue; const inW = SID !== 'golden' || Math.abs(SP.golden.W - g.w) < .6; if (inW && gateOpen(g) && g.p.distanceTo(B.p) < 2.3) { g.got = true; S.got++; move(`light ${S.got} of ${GATES.length}`, [10, 30, 10, 30, 10]); pluck(784, .06); } }
+  if (S.state === 'play' && !S.done && S.got === GATES.length) { S.done = true; const secs = (T - S.t0).toFixed(1), names = [...new Set(S.moves.map(m => m.n).filter(n => !/^light /.test(n)))]; say(`${RIG.name}: all ${GATES.length} lights in ${secs} s · ${names.length} moves`, 6); buzz([20, 40, 20, 40, 80]);
+    try { const Sx = JSON.parse(localStorage.getItem('cj-sealed') || '{}'); Sx['body-' + SID] = {stars: Math.min(3, names.length), secs: +secs, clips: 0, t: Date.now()}; localStorage.setItem('cj-sealed', JSON.stringify(Sx)); } catch (e) {}
+    const nx = ORDER[(ORDER.indexOf(SID) + 1) % ORDER.length], a = $('next'); a.href = `?sp=${nx}`; a.textContent = `${SPEC[nx].verb} · ${(RIGS.find(r => r.id === nx) || {name: nx}).name} →`; a.style.display = 'block'; }
+  // the camera: orbits the jelly; it swings behind its motion as fast as the species asks (a stick species asks a lot; a drifter hardly at all)
+  if (keys.has('q')) S.yaw += dt * 1.2; if (keys.has('e')) S.yaw -= dt * 1.2;
+  const hv = Math.hypot(B.v.x, B.v.z); if (!S.dial && hv > 1 && S.follow) { const want = Math.atan2(-B.v.x, -B.v.z); let d = want - S.yaw; d = Math.atan2(Math.sin(d), Math.cos(d)); S.yaw += d * Math.min(1, dt * S.follow); }
+  camT.lerp(B.p, 1 - Math.pow(.04, dt)); cam.position.copy(camT).add(V3(Math.sin(S.yaw) * Math.cos(S.pitch), Math.sin(S.pitch), Math.cos(S.yaw) * Math.cos(S.pitch)).multiplyScalar(S.dist)); cam.lookAt(camT); cam.updateMatrixWorld(); camBasis();
+  // draw
+  body.position.copy(B.p); body.quaternion.copy(B.q); const ps = innerHeight * R.getPixelRatio(); U.uScale.value = ps * .5 / Math.tan(THREE.MathUtils.degToRad(cam.fov / 2));
+  rig.update({t: T, dt, cam: cam.position, ph: sp.ph ? sp.ph() : (T * .35) % 1, glow: .15 + Math.min(1, B.v.length() / 10) * .4, hurt: 0, scale: ps * .0095 * 1.1, lit: S.got});
+  for (const g of GATES) { const a = A(g.pts); let r = 2.2, b = g.got ? .15 : 1; if (SID === 'golden') { const dw = SP.golden.W - g.w; r = 2.2 * Math.sqrt(Math.max(0, 1 - (dw / 1.4) ** 2)); b *= Math.abs(dw) < .6 ? 1 : .5; } if (!gateOpen(g)) b *= .25; ringPts(g.p, Math.max(.05, r), 160, [.95 * b, .7 * b, .38 * b].map(v => v * (.75 + .25 * Math.sin(T * 3 + g.i))), a.P, a.C, a.S, 0, r > .05 ? .32 : 0); upd(g.pts); }
+  { const s = A(SNOW); if (sp.snow) for (let i = 0; i < 1400; i++) sp.snow(s.P, i, dt); if (sp.snow) SNOW.geometry.attributes.position.needsUpdate = true; }
+  drawGuide(); if (S.sayT && performance.now() > S.sayT) $('say').style.opacity = 0;
+  $('moves').textContent = S.moves.length ? '· ' + [...new Set(S.moves.slice(-5).map(m => m.n))].join(' · ') : ''; $('stat').textContent = `lights ${S.got} / ${GATES.length} · ${B.v.length().toFixed(1)} m/s${SID === 'golden' ? ` · w ${SP.golden.W.toFixed(1)}` : ''}`;
+  if (S.lp && AC) S.lp.frequency.setTargetAtTime(220 + B.v.length() * 40, AC.currentTime, .2);
+  comp.render(); }
+function drawGuide() { const W = innerWidth, H = innerHeight; if (gd.width !== W || gd.height !== H) { gd.width = W; gd.height = H; } gx.clearRect(0, 0, W, H); if (S.state !== 'play') return;
+  sp.hud?.(gx);
+  // the next light, if it is off screen: an arrow at the edge
+  const nx = GATES.find(g => !g.got); if (nx) { _a.copy(nx.p).project(cam); const behind = _a.z > 1; let x = (_a.x * .5 + .5) * W, y = (-_a.y * .5 + .5) * H; if (behind) { x = W - x; y = H - y; } if (behind || x < 30 || x > W - 30 || y < 60 || y > H - 60) { const cx = W / 2, cy = H / 2, dx = x - cx, dy = y - cy, k = Math.min((W / 2 - 40) / Math.abs(dx || 1), (H / 2 - 70) / Math.abs(dy || 1)); const ex = cx + dx * k, ey = cy + dy * k, a = Math.atan2(dy, dx); gx.fillStyle = 'rgba(255,214,140,.8)'; gx.beginPath(); gx.moveTo(ex + Math.cos(a) * 12, ey + Math.sin(a) * 12); gx.lineTo(ex + Math.cos(a + 2.5) * 10, ey + Math.sin(a + 2.5) * 10); gx.lineTo(ex + Math.cos(a - 2.5) * 10, ey + Math.sin(a - 2.5) * 10); gx.fill(); } }
+  const D = DIAL(); gx.strokeStyle = 'rgba(207,221,232,.35)'; gx.lineWidth = 1.5; gx.beginPath(); gx.arc(D.x, D.y, D.r, 0, 7); gx.stroke(); gx.fillStyle = 'rgba(240,163,90,.8)'; gx.beginPath(); gx.arc(D.x + Math.sin(S.yaw) * D.r * .7, D.y + Math.cos(S.yaw) * D.r * .7 * Math.cos(S.pitch), 6, 0, 7); gx.fill(); label(gx, 'view', D.x, D.y + D.r + 14); }
+requestAnimationFrame(frame);
+window.__bod = {B, S, SP, sp, GATES, down, up, mv, cam, screen, rayAt, waterAt, start, floorY, get T() { return T; }};
+</script></body></html>
