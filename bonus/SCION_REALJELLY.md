@@ -52,7 +52,7 @@ A ten-shot film, about 90 seconds, shot live on the running animal: nothing is p
 | Feeding | 51 stings and 51 swallowed in 12 s; the stomachs filled; volume 100% |
 | The wall, with the light held beyond it | it bumped, learned to 100% within about four bumps, and afterwards sat 4.5–8 m from the centre of a 10 m tank; a few later bumps still happened |
 | The wreck | no particle of the jelly was ever inside the steel (0 over 20 s beside the hull); volume 95–100% |
-| The scene without the Fab files | loads with no errors: the wreck, barrels, sand and gravel only |
+| The scene without the Fab files (as on the public site) | loads with no errors: the wreck, barrels, gravel, the CC0 rocks and seabed |
 
 **Fixed along the way:**
 - **Stings were unlimited.** The jelly ate 644 plankton in 12 s. Tentacles now need 0.45 s between stings, and the inflow is weaker.
@@ -71,14 +71,16 @@ A ten-shot film, about 90 seconds, shot live on the running animal: nothing is p
 | pack | what | licence | published? |
 |---|---|---|---|
 | Wreck and Seabed | four 1K material sets (rusty painted metal, rusty metal sheet, sand, gravel) and a barrel | Poly Haven, **CC0** | **yes**, in `assets/wreck/` |
-| Jelly Fab Assets | Thai Beach rock, coral, and beach sand (Fab's low-quality GLBs, 1K) | Fab licence; the pack's own note says to keep the source files out of the public repository | **no**: `assets/fab/` is in `.gitignore`. The page loads them if they are there, and runs without them. |
+| CC0 substitutes (added by the owner) | two coast-rock scans and a seabed sand | Poly Haven, **CC0** | **yes**, in `assets/fab/` |
+| Jelly Fab Assets | Thai Beach rock, coral, and beach sand (Fab's low-quality GLBs, 1K) | Fab licence; the pack's own note says to keep the source files out of the public repository | **no**: those three are in `.gitignore`. The page adds them if they are there, and runs without them. |
 
 **As built:**
 - **The seabed:** a duned floor in the sand material, with a gravel patch under the wreck.
 - **The hull:** a 10 m section of a ship's side, lying half sunk and tilted. It is open along the top and **breached on one flank**, with painted rust outside, sheet rust inside, eight ribs, and a fallen deck plate.
 - **Steel is solid:** jelly particles that meet the shell are put back on their side of it. The breach and the open top let the jelly through.
 - **Barrels:** two (the CC0 prop), one on its side by the breach, one half buried.
-- **With the Fab files present locally:** four scanned rocks, six corals, and the beach sand on the floor.
+- **The reef (published):** six outcrops of the CC0 coast rocks, and the CC0 seabed sand on the floor.
+- **With the Fab files present locally:** three more scanned rocks, six corals, and the beach sand instead.
 - **A new shot in the Jelly Reel:** the light is put inside the wreck, and the jelly goes down to it.
 - **Model loading:** three.js's own GLTFLoader (r160, MIT) is now in the project's vendor folder.
 
