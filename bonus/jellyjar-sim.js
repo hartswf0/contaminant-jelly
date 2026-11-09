@@ -19,21 +19,21 @@ export function makeGel(o = {}) {
   const ed = new Set(); for (let t = 0; t < NT; t++) for (const [p, q] of [[0, 1], [0, 2], [0, 3], [1, 2], [1, 3], [2, 3]]) { const a = TI[t * 4 + p], b = TI[t * 4 + q]; ed.add(a < b ? a * 100000 + b : b * 100000 + a); }
   const EI = new Int32Array(ed.size * 2), EL = new Float32Array(ed.size); { let e = 0; for (const k of ed) { const a = Math.floor(k / 100000), b = k % 100000; EI[e * 2] = a; EI[e * 2 + 1] = b; EL[e] = Math.hypot(X[a * 3] - X[b * 3], X[a * 3 + 1] - X[b * 3 + 1], X[a * 3 + 2] - X[b * 3 + 2]); e++; } }
   const ORDER = [[1, 3, 2], [0, 2, 3], [0, 3, 1], [0, 1, 2]], gr = new Float32Array(12);
-  const M = {N, NT, X, V, W, TI, mass, REST, firm: o.firm ?? .4, damp: o.damp ?? .3, EC: o.EC ?? 4e-3, EC0: o.EC0 ?? 1e-5, VC: o.VC ?? 0, grab: null, R, H, JAR, kinetic: 0};
+  const M = {N, NT, X, V, W, TI, mass, REST, firm: o.firm ?? .4, damp: o.damp ?? .3, EC: o.EC ?? 4e-3, EC0: o.EC0 ?? 1e-5, VC: o.VC ?? 0, grab: null, R, H, JAR, kinetic: 0, free: !!o.free, EI, EL, SC: new Float32Array(EL.length).fill(1), F: new Float32Array(N * 3), drag: o.drag ?? 0};   // free: afloat (no gravity, floor or jar); SC: each edge's rest length scaled (a muscle shortens its fibres); F: outside accelerations
   M.volume = () => { let v = 0; for (let t = 0; t < NT; t++) v += Math.abs(vol(t)); return v; };
   M.step = (dt, sub = 12) => { const h = dt / sub, ec = M.EC * Math.pow(1 - M.firm, 2.2) + M.EC0, ea = ec / (h * h), va = M.VC / (h * h), damp = Math.exp(-h * (.4 + 9 * M.damp * M.damp));
     for (let s = 0; s < sub; s++) {
-      for (let i = 0; i < N; i++) { if (!W[i]) continue; const o3 = i * 3; V[o3 + 1] += G * h; for (let c = 0; c < 3; c++) { V[o3 + c] *= damp; PREV[o3 + c] = X[o3 + c]; X[o3 + c] += V[o3 + c] * h; } }
+      for (let i = 0; i < N; i++) { if (!W[i]) continue; const o3 = i * 3; if (!M.free) V[o3 + 1] += G * h; for (let c = 0; c < 3; c++) { V[o3 + c] += M.F[o3 + c] * h; V[o3 + c] *= damp; PREV[o3 + c] = X[o3 + c]; X[o3 + c] += V[o3 + c] * h; } }
       if (M.grab) { const g = M.grab, o3 = g.i * 3; X[o3] = g.x; X[o3 + 1] = g.y; X[o3 + 2] = g.z; }
       // edges: stretching costs, as firm as you set it
-      for (let e = 0; e < EL.length; e++) { const a = EI[e * 2], b = EI[e * 2 + 1], wa = W[a], wb = W[b], w = wa + wb; if (!w) continue; const dx = X[a * 3] - X[b * 3], dy = X[a * 3 + 1] - X[b * 3 + 1], dz = X[a * 3 + 2] - X[b * 3 + 2], L = Math.hypot(dx, dy, dz); if (L < 1e-9) continue; const lam = -(L - EL[e]) / (w + ea) / L;
+      for (let e = 0; e < EL.length; e++) { const a = EI[e * 2], b = EI[e * 2 + 1], wa = W[a], wb = W[b], w = wa + wb; if (!w) continue; const dx = X[a * 3] - X[b * 3], dy = X[a * 3 + 1] - X[b * 3 + 1], dz = X[a * 3 + 2] - X[b * 3 + 2], L = Math.hypot(dx, dy, dz); if (L < 1e-9) continue; const lam = -(L - EL[e] * M.SC[e]) / (w + ea) / L;
         X[a * 3] += dx * lam * wa; X[a * 3 + 1] += dy * lam * wa; X[a * 3 + 2] += dz * lam * wa; X[b * 3] -= dx * lam * wb; X[b * 3 + 1] -= dy * lam * wb; X[b * 3 + 2] -= dz * lam * wb; }
       // volumes: gelatin is nearly incompressible
       for (let t = 0; t < NT; t++) { let w = 0; for (let j = 0; j < 4; j++) { const [p, q, r] = ORDER[j], A = TI[t * 4 + p] * 3, B = TI[t * 4 + q] * 3, C = TI[t * 4 + r] * 3, e1x = X[B] - X[A], e1y = X[B + 1] - X[A + 1], e1z = X[B + 2] - X[A + 2], e2x = X[C] - X[A], e2y = X[C + 1] - X[A + 1], e2z = X[C + 2] - X[A + 2];
           gr[j * 3] = (e1y * e2z - e1z * e2y) / 6; gr[j * 3 + 1] = (e1z * e2x - e1x * e2z) / 6; gr[j * 3 + 2] = (e1x * e2y - e1y * e2x) / 6; const wi = W[TI[t * 4 + j]]; w += wi * (gr[j * 3] ** 2 + gr[j * 3 + 1] ** 2 + gr[j * 3 + 2] ** 2); }
         if (w < 1e-12) continue; const lam = -(vol(t) - RV[t]) / (w + va);   /* a little give: perfectly incompressible tetrahedra lock */ for (let j = 0; j < 4; j++) { const i = TI[t * 4 + j], wi = W[i]; X[i * 3] += lam * wi * gr[j * 3]; X[i * 3 + 1] += lam * wi * gr[j * 3 + 1]; X[i * 3 + 2] += lam * wi * gr[j * 3 + 2]; } }
       // the floor grips; the jar's glass holds it in
-      for (let i = 0; i < N; i++) { const o3 = i * 3; if (X[o3 + 1] < 0) { X[o3 + 1] = 0; X[o3] = PREV[o3] + (X[o3] - PREV[o3]) * .1; X[o3 + 2] = PREV[o3 + 2] + (X[o3 + 2] - PREV[o3 + 2]) * .1; } const r = Math.hypot(X[o3], X[o3 + 2]); if (r > JAR) { X[o3] *= JAR / r; X[o3 + 2] *= JAR / r; } }
+      if (!M.free) for (let i = 0; i < N; i++) { const o3 = i * 3; if (X[o3 + 1] < 0) { X[o3 + 1] = 0; X[o3] = PREV[o3] + (X[o3] - PREV[o3]) * .1; X[o3 + 2] = PREV[o3 + 2] + (X[o3 + 2] - PREV[o3 + 2]) * .1; } const r = Math.hypot(X[o3], X[o3 + 2]); if (r > JAR) { X[o3] *= JAR / r; X[o3 + 2] *= JAR / r; } }
       for (let i = 0; i < N; i++) { const o3 = i * 3; for (let c = 0; c < 3; c++) V[o3 + c] = (X[o3 + c] - PREV[o3 + c]) / h; } }
     let k = 0; for (let i = 0; i < N; i++) if (W[i]) k += .5 * mass[i] * (V[i * 3] ** 2 + V[i * 3 + 1] ** 2 + V[i * 3 + 2] ** 2); M.kinetic = k; };
   // grabbing: the nearest particle follows the hand (its weight set aside); letting go flings it with the hand's last speed
