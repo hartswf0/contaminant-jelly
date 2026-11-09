@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Particle Jelly · jelly-films</title>
+<meta name="description" content="A moon jellyfish as 879 particles in a tank: the ground-truth simulation made for the WorldParticle learned simulator, and (when a rollout is added) the model's prediction laid over it.">
+<link rel="stylesheet" href="../fonts/fonts.css">
+<script type="importmap">{"imports":{"three":"../paeleo/scion/videotext/vendor/three.module.min.js","three/addons/":"../paeleo/scion/videotext/vendor/addons/"}}</script>
+<style>
+:root{color-scheme:dark;--gold:#f0a35a;--dim:#8293a4}html,body{margin:0;height:100%;overflow:hidden;background:#0b1413;color:#e6edf3;font:300 15px/1.5 Jost,system-ui,sans-serif;-webkit-user-select:none;user-select:none}a{color:var(--gold);text-decoration:none}
+canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}.ui{position:fixed;pointer-events:none}#guide{inset:0;width:100%;height:100%}
+#top{top:max(14px,env(safe-area-inset-top));left:16px;right:16px;display:flex;justify-content:space-between;gap:10px;font:300 12px 'JetBrains Mono',monospace;color:var(--dim);text-shadow:0 0 6px #000}#top b{font:400 12px Anton,Impact,sans-serif;letter-spacing:.3em;color:var(--gold);margin-right:10px}
+#bar{left:0;right:0;bottom:0;padding:10px 14px max(14px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:8px;pointer-events:auto;background:linear-gradient(transparent,rgba(5,9,9,.9) 40%)}
+#bar .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}#bar button{all:unset;cursor:pointer;font:400 11px Anton,Impact,sans-serif;letter-spacing:.18em;padding:7px 11px;border-radius:14px;color:var(--dim);background:rgba(207,221,232,.1)}#bar button.on{color:#0b1413;background:var(--gold)}
+#bar input{flex:1;accent-color:#f0a35a}#bar span{font:300 11px 'JetBrains Mono',monospace;color:var(--dim)}#line{font:italic 14px/1.45 Georgia,serif;color:#dfe6e0;max-width:760px}
+</style></head><body>
+<canvas id="gl" aria-label="A moon jellyfish made of particles, pulsing in a tank"></canvas><canvas class="ui" id="guide"></canvas>
+<div class="ui" id="top"><div><b>PARTICLE JELLY</b><span id="what">a simulation for WorldParticle</span></div><div id="stat"></div></div>
+<div class="ui" id="bar"><div id="line"></div><div class="row" id="samples"></div><div class="row"><button id="play">❚❚</button><input id="scrub" type="range" min="0" max="1" step="1" value="0"><span id="time"></span></div>
+  <div class="row"><button id="gt" class="on">SIMULATION</button><button id="pred" style="display:none">WORLDPARTICLE</button><button id="force">SHOW FORCE</button><span id="err"></span><span style="margin-left:auto"><a href="../sim/worldparticle/README.md">the samples and how to run WorldParticle on them</a> · <a href="SCION_WORLDPARTICLE.md">the theory</a></span></div></div>
+<script type="module">
+import * as THREE from 'three';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+import {makeCam} from './cam3d.js';
+const $ = id => document.getElementById(id), Q = new URLSearchParams(location.search), V3 = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
+const SAMPLES = {jelly_straight: ['STRAIGHT', 'Six symmetric pulses: the rim squeezes for 0.3 s each second, the bell springs back, and the body rows itself up through the water.'],
+  jelly_turn: ['TURN', 'The +x side of the rim squeezes 70% harder: the bell tips and the pulses carry it away to one side. An uneven squeeze is how a jelly steers.'],
+  jelly_drag: ['DRAG', 'From 2 s to 3.6 s an outside pull drags one tentacle tip sideways: the elastic body has to answer through its whole length.']};
+let SK = SAMPLES[Q.get('s')] ? Q.get('s') : 'jelly_straight';
+// ---- the water
+const R = new THREE.WebGLRenderer({canvas: $('gl'), antialias: false}); R.setPixelRatio(Math.min(1.6, devicePixelRatio)); R.toneMapping = THREE.ACESFilmicToneMapping;
+const FOG = new THREE.Color('#14232a'), scene = new THREE.Scene(); scene.background = FOG.clone(); const cam = new THREE.PerspectiveCamera(45, 1, .01, 50);
+const comp = new EffectComposer(R); comp.addPass(new RenderPass(scene, cam)); comp.addPass(new UnrealBloomPass(new THREE.Vector2(1, 1), .8, .5, .5)); comp.addPass(new OutputPass());
+const U = {uScale: {value: 1}};
+const VS = `uniform float uScale; attribute vec3 aC; attribute float aS; varying vec3 vC; void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.); vC = aC; gl_PointSize = max(1., aS * uScale / -mv.z); gl_Position = projectionMatrix * mv; }`;
+const glowM = () => new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: U, vertexShader: VS, fragmentShader: `varying vec3 vC; void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; gl_FragColor = vec4(vC * exp(-r2 * 13.), 1.); }`});
+const cloud = n => { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3)); g.setAttribute('aC', new THREE.BufferAttribute(new Float32Array(n * 3), 3)); g.setAttribute('aS', new THREE.BufferAttribute(new Float32Array(n), 1)); const p = new THREE.Points(g, glowM()); p.frustumCulled = false; scene.add(p); return p; };
+const CAM = makeCam(THREE, cam, {mode: 'orbit', modes: ['orbit'], yaw: .7, dist: .75});
+let D = null, GT = null, PR = null, f = 0, playing = true, showPred = false, showForce = false, acc = 0;
+const body = cloud(879), pred = cloud(879), tankPts = cloud(4000), forcePts = cloud(879 * 6);
+async function load(k) { SK = k; history.replaceState(null, '', '?s=' + k); $('line').textContent = SAMPLES[k][1]; $('samples').innerHTML = Object.entries(SAMPLES).map(([key, [n]]) => `<button data-s="${key}" class="${key === k ? 'on' : ''}">${n}</button>`).join('');
+  const d = await (await fetch(`wp/${k}.json`)).json(), gt = new Int16Array(await (await fetch(`wp/${k}.bin`)).arrayBuffer()); let pr = null;
+  try { const r = await fetch(`wp/${k}_pred.bin`); if (r.ok) pr = new Int16Array(await r.arrayBuffer()); } catch (e) {} D = d; GT = gt; PR = pr;   // all at once, so a frame never sees half a sample $('pred').style.display = PR ? 'inline-block' : 'none'; if (!PR) showPred = false;
+  $('scrub').max = D.frames - 1; f = 0; const t = D.tank, a = tankPts.geometry.attributes; let n = 0; const put = (x, y, z) => { if (n < 4000) { a.position.array.set([x, y, z], n * 3); a.aC.array.set([.12, .2, .22], n * 3); a.aS.array[n] = .004; n++; } };
+  for (const y of [t.floor, t.top]) for (let s = -t.half; s <= t.half; s += .02) { put(s, y, -t.half); put(s, y, t.half); put(-t.half, y, s); put(t.half, y, s); } for (const [x, z] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) for (let y = t.floor; y <= t.top; y += .02) put(x * t.half, y, z * t.half);
+  for (let i = 0; i < 40; i++) for (let j = 0; j < 40; j++) put(-t.half + i / 39 * 2 * t.half, t.floor, -t.half + j / 39 * 2 * t.half); a.position.needsUpdate = a.aC.needsUpdate = a.aS.needsUpdate = true; }
+const deq = (A, fr, i, out) => { const o = (fr * D.n + i) * 3; for (let c = 0; c < 3; c++) out[c] = D.lo[c] + (A[o + c] + 32768) / 65535 * (D.hi[c] - D.lo[c]); return out; };
+const COL = [[.55, .42, .25], [.35, .85, .9], [.95, .55, .7]], SZ = [.009, .007, .009], _q = [0, 0, 0], _r = [0, 0, 0];
+$('samples').addEventListener('click', e => { const b = e.target.closest('button'); if (b) load(b.dataset.s); });
+$('play').addEventListener('click', () => { playing = !playing; $('play').textContent = playing ? '❚❚' : '▶'; }); $('scrub').addEventListener('input', e => { f = +e.target.value; });
+$('pred').addEventListener('click', () => { showPred = !showPred; $('pred').classList.toggle('on', showPred); }); $('force').addEventListener('click', () => { showForce = !showForce; $('force').classList.toggle('on', showForce); });
+const cv = $('gl'); cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); CAM.C.dial = {id: 'p', x: e.clientX, y: e.clientY}; }); cv.addEventListener('pointermove', e => { if (CAM.C.dial) CAM.dialMove('p', e.clientX, e.clientY); }); cv.addEventListener('pointerup', () => CAM.dialUp('p'));
+cv.addEventListener('wheel', e => { e.preventDefault(); CAM.zoom(Math.exp(e.deltaY * .001)); }, {passive: false});
+const size = () => { R.setSize(innerWidth, innerHeight, false); comp.setSize(innerWidth, innerHeight); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); }; addEventListener('resize', size); size();
+let last = performance.now(); const gd = $('guide'), gx = gd.getContext('2d'), centre = V3();
+function frame(now) { requestAnimationFrame(frame); const dt = Math.max(0, Math.min(.05, (now - last) / 1000)); last = now; if (!D) { comp.render(); return; }
+  if (playing) { acc += dt * D.fps; while (acc >= 1) { acc--; f = (f + 1) % D.frames; } $('scrub').value = f; }
+  const a = body.geometry.attributes, b = pred.geometry.attributes; let cx = 0, cy = 0, cz = 0, nb = 0, err = 0;
+  for (let i = 0; i < D.n; i++) { deq(GT, f, i, _q); const p = D.part[i]; a.position.array.set(_q, i * 3); a.aC.array.set(COL[p].map(v => v * (showPred ? .55 : 1)), i * 3); a.aS.array[i] = SZ[p]; if (p === 0) { cx += _q[0]; cy += _q[1]; cz += _q[2]; nb++; }
+    if (showPred && PR) { deq(PR, Math.min(f, (D.pred_frames || D.frames) - 1), i, _r); b.position.array.set(_r, i * 3); b.aC.array.set([.4, .62, 1], i * 3); b.aS.array[i] = SZ[p] * .9; err += Math.hypot(_r[0] - _q[0], _r[1] - _q[1], _r[2] - _q[2]); } else b.aS.array[i] = 0; }
+  a.position.needsUpdate = a.aC.needsUpdate = a.aS.needsUpdate = true; b.position.needsUpdate = b.aC.needsUpdate = b.aS.needsUpdate = true;
+  // the force the model is given: drawn as short strokes from each particle (the muscle squeezing the rim, the jet, a pull)
+  { const fa = forcePts.geometry.attributes; let k = 0; if (showForce && f > 0) { for (let i = 0; i < D.n; i++) { deq(GT, f, i, _q); deq(GT, f - 1, i, _r); const vx = _q[0] - _r[0], vy = _q[1] - _r[1], vz = _q[2] - _r[2], m = Math.hypot(vx, vy, vz); if (m < 1e-4) continue; for (let s = 1; s <= 5 && k < 879 * 6; s++, k++) { fa.position.array.set([_q[0] + vx * s * 2, _q[1] + vy * s * 2, _q[2] + vz * s * 2], k * 3); fa.aC.array.set([.9, .5, .3].map(v => v * (1 - s / 6)), k * 3); fa.aS.array[k] = .003; } } } for (; k < 879 * 6; k++) fa.aS.array[k] = 0; fa.position.needsUpdate = fa.aC.needsUpdate = fa.aS.needsUpdate = true; }
+  centre.set(cx / nb, cy / nb, cz / nb); CAM.step(dt, {p: centre.clone().add(V3(0, -.08, 0)), v: V3(), axis: V3(0, 1, 0), hush: false, carve: false});
+  U.uScale.value = innerHeight * R.getPixelRatio() * .5 / Math.tan(THREE.MathUtils.degToRad(cam.fov / 2));
+  $('time').textContent = `${(f / D.fps).toFixed(2)} s · frame ${f + 1} of ${D.frames}`; $('stat').textContent = `${D.n} particles · bell at y ${(cy / nb * 100).toFixed(1)} cm`; $('err').textContent = showPred && PR ? `mean prediction error ${(err / D.n * 1000).toFixed(1)} mm` : (PR ? '' : 'no WorldParticle rollout yet: see the README to run it');
+  if (gd.width !== innerWidth) { gd.width = innerWidth; gd.height = innerHeight; } gx.clearRect(0, 0, gd.width, gd.height); CAM.draw(gx);
+  comp.render(); }
+requestAnimationFrame(frame); load(SK);
+window.__wp = {get D() { return D; }, get f() { return f; }, load, CAM};
+</script></body></html>
