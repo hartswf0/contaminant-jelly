@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Time Film · jelly-films</title>
+<meta name="description" content="A shot as a material of space and time: stir it and its moments slide; thick places carry a gesture whole, thin places shear it into overlapping moments; a cut creeps across it and leaves pockets of the old scene.">
+<link rel="stylesheet" href="../fonts/fonts.css">
+<script type="importmap">{"imports":{"three":"../paeleo/scion/videotext/vendor/three.module.min.js"}}</script>
+<style>
+:root{color-scheme:dark;--gold:#f0a35a;--dim:#8293a4}html,body{margin:0;height:100%;overflow:hidden;background:#070c0c;color:#e6edf3;font:300 15px/1.5 Jost,system-ui,sans-serif;-webkit-user-select:none;user-select:none;overscroll-behavior:none}
+canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}.ui{position:fixed;pointer-events:none}
+#top{top:max(14px,env(safe-area-inset-top));left:16px;right:16px;display:flex;justify-content:space-between;gap:10px;font:300 12px 'JetBrains Mono',monospace;color:var(--dim);text-shadow:0 0 6px #000}#top b{font:400 12px Anton,Impact,sans-serif;letter-spacing:.3em;color:var(--gold);margin-right:10px}
+#say{left:0;right:0;top:max(44px,calc(env(safe-area-inset-top) + 34px));text-align:center;font:italic clamp(15px,2.2vw,19px)/1.4 Georgia,serif;text-shadow:0 0 8px #000;padding:0 24px;transition:opacity .6s}
+#tools{left:0;right:0;bottom:max(16px,env(safe-area-inset-bottom));display:flex;justify-content:center;flex-wrap:wrap;gap:8px;pointer-events:auto}#tools button{all:unset;cursor:pointer;font:400 13px Anton,Impact,sans-serif;letter-spacing:.2em;padding:10px 15px;border-radius:18px;color:var(--dim);background:rgba(5,9,9,.65)}#tools button.on{color:#0b1413;background:var(--gold)}#tools .sep{width:12px}
+</style></head><body>
+<canvas id="gl" aria-label="A film whose moments can be stirred, thickened, thinned and cut"></canvas>
+<div class="ui" id="top"><div><b>TIME FILM</b><span id="what"></span></div><div id="stat"></div></div>
+<div class="ui" id="say">Drag across the film to stir its time. Where something moves, the film is thick and carries the gesture whole; where nothing moves it is thin, and shears.</div>
+<div class="ui" id="tools"><button data-t="stir" class="on">STIR</button><button data-t="thick">THICKEN</button><button data-t="thin">THIN</button><button data-t="cut">CUT</button><span class="sep"></span><button data-v="field">SEE THE FIELDS</button><button data-v="reset">RESET</button></div>
+<script type="module">
+import * as THREE from 'three';
+const $ = id => document.getElementById(id), Q = new URLSearchParams(location.search), CL = '../current/drift/data/crashlab/';
+const PAIRS = [['cineosis-hand-butter', 'ep3-the-raft'], ['ep6-the-knot', 'cineosis-handmade-film']]; let PAIR = 0;
+const NF = 64, FW = 160, FH = 120, AT = 8;                       // 64 frames of 160 x 120 in an 8 x 8 atlas
+const GX = 64, GY = 48, NG = GX * GY;                            // the fields' grid
+// ---- the fields: D, which moment shows here (frames, relative to the playhead); W, how fast that is changing; NU, thickness (viscosity); C, the cut
+const D = new Float32Array(NG), W = new Float32Array(NG), NU = new Float32Array(NG), NU0 = new Float32Array(NG), C = new Float32Array(NG), CP = new Float32Array(NG);
+const FIELD = new Uint16Array(NG * 4), fieldTex = new THREE.DataTexture(FIELD, GX, GY, THREE.RGBAFormat, THREE.HalfFloatType);   // half floats: a time offset needs finer steps than a byte, or it bands fieldTex.magFilter = fieldTex.minFilter = THREE.LinearFilter; fieldTex.flipY = false;
+// ---- the clips: an atlas each; the thickness field starts from the clip itself (still places thick, moving places thin)
+function atlas(id, motion) { const c = document.createElement('canvas'); c.width = FW * AT; c.height = FH * AT; const g = c.getContext('2d', {willReadFrequently: true}), tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.flipY = false; tex.generateMipmaps = false; tex.minFilter = THREE.LinearFilter;   // no mipmaps: neighbouring pixels may show far-apart frames, and a mip would smear the seams
+  const s = document.createElement('canvas'); s.width = GX; s.height = GY; const sg = s.getContext('2d', {willReadFrequently: true}); let prev = null, done = 0; const mot = new Float32Array(NG);
+  for (let k = 0; k < NF; k++) { const im = new Image(); im.onload = () => { g.drawImage(im, (k % AT) * FW, Math.floor(k / AT) * FH, FW, FH); tex.needsUpdate = true; if (motion) { sg.drawImage(im, 0, 0, GX, GY); const d = sg.getImageData(0, 0, GX, GY).data; motion.frames[k] = d; } if (++done === NF && motion) motion.ready(); }; im.src = `${CL}${id}/f${String(k).padStart(3, '0')}.jpg`; }
+  return tex; }
+let A = null, B = null;
+function load(i) { PAIR = i % PAIRS.length; const [a, b] = PAIRS[PAIR]; const mo = {frames: new Array(NF), ready() { const m = new Float32Array(NG); let mx = 0; for (let k = 1; k < NF; k++) { const p = this.frames[k - 1], q = this.frames[k]; if (!p || !q) continue; for (let j = 0; j < NG; j++) { const e = Math.abs(p[j * 4] - q[j * 4]) + Math.abs(p[j * 4 + 1] - q[j * 4 + 1]) + Math.abs(p[j * 4 + 2] - q[j * 4 + 2]); m[j] += e; } } for (let j = 0; j < NG; j++) mx = Math.max(mx, m[j]);
+      for (let j = 0; j < NG; j++) { NU0[j] = Math.max(.08, Math.min(1, .08 + Math.sqrt(m[j] / (mx || 1)) * 1.3)); NU[j] = NU0[j]; } say('Thickness comes from the clip: where something moves (a gesture) the film is thick and carries it whole; where nothing moves it is thin.'); }};
+  A = atlas(a, mo); B = atlas(b, null); mat.uniforms.uA.value = A; mat.uniforms.uB.value = B; reset(); $('what').textContent = `${a.replace(/^cineosis-|^ep\d-/, '').replace(/-/g, ' ')} · cut to ${b.replace(/^cineosis-|^ep\d-/, '').replace(/-/g, ' ')}`; }
+function reset() { D.fill(0); W.fill(0); C.fill(0); CP.fill(0); NU.set(NU0); S.cut = null; }
+// ---- the picture: each pixel shows frame (playhead + D) of clip A, or of clip B where the cut has reached; the fields can be seen
+const R = new THREE.WebGLRenderer({canvas: $('gl'), antialias: false}); R.setPixelRatio(Math.min(2, devicePixelRatio)); const scene = new THREE.Scene(), cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+const mat = new THREE.ShaderMaterial({uniforms: {uA: {value: null}, uB: {value: null}, uF: {value: fieldTex}, uT: {value: 0}, uTB: {value: 0}, uShow: {value: 0}, uAsp: {value: 1}},
+  vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0., 1.); }`,
+  fragmentShader: `uniform sampler2D uA, uB, uF; uniform float uT, uTB, uShow, uAsp; varying vec2 vUv;
+    vec3 frameAt(sampler2D at, vec2 uv, float f){ f = mod(f, 64.); float f0 = floor(f), f1 = mod(f0 + 1., 64.), k = f - f0; vec2 inset = uv * vec2(.97, .97) + .015;
+      vec2 a = (vec2(mod(f0, 8.), floor(f0 / 8.)) + inset) / 8., b = (vec2(mod(f1, 8.), floor(f1 / 8.)) + inset) / 8.; return mix(texture2D(at, a).rgb, texture2D(at, b).rgb, k); }
+    vec3 hue(float h){ return clamp(abs(mod(h * 6. + vec3(0., 4., 2.), 6.) - 3.) - 1., 0., 1.); }
+    void main(){ vec2 sc = vec2(1.); float fa = 4. / 3.; if (uAsp > fa) sc.x = uAsp / fa; else sc.y = fa / uAsp; vec2 uv = (vUv - .5) * sc + .5; if (any(lessThan(uv, vec2(0.))) || any(greaterThan(uv, vec2(1.)))) { gl_FragColor = vec4(.03, .05, .05, 1.); return; }
+      vec2 fuv = vec2(uv.x, 1. - uv.y); vec4 F = texture2D(uF, fuv); float d = F.r, cut = F.g, nu = F.b;
+      vec3 col = mix(frameAt(uA, fuv, uT + d), frameAt(uB, fuv, uTB + d), smoothstep(.1, .9, cut));
+      if (uShow > .5) { vec3 tint = d > 0. ? vec3(.35, .6, 1.) : vec3(1., .6, .3); col = mix(col * (.35 + .65 * nu), tint, min(.7, abs(d) / 12.)); col += vec3(1., .8, .5) * smoothstep(.4, .5, cut) * smoothstep(.6, .5, cut) * .9; }
+      gl_FragColor = vec4(pow(col, vec3(1.)), 1.); }`});
+scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat));
+// ---- the material: time-velocity spreads to neighbours as strongly as the film is thick (a thick patch moves as one); it damps; it displaces time; a thin patch keeps sharp differences (shear)
+const S = {tool: 'stir', show: false, sayT: performance.now() + 6000, cut: null, p: null};
+function step(dt) { const Wn = new Float32Array(NG); for (let y = 0; y < GY; y++) for (let x = 0; x < GX; x++) { const i = y * GX + x, l = x ? i - 1 : i, r = x < GX - 1 ? i + 1 : i, u = y ? i - GX : i, dn = y < GY - 1 ? i + GX : i;
+      const avg = (W[l] * NU[l] + W[r] * NU[r] + W[u] * NU[u] + W[dn] * NU[dn]) / (NU[l] + NU[r] + NU[u] + NU[dn] + 1e-6); Wn[i] = W[i] + (avg - W[i]) * Math.min(1, dt * 22 * NU[i] * NU[i]); }
+  for (let i = 0; i < NG; i++) { W[i] = Wn[i] * Math.exp(-dt * (1.2 + 1.5 * (1 - NU[i]))); D[i] = Math.max(-31, Math.min(31, D[i] + W[i] * dt)); NU[i] += (NU0[i] - NU[i]) * dt * .02; }
+  // the cut: a front that spreads cell to cell, slowly through thick film; thick pockets hold the old scene
+  if (S.cut) { for (let y = 0; y < GY; y++) for (let x = 0; x < GX; x++) { const i = y * GX + x; if (C[i] >= 1) continue; const near = Math.max(x ? C[i - 1] : 0, x < GX - 1 ? C[i + 1] : 0, y ? C[i - GX] : 0, y < GY - 1 ? C[i + GX] : 0); if (near > .95) { CP[i] += dt * 9 * Math.pow(1 - NU[i], 2.2) + dt * .6; if (CP[i] >= 1) C[i] = 1; else C[i] = Math.max(C[i], CP[i] * .9); } } } }
+const hf = THREE.DataUtils.toHalfFloat; function upload() { for (let i = 0; i < NG; i++) { FIELD[i * 4] = hf(D[i]); FIELD[i * 4 + 1] = hf(C[i]); FIELD[i * 4 + 2] = hf(NU[i]); FIELD[i * 4 + 3] = hf(1); } fieldTex.needsUpdate = true; }
+// ---- the hand
+const cv = $('gl'); const toGrid = (cx, cy) => { const a = innerWidth / innerHeight, fa = 4 / 3; let w = innerWidth, h = innerHeight; if (a > fa) w = h * fa; else h = w / fa; return [(cx - (innerWidth - w) / 2) / w * GX, (cy - (innerHeight - h) / 2) / h * GY, w / GX]; };
+function brush(gx, gy, rad, f) { for (let y = Math.max(0, Math.floor(gy - rad * 2)); y < Math.min(GY, gy + rad * 2); y++) for (let x = Math.max(0, Math.floor(gx - rad * 2)); x < Math.min(GX, gx + rad * 2); x++) { const w = Math.exp(-((x - gx) ** 2 + (y - gy) ** 2) / (rad * rad)); if (w > .02) f(y * GX + x, w); } }
+cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); const [gx, gy] = toGrid(e.clientX, e.clientY); S.p = {id: e.pointerId, x: e.clientX, y: e.clientY, gx, gy};
+  if (S.tool === 'cut') { reset2cut(gx, gy); } });
+function reset2cut(gx, gy) { C.fill(0); CP.fill(0); const x = Math.round(Math.max(0, Math.min(GX - 1, gx))), y = Math.round(Math.max(0, Math.min(GY - 1, gy))); C[y * GX + x] = 1; S.cut = {x, y, t: performance.now()}; say('A cut, starting where you touched: it spreads fast through thin film and slowly through thick, so pockets of the old scene hang on.'); }
+cv.addEventListener('pointermove', e => { if (!S.p || S.p.id !== e.pointerId) return; const [gx, gy, cell] = toGrid(e.clientX, e.clientY), dx = (e.clientX - S.p.x) / cell, dy = (e.clientY - S.p.y) / cell;
+  if (S.tool === 'stir') brush(gx, gy, 4, (i, w) => { W[i] += dx * 14 * w; });                // drag right: forward in time; left: back
+  if (S.tool === 'thick') brush(gx, gy, 4, (i, w) => { NU[i] = Math.min(1, NU[i] + .08 * w); NU0[i] = Math.min(1, NU0[i] + .08 * w); });
+  if (S.tool === 'thin') brush(gx, gy, 4, (i, w) => { NU[i] = Math.max(.05, NU[i] - .08 * w); NU0[i] = Math.max(.05, NU0[i] - .08 * w); });
+  S.p.x = e.clientX; S.p.y = e.clientY; S.p.gx = gx; S.p.gy = gy; });
+cv.addEventListener('pointerup', () => { S.p = null; });
+const LINES = {stir: 'Stir: drag right to pull moments forward, left to pull them back. A thick place moves as one; a thin place shears.', thick: 'Thicken: paint where the film should carry a gesture whole.', thin: 'Thin: paint where moments should slip past each other.', cut: 'Cut: touch where the next shot should begin.'};
+const say = t => { $('say').textContent = t; $('say').style.opacity = 1; S.sayT = performance.now() + 4500; };
+$('tools').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.t) { S.tool = b.dataset.t; document.querySelectorAll('#tools [data-t]').forEach(q => q.classList.toggle('on', q === b)); say(LINES[S.tool]); }
+  if (b.dataset.v === 'field') { S.show = !S.show; b.classList.toggle('on', S.show); say(S.show ? 'The fields: blue is ahead in time, amber behind; dark is thin, bright is thick; the gold line is the cut\'s front.' : 'The film.'); } if (b.dataset.v === 'reset') { reset(); say('The film is itself again.'); } });
+addEventListener('keydown', e => { if (e.key === 'n') load(PAIR + 1); });
+// ---- the loop
+const size = () => { R.setSize(innerWidth, innerHeight, false); mat.uniforms.uAsp.value = innerWidth / innerHeight; }; addEventListener('resize', size); size(); load(+(Q.get('pair') || 0));
+let last = performance.now(), T = 0;
+function frame(now) { requestAnimationFrame(frame); const dt = Math.max(0, Math.min(1 / 30, (now - last) / 1000)); last = now; T += dt; step(dt); upload(); mat.uniforms.uT.value = (T * 12) % NF; mat.uniforms.uTB.value = (T * 12 + 17) % NF; mat.uniforms.uShow.value = S.show ? 1 : 0;
+  if (performance.now() > S.sayT) $('say').style.opacity = 0; let dmx = 0, cs = 0; for (let i = 0; i < NG; i++) { dmx = Math.max(dmx, Math.abs(D[i])); cs += C[i]; } $('stat').textContent = `most displaced: ${dmx.toFixed(1)} frames · cut ${Math.round(cs / NG * 100)}%`; R.render(scene, cam); }
+requestAnimationFrame(frame);
+window.__tf = {D, W, NU, NU0, C, S, step, brush, reset2cut, get T() { return T; }, GX, GY};
+</script></body></html>

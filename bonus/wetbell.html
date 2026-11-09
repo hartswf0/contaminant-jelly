@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Wet Bell · jelly-films</title>
+<meta name="description" content="A jellyfish whose bell takes up light from the water: the rim soaks it up, it spreads across the bell as a thin film of colour, and a hard pulse sheds it into a curling vortex ring that pushes the bell on.">
+<link rel="stylesheet" href="../fonts/fonts.css">
+<script type="importmap">{"imports":{"three":"../paeleo/scion/videotext/vendor/three.module.min.js","three/addons/":"../paeleo/scion/videotext/vendor/addons/"}}</script>
+<style>
+:root{color-scheme:dark;--gold:#f0a35a;--dim:#8293a4}html,body{margin:0;height:100%;overflow:hidden;background:#0b1413;color:#e6edf3;font:300 15px/1.5 Jost,system-ui,sans-serif;-webkit-user-select:none;user-select:none;overscroll-behavior:none}
+canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}.ui{position:fixed;pointer-events:none}#guide{inset:0;width:100%;height:100%}
+#top{top:max(14px,env(safe-area-inset-top));left:16px;right:16px;display:flex;justify-content:space-between;gap:10px;font:300 12px 'JetBrains Mono',monospace;color:var(--dim);text-shadow:0 0 6px #000}#top b{font:400 12px Anton,Impact,sans-serif;letter-spacing:.3em;color:var(--gold);margin-right:10px}
+#say{left:0;right:0;top:max(44px,calc(env(safe-area-inset-top) + 34px));text-align:center;font:italic clamp(15px,2.2vw,19px)/1.4 Georgia,serif;text-shadow:0 0 8px #000;padding:0 24px;transition:opacity .6s}
+</style></head><body>
+<canvas id="gl" aria-label="A jellyfish swimming through clouds of light, carrying their colour on its bell and shedding it into its wake"></canvas><canvas class="ui" id="guide"></canvas>
+<div class="ui" id="top"><div><b>WET BELL</b><span id="what"></span></div><div id="stat"></div></div>
+<div class="ui" id="say">Drag to steer · tap to pulse · double-tap a hard pulse to shed what the bell carries</div>
+<script type="module">
+import * as THREE from 'three';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+import {RIGS, makeRig} from '../current/drift/rigs.js';
+const $ = id => document.getElementById(id), Q = new URLSearchParams(location.search), CL = '../current/drift/data/crashlab/', V3 = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z), UP = V3(0, 1, 0);
+const RID = RIGS.some(r => r.id === Q.get('rig')) ? Q.get('rig') : 'glass';
+// ---- the water
+const R = new THREE.WebGLRenderer({canvas: $('gl'), antialias: false}); R.setPixelRatio(Math.min(1.6, devicePixelRatio)); R.toneMapping = THREE.ACESFilmicToneMapping;
+const FOG = new THREE.Color('#122326'), scene = new THREE.Scene(); scene.background = FOG.clone(); scene.fog = new THREE.FogExp2(FOG, .03);
+const cam = new THREE.PerspectiveCamera(55, 1, .1, 200); const comp = new EffectComposer(R); comp.addPass(new RenderPass(scene, cam)); comp.addPass(new UnrealBloomPass(new THREE.Vector2(1, 1), .7, .55, .55)); comp.addPass(new OutputPass());
+const U = {uScale: {value: 1}, uFogD: {value: .03}};
+const glowM = () => new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: U,
+  vertexShader: `uniform float uScale, uFogD; attribute vec3 aC; attribute float aS; varying vec3 vC; void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.); float z = -mv.z; vC = aC * exp(-pow(uFogD * z, 2.)); gl_PointSize = max(1., aS * uScale / z); gl_Position = projectionMatrix * mv; }`,
+  fragmentShader: `varying vec3 vC; void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; gl_FragColor = vec4(vC * exp(-r2 * 13.), 1.); }`});
+const cloud = n => { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3)); g.setAttribute('aC', new THREE.BufferAttribute(new Float32Array(n * 3), 3)); g.setAttribute('aS', new THREE.BufferAttribute(new Float32Array(n), 1)); const p = new THREE.Points(g, glowM()); p.frustumCulled = false; scene.add(p); return p; };
+const A = p => ({P: p.geometry.attributes.position.array, C: p.geometry.attributes.aC.array, S: p.geometry.attributes.aS.array}), upd = p => ['position', 'aC', 'aS'].forEach(k => p.geometry.attributes[k].needsUpdate = true);
+{ const sn = cloud(1500), a = A(sn); for (let i = 0; i < 1500; i++) { a.P.set([(Math.random() - .5) * 80, (Math.random() - .5) * 40, (Math.random() - .5) * 80], i * 3); const b = .06 + Math.random() * .08; a.C.set([b * .8, b, b], i * 3); a.S[i] = .05; } upd(sn); }
+// ---- the jelly
+const rig = makeRig(THREE, RID), body = new THREE.Group(); body.add(rig.group); rig.group.scale.setScalar(rig.norm * 1.1); scene.add(body);
+const J = {p: V3(0, 0, 8), v: V3(), axis: V3(0, .3, -1).normalize(), q: new THREE.Quaternion(), lastP: -9, hard: false};
+// ---- the skin: 6 rings x 24 around; each node has stiffness (how it moves), thickness (how it looks) and saturation (what it carries), and a carried colour
+const RINGS = 6, AROUND = 24, NS = RINGS * AROUND, RB = 1.08, HB = .82;
+const STIFF = new Float32Array(NS), THICK = new Float32Array(NS), SAT = new Float32Array(NS), COL = new Float32Array(NS * 3), LOCAL = Array.from({length: NS}, () => V3()), WORLD = Array.from({length: NS}, () => V3());
+for (let r = 0; r < RINGS; r++) for (let k = 0; k < AROUND; k++) STIFF[r * AROUND + k] = 1 - r / (RINGS - 1) * .75;   // the crown is stiff, the rim soft
+const skin = cloud(NS * 3);
+// ---- the clouds of light: each the colours of a frame of an archive film, drifting
+const CLIPS = ['cineosis-hand-butter', 'ep3-the-raft', 'ep6-the-knot', 'cineosis-handmade-film'], CN = 700;
+const CLOUDS = CLIPS.map((id, ci) => { const c = {id, ctr: V3(Math.cos(ci * 1.7) * 9, Math.sin(ci * 2.3) * 3, -6 - ci * 9), P: new Float32Array(CN * 3), C: new Float32Array(CN * 3), alive: new Uint8Array(CN).fill(1), pts: cloud(CN), got: 0};
+  for (let i = 0; i < CN; i++) { const d = V3().randomDirection().multiplyScalar(Math.cbrt(Math.random()) * 2.6); c.P.set([c.ctr.x + d.x, c.ctr.y + d.y * .7, c.ctr.z + d.z], i * 3); c.C.set([.5, .5, .5], i * 3); }
+  const im = new Image(); im.onload = () => { const cv = document.createElement('canvas'); cv.width = 40; cv.height = 30; const g = cv.getContext('2d'); g.drawImage(im, 0, 0, 40, 30); const d = g.getImageData(0, 0, 40, 30).data; for (let i = 0; i < CN; i++) { const q = Math.floor(Math.random() * 1200) * 4, b = 1.4; c.C.set([(d[q] / 255) ** 2.2 * b, (d[q + 1] / 255) ** 2.2 * b, (d[q + 2] / 255) ** 2.2 * b], i * 3); } }; im.src = `${CL}${id}/f020.jpg`; return c; });
+// ---- the wake: a vortex ring per pulse (it curls, travels back, spreads and fades); shed colour rides in it
+const RINGS_W = [], WN = 200; const wakePts = cloud(8 * WN);
+function shedRing(strength, shed) { const rim = WORLD.slice((RINGS - 1) * AROUND), ctr = rim.reduce((s, v) => s.add(v), V3()).divideScalar(rim.length), back = J.axis.clone().negate();
+  const r = {ctr: ctr.addScaledVector(back, .3), dir: back, R: RB * .9, age: 0, str: strength, th: new Float32Array(WN), ph: new Float32Array(WN), col: new Float32Array(WN * 3)};
+  for (let i = 0; i < WN; i++) { r.th[i] = i / WN * Math.PI * 2; r.ph[i] = Math.random() * Math.PI * 2; r.col.set([.25, .45, .5], i * 3); }
+  if (shed) { let k = 0; for (let n = (RINGS - 2) * AROUND; n < NS; n++) { const take = SAT[n] * .6; if (take < .02) continue; SAT[n] -= take; for (let m = 0; m < Math.min(8, take * 30) && k < WN; m++, k++) { const idx = Math.floor(Math.random() * WN); r.col.set([COL[n * 3] * 2, COL[n * 3 + 1] * 2, COL[n * 3 + 2] * 2], idx * 3); } } S.shed += k; if (k) say(`shed ${k} motes of what the bell carried into the wake`); }
+  RINGS_W.push(r); if (RINGS_W.length > 8) RINGS_W.shift(); }
+// ---- pulses
+const S = {sayT: performance.now() + 5000, st: null, lastTap: 0, glide: 0, absorbed: 0, shed: 0};
+function pulse(hard) { if (G.T - J.lastP < .45) return; J.lastP = G.T; J.hard = hard; J.v.addScaledVector(J.axis, hard ? 4.5 : 2.6); shedRing(hard ? 1.4 : 1, hard); try { navigator.vibrate && navigator.vibrate(hard ? [10, 20, 10] : 8); } catch (e) {} }
+const pulseC = ph => ph < .3 ? Math.sin(ph / .3 * Math.PI / 2) : 1 - (t => t * t * (3 - 2 * t))((ph - .3) / .7);
+// ---- input: drag steers (relative to the view); tap pulses; double-tap is a hard pulse that sheds
+const cv = $('gl'), G = {T: 0}, keys = new Set();
+cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); S.st = {id: e.pointerId, x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY, t: performance.now()}; });
+cv.addEventListener('pointermove', e => { if (S.st && S.st.id === e.pointerId) { S.st.x = e.clientX; S.st.y = e.clientY; } });
+cv.addEventListener('pointerup', e => { if (!S.st || S.st.id !== e.pointerId) return; const tap = performance.now() - S.st.t < 220 && Math.hypot(S.st.x - S.st.x0, S.st.y - S.st.y0) < 12; S.st = null; if (!tap) return; const now = performance.now(); if (now - S.lastTap < 320) { pulse(true); S.lastTap = 0; } else { S.lastTap = now; setTimeout(() => { if (S.lastTap === now) pulse(false); }, 330); } });
+addEventListener('keydown', e => { keys.add(e.key.toLowerCase()); if (e.key === ' ') { e.preventDefault(); pulse(e.shiftKey); } }); addEventListener('keyup', e => keys.delete(e.key.toLowerCase()));
+const say = t => { $('say').textContent = t; $('say').style.opacity = 1; S.sayT = performance.now() + 3200; };
+// ---- the loop
+const size = () => { R.setSize(innerWidth, innerHeight, false); comp.setSize(innerWidth, innerHeight); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); }; addEventListener('resize', size); size();
+let last = performance.now(); const camP = V3(0, 3, 16), camL = V3(), gd = $('guide'), gx = gd.getContext('2d');
+function frame(now) { requestAnimationFrame(frame); const dt = Math.max(0, Math.min(1 / 30, (now - last) / 1000)); last = now; G.T += dt;
+  // steering: the bell turns toward where the finger pushes (relative to the view)
+  const camF = cam.getWorldDirection(V3()), camR = V3().crossVectors(camF, UP).normalize(), camU = V3().crossVectors(camR, camF);
+  let sx = 0, sy = 0; if (S.st) { sx = (S.st.x - S.st.x0) / 90; sy = (S.st.y - S.st.y0) / 90; } if (keys.has('a')) sx = -1; if (keys.has('d')) sx = 1; if (keys.has('w')) sy = -1; if (keys.has('s')) sy = 1;
+  if (sx || sy) { const want = camF.clone().addScaledVector(camR, sx * 1.4).addScaledVector(camU, -sy * 1.4).normalize(); J.axis.lerp(want, 1 - Math.exp(-dt * 2.2)).normalize(); if (G.T - J.lastP > 1.05) pulse(false); }
+  // the bell: a pulse contracts the rim; the soft rim wobbles more than the stiff crown
+  const ph = Math.min(1, (G.T - J.lastP) / 1.0), con = J.lastP > 0 && G.T - J.lastP < 1 ? pulseC(ph) * (J.hard ? 1.3 : 1) : 0;
+  J.q.slerp(new THREE.Quaternion().setFromUnitVectors(UP, J.axis), 1 - Math.exp(-dt * 4));
+  for (let r = 0; r < RINGS; r++) for (let k = 0; k < AROUND; k++) { const n = r * AROUND + k, th = (r + .5) / RINGS * 1.35, a = k / AROUND * Math.PI * 2, soft = 1 - STIFF[n], wob = Math.sin(G.T * 3.1 + k * .8 + r) * .03 * soft * (1 + 3 * con);
+    const rad = RB * Math.sin(th) * (1 - .26 * con * soft * 1.4) + wob; LOCAL[n].set(Math.cos(a) * rad, HB * Math.cos(th) - .25 + con * .08 * soft, Math.sin(a) * rad); WORLD[n].copy(LOCAL[n]).applyQuaternion(J.q).add(J.p); }
+  // the water's memory: a young vortex ring beneath the bell pushes it on as the bell refills (pulse -> curl -> glide)
+  S.glide = 0; for (const w of RINGS_W) { w.age += dt; const d = w.ctr.distanceTo(J.p); if (w.age > .25 && w.age < 1.1 && d < 2.4) { const push = 1.6 * w.str * (1 - (w.age - .25) / .85); J.v.addScaledVector(J.axis, push * dt); S.glide = Math.max(S.glide, push); } w.ctr.addScaledVector(w.dir, dt * (1.3 * Math.exp(-w.age * .6))); w.R += dt * .25; }
+  J.v.multiplyScalar(Math.exp(-dt * .9)); J.p.addScaledVector(J.v, dt); J.p.clampLength(0, 45);
+  // the rim takes up light: a cloud's mote that touches the rim is soaked into the nearest rim node (saturation, colour, thickness)
+  const rimC = V3(); for (let k = 0; k < AROUND; k++) rimC.add(WORLD[(RINGS - 1) * AROUND + k]); rimC.divideScalar(AROUND);
+  for (const c of CLOUDS) { if (c.ctr.distanceTo(J.p) > 6) continue; for (let i = 0; i < CN; i++) { if (!c.alive[i]) continue; const px = c.P[i * 3], py = c.P[i * 3 + 1], pz = c.P[i * 3 + 2]; let best = -1, bd = .42; for (let k = 0; k < AROUND * 2; k++) { const n = (RINGS - 2) * AROUND + k, w = WORLD[n], d = Math.hypot(w.x - px, w.y - py, w.z - pz); if (d < bd) { bd = d; best = n; } }
+    if (best >= 0 && J.v.length() > .4) { c.alive[i] = 0; c.got++; S.absorbed++; const s0 = SAT[best], s1 = s0 + .06; for (let ch = 0; ch < 3; ch++) COL[best * 3 + ch] = (COL[best * 3 + ch] * s0 + c.C[i * 3 + ch] * .06) / s1; SAT[best] = s1; THICK[best] = Math.min(1, THICK[best] + .05); } } }
+  // what it carries spreads over the bell while it glides (slower while it contracts); thickness drains as it spreads; nothing is lost but what is shed
+  const kd = dt * (con > .2 ? .4 : 2.2); const S2 = SAT.slice(), C2 = COL.slice(), T2 = THICK.slice();
+  for (let r = 0; r < RINGS; r++) for (let k = 0; k < AROUND; k++) { const n = r * AROUND + k, nb = [r * AROUND + (k + 1) % AROUND, r * AROUND + (k + AROUND - 1) % AROUND]; if (r > 0) nb.push(n - AROUND); if (r < RINGS - 1) nb.push(n + AROUND);
+    let ds = 0, dth = 0; const dc = [0, 0, 0]; for (const m of nb) { const f = Math.min(STIFF[n], STIFF[m]) * .5 + .5; ds += (S2[m] - S2[n]) * f; dth += (T2[m] - T2[n]) * f; for (let ch = 0; ch < 3; ch++) dc[ch] += (C2[m * 3 + ch] * S2[m] - C2[n * 3 + ch] * S2[n]) * f; }
+    SAT[n] = Math.max(0, S2[n] + ds * kd * .25); THICK[n] = Math.max(0, T2[n] + dth * kd * .25 - dt * .02); if (SAT[n] > 1e-4) for (let ch = 0; ch < 3; ch++) COL[n * 3 + ch] = Math.max(0, (C2[n * 3 + ch] * S2[n] + dc[ch] * kd * .25) / SAT[n]); }
+  // draw the skin: brightness is saturation, colour is what it carries, tinted by thin-film interference from its thickness
+  { const a = A(skin); let q = 0; for (let n = 0; n < NS; n++) { const t = THICK[n], hue = [.5 + .5 * Math.cos(6.28 * (t * 1.6 + 0)), .5 + .5 * Math.cos(6.28 * (t * 1.6 + .33)), .5 + .5 * Math.cos(6.28 * (t * 1.6 + .67))], s = Math.min(1.2, SAT[n] * 2.2);
+      for (let j = 0; j < 3; j++, q++) { a.P.set([WORLD[n].x + (j - 1) * .03, WORLD[n].y + (j === 1 ? .03 : 0), WORLD[n].z], q * 3); a.C.set([0, 1, 2].map(ch => (COL[n * 3 + ch] * s * 1.3 + hue[ch] * t * .25 + .03) * (j === 1 ? 1 : .6)), q * 3); a.S[q] = .1 + .14 * Math.min(1, SAT[n] * 3); } } upd(skin); }
+  for (const c of CLOUDS) { const a = A(c.pts); for (let i = 0; i < CN; i++) { if (c.alive[i]) { c.P[i * 3] += Math.sin(G.T * .4 + i) * .004; c.P[i * 3 + 1] += Math.cos(G.T * .3 + i * 1.3) * .003; } a.P.set([c.P[i * 3], c.P[i * 3 + 1], c.P[i * 3 + 2]], i * 3); a.C.set([c.C[i * 3] * .55, c.C[i * 3 + 1] * .55, c.C[i * 3 + 2] * .55], i * 3); a.S[i] = c.alive[i] ? .13 : 0; } upd(c.pts); }
+  { const a = A(wakePts); let q = 0; for (const w of RINGS_W) { const fade = Math.max(0, 1 - w.age / 4.5), u = Math.abs(w.dir.y) > .9 ? V3(1, 0, 0) : UP, e1 = V3().crossVectors(w.dir, u).normalize(), e2 = V3().crossVectors(w.dir, e1);
+      for (let i = 0; i < WN; i++, q++) { w.ph[i] += dt * 4 * fade; const th = w.th[i], rr = w.R + Math.cos(w.ph[i]) * .28, ax = Math.sin(w.ph[i]) * .28; const p = w.ctr.clone().addScaledVector(e1, Math.cos(th) * rr).addScaledVector(e2, Math.sin(th) * rr).addScaledVector(w.dir, ax); a.P.set([p.x, p.y, p.z], q * 3); a.C.set([w.col[i * 3] * fade, w.col[i * 3 + 1] * fade, w.col[i * 3 + 2] * fade], q * 3); a.S[q] = .09; } }
+    for (; q < 8 * WN; q++) a.S[q] = 0; upd(wakePts); }
+  // the camera: behind and a little above, looking ahead along the glide
+  const back = J.axis.clone().setY(J.axis.y * .5).normalize(); camP.lerp(J.p.clone().addScaledVector(back, -7.5).add(V3(0, 2.6, 0)), 1 - Math.pow(.05, dt)); camL.lerp(J.p.clone().addScaledVector(J.axis, 2.5), 1 - Math.pow(.02, dt)); cam.position.copy(camP); cam.lookAt(camL);
+  body.position.copy(J.p); body.quaternion.copy(J.q); const ps = innerHeight * R.getPixelRatio(); U.uScale.value = ps * .5 / Math.tan(THREE.MathUtils.degToRad(cam.fov / 2));
+  rig.update({t: G.T, dt, cam: cam.position, ph: G.T - J.lastP < 1 ? (G.T - J.lastP) : 0, glow: .2, hurt: 0, scale: ps * .0095 * 1.1, lit: 0});
+  // the bell, unrolled: a disc (crown in the middle, rim at the edge) showing what it carries and how thick the film is
+  if (gd.width !== innerWidth) { gd.width = innerWidth; gd.height = innerHeight; } gx.clearRect(0, 0, gd.width, gd.height); const ox = gd.width - 80, oy = 120;
+  for (let r = 0; r < RINGS; r++) for (let k = 0; k < AROUND; k++) { const n = r * AROUND + k, a = k / AROUND * Math.PI * 2, rr = 10 + r * 10, s = Math.min(1, SAT[n] * 2.5); gx.fillStyle = `rgba(${[0, 1, 2].map(ch => Math.min(255, (COL[n * 3 + ch] ** (1 / 2.2)) * 255 * s + 30) | 0)},${.25 + .75 * s})`; gx.beginPath(); gx.arc(ox + Math.cos(a) * rr, oy + Math.sin(a) * rr, 3 + 3 * THICK[n], 0, 7); gx.fill(); }
+  gx.fillStyle = 'rgba(207,221,232,.6)'; gx.font = "300 10px 'JetBrains Mono', monospace"; gx.textAlign = 'center'; gx.fillText('the bell: crown · rim', ox, oy + 80);
+  if (S.glide > .1) { gx.fillStyle = 'rgba(240,163,90,.85)'; gx.fillText('the wake pushes: glide', innerWidth / 2, innerHeight - 30); }
+  let carry = 0; for (let n = 0; n < NS; n++) carry += SAT[n]; $('stat').textContent = `carrying ${carry.toFixed(1)} · soaked up ${S.absorbed} · shed ${S.shed}`; $('what').textContent = `${RINGS_W.length} rings in the wake`;
+  if (performance.now() > S.sayT) $('say').style.opacity = 0; comp.render(); }
+requestAnimationFrame(frame);
+window.__wb = {J, S, SAT, THICK, COL, CLOUDS, RINGS_W, pulse, get T() { return G.T; }, RINGS, AROUND};
+</script></body></html>
