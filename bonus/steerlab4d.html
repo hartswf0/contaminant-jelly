@@ -21,7 +21,7 @@ canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-acti
 <div class="ui" id="hud"></div><div class="ui" id="say"></div><a class="ui" id="next"></a>
 <div class="ui" id="card"><div class="k">BONUS · THE STEER LAB 4D</div><h1>A fourth direction</h1>
   <p>Every finger is a tentacle. Touch a stone and an arm grabs it. Some stones live in a fourth direction, w; grab one and the arm pulls you there.</p>
-  <div class="go">TOUCH TO BEGIN</div><div class="lk"><a href="steerlab3d.html">the 3D lab</a> · <a href="SCION_STEERLAB4D.md">how it works</a></div></div>
+  <div class="go">TOUCH TO BEGIN</div><div class="lk"><a href="fourspace.html">four-space: five more games →</a> · <a href="steerlab3d.html">the 3D lab</a> · <a href="SCION_STEERLAB4D.md">how it works</a></div></div>
 <script type="module">
 import * as THREE from 'three';
 import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
@@ -106,7 +106,7 @@ $('next').addEventListener('click', e => { e.preventDefault(); load(SK + 1); });
 // ---------------------------------------------------------------- the loop
 const size = () => { R.setSize(innerWidth, innerHeight, false); comp.setSize(innerWidth, innerHeight); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); }; addEventListener('resize', size); size();
 let last = performance.now(); const gd = $('guide'), gx = gd.getContext('2d'); load(SK);
-function frame(now) { requestAnimationFrame(frame); const dt = Math.min(1 / 30, (now - last) / 1000); last = now; T += dt;
+function frame(now) { requestAnimationFrame(frame); const dt = Math.max(0, Math.min(1 / 30, (now - last) / 1000)); last = now; T += dt;
   // the arms pull in space; an arm holding a stone at another w also pulls you along w, harder the more load it takes
   const o = AR.step(dt, T, B, env); if (o.snap) { B.v.addScaledVector(o.F, .14); B.w.addScaledVector(o.T, .1); }
   const held = AR.arms.filter(a => a.mode === 'latch' && a.anc); let pw = 0; for (const a of held) if (a.anc.w !== undefined) pw += (a.anc.w - S.W) * (.6 + Math.min(1.4, a.ten / 15)); S.Wv += pw * dt * .9; S.Wv *= Math.exp(-dt * 1.6); const W0 = S.W; S.W = clamp(S.W + S.Wv * dt, -6, 6);

@@ -157,7 +157,7 @@ function reset() { B.p.set(...RM.start); B.v.set(0, 0, 0); B.w.set(0, 0, 0); B.q
 // ---------------------------------------------------------------- the loop
 const size = () => { R.setSize(innerWidth, innerHeight, false); comp.setSize(innerWidth, innerHeight); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); }; addEventListener('resize', size); size();
 let T = 0, last = performance.now(); const camT = B.p.clone(), gd = $('guide'), gx = gd.getContext('2d');
-function frame(now) { requestAnimationFrame(frame); const dt = Math.min(1 / 30, (now - last) / 1000); last = now; T += dt; U.uT.value = T;
+function frame(now) { requestAnimationFrame(frame); const dt = Math.max(0, Math.min(1 / 30, (now - last) / 1000)); last = now; T += dt; U.uT.value = T;
   KELP.forEach(k => k.nodes.forEach(n => { n.p.x = k.x + Math.sin(T * .7 + k.ph + n.j * .3) * .02 * n.j * n.j * .3; n.p.z = k.z + Math.cos(T * .5 + k.ph + n.j * .2) * .015 * n.j * n.j * .3; }));
   if (RM.worm) WORM.live = (WORM.live + dt * 2.2) % NG;   // the film plays on through its coil
   // the arms pull; the bell answers in three dimensions

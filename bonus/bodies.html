@@ -314,7 +314,7 @@ function reset() { location.reload(); }
 // ---------------------------------------------------------------- the loop
 const size = () => { R.setSize(innerWidth, innerHeight, false); comp.setSize(innerWidth, innerHeight); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); }; addEventListener('resize', size); size();
 let last = performance.now(); const gd = $('guide'), gx = gd.getContext('2d');
-function frame(now) { requestAnimationFrame(frame); const dt = Math.min(1 / 30, (now - last) / 1000); last = now; T += dt; U.uT.value = T; camBasis();
+function frame(now) { requestAnimationFrame(frame); const dt = Math.max(0, Math.min(1 / 30, (now - last) / 1000)); last = now; T += dt; U.uT.value = T; camBasis();
   S.follow = 0; if (S.state === 'play') sp.step(dt);
   if (!sp.own) { const wl = B.w.length(); if (wl > 1e-5) B.q.premultiply(new THREE.Quaternion().setFromAxisAngle(B.w.clone().divideScalar(wl), wl * dt)).normalize(); B.p.addScaledVector(B.v, dt); }
   sp.post?.(); if (!SPI.floor) { const fy = floorY(B.p.x, B.p.z); if (B.p.y < fy + 1) { B.p.y = fy + 1; if (B.v.y < -4) move('bell-first into the floor', [20, 30]); B.v.y = Math.abs(B.v.y) * .3; } }
