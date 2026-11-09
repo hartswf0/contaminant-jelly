@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Film Matter · jelly-films</title>
+<meta name="description" content="A film made of its own pixels: it hangs as a sheet, pours as water, settles as sand, and reassembles; your jellyfish swims through it, and the film keeps playing in whatever it has become.">
+<link rel="stylesheet" href="../fonts/fonts.css">
+<script type="importmap">{"imports":{"three":"../paeleo/scion/videotext/vendor/three.module.min.js","three/addons/":"../paeleo/scion/videotext/vendor/addons/"}}</script>
+<style>
+:root{color-scheme:dark;--gold:#f0a35a;--dim:#8293a4}html,body{margin:0;height:100%;overflow:hidden;background:#0b1413;color:#e6edf3;font:300 15px/1.5 Jost,system-ui,sans-serif;-webkit-user-select:none;user-select:none;overscroll-behavior:none}a{color:var(--gold);text-decoration:none}
+canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}.ui{position:fixed;pointer-events:none}
+#top{top:max(14px,env(safe-area-inset-top));left:16px;right:16px;display:flex;justify-content:space-between;gap:10px;font:300 12px 'JetBrains Mono',monospace;color:var(--dim);text-shadow:0 0 6px #000}#top b{font:400 12px Anton,Impact,sans-serif;letter-spacing:.3em;color:var(--gold);margin-right:10px}
+#say{left:0;right:0;top:max(44px,calc(env(safe-area-inset-top) + 34px));text-align:center;font:italic clamp(15px,2.2vw,19px)/1.4 Georgia,serif;text-shadow:0 0 8px #000;padding:0 24px;transition:opacity .6s}
+#verbs{left:0;right:0;bottom:max(18px,env(safe-area-inset-bottom));display:flex;justify-content:center;gap:10px;pointer-events:auto}#verbs button{all:unset;cursor:pointer;font:400 15px Anton,Impact,sans-serif;letter-spacing:.24em;padding:11px 18px;border-radius:20px;color:var(--dim);background:rgba(5,9,9,.6)}#verbs button.on{color:#0b1413;background:var(--gold)}
+#clip{top:max(40px,calc(env(safe-area-inset-top) + 30px));right:16px;pointer-events:auto;font:300 12px 'JetBrains Mono',monospace;color:var(--gold);cursor:pointer;text-shadow:0 0 6px #000}
+</style></head><body>
+<canvas id="gl" aria-label="A film frame made of particles in a tank of water; a jellyfish swims through it"></canvas>
+<div class="ui" id="top"><div><b>FILM MATTER</b><span id="what"></span></div><div id="stat"></div></div>
+<div class="ui" id="say">Swim with a finger · tap to pulse · then turn the film to water, or to sand</div><div class="ui" id="clip"></div>
+<div class="ui" id="verbs"><button data-s="film" class="on">FILM</button><button data-s="water">WATER</button><button data-s="sand">SAND</button></div>
+<script type="module">
+import * as THREE from 'three';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+import {RIGS, makeRig} from '../current/drift/rigs.js';
+import {makeMatter} from './filmmatter-sim.js';
+const $ = id => document.getElementById(id), Q = new URLSearchParams(location.search), CL = '../current/drift/data/crashlab/';
+const CLIPS = ['cineosis-hand-butter', 'ep3-the-raft', 'ep6-the-knot', 'cineosis-handmade-film'], nice = id => id.replace(/^cineosis-|^ep\d-/, '').replace(/-/g, ' ');
+let RID = Q.get('rig'); if (!RID) try { RID = localStorage.getItem('cj-rig'); } catch (e) {} if (!RIGS.some(r => r.id === RID)) RID = 'golden';
+const M = makeMatter(), N = M.N, NX = M.NX, NY = M.NY;
+// ---- the water and the camera: a tank seen from the front
+const R = new THREE.WebGLRenderer({canvas: $('gl'), antialias: false}); R.setPixelRatio(Math.min(1.6, devicePixelRatio)); R.toneMapping = THREE.ACESFilmicToneMapping;
+const scene = new THREE.Scene(); scene.background = new THREE.Color('#0d1a1c'); const cam = new THREE.PerspectiveCamera(40, 1, .1, 100);
+const comp = new EffectComposer(R); comp.addPass(new RenderPass(scene, cam)); comp.addPass(new UnrealBloomPass(new THREE.Vector2(1, 1), .35, .5, .8)); comp.addPass(new OutputPass());
+const U = {uScale: {value: 1}};
+const film = (() => { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(M.X, 3)); g.setAttribute('aC', new THREE.BufferAttribute(new Float32Array(N * 3), 3));
+  const m = new THREE.ShaderMaterial({transparent: true, depthWrite: false, uniforms: U, vertexShader: `uniform float uScale; attribute vec3 aC; varying vec3 vC; void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.); vC = aC; gl_PointSize = max(1., .16 * uScale / -mv.z); gl_Position = projectionMatrix * mv; }`,
+    fragmentShader: `varying vec3 vC; void main(){ vec2 q = gl_PointCoord - .5; float r2 = dot(q, q); if (r2 > .25) discard; gl_FragColor = vec4(vC, .92 * exp(-r2 * 9.)); }`}); const p = new THREE.Points(g, m); p.frustumCulled = false; scene.add(p); return p; })();
+{ const n = 900, g = new THREE.BufferGeometry(), P = new Float32Array(n * 3); let k = 0; const put = (x, y, z) => { if (k < n) P.set([x, y, z], 3 * k++); }; for (let x = -M.BW; x <= M.BW; x += .1) { put(x, 0, -M.BZ); put(x, 0, M.BZ); put(x, M.TOP, M.BZ); } for (let y = 0; y <= M.TOP; y += .1) { put(-M.BW, y, M.BZ); put(M.BW, y, M.BZ); }
+  g.setAttribute('position', new THREE.BufferAttribute(P, 3)); const t = new THREE.Points(g, new THREE.PointsMaterial({color: 0x2a4448, size: .03})); scene.add(t); }
+// ---- the jelly
+const rig = makeRig(THREE, RID), body = new THREE.Group(); body.add(rig.group); rig.group.scale.setScalar(rig.norm * .42); scene.add(body); let ph = 0, lastP = -9;
+// ---- the film: each particle keeps its pixel; every frame of the clip is sampled to the particle grid
+let FRAMES = [], CLIP = 0; const cvs = document.createElement('canvas'); cvs.width = NX; cvs.height = NY; const cx = cvs.getContext('2d', {willReadFrequently: true});
+function loadClip(i) { CLIP = i % CLIPS.length; const id = CLIPS[CLIP]; FRAMES = new Array(64).fill(null); $('clip').textContent = `film: ${nice(id)} ▸`;
+  for (let k = 0; k < 64; k++) { const im = new Image(); im.onload = () => { cx.drawImage(im, 0, 0, NX, NY); const d = cx.getImageData(0, 0, NX, NY).data, a = new Float32Array(N * 3); for (let q = 0; q < N; q++) { a[q * 3] = (d[q * 4] / 255) ** 2.2; a[q * 3 + 1] = (d[q * 4 + 1] / 255) ** 2.2; a[q * 3 + 2] = (d[q * 4 + 2] / 255) ** 2.2; } if (id === CLIPS[CLIP]) FRAMES[k] = a; }; im.src = `${CL}${id}/f${String(k).padStart(3, '0')}.jpg`; } }
+$('clip').addEventListener('click', () => loadClip(CLIP + 1)); loadClip(0);
+// ---- the verbs: what the film is made of
+const LINES = {film: 'A film: a sheet of its own pixels, still playing. Swim into it and it gives, and springs back.', water: 'Water: the film pours, and goes on playing as it flows.', sand: 'Sand: the film falls in grains and settles; every grain is still a pixel of the film.', home: 'The film comes back: every pixel flies home.'};
+const say = t => { $('say').textContent = t; $('say').style.opacity = 1; S.sayT = performance.now() + 3500; };
+const S = {sayT: performance.now() + 5000, st: null};
+function setState(s) { const to = s === 'film' && M.state !== 'film' ? 'home' : s; M.set(to); say(LINES[to]); document.querySelectorAll('#verbs button').forEach(b => b.classList.toggle('on', b.dataset.s === s)); try { navigator.vibrate && navigator.vibrate(12); } catch (e) {} }
+$('verbs').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setState(b.dataset.s); });
+addEventListener('keydown', e => { const k = e.key; if (k === '1') setState('film'); if (k === '2') setState('water'); if (k === '3') setState('sand'); if (k === ' ') { e.preventDefault(); pulse(); } });
+// ---- swimming: a finger is a stick (in the plane of the tank); a quick tap pulses the bell
+const cv = $('gl'); function pulse() { M.pulse(4); lastP = M.t; try { navigator.vibrate && navigator.vibrate([6, 10, 6]); } catch (e) {} }
+cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); S.st = {id: e.pointerId, x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY, t: performance.now()}; });
+cv.addEventListener('pointermove', e => { if (S.st && S.st.id === e.pointerId) { S.st.x = e.clientX; S.st.y = e.clientY; } });
+cv.addEventListener('pointerup', e => { if (S.st && S.st.id === e.pointerId) { if (performance.now() - S.st.t < 220 && Math.hypot(S.st.x - S.st.x0, S.st.y - S.st.y0) < 12) pulse(); S.st = null; } });
+const keys = new Set(); addEventListener('keydown', e => keys.add(e.key)); addEventListener('keyup', e => keys.delete(e.key));
+// ---- the loop
+const size = () => { R.setSize(innerWidth, innerHeight, false); comp.setSize(innerWidth, innerHeight); cam.aspect = innerWidth / innerHeight; const fit = Math.max((M.BW * 2 + .6) / cam.aspect, M.TOP + .6) / 2 / Math.tan(THREE.MathUtils.degToRad(20)); cam.position.set(0, M.TOP / 2, fit); cam.lookAt(0, M.TOP / 2, 0); cam.updateProjectionMatrix(); }; addEventListener('resize', size); size();
+let last = performance.now(), fk = 0;
+function frame(now) { requestAnimationFrame(frame); const dt = Math.max(0, Math.min(1 / 30, (now - last) / 1000)); last = now; const J = M.jelly;
+  let sx = 0, sy = 0; if (S.st) { sx = (S.st.x - S.st.x0) / 80; sy = -(S.st.y - S.st.y0) / 80; } if (keys.has('ArrowLeft') || keys.has('a')) sx = -1; if (keys.has('ArrowRight') || keys.has('d')) sx = 1; if (keys.has('ArrowUp') || keys.has('w')) sy = 1; if (keys.has('ArrowDown') || keys.has('s')) sy = -1;
+  const m = Math.min(1, Math.hypot(sx, sy)); J.vx += ((m ? sx / Math.max(1, Math.hypot(sx, sy)) * 3.2 : 0) - J.vx) * Math.min(1, dt * 3); J.vy += ((m ? sy / Math.max(1, Math.hypot(sx, sy)) * 3.2 : -.3) - J.vy) * Math.min(1, dt * 3);
+  if (m > .3 && M.t - lastP > 1.1) pulse();   // swimming is pulsing
+  M.step(dt || 1 / 60);
+  // colour: each particle shows its own pixel of the current frame, whatever the film has become
+  fk = (fk + dt * 12) % 64; const fr = FRAMES[Math.floor(fk)] || FRAMES.find(Boolean); if (fr) film.geometry.attributes.aC.array.set(fr); film.geometry.attributes.aC.needsUpdate = true; film.geometry.attributes.position.needsUpdate = true;
+  body.position.set(J.x, J.y, J.z); const tilt = Math.atan2(-J.vx, Math.max(.5, J.vy + 1.5)) * .5; body.rotation.z += (tilt - body.rotation.z) * Math.min(1, dt * 3);
+  const ps = innerHeight * R.getPixelRatio(); U.uScale.value = ps * .5 / Math.tan(THREE.MathUtils.degToRad(cam.fov / 2));
+  rig.update({t: M.t, dt, cam: cam.position, ph: M.t - lastP < 1 ? M.t - lastP : 0, glow: .3, hurt: 0, scale: ps * .0095 * .45, lit: 0});
+  if (performance.now() > S.sayT) $('say').style.opacity = 0; $('what').textContent = `${M.state === 'home' ? 'coming back' : M.state} · ${nice(CLIPS[CLIP])} · frame ${Math.floor(fk) + 1}`; $('stat').textContent = `${N} pixels`;
+  comp.render(); }
+requestAnimationFrame(frame);
+window.__fm = {M, setState, pulse, get fk() { return fk; }, get FRAMES() { return FRAMES; }};
+</script></body></html>
