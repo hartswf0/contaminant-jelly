@@ -84,6 +84,32 @@ A ten-shot film, about 90 seconds, shot live on the running animal: nothing is p
 - **A new shot in the Jelly Reel:** the light is put inside the wreck, and the jelly goes down to it.
 - **Model loading:** three.js's own GLTFLoader (r160, MIT) is now in the project's vendor folder.
 
+## 5b · The water, the light and the tentacles
+**The direction:** "Why are the tentacles of the jellyfish not good? Why no caustics, or particles, sedimentation in the water? No light, no surface scattering, etc."
+
+Each was missing; each is now built.
+
+| what was missing | built as |
+|---|---|
+| **Caustics** | Every lit surface (seabed, gravel, hull, barrels, every scanned rock) catches a moving net of light from the surface: two layers of a tiling caustic pattern, strongest on upward faces, fading with depth. It is added in each material's own shader, so it needs no shadow maps. |
+| **Light** | A lighter water column above and darker below; 52 soft shafts of light leaning with the sun, flickering; the light you place is now a real lamp that lights the wreck, the sand and the jelly around it. |
+| **The surface** | Seen from below: a bright, rippling skin, brightest overhead (Snell's window), fading with distance. |
+| **Particles** | Marine snow: 2,600 flecks sinking and swaying everywhere, near ones large and soft; it wraps round the camera, so it never runs out. |
+| **Sedimentation** | Silt lifts off the seabed where a vortex ring reaches the bottom or the bell passes within 2.4 m of it; it billows, drifts and settles again over 7 s. |
+| **Scattering in the flesh** | The bell has a bright rim where you see it edge-on, and glows through when the sun or the lamp is behind it. |
+| **The tentacles** | They were 24 thin lines of 10 points. They are now 32 ribbons of 18 points that always face you: fine, tapering, faintly beaded with stinging cells, swaying and trailing with more drag. The four oral arms are broad frilled ribbons. They glow with the canals when the jelly is touched. |
+
+**Fixed along the way:**
+- **The bell vanished when the jelly swam far from where it started.** Its bounds were measured once at the start, so the renderer culled it. This was a real bug in play, also fixed in the Thinking Jelly.
+
+**Tested:** the page loads and runs with no shader or script errors, with and without the Quixel files. The screenshots show the caustics on the seabed, the shafts, the surface, the snow, and the ribbon tentacles; a silt puff was triggered near the floor.
+
+**Not yet judged:**
+- **Frame rate on a phone.** This adds shader work to every surface, and the shafts and snow overdraw.
+- **Whether the tentacles now read as good in motion.** I have only stills.
+
+**"Include them all":** every asset in both packs is used in the scene. On the public site that is every CC0 asset. The three Quixel scans (Thai Beach rock, coral, sand) are in the scene only where the files exist locally, because their own note says to keep them out of the public repository. Publishing them is the owner's decision, to be checked against the Fab licence.
+
 ## 5a · What is not built
 - **Real fluid:** the water is a thrust model with drawn vortex rings, not a fluid simulation.
 - **Seeing:** the eyes sense the light's direction and the wall's nearness; they do not form images.
