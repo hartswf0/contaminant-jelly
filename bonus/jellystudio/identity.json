@@ -1,5 +1,25 @@
 {
-"spans": {
+"tracks": {
+"boxes-found": {
+"roar_D": "Hollow Square Roar-Brute 0:10.12",
+"roar_C": "Hollow Square Roar-Brute 0:41.62",
+"roar_D2": "Hollow Square Roar-Brute 0:48.72",
+"roar_long": "Hollow Square Roar-Brute 1:47.66",
+"roar_out": "Hollow Square Roar-Brute 1:52.00",
+"answer_A": "Boxes on My Back 2:23.97",
+"kick": "Trap-Tox & Cardboard 1:07.11",
+"snare": "The Cathedral of Tape Echo 2:00.23",
+"hat": "Subterranean Dreams 0:18.55",
+"knock": "KNOCK (new)",
+"ohat": "OPEN HAT (new)",
+"sub_D": "SUB D (new)",
+"sub_A": "SUB A (new)",
+"sub_C": "SUB C (new)",
+"sub_G": "SUB G (new)",
+"riser": "RISER (new)",
+"hiss": "AIR (new)"
+},
+"boxes-made": {
 "roar_D": "Hollow Square Roar-Brute 0:10.12",
 "roar_C": "Hollow Square Roar-Brute 0:41.62",
 "roar_D2": "Hollow Square Roar-Brute 0:48.72",
@@ -7,28 +27,69 @@
 "roar_out": "Hollow Square Roar-Brute 1:52.00",
 "answer_A": "Boxes on My Back 2:23.97",
 "kick": "KICK (new)",
-"knock": "KNOCK (new)",
 "snare": "SNARE (new)",
 "hat": "HAT (new)",
+"ohat": "OPEN HAT (new)",
+"knock": "KNOCK (new)",
 "sub_D": "SUB D (new)",
 "sub_A": "SUB A (new)",
 "sub_C": "SUB C (new)",
 "sub_G": "SUB G (new)",
 "riser": "RISER (new)",
-"hiss": "HISS (new)"
+"hiss": "AIR (new)"
+},
+"remix-boom": {
+"chop1": "Blown-Out Sanctuary 3:02.05",
+"chop2": "Blown-Out Sanctuary 2:31.61",
+"chop3": "Blown-Out Sanctuary 0:29.19",
+"chop4": "Blown-Out Sanctuary 3:29.24",
+"kick": "KICK (new)",
+"snare": "SNARE (new)",
+"hat": "HAT (new)",
+"ohat": "OPEN HAT (new)",
+"knock": "KNOCK (new)",
+"sub_A": "SUB A (new)",
+"sub_E": "SUB E (new)",
+"hiss": "AIR (new)",
+"riser": "RISER (new)"
+},
+"remix-dub": {
+"chop1": "Chiral Cargo & The Rope-Not-Stick Choir 0:07.15",
+"chop2": "Chiral Cargo & The Rope-Not-Stick Choir 2:29.65",
+"chop3": "Chiral Cargo & The Rope-Not-Stick Choir 2:33.19",
+"chop4": "Chiral Cargo & The Rope-Not-Stick Choir 0:08.01",
+"kick": "KICK (new)",
+"snare": "SNARE (new)",
+"hat": "HAT (new)",
+"ohat": "OPEN HAT (new)",
+"knock": "KNOCK (new)",
+"sub_B": "SUB B (new)",
+"sub_E": "SUB E (new)",
+"hiss": "AIR (new)",
+"riser": "RISER (new)"
+},
+"remix-half": {
+"chop1": "Steppe Telegraph & The 6,500-Voice Lavender Shanty 2:26.69",
+"chop2": "Steppe Telegraph & The 6,500-Voice Lavender Shanty 1:49.17",
+"chop3": "Steppe Telegraph & The 6,500-Voice Lavender Shanty 0:05.82",
+"chop4": "Steppe Telegraph & The 6,500-Voice Lavender Shanty 0:01.83",
+"kick": "KICK (new)",
+"snare": "SNARE (new)",
+"hat": "HAT (new)",
+"ohat": "OPEN HAT (new)",
+"knock": "KNOCK (new)",
+"sub_B": "SUB B (new)",
+"sub_D#": "SUB D# (new)",
+"hiss": "AIR (new)",
+"riser": "RISER (new)"
+}
 },
 "sources": {
-"S5fd772": {
-"title": "Blown-Out Sanctuary",
+"S29988c": {
+"title": "Hollow Square Roar-Brute",
 "catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Blown-Out Sanctuary - Treblo.ogg",
-"sha256": "5fd772ace4752c52702dcfd6619c6f49d5beff199f249a433ce161a9bad5a641"
-},
-"Sf3b786": {
-"title": "Boxes On My Back",
-"catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Boxes On My Back - Treblo (4).ogg",
-"sha256": "f3b786d60ae71ab64ae405e2b1635992052baa9511aeda6af0d71a08f520c805"
+"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Hollow Square Roar-Brute - Treblo.ogg",
+"sha256": "29988cce89b7a1d185d83698807c1d7f2bd4ff20ad5a931e6199be63886ebfe9"
 },
 "Sd3ac86": {
 "title": "Boxes on My Back",
@@ -36,203 +97,11 @@
 "path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Boxes on My Back - Treblo (1).ogg",
 "sha256": "d3ac8625d68e7c1110cad7fdd422ed8f25e625f4fc3b4ddfd791827bb94cac53"
 },
-"S2222ca": {
-"title": "Boxes on My Back",
-"catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Boxes on My Back - Treblo (2).ogg",
-"sha256": "2222ca48d9fd72de7aba0148b0bc75dff648cd391445c6ade22df23e62d3e03d"
-},
-"S8ed703": {
-"title": "Boxes on My Back",
-"catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Boxes on My Back - Treblo (3).ogg",
-"sha256": "8ed703218a8135dfd87370ed95fa174322f7c034c24bce6c523c6fd79416fb35"
-},
-"S03e734": {
-"title": "Boxes on My Back",
-"catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Boxes on My Back - Treblo (5).ogg",
-"sha256": "03e734dfe1e63c660a47dd9b9f85b7b0d34b84a527623a297eeda082876fea11"
-},
-"Sa8bb63": {
-"title": "Boxes on My Back",
-"catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Boxes on My Back - Treblo (6).ogg",
-"sha256": "a8bb630d4b8cab3b353d268a4f738f65504325f3256e7303652db5d25baa619e"
-},
-"Sf6312d": {
-"title": "Boxes on My Back",
-"catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Boxes on My Back - Treblo (7).ogg",
-"sha256": "f6312da519fa06727f5e9843d95ba89c92ce3149f7c1e5dbb326fa28ff7fdceb"
-},
-"S45eece": {
-"title": "Boxes on My Back",
-"catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Boxes on My Back - Treblo.ogg",
-"sha256": "45eece279e7fdba9efb01d98965005237a899f28c3050c8db738684d29b4a338"
-},
-"Sf5930e": {
-"title": "Brutus Never Learned to Read",
-"catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Brutus Never Learned to Read - Treblo.ogg",
-"sha256": "f5930e8d5f8a1509d272e836567a0c9cc8f7c907b18bf549e7e03916c0c88e88"
-},
-"S823ae3": {
-"title": "Brutus Protocol",
-"catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Brutus Protocol - Treblo.ogg",
-"sha256": "823ae33a7343f3693f727c540018870c968b1d311c958dd164e4fc58f81dac42"
-},
-"S74260a": {
-"title": "Brutus in the Basement",
-"catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Brutus in the Basement - Treblo.ogg",
-"sha256": "74260a93aac54cbf0228811b56929d67034950a41b7761ace7ae62853546f668"
-},
-"Se63160": {
-"title": "Capsae in Tergo Meo",
-"catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Capsae in Tergo Meo - Treblo.ogg",
-"sha256": "e631609edbbf4c21f57acbd8c9d054aa3d112ed694b2b221038a85d18ff875aa"
-},
-"S3273c8": {
-"title": "Cathedral of Static",
-"catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Cathedral of Static - Treblo.ogg",
-"sha256": "3273c8788a84b5924a6ea8f79211974acbfba630b821aef26383281317acf846"
-},
-"Sf85d3f": {
-"title": "Fa Sol La Mi",
-"catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Fa Sol La Mi - Treblo (1).ogg",
-"sha256": "f85d3f167dfdf5cce0e1e3a82c091ba4e030fedfa5229456e4ee0b1dc62b9806"
-},
-"S45d9be": {
-"title": "Fa Sol La Mi",
-"catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Fa Sol La Mi - Treblo.ogg",
-"sha256": "45d9be599a44bbb1535dabcf90ce40d3deda69239bf9a6bbc6437b528bd41b65"
-},
-"S9f0c76": {
-"title": "Four-Wall Hollow Square",
-"catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Four-Wall Hollow Square - Treblo.ogg",
-"sha256": "9f0c76a9c0faff198f54efa2daab6ccda23c3bdf171be0c659a862a95998aed1"
-},
-"S79bf9a": {
-"title": "HUNH! (92 BPM Field Clock)",
-"catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - HUNH! (92 BPM Field Clock) - Treblo.ogg",
-"sha256": "79bf9a506eebbdb28e89472592dba21d589ee4575af98dc963fdb2cb1cb7de32"
-},
-"S89adbb": {
-"title": "Heavy Load Chorus",
-"catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Heavy Load Chorus - Treblo.ogg",
-"sha256": "89adbbfc9285fae4eaf8e3ee3585abc42a34d8b078aeee0a7a38c8e245c811d4"
-},
-"S7e1311": {
-"title": "Hollow Square Roar",
-"catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Hollow Square Roar - Treblo (1).ogg",
-"sha256": "7e13115249be84054b91b7de5fca9b4153eed30331eff18be84dde45eed784c3"
-},
-"S25d45a": {
-"title": "Hollow Square Roar",
-"catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Hollow Square Roar - Treblo (2).ogg",
-"sha256": "25d45af7702d3c0936d0f16ed2a7d5ce2563f32f901ca196c8ec21b1065666a3"
-},
-"Scfa2d2": {
-"title": "Hollow Square Roar",
-"catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Hollow Square Roar - Treblo.ogg",
-"sha256": "cfa2d27e963eab8cafc592088c98a033b5f59b252fb3c0153352563a4e6b2118"
-},
-"S29988c": {
-"title": "Hollow Square Roar-Brute",
-"catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Hollow Square Roar-Brute - Treblo.ogg",
-"sha256": "29988cce89b7a1d185d83698807c1d7f2bd4ff20ad5a931e6199be63886ebfe9"
-},
-"S2331ca": {
-"title": "Parchman Hollow Square",
-"catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Parchman Hollow Square - Treblo.ogg",
-"sha256": "2331ca7becfe0d88f0be732f6d068860d18d790a6df474dbb4c355a3574656a8"
-},
-"S99f524": {
-"title": "The Presto Disc & The Hollow-Square Field Engine",
-"catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - The Presto Disc & The Hollow-Square Field Engine - Treblo.ogg",
-"sha256": "99f524b407029ae3a9b7efbc11a238dfb5f00666027685f36c0226abf73972fc"
-},
-"S1ff4b7": {
-"title": "BUH-BOX _ -CK! (80 Voices as Drum Kit)",
-"catalog": "et-tu-brute-beats",
-"path": "Et Tu, Brute (beats)/Et tu, Brute_ - BUH-BOX _ -CK! (80 Voices as Drum Kit) - Treblo.ogg",
-"sha256": "1ff4b7a1d9cda31cb61dcd8c2898eaaeca71fedb546139e5e7f5a7ee42aab329"
-},
-"Sc734fd": {
-"title": "Brutus",
-"catalog": "et-tu-brute-beats",
-"path": "Et Tu, Brute (beats)/Et tu, Brute_ - Brutus - Treblo (1).ogg",
-"sha256": "c734fd01fa1813e41c899d75e7b9a0e19242c022d427aa813e26bfce694bb84c"
-},
-"S0d5ea6": {
-"title": "Brutus",
-"catalog": "et-tu-brute-beats",
-"path": "Et Tu, Brute (beats)/Et tu, Brute_ - Brutus - Treblo.ogg",
-"sha256": "0d5ea644ca9f9bd7c6811238f6baf88b88cbd87134cd6ed339d492f98e1eec0b"
-},
-"S94f385": {
-"title": "Cathedral Dub Vigil",
-"catalog": "et-tu-brute-beats",
-"path": "Et Tu, Brute (beats)/Et tu, Brute_ - Cathedral Dub Vigil - Treblo.ogg",
-"sha256": "94f3859f572d26aa909286edcda37029cda7bc45d161b3889d27d7a7f6fd77e4"
-},
-"Sadac8e": {
-"title": "Choral-First Motorik",
-"catalog": "et-tu-brute-beats",
-"path": "Et Tu, Brute (beats)/Et tu, Brute_ - Choral-First Motorik - Treblo.ogg",
-"sha256": "adac8e22ae30d280d09f68711ac0612da439b493db0a466d009c088ca91e3cef"
-},
-"S8ee5a1": {
-"title": "Echoes of the Black Chapel",
-"catalog": "et-tu-brute-beats",
-"path": "Et Tu, Brute (beats)/Et tu, Brute_ - Echoes of the Black Chapel - Treblo.ogg",
-"sha256": "8ee5a1761abe01ddedc745d554f56dd13a209eae59e3eb53ae6f11b6b33bdebf"
-},
-"Secf58a": {
-"title": "Grand Opera Chorus & Dub-Mud Catacomb",
-"catalog": "et-tu-brute-beats",
-"path": "Et Tu, Brute (beats)/Et tu, Brute_ - Grand Opera Chorus & Dub-Mud Catacomb - Treblo.ogg",
-"sha256": "ecf58a9b519a58a1fc4752611fc96f616810ab966cbee70848cc524ecb84d69b"
-},
-"S53542b": {
-"title": "Purple Haze Junction",
-"catalog": "et-tu-brute-beats",
-"path": "Et Tu, Brute (beats)/Et tu, Brute_ - Purple Haze Junction - Treblo.ogg",
-"sha256": "53542ba854d15917e7197ec80ab667f05647a44af04ee18c09b6962ceda03b5d"
-},
-"Sd869d5": {
-"title": "Ritual Drums & Sacred Choirs",
-"catalog": "et-tu-brute-beats",
-"path": "Et Tu, Brute (beats)/Et tu, Brute_ - Ritual Drums & Sacred Choirs - Treblo.ogg",
-"sha256": "d869d55300d3917eee8480c11955472dfc95670431215b570132021989adde15"
-},
-"S1a4289": {
-"title": "Steppe Telegraph & The 6,500-Voice Lavender Shanty",
-"catalog": "et-tu-brute-beats",
-"path": "Et Tu, Brute (beats)/Et tu, Brute_ - Steppe Telegraph & The 6,500-Voice Lavender Shanty - Treblo.ogg",
-"sha256": "1a4289394ef855981f96bd64f4011b02382913d61146a2bdb6508b5b74231d6b"
-},
-"Secb35f": {
-"title": "The Ancient-Chant Singularity",
-"catalog": "et-tu-brute-beats",
-"path": "Et Tu, Brute (beats)/Et tu, Brute_ - The Ancient-Chant Singularity - Treblo.ogg",
-"sha256": "ecb35fcd72efca737d2846eae5432b93b575ee2ecce305f0048a0d0a4380f0f3"
+"S484319": {
+"title": "Trap-Tox & Cardboard",
+"catalog": "et-tu-brute-boxback",
+"path": "Et tu, Brute (BOXBACK)/Et tu, Brute_ - Trap-Tox & Cardboard - Treblo.ogg",
+"sha256": "484319c635d936de82707abfd95a6201b5377edc738f12579a1571c7ab7d17f8"
 },
 "S5bb2f2": {
 "title": "The Cathedral of Tape Echo",
@@ -240,65 +109,17 @@
 "path": "Et Tu, Brute (beats)/Et tu, Brute_ - The Cathedral of Tape Echo - Treblo.ogg",
 "sha256": "5bb2f26bf5b8af87e4854e84d155f80be229738f9d88929c43a3e8716353c1cb"
 },
-"Sa0fea1": {
-"title": "The Knife I Carry",
-"catalog": "et-tu-brute-beats",
-"path": "Et Tu, Brute (beats)/Et tu, Brute_ - The Knife I Carry - Treblo.ogg",
-"sha256": "a0fea16a0d881ea66a680467c3a94fea21e37641c72cf11e5c9990d685924225"
+"S5e8b37": {
+"title": "Subterranean Dreams",
+"catalog": "et-tu-brute",
+"path": "Et tu, Brute/Et tu, Brute_ - Subterranean Dreams - Treblo.ogg",
+"sha256": "5e8b3760353b2028554deae829fd2255775804f573c346ef6e8897fd30bc8ec7"
 },
-"Sbcab44": {
-"title": "ALL BOX",
-"catalog": "et-tu-brute-boxback",
-"path": "Et tu, Brute (BOXBACK)/Et tu, Brute_ - ALL BOX - Treblo.ogg",
-"sha256": "bcab4487cb1063b6edb4b70a2c3dea83557136c1e01fd8663c1fdf6951a38528"
-},
-"S73db4b": {
-"title": "Boxes",
-"catalog": "et-tu-brute-boxback",
-"path": "Et tu, Brute (BOXBACK)/Et tu, Brute_ - Boxes - Treblo (1).ogg",
-"sha256": "73db4b5946e465a66e340a59d11cbd02929d4619ed8f02b188ffe42c352c8ace"
-},
-"Sc6d245": {
-"title": "Boxes",
-"catalog": "et-tu-brute-boxback",
-"path": "Et tu, Brute (BOXBACK)/Et tu, Brute_ - Boxes - Treblo (2).ogg",
-"sha256": "c6d24582ef072b9405d48ab12f408e191979d12f8488d530b345b5985589a100"
-},
-"S2159e0": {
-"title": "Boxes",
-"catalog": "et-tu-brute-boxback",
-"path": "Et tu, Brute (BOXBACK)/Et tu, Brute_ - Boxes - Treblo (3).ogg",
-"sha256": "2159e0ea6f41ceca2c918ec0091ed906051af684a8260c991cec86bbad88b1ad"
-},
-"S987a3f": {
-"title": "Boxes",
-"catalog": "et-tu-brute-boxback",
-"path": "Et tu, Brute (BOXBACK)/Et tu, Brute_ - Boxes - Treblo.ogg",
-"sha256": "987a3ff3e0b42392252f05f59ba51a507844d37778bb4eb55d0674ad2f4f7863"
-},
-"Sbc2030": {
-"title": "Boxes on My Back",
-"catalog": "et-tu-brute-boxback",
-"path": "Et tu, Brute (BOXBACK)/Et tu, Brute_ - Boxes on My Back - Treblo (8).ogg",
-"sha256": "bc20304dde901f23192d90d7cda598f739f68f8e41495aa65a07d9a91515cb6d"
-},
-"S66ff79": {
-"title": "Boxes on My Back",
-"catalog": "et-tu-brute-boxback",
-"path": "Et tu, Brute (BOXBACK)/Et tu, Brute_ - Boxes on My Back - Treblo (9).ogg",
-"sha256": "66ff79bfafdda742ea0bba91995f1edf913d6da037707b7d0174fc64170a81ad"
-},
-"Scdc5c7": {
-"title": "Boxes On My Back (The Jansport Dub)",
-"catalog": "et-tu-brute-boxback",
-"path": "Et tu, Brute (BOXBACK)/Et tu, Brute_ - Boxes On My Back (The Jansport Dub) - Treblo.ogg",
-"sha256": "cdc5c7f67a719649eb5a67227da7dda1328b597364744b489c22372c223252e7"
-},
-"Se8d0c4": {
-"title": "Boxes on My Back (Voidout Protocol)",
-"catalog": "et-tu-brute-boxback",
-"path": "Et tu, Brute (BOXBACK)/Et tu, Brute_ - Boxes on My Back (Voidout Protocol) - Treblo.ogg",
-"sha256": "e8d0c49fcbba77d7edf56f30816e367a990345b492af5d3348e32a8683450b4b"
+"S5fd772": {
+"title": "Blown-Out Sanctuary",
+"catalog": "et-tu-brute-boxes-on-my-back",
+"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Blown-Out Sanctuary - Treblo.ogg",
+"sha256": "5fd772ace4752c52702dcfd6619c6f49d5beff199f249a433ce161a9bad5a641"
 },
 "S87c116": {
 "title": "Chiral Cargo & The Rope-Not-Stick Choir",
@@ -306,131 +127,11 @@
 "path": "Et tu, Brute (BOXBACK)/Et tu, Brute_ - Chiral Cargo & The Rope-Not-Stick Choir - Treblo.ogg",
 "sha256": "87c116139dbe49cf37b6616c5c86d000606394ebbcc2e11cdc25bd0ffccb591a"
 },
-"S741f10": {
-"title": "Corrugated Sky",
-"catalog": "et-tu-brute-boxback",
-"path": "Et tu, Brute (BOXBACK)/Et tu, Brute_ - Corrugated Sky - Treblo.ogg",
-"sha256": "741f10ec1e336da68133e2c719e4190ecb82b22c039ed0b823cc573f4019d6ed"
-},
-"S61cece": {
-"title": "Schrodinger's Jansport",
-"catalog": "et-tu-brute-boxback",
-"path": "Et tu, Brute (BOXBACK)/Et tu, Brute_ - Schrodinger's Jansport - Treblo.ogg",
-"sha256": "61cecef632f83a28f271ba6a04d9e989c044f8d62f8ba23064d5e6dc8ab68a88"
-},
-"Sc61caf": {
-"title": "The Paradox Unboxing",
-"catalog": "et-tu-brute-boxback",
-"path": "Et tu, Brute (BOXBACK)/Et tu, Brute_ - The Paradox Unboxing - Treblo.ogg",
-"sha256": "c61caf48d18fc9fb0bd124597380c194045fdaf352f7618068831ea0b0bfda3d"
-},
-"S991052": {
-"title": "The Universal Boxback",
-"catalog": "et-tu-brute-boxback",
-"path": "Et tu, Brute (BOXBACK)/Et tu, Brute_ - The Universal Boxback - Treblo.ogg",
-"sha256": "991052d28ddcfd3ba0885864c50351c0163fc3bd68e424a98b391605bbb47a45"
-},
-"S4b8312": {
-"title": "The Whole Package",
-"catalog": "et-tu-brute-boxback",
-"path": "Et tu, Brute (BOXBACK)/Et tu, Brute_ - The Whole Package - Treblo.ogg",
-"sha256": "4b8312cae9f6ccc3e90dc9751e69f047c1a801dfdeb925d399c3c4233c864d71"
-},
-"S484319": {
-"title": "Trap-Tox & Cardboard",
-"catalog": "et-tu-brute-boxback",
-"path": "Et tu, Brute (BOXBACK)/Et tu, Brute_ - Trap-Tox & Cardboard - Treblo.ogg",
-"sha256": "484319c635d936de82707abfd95a6201b5377edc738f12579a1571c7ab7d17f8"
-},
-"S9e51e3": {
-"title": "What's In The Box (Pandora's Vocoder)",
-"catalog": "et-tu-brute-boxback",
-"path": "Et tu, Brute (BOXBACK)/Et tu, Brute_ - What's In The Box (Pandora's Vocoder) - Treblo.ogg",
-"sha256": "9e51e3a576e3637ecff29089a6cc7bbebb7f426fd46bad6213dc81c4ed6a03cf"
-},
-"S4ea7c4": {
-"title": "Wittgenstein's Backpack",
-"catalog": "et-tu-brute-boxback",
-"path": "Et tu, Brute (BOXBACK)/Et tu, Brute_ - Wittgenstein's Backpack - Treblo.ogg",
-"sha256": "4ea7c4efe570a8d4b1c1b92b35145f8ac380a716276f325baaf82230f2d82b77"
-},
-"S05e7af": {
-"title": "Amen",
-"catalog": "et-tu-brute",
-"path": "Et tu, Brute/Et tu, Brute_ - Amen - Treblo.ogg",
-"sha256": "05e7afc4fe7ece70f452115d48e466033d837df2a20f726fde8d395fbc729a9d"
-},
-"Sc7ef54": {
-"title": "Blown-Out Sanctuary",
-"catalog": "et-tu-brute",
-"path": "Et tu, Brute/Et tu, Brute_ - Blown-Out Sanctuary - Treblo (1).ogg",
-"sha256": "c7ef5492e53de08355b05c94b8b5fc0a339e46104c038362a58ef3fafe92d524"
-},
-"S7a237f": {
-"title": "Brutus",
-"catalog": "et-tu-brute",
-"path": "Et tu, Brute/Et tu, Brute_ - Brutus - Treblo (2).ogg",
-"sha256": "7a237fc28cf1c27052d343448b8964ee3786ee2dd51a5d6f03fd58382e3b9a07"
-},
-"S6dd5bc": {
-"title": "Heavy Weather in the Boiler Room",
-"catalog": "et-tu-brute",
-"path": "Et tu, Brute/Et tu, Brute_ - Heavy Weather in the Boiler Room - Treblo.ogg",
-"sha256": "6dd5bc31b133c521846dfe8748edaa539a44dab32e92325226aef4621dd3ab62"
-},
-"Sadaceb": {
-"title": "I'm God",
-"catalog": "et-tu-brute",
-"path": "Et tu, Brute/Et tu, Brute_ - I'm God - Treblo.ogg",
-"sha256": "adacebca45f1373407637f79d27614795bfd3caf5f6644378730ae8b6ebab511"
-},
-"Se5dc9f": {
-"title": "Reversed Heavens & Blown-Out Mud",
-"catalog": "et-tu-brute",
-"path": "Et tu, Brute/Et tu, Brute_ - Reversed Heavens & Blown-Out Mud - Treblo.ogg",
-"sha256": "e5dc9ffac3b51f727beef51e051dee2516d78467145ccc707085db3a17db65f7"
-},
-"S2ebaad": {
-"title": "Selah",
-"catalog": "et-tu-brute",
-"path": "Et tu, Brute/Et tu, Brute_ - Selah - Treblo.ogg",
-"sha256": "2ebaad68e3823fc50f5113ecb8f04753c01d5c96acb0d5f8545d2e5de583d0b2"
-},
-"S3adb59": {
-"title": "Sirens, Part 2",
-"catalog": "et-tu-brute",
-"path": "Et tu, Brute/Et tu, Brute_ - Sirens, Part 2 - Treblo.ogg",
-"sha256": "3adb5910fd9dce94c5ceb27ba413d37c0a641989ae1f9a2a16705019260d8d0b"
-},
-"S5e8b37": {
-"title": "Subterranean Dreams",
-"catalog": "et-tu-brute",
-"path": "Et tu, Brute/Et tu, Brute_ - Subterranean Dreams - Treblo.ogg",
-"sha256": "5e8b3760353b2028554deae829fd2255775804f573c346ef6e8897fd30bc8ec7"
-},
-"S14b806": {
-"title": "The Dagger in the Senate",
-"catalog": "et-tu-brute",
-"path": "Et tu, Brute/Et tu, Brute_ - The Dagger in the Senate - Treblo.ogg",
-"sha256": "14b806ad8f98b283fe38c8444e98e162621873c1183a2cb3ee1519c31d287283"
-},
-"S7b87f6": {
-"title": "The Shaolin Shadow",
-"catalog": "et-tu-brute",
-"path": "Et tu, Brute/Et tu, Brute_ - The Shaolin Shadow - Treblo.ogg",
-"sha256": "7b87f64debd75c213f25ea1da36f6309f4fbe3f163ecee12ca20858b61e47767"
-},
-"S86d588": {
-"title": "Weight Off",
-"catalog": "et-tu-brute",
-"path": "Et tu, Brute/Et tu, Brute_ - Weight Off - Treblo.ogg",
-"sha256": "86d588618321116c750d8b6dec9c92efad14b2ced651b3a43fecfc07fa934663"
-},
-"S4052fb": {
-"title": "Wheel of Fate",
-"catalog": "et-tu-brute",
-"path": "Et tu, Brute/Et tu, Brute_ - Wheel of Fate - Treblo.ogg",
-"sha256": "4052fb4a2fcfc8bfb5575bff7953e18736a6d39f9d9993e106de226efe08317e"
+"S1a4289": {
+"title": "Steppe Telegraph & The 6,500-Voice Lavender Shanty",
+"catalog": "et-tu-brute-beats",
+"path": "Et Tu, Brute (beats)/Et tu, Brute_ - Steppe Telegraph & The 6,500-Voice Lavender Shanty - Treblo.ogg",
+"sha256": "1a4289394ef855981f96bd64f4011b02382913d61146a2bdb6508b5b74231d6b"
 }
 }
 }

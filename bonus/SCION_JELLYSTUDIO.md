@@ -8,11 +8,11 @@
 | | where |
 |---|---|
 | **The instrument** | `bonus/jellystudio.html` (on the index's Bonus shelf) |
-| **The edit map** (every placement) | `bonus/jellystudio/scion.json` |
+| **The edit maps** (every placement, one per track) | `bonus/jellystudio/<track>/scion.json` |
 | **The names behind the hidden labels** | `bonus/jellystudio/identity.json` |
-| **The cut sounds** (16, exact, uncompressed) | `bonus/jellystudio/clips/` |
-| **Proof A, Proof B, the break, the whole track** | `bonus/jellystudio/renders/` |
-| **Five aligned stems of the whole track** | `bonus/jellystudio/stems/` |
+| **The cut sounds** (exact, uncompressed) | `bonus/jellystudio/<track>/clips/` |
+| **The renders** | `bonus/jellystudio/<track>/renders/` |
+| **Five aligned stems of the main track** | `bonus/jellystudio/boxes-found/stems/` |
 | **The tools that made them** | `sim/jellystudio/` (archivist, scouts, ranking, builder, checks) |
 
 ## 2 · The instrument: the brief, turned into an animal
@@ -165,3 +165,68 @@ Neither could listen. "Audition" here means measuring a candidate against the mo
 - **The vocal itself.** No vocal take was in the brief; the protected bar is measured as empty, not tested against a voice.
 - **The instrument on a phone,** by hand. It was run in a simulated phone browser only.
 - **One catalog track** was not indexed (the accented file name).
+
+## 12 · A third revision: better drums, a better sub, and three remixes of other sources
+**The direction (after listening):** "The drums and sub don't sound good enough, make them better, and make some other good remixes of others."
+
+Sections 6 to 9 describe the first two revisions. The tracks in the instrument are now the ones below. **Still nothing was heard here:** what follows says what was changed and what was measured. Whether it is better is for your ear.
+
+### Why the first drums and sub were weak (measured)
+| sound | what it was | measured |
+|---|---|---|
+| kick | one sine sweep and a tick of noise | 94% of its energy below 120 Hz; nothing above 400 Hz: no knock, no click |
+| snare | filtered noise and one tone | 6% of its energy between 400 Hz and 2 kHz, where a snare's rattle is |
+| hat | a 60 ms burst of noise | no pitch, no ring, every hit the same |
+| sub | a flat sine | 99% between 60 and 120 Hz: a phone or laptop speaker plays none of it |
+| the pattern | every hit on the grid at one of two levels | no swing, no ghost notes, no open hat |
+
+### What was done
+**Two new kits, to compare** (two tracks in the instrument: BOXES · FOUND DRUMS and BOXES · MADE DRUMS).
+| | FOUND | MADE |
+|---|---|---|
+| kick | cut from *Subterranean Dreams* at 1:07: it stands 60 dB out of silence | a driven body that falls from 230 to 49 Hz, a louder click, a low thump; 15% of its energy now between 120 and 400 Hz |
+| snare | cut from *The Cathedral of Tape Echo* at 2:00 (54 dB out of silence) | two falling tones, hiss, a separate layer of rattle (22% between 400 Hz and 2 kHz, up from 6%), and a short room, different in each ear |
+| hat | cut from *Trap-Tox & Cardboard* at 0:18 (50 dB out of silence) | six square waves at clashing pitches, as the old drum machines did; a closed and an open one |
+
+**A limit of the search:** 299 hits in the catalog rise sharply out of quiet, but nearly all have music under them within a third of a second. Only these three were clean enough to use as they are. The found hat is mostly middle (63% between 400 Hz and 2 kHz): it may read as a click, not a hat.
+
+**The sub** is now an 808-style note:
+- it starts almost an octave high and falls to its pitch in about a hundredth of a second;
+- it is driven, so it has overtones: 10% of its energy is now above 120 Hz (it was 1%), which a small speaker can play;
+- it decays, where the first was flat;
+- under a kick it fades in over 28 ms, so the kick's click is heard first.
+
+**The pattern:**
+- sixteenth-note hats with swing and three levels of accent;
+- ghost snares, and an open hat at the end of every second bar;
+- small seeded differences in time and level on hats and ghosts, so no two bars are the same machine.
+
+### Three remixes of other sources
+**How the sources were chosen (names hidden):** every source was scored by how many loud, steady, pitched phrases it holds that sit together (thirds, fourths, fifths, sixths). Six qualified; the best from three different catalogs were taken.
+
+**How they are made:** each phrase is cut at its own onset into a short chop and replayed on a new grid. The source's own tempo therefore does not matter, and nothing is stretched.
+
+| remix | source (revealed after ranking) | tempo | the idea |
+|---|---|---|---|
+| **1 · BOOM-BAP** | *Blown-Out Sanctuary* | 86 | four chops (A, A, E, E) on a swung grid; a new sub at each chop's own pitch, brought down by octaves |
+| **2 · DUB** | *Chiral Cargo & The Rope-Not-Stick Choir* | 63 | kick and snare together on beat three; an echo made of five single placements, each 5 dB quieter, thrown from side to side. Every repeat can be removed on the bell |
+| **3 · HALF-TIME** | *Steppe Telegraph & The 6,500-Voice Lavender Shanty* | 70 | stabs, snare on three, hat rolls |
+
+Each is 21 bars (59 to 80 seconds): four bars without drums' weight, an eight-bar drop, a two-bar break, a six-bar return, a last word.
+
+**No new sub in remixes 2 and 3.** Their chops already hold 83 to 87% of their energy below 110 Hz. A second bass would fight them, so the sample is its own bass.
+
+**A false positive caught:** three different sources all appeared to sing the same A sharp at 918.8 Hz. That number is the upper edge of my pitch search, not a pitch. Those phrases were thrown out and the sources chosen again.
+
+### Checked
+| check | result |
+|---|---|
+| both versions of the main track | low end held four bars and arriving on bar 5; the voice bar 20 dB clear or more; the sub out for two bars and back 5 dB heavier; peaks at -1.0 dBFS; stems add up to the master (79 dB down) |
+| the three remixes | whole numbers of bars; peaks under -1 dBFS; no clicks at edit points |
+| the instrument | all five tracks load and play with no errors; its own render of each whole track matches the reference to between 48 and 61 dB down; the short scenes match less closely (33 to 38 dB), at the cut-off of their last notes |
+
+### Not done, not judged
+- **No blind critic this time.** The complaint was about how it sounds, which a measuring critic cannot settle.
+- **Switching between FOUND and MADE reloads the page.** They are two tracks, so the comparison is not instant.
+- **The remixes by ear:** whether the chops make a phrase, and whether the chosen sources were the right "others". Name the tracks you want and they can be built the same way.
+- **The remix chops were chosen by steadiness of pitch.** That favours held notes and drones over rhythmic or sung lines.

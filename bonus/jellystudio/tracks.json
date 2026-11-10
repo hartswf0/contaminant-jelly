@@ -1,0 +1,32 @@
+[
+ {
+  "id": "boxes-found",
+  "label": "BOXES \u00b7 FOUND DRUMS",
+  "title": "ET TU, BRUTE \u00b7 BOXES ON MY BACK",
+  "bpm": 72
+ },
+ {
+  "id": "boxes-made",
+  "label": "BOXES \u00b7 MADE DRUMS",
+  "title": "ET TU, BRUTE \u00b7 BOXES ON MY BACK",
+  "bpm": 72
+ },
+ {
+  "id": "remix-boom",
+  "label": "REMIX 1 \u00b7 BOOM-BAP",
+  "title": "REMIX 1 \u00b7 BOOM-BAP",
+  "bpm": 86
+ },
+ {
+  "id": "remix-dub",
+  "label": "REMIX 2 \u00b7 DUB",
+  "title": "REMIX 2 \u00b7 DUB",
+  "bpm": 63
+ },
+ {
+  "id": "remix-half",
+  "label": "REMIX 3 \u00b7 HALF-TIME",
+  "title": "REMIX 3 \u00b7 HALF-TIME",
+  "bpm": 70
+ }
+]
