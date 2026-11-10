@@ -215,3 +215,25 @@ The page has no separate cinematic layer. The simulation is the film:
 - The personas are Pask and Sonnabend's period satire, kept as historical labels.
 - The mobiles' look is the jellies', not Sonnabend's fibreglass.
 - The timings and the contrast law are tuned for a screen, not measured from the 1968 relays.
+
+## Tribunal verdict (independent critics, frame- and audio-measured)
+
+| Round | Build | Verdict | Largest gap → repair |
+|---|---|---|---|
+| 1 | 430f9ac | reference stronger | satisfaction invisible → brightness bound to drive, chord on F = 1 |
+| 2 | 239f8a9 | reference stronger (narrow) | director cut away from satisfaction → protected 1.5 s closure shots |
+| 3 | d2af83e | **hard proof PASS** | flare: 6–11% of agent pixels clip (F1 40.0 s, G 53.5 s, J/F3 75.25 s, F3 80.5 s); target < 5%. **Not repaired.** |
+
+What round 3 measured:
+- **Closures:** all five frame the satisfied male, who darkens 51–66% within 0.5 s, in a shot of at least 1.58 s.
+- **Chords:** each closure has one, 7–12 LU above the bed, and no chord sounds without a closure.
+- **Torch:** the director cut to the stranger live on both desktop and phone.
+- **Lit room:** it measures 15–18 LU quieter, and the society resumes afterwards.
+
+Known open issues, by critic 3:
+- The flare above.
+- The 40–52 s lull.
+- The pair do not visibly part inside the closure shot.
+- The lights rise inside the G closure shot at 57 s.
+- The torch outcome is cut away from at 31.83 s.
+- The torch colour is close to F3's white.
