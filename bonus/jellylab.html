@@ -31,6 +31,17 @@ canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-acti
 .box{position:fixed;left:0;right:0;height:11vh;background:#000;z-index:2;display:none}#lbT{top:0}#lbB{bottom:0}
 body.cinema .ui,body.cinema .panel,body.cinema .tag{opacity:0!important;pointer-events:none!important}body.cinema #glyph{display:grid}body.cinema.still #glyph{opacity:0}
 body.letter .box{display:block}
+/* phones: panels are a short bottom sheet so the water stays visible above it */
+@media (max-width:700px),(max-height:520px){
+  .panel{left:max(6px,env(safe-area-inset-left))!important;right:max(6px,env(safe-area-inset-right))!important;top:auto!important;width:auto;
+    bottom:calc(max(8px,env(safe-area-inset-bottom)) + var(--dockH,44px));max-height:var(--sheetH,34vh);padding:8px 10px;background:rgba(6,12,13,.62);border-radius:12px}
+  .panel h2{position:sticky;top:-8px;background:rgba(6,12,13,.92);margin:-8px -10px 6px;padding:8px 10px;z-index:1;cursor:pointer}
+  .panel.min{max-height:40px;overflow:hidden}
+  .panel .card{font-size:11px}.panel .card.fold{max-height:3.1em;overflow:hidden;position:relative}
+  .panel .card.fold::after{content:'… tap for the whole card';position:absolute;right:0;bottom:0;background:rgba(6,12,13,.9);padding-left:6px;font:300 10px 'JetBrains Mono',monospace;color:var(--gold)}
+  .dock{gap:4px}.dock button{padding:6px 8px;font-size:10px;letter-spacing:.1em}
+  #top .st{font-size:10px}
+}
 </style>
 </head>
 <body>
@@ -88,12 +99,18 @@ function select(E) { SEL = E; LIVE.forEach(x => x.tag.classList.toggle('sel', x 
 $('spawn').innerHTML = JELLIES.map(j => `<button data-add="${j.id}" title="${j.line.replace(/"/g, '&quot;')}">${j.name.replace(/^The /, '')}${j.kind === 'real' ? ' ●' : ''}</button>`).join(''); $('spawn').onclick = e => { const b = e.target.closest('[data-add]'); if (b) select(add(b.dataset.add)); };
 function paintLive() { $('live').innerHTML = LIVE.map(E => `<button data-k="${E.key}" class="${E === SEL ? 'on' : ''}">${E.J.name.replace(/^The /, '')} ✕</button>`).join(''); $('live').querySelectorAll('button').forEach(b => b.onclick = e => { const E = LIVE.find(x => x.key === +b.dataset.k); if (!E) return; if (e.offsetX > b.clientWidth - 18) remove(E); else select(E); }); paintCast(); }
 function paintInsp() { const d = $('insp'); if (!SEL) { d.innerHTML = '<small>nothing selected</small>'; return; } const J = SEL.J, sp = SPECIES[SEL.id], meta = JELLIES.find(j => j.id === SEL.id);
-  d.innerHTML = `<div class="card">${sp ? speciesCard(SEL.id).replace(/\n/g, '<br>') : `${J.name}: ${meta.line}`}</div>` + (J.views.length > 1 ? `<div class="row">${J.views.map(v => `<button data-view="${v}">${v.toUpperCase()}</button>`).join('')}</div>` : '') + `<div class="row" id="ctlB"></div><div id="ctlR"></div><div class="row"><button id="follow">CAMERA: TRACK THIS ONE</button><button id="rm">REMOVE</button></div>` + (sp ? `<small>${speciesTable(SEL.id)}</small>` : '');
+  d.innerHTML = `<div class="card${PHONE() ? ' fold' : ''}" onclick="this.classList.toggle('fold')">${sp ? speciesCard(SEL.id).replace(/\n/g, '<br>') : `${J.name}: ${meta.line}`}</div>` + (J.views.length > 1 ? `<div class="row">${J.views.map(v => `<button data-view="${v}">${v.toUpperCase()}</button>`).join('')}</div>` : '') + `<div class="row" id="ctlB"></div><div id="ctlR"></div><div class="row"><button id="follow">CAMERA: TRACK THIS ONE</button><button id="rm">REMOVE</button></div>` + (sp ? `<small>${speciesTable(SEL.id)}</small>` : '');
   d.querySelectorAll('[data-view]').forEach(b => b.onclick = () => { J.setLook({view: b.dataset.view}); d.querySelectorAll('[data-view]').forEach(x => x.classList.toggle('on', x === b)); });
   const cb = $('ctlB'), cr = $('ctlR'); for (const c of J.controls) { if (c.kind === 'button') { const b = document.createElement('button'); b.textContent = c.label; b.onclick = c.run; cb.appendChild(b); } else { const l = document.createElement('label'), i = document.createElement('input'), v = document.createElement('span'); l.append(c.label, i, v); Object.assign(i, {type: 'range', min: c.min, max: c.max, step: c.step, value: c.get()}); v.textContent = (+c.get()).toFixed(2); i.oninput = () => { c.set(i.value); v.textContent = (+i.value).toFixed(2); }; cr.appendChild(l); } }
   $('follow').onclick = () => { CAM.follow = SEL; setMode('track'); }; $('rm').onclick = () => remove(SEL); }
 const speciesTable = id => { const s = SPECIES[id]; return `pacemakers ${s.n}${s.rings ? ` × ${s.rings} rings (lag ${s.lag}s)` : ''} · period ${s.pace}s ±${Math.round(s.spread * 50)}% · ring ${s.loop}s round · refractory ${s.refr}s · muscle ${s.musc} · bell stiffness ${s.stiff} · thrust ${s.thrust} · light ${s.photo} · balance ${s.stato} · touch ${s.touch} · tentacles ${s.tent[0]}×${s.tent[1]} · glow ${s.lum[0]}`; };
-document.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { const p = $(b.dataset.p); p.classList.toggle('open'); b.classList.toggle('on', p.classList.contains('open')); share(true); });
+const PHONE = () => innerWidth <= 700 || innerHeight <= 520;
+function syncSheet() { const d = $('dock'); document.documentElement.style.setProperty('--dockH', (d ? d.offsetHeight + 8 : 44) + 'px'); }
+document.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { const p = $(b.dataset.p);
+  if (PHONE()) document.querySelectorAll('.panel.open').forEach(o => { if (o !== p) { o.classList.remove('open', 'min'); const ob = document.querySelector(`[data-p="${o.id}"]`); if (ob) ob.classList.remove('on'); } });
+  p.classList.remove('min'); p.classList.toggle('open'); b.classList.toggle('on', p.classList.contains('open')); syncSheet(); share(true); });
+document.querySelectorAll('.panel h2').forEach(h => h.addEventListener('click', e => { if (!PHONE() || e.target.dataset.close) return; h.closest('.panel').classList.toggle('min'); }));
+addEventListener('resize', syncSheet); syncSheet();
 document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => { $(b.dataset.close).classList.remove('open'); document.querySelector(`[data-p="${b.dataset.close}"]`).classList.remove('on'); });
 // ---------------------------------------------------------------- cinema: everything hideable
 let glyphT = 0; const cinema = on => { document.body.classList.toggle('cinema', on); $('cine').classList.toggle('on', on); glyphT = 0; document.body.classList.remove('still'); share(true); };
@@ -121,7 +138,7 @@ function camera(dt) { CAM.t += dt * CAM.spd; const t = CAM.t, d = CAM.dist, tg =
   const k = 1 - Math.exp(-dt * CAM.ease); CAM.pos.lerp(want, k); CAM.look.lerp(look, k); cam.position.copy(CAM.pos); cam.lookAt(CAM.look); if (Math.abs(cam.fov - CAM.fov) > .01) { cam.fov += (CAM.fov - cam.fov) * k; cam.updateProjectionMatrix(); } }
 // tap a jelly to inspect it; drag in FREE mode to look around; tap the water to move the light
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(); let down = null;
-$('gl').addEventListener('pointerdown', e => { down = {x: e.clientX, y: e.clientY, yaw: CAM.yaw, pitch: CAM.pitch}; });
+$('gl').addEventListener('pointerdown', e => { down = {x: e.clientX, y: e.clientY, yaw: CAM.yaw, pitch: CAM.pitch}; if (PHONE()) document.querySelectorAll('.panel.open').forEach(o => o.classList.add('min')); });
 $('gl').addEventListener('pointermove', e => { if (!down || CAM.mode !== 'free') return; CAM.yaw = down.yaw - (e.clientX - down.x) * .006; CAM.pitch = Math.max(-1.3, Math.min(1.3, down.pitch + (e.clientY - down.y) * .006)); });
 $('gl').addEventListener('pointerup', e => { if (!down) return; const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y) > 8; down = null; if (moved) return; ndc.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); ray.setFromCamera(ndc, cam);
   let best = null, bd = 1e9; for (const E of LIVE) { const c = E.J.state().com, d = ray.ray.distanceToPoint(c); if (d < 1.2 && d < bd) { bd = d; best = E; } } if (best) { select(best); if (best.J.touch) best.J.touch(Math.floor(Math.random() * 8)); else best.J.pulse(.6); return; }
@@ -183,6 +200,9 @@ function frame(now) { requestAnimationFrame(frame); const raw = Math.min(.1, (no
   if (document.body.classList.contains('cinema')) { glyphT += raw; if (glyphT > 2.5) document.body.classList.add('still'); }
   if (shareT > 0 && (shareT -= raw) <= 0) share();
   $('st').textContent = `${LIVE.length} jellies · ${Math.round(fps)} fps${SONG.on ? ` · ${SONG.bpm} bpm` : ''}${SEL ? ` · ${SEL.J.name.replace(/^The /, '')} ${Math.round(SEL.J.state().rate)} beats/min` : ''}`;
+  { let cover = 0; if (PHONE()) document.querySelectorAll('.panel.open').forEach(o => { const r = o.getBoundingClientRect(); cover = Math.max(cover, innerHeight - r.top); });
+    const off = Math.round(Math.min(cover, innerHeight * .5) * .5);
+    if (off !== (cam._off || 0)) { cam._off = off; if (off) cam.setViewOffset(innerWidth, innerHeight, 0, off, innerWidth, innerHeight); else cam.clearViewOffset(); } }
   comp.render(); }
 requestAnimationFrame(frame);
 window.__lab = {LIVE, ORG, SONG, CAM, AUTO, add, remove, select, cinema, scene, cam, THREE, R, comp, camera, T: () => T};
