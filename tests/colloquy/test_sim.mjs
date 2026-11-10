@@ -75,7 +75,7 @@ test('raising the ambient light gives fewer handshakes per minute', () => {
 
 test('visitor · prosthetic male (torch) engages a female', () => {
   const c = makeColloquy({seed: 7}), ev = record(c); c.run(30); const f = c.S.females[1]; f.O = .7; f.P = .1;
-  runUntil(c, () => f.stage === 1, 30); c.visitor.torch(1, 'O', 6); c.run(3);
+  runUntil(c, () => f.stage === 1, 30); c.visitor.torch(1, 'O', 8); c.run(5);
   const st = ev.filter(e => e.kind === 'stage' && e.who === 'F2' && /torch/.test(e.why));
   assert(st.length >= 2 && ev.some(e => e.kind === 'sweep' && e.f === 'F2' && e.m === 'V'), 'no torch engagement');
   return {stages: st.map(e => e.stage)};

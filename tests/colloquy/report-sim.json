@@ -1,6 +1,6 @@
 {
  "suite": "colloquy sim",
- "when": "2026-11-10T11:03:29.456Z",
+ "when": "2026-11-10T12:04:00.465Z",
  "passed": 13,
  "failed": 0,
  "results": [
@@ -19,9 +19,9 @@
     "female": "F1",
     "desire": "O",
     "vane": "C",
-    "before": 0.7752,
-    "after": 0.2252,
-    "t": 7.87
+    "before": 0.7857,
+    "after": 0.2357,
+    "t": 8.37
    }
   },
   {
@@ -38,8 +38,8 @@
    "name": "memory: after an UP reinforcement the next encounter with that male sweeps UP first",
    "ok": true,
    "detail": {
-    "reencounters": 109,
-    "upWrites": 68
+    "reencounters": 102,
+    "upWrites": 65
    }
   },
   {
@@ -47,16 +47,16 @@
    "ok": true,
    "detail": {
     "adaptations": 6,
-    "reinforcementsAfterInversion": 27
+    "reinforcementsAfterInversion": 28
    }
   },
   {
    "name": "majority arbitration resolves contention over bar Z",
    "ok": true,
    "detail": {
-    "contentions": 58,
-    "haltWins": 38,
-    "turnWins": 20
+    "contentions": 43,
+    "haltWins": 33,
+    "turnWins": 10
    }
   },
   {
@@ -64,9 +64,9 @@
    "ok": true,
    "detail": {
     "perMinute": {
-     "dark": 4.04,
-     "dim": 3.67,
-     "lit": 2.64
+     "dark": 3.69,
+     "dim": 3.42,
+     "lit": 2.31
     }
    }
   },
@@ -87,8 +87,8 @@
    "detail": {
     "m": "G",
     "vane": "C",
-    "before": 0.7626,
-    "after": 0.2126
+    "before": 0.7731,
+    "after": 0.2231
    }
   },
   {
@@ -108,8 +108,8 @@
      "fast": 0.352
     },
     "handshakes15min": {
-     "calm": 39,
-     "urgent": 66
+     "calm": 42,
+     "urgent": 72
     }
    }
   },
@@ -119,46 +119,46 @@
    "detail": [
     {
      "seed": 7,
-     "handshakes": 121,
-     "perMin": 4.03,
-     "aborts": 47,
-     "contentions": 168,
+     "handshakes": 114,
+     "perMin": 3.8,
+     "aborts": 28,
+     "contentions": 142,
      "satisfied": [
-      67,
-      54,
-      43,
-      36,
-      42
+      64,
+      50,
+      39,
+      34,
+      41
      ],
-     "maxHoldS": 3.72
+     "maxHoldS": 3.67
     },
     {
      "seed": 19,
-     "handshakes": 124,
-     "perMin": 4.13,
-     "aborts": 43,
-     "contentions": 168,
+     "handshakes": 107,
+     "perMin": 3.57,
+     "aborts": 36,
+     "contentions": 141,
      "satisfied": [
-      65,
       59,
-      46,
-      40,
-      38
+      48,
+      39,
+      31,
+      37
      ],
-     "maxHoldS": 3.68
+     "maxHoldS": 3.73
     },
     {
      "seed": 42,
-     "handshakes": 114,
-     "perMin": 3.8,
-     "aborts": 43,
-     "contentions": 157,
+     "handshakes": 117,
+     "perMin": 3.9,
+     "aborts": 33,
+     "contentions": 150,
      "satisfied": [
-      63,
-      51,
-      47,
-      38,
-      29
+      57,
+      60,
+      41,
+      36,
+      40
      ],
      "maxHoldS": 3.72
     }

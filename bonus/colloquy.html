@@ -100,6 +100,7 @@ body.exhibit #dock .row.vis,body.exhibit #dock .row.tog{opacity:.25}
 <dt>tone</dt><dd>her emitter, phase-locked to his flashes; his sound sensor listens for it</dd>
 <dt>M<sub>A</sub>, M<sub>B</sub></dt><dd>her memories, per male, of the mirror angle that last satisfied his O (M<sub>A</sub>) or P (M<sub>B</sub>)</dd>
 <dt>τ</dt><dd>the window for her mirror search; if no reinforcement lands within it, both abort and scan again</dd>
+<dt>hue</dt><dd>each mobile’s own colour, on its halo and filament: G red, J green, F1 blue, F2 violet, F3 pale gold; its brightness is its need</dd>
 <dt>1–7</dt><dd>scan · contact · phase-lock · commitment · mirror sweep · closure (F = 1) · consolidate and resume</dd>
 </dl></section>
 
@@ -145,10 +146,10 @@ const errors = [];
 addEventListener('error', e => errors.push(String(e.message || e))); addEventListener('unhandledrejection', e => errors.push(String(e.reason)));
 
 // ---------------------------------------------------------------- events: sound, captions, the measured rate
-const recent = [], tail = [], NAME = {G: 'G', J: 'J'};
+const recent = [], tail = [], NAME = {G: 'G', J: 'J'}; let REC = null;
 const say = (txt, k = '') => { $('cap').innerHTML = (k ? `<b>${k}</b>` : '') + txt; };
 sim.on(ev => {
-  sound.event(ev); if (FILM) filmEvents.push({...ev});
+  sound.event(ev); if (FILM) filmEvents.push({...ev}); if (REC) REC.ev.push({...ev});
   if (ev.kind === 'reinforce') recent.push(ev.t);
   if (['reinforce', 'abort', 'energetic', 'memory', 'visitor', 'contention', 'adapt'].includes(ev.kind)) { tail.push(ev); if (tail.length > 8) tail.shift(); }
 });
@@ -159,6 +160,7 @@ function narrate() {
   // the caption follows the camera: the director's encounter first, else the most advanced one
   const df = stage.director.focus && stage.director.focus.f; let f = df && df.partner !== -1 && df.stage > 1 ? df : null; if (!f) for (const x of S.females) if (x.partner !== -1 && x.stage > 1 && (!f || x.stage > f.stage)) f = x;
   const last = tail[tail.length - 1];
+  if (P.ambient > .3) return say('The gallery lights come up. The photocells lose their contrast: lamps still flash, but no one answers.', 'LIGHT');
   if (last && last.kind === 'abort' && S.t - last.t < 2.2) return say(last.why === 'occluded by visitor' ? `A visitor’s shadow broke ${last.m}’s beam to ${last.f}: both fall back to scanning.` : /τ/.test(last.why) ? `τ ran out with no reinforcement: ${last.f || ''} and ${last.m || 'her partner'} give up and scan again.` : `The line between ${last.m || '…'} and ${last.f || '…'} was lost: both scan again.`, 'ABORT');
   if (!f) { const m = S.males.find(m => m.stage >= 6); if (m) return say(`A visitor’s mirror threw ${m.id}’s beam onto vane ${m.vane}: F = 1, and his ${m.desire} drive falls by ω.`, '6 · CLOSURE');
     const sc = S.males.filter(m => m.desire); if (!sc.length) return say('Every drive is below L<sub>min</sub>: the mobiles are quiet and dark until their needs rebuild.', 'SATISFIED');
@@ -250,6 +252,8 @@ function exhibitionStep() {
   if (!EXH) return; const u = S.t - exhT;
   // plates come and go like a gallery's own captions
   const lab = (u % 240) > 4 && (u % 240) < 34, st = (u % 300) > 150 && (u % 300) < 185; if ($('label').classList.contains('open') !== lab) openPlate('label', lab); if ($('state').classList.contains('open') !== st) openPlate('state', st);
+  // darkness demonstrated: every 6 minutes the gallery lights come up for 12 s, and the society falls quiet
+  const dk = u % 360; if (dk > 300 && dk < 312) { if (P.ambient < .9) sim.set({ambient: .95}); } else if (P.ambient > .5) sim.set({ambient: 0});
   // the ghost visitor (every ~2.5 min, one of the four modes in turn)
   const k = Math.floor(u / 150), slot = u % 150;
   if (slot > 60 && slot < 62 && (!ghost || ghost.k !== k)) { ghost = {k, mode: GHOST[k % 4], t: S.t};
@@ -292,8 +296,9 @@ requestAnimationFrame(frame);
 const filmEvents = [], filmTrace = [];
 const FILMSCRIPT = [
   {at: 0, card: 'THE COLLOQUY OF MOBILES<small>after Gordon Pask, 1968 · five mobiles, played by jellies</small>', until: 3.6},
-  {at: 30, torch: 'auto'},
-  {at: 52, stand: true}, {leave: 12},
+  {at: 27, torch: 1},
+  {at: 42, stand: true}, {leave: 8},
+  {at: 57, ambient: .95}, {at: 67, ambient: 0},
   {at: 78.5, card: 'THE COLLOQUY OF MOBILES<small>Gordon Pask with Yolanda Sonnabend, Marc Dowson and Tony Watts · ICA London 1968 · reconstruction Pangaro &amp; McLeish 2018, ZKM Karlsruhe</small>', until: 84.5}];
 let filmF = 0, standFix = null;
 const film = {fps: 24, duration: +(Q.get('dur') || 84),
@@ -301,7 +306,8 @@ const film = {fps: 24, duration: +(Q.get('dur') || 84),
     const card = FILMSCRIPT.find(c => c.card && t >= c.at && t < c.until); $('card').style.display = card ? 'grid' : 'none';
     if (card) { if ($('cardIn').innerHTML !== card.card) $('cardIn').innerHTML = card.card; $('card').style.opacity = Math.max(0, Math.min(1, (t - card.at) / .8 + (card.at === 0 ? 1 : 0), (card.until - t) / .8)); }
     for (const c of FILMSCRIPT) {
-      if (c.torch && t >= c.at && !c.done) { const i = S.females.findIndex(f => f.stage === 1 && sim.desireOf(f) && f.partner === -1); if (i >= 0) { sim.visitor.torch(i, sim.desireOf(S.females[i]), 4.5); c.done = true; } }
+      if (c.ambient != null && t >= c.at && !c.done) { sim.set({ambient: c.ambient}); c.done = true; }
+      if (c.torch && t >= c.at && !c.done) { const i = typeof c.torch === 'number' ? (S.females[c.torch].stage === 1 && sim.desireOf(S.females[c.torch]) ? c.torch : -1) : S.females.findIndex(f => f.stage === 1 && sim.desireOf(f) && f.partner === -1); if (i >= 0) { sim.visitor.torch(i, sim.desireOf(S.females[i]), 4.5); c.done = true; } }
       if (c.stand && t >= c.at && !c.done) { const m = S.males.find(m => m.stage >= 3 && m.stage <= 5 && m.partner >= 0); if (m) { const f = S.females[m.partner], a = sim.malePos(m), b = sim.femalePos(f); standFix = {x: (a.x + b.x) / 2, z: (a.z + b.z) / 2, at: t}; c.done = true; } }
       if (c.leave && standFix && t >= standFix.at + c.leave && !c.done) { sim.visitor.leave(); standFix = null; c.done = true; } }
     if (standFix) { const k = Math.min(1, (S.t - (standFix.t0 ??= S.t)) / .5); sim.visitor.stand(standFix.x * (1.6 - .6 * k), standFix.z * (1.6 - .6 * k)); }
@@ -322,6 +328,13 @@ const COLLOQUY = window.COLLOQUY = {
   shot: v => setView(Object.keys(VMAP).find(k => VMAP[k] === v || k === String(v).toUpperCase()) || 'AUTO'), mode: setMode, cinema, letterbox: letter, exhibit, plate: openPlate,
   events: (n = 20) => S.log.slice(-n), director: () => ({shot: stage.director.shot, manual: stage.director.manual, cuts: stage.director.cuts, log: stage.director.log.slice(-10)}),
   handshakesPerMinute: perMin, step(seconds) { sim.run(seconds); },
+  // test probes: the sound of a stretch of the live run (offline, same voices), and the measured brightness of a screen region
+  async audioProbe(seconds) { const rr = stage.render; stage.render = () => {}; REC = {ev: [], tr: []}; const t0 = S.t; for (let i = 0; i < seconds * 24; i++) { tick(1 / 24); REC.tr.push({t: S.t, st: soundState(S)}); } stage.render = rr;
+    const R0 = REC; REC = null; const buf = await renderOffline(R0.tr, R0.ev, seconds, t0); const bytes = wav(buf); let s = ''; for (let i = 0; i < bytes.length; i += 32768) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 32768));
+    return {wav: btoa(s), reinforce: R0.ev.filter(e => e.kind === 'reinforce' && e.t - t0 < seconds - 1).map(e => +(e.t - t0).toFixed(3))}; },
+  lum(x, y, r) { const c = $('gl'), w = c.width, h = c.height, k = w / innerWidth, cv2 = document.createElement('canvas'); cv2.width = w; cv2.height = h; const g = cv2.getContext('2d'); g.drawImage(c, 0, 0);
+    const X = Math.max(0, Math.round((x - r) * k)), Y = Math.max(0, Math.round((y - r) * k)), W2 = Math.min(w - X, Math.round(2 * r * k)), H2 = Math.min(h - Y, Math.round(2 * r * k)), d = g.getImageData(X, Y, W2, H2).data; let sum = 0;
+    for (let i = 0; i < d.length; i += 4) sum += .2126 * d[i] + .7152 * d[i + 1] + .0722 * d[i + 2]; return sum / (d.length / 4); },
   soak(seconds) { const n = Math.round(seconds * 60); for (let i = 0; i < n; i++) { sim.step(1 / 60); exhibitionStep(); } narrate(); if ($('state').classList.contains('open')) plate(); return {t: S.t, handshakes: S.handshakes, stuck: S.stuck, sat: [...S.males, ...S.females].map(a => a.sat), ghosts: ghost ? ghost.k + 1 : 0}; }, tick: (dt = 1 / 30) => tick(dt), errors, fps: () => fps, film, sim, stage, sound};
 // cineulation: the live machine plays as cinema by default (letterboxed, controls hidden, darkness as the stage); ?ui starts with the controls
 if (!Q.has('ui') || FILM) { cinema(true); letter(!Q.has('noletter')); } if (EXH) exhibit(true);

@@ -5,7 +5,7 @@ const BASE = process.argv[2] || 'http://localhost:8791', DUR = +(process.argv[3]
 const OUT = path.join(__dirname, '../../bonus/colloquy/colloquy-film.mp4'), TMPV = OUT + '.video.mp4', TMPA = OUT + '.wav';
 (async () => {
   const b = await chromium.launch(), p = await b.newPage({viewport: {width: 1280, height: 720}}); const errs = []; p.on('pageerror', e => errs.push(e.message));
-  await p.goto(`${BASE}/bonus/colloquy.html?film&seed=9&tempo=1.8&dur=${DUR}`); await p.waitForFunction(() => window.COLLOQUY && COLLOQUY.film);
+  await p.goto(`${BASE}/bonus/colloquy.html?film&seed=7&tempo=1.8&dur=${DUR}`); await p.waitForFunction(() => window.COLLOQUY && COLLOQUY.film);
   const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-', '-c:v', 'libx264', '-preset', 'slow', '-crf', '26', '-maxrate', '1100k', '-bufsize', '2200k', '-pix_fmt', 'yuv420p', '-threads', '2', TMPV], {stdio: ['pipe', 'inherit', 'inherit']});
   const t0 = Date.now();
   for (let f = 0; f < N; f++) {
@@ -19,6 +19,6 @@ const OUT = path.join(__dirname, '../../bonus/colloquy/colloquy-film.mp4'), TMPV
   await b.close();
   await new Promise(r => spawn('ffmpeg', ['-y', '-loglevel', 'error', '-i', TMPV, '-i', TMPA, '-c:v', 'copy', '-c:a', 'aac', '-b:a', '96k', '-shortest', '-movflags', '+faststart', OUT], {stdio: 'inherit'}).on('close', r));
   fs.unlinkSync(TMPV); fs.unlinkSync(TMPA);
-  fs.writeFileSync(path.join(__dirname, 'report-film.json'), JSON.stringify({film: 'bonus/colloquy/colloquy-film.mp4', seconds: DUR, fps: FPS, size: [1280, 720], seed: 9, tempo: 1.8, director: 'the live event-driven director (same page, same clock)', bytes: fs.statSync(OUT).size, renderSeconds: Math.round((Date.now() - t0) / 1000), pageErrors: errs, events: log}, null, 1));
+  fs.writeFileSync(path.join(__dirname, 'report-film.json'), JSON.stringify({film: 'bonus/colloquy/colloquy-film.mp4', seconds: DUR, fps: FPS, size: [1280, 720], seed: 7, tempo: 1.8, director: 'the live event-driven director (same page, same clock)', bytes: fs.statSync(OUT).size, renderSeconds: Math.round((Date.now() - t0) / 1000), pageErrors: errs, events: log}, null, 1));
   console.log('done', OUT, fs.statSync(OUT).size, 'bytes', errs.length ? 'ERRORS ' + errs.join('|') : '');
 })();

@@ -72,12 +72,39 @@ The page has no separate cinematic layer. The simulation is the film:
 | consolidate (→ 7) | a hold on her memory glow, in the colour of the drive |
 | Z contention (when nothing is engaged) | bar Z |
 | abort | side |
-| visitor: torch / stand in / mirror / conduct | triangulation with the torch / the visitor / the vanes / bar Z |
+| lights up / down (`ambient`) | the wide plan, held while the room is lit |
+| visitor: torch / stand in / mirror / conduct | over the stranger's shoulder / the visitor / the vanes / bar Z |
 
 - **Holds:** a new story needs 1.8 s and the next beat of the same encounter 0.85 s. A visitor's act (a new torch, stepping in) cuts at once, because it is rare by construction. Past 9 s a shot is refreshed, again only on the next event. The director stays with the current encounter and does not jump to another pair mid-handshake.
 - **Pacing:** to give the director room, registration (`register` 0.9 s), the held beam before the sweep (`commitHold` 1.0 s) and closure before consolidation (`closeHold` 1.0 s) are paced for the screen. This is marked INTERPRETATION.
 - **Sound:** it starts on the first gesture, because browsers need one.
 - **The film is a recording of this cineulation:** the same page, director and fixed 1/60 s machine clock, stepped at 24 fps by `COLLOQUY.film.frame()` (which calls the live `tick`). The recorded visitor comes in at 30 s with the torch and stands in a beam at 52 s for 12 s. The sound is rendered offline from the same run's trace.
+
+## Critic round 1 → repairs (satisfaction must be visible and audible)
+- **Brightness is need.**
+  - Each bell is lit by its drive level: a dimmer on every rig material is scaled by (O + P)/2, and an identity-coloured halo follows the same value. Rising need brightens the bell.
+  - A committed male (B on) burns brighter.
+  - At F = 1, B goes out at once. The vane flares for 0.3 s, and the satisfied body falls dark, then is slowly relit by need (time constant 7 s).
+  - The pair swing apart on their filaments.
+  - Measured on rendered frames, 0.5 s after closure: 64–71% below the commit value.
+- **The satisfaction chord.** At F = 1 a triad on his own pitch is struck over a quieter bed. Measured with EBU R128: momentary loudness +19 to +20 LU over the bed within 0.5 s of every F = 1, with a loudness range of 12.3 LU.
+- **Identity colours** carried by each mobile's halo and filament: G red, J green, F1 blue, F2 violet, F3 pale gold.
+- **The torch:**
+  - It has its own cold white.
+  - A stranger figure holds it.
+  - The director cuts at once, over the stranger's shoulder (`stranger`).
+  - The film's torch solicits F2.
+- **Shot holds:**
+  - Shots are refreshed on an event after 6 s. With no event for 8 s, the director cuts to an establishing shot; the log marks this cut "no event".
+  - Beats of one encounter are at least 1.4 s apart, except the key beats (F = 1, consolidation), which need 0.9 s.
+  - Cuts are hard; the camera does not ease between shots.
+- **Bloom** is clamped (strength 0.55, threshold 0.74), and the beams are softer.
+- **Bar Z** has a lamp strip: amber when halted by majority, teal when turning. The commit shot frames it close from below.
+- **Darkness:**
+  - An `ambient` event (lights up) cuts to the wide plan and holds the quiet room.
+  - The film raises the gallery light from 57 to 67 s. No handshake completes while it is lit; the conversation resumes after.
+  - Exhibition mode does the same every 6 minutes.
+- **Pacing:** `commitHold` is 1.5 s and `closeHold` 1.6 s, so the director can show the commitment, the sweep, the satisfaction and the consolidation.
 
 ## The staging
 - **Cast** (`?cast=G:sentinel,J:celluloid,F1:glass,F2:medusa,F3:veil` is the default):
@@ -155,11 +182,13 @@ The page has no separate cinematic layer. The simulation is the film:
   - a press is the torch, and the director cuts to it;
   - a tap or a key reveals the controls;
   - the 390 px phone picture is uncovered.
+  - Satisfaction is visible: the region brightness 0.5 s after F = 1 is at least 40% below the commit value.
+  - Satisfaction is audible: an EBU R128 momentary peak at least 6 LU above the bed within 0.5 s of each F = 1.
 
 **Run:**
 - `node tests/colloquy/test_sim.mjs`
 - `node tests/colloquy/test_page.cjs http://localhost:PORT <shotDir>`, with a static server at the repo root
-- `node tests/colloquy/render_film.cjs http://localhost:PORT 84` (the film: the live page at seed 9, tempo 1.8)
+- `node tests/colloquy/render_film.cjs http://localhost:PORT 84` (the film: the live page at seed 7, tempo 1.8)
 
 ## Not claimed
 - The personas are Pask and Sonnabend's period satire, kept as historical labels.

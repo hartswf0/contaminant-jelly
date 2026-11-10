@@ -6,141 +6,114 @@
   1280,
   720
  ],
- "seed": 9,
+ "seed": 7,
  "tempo": 1.8,
  "director": "the live event-driven director (same page, same clock)",
- "bytes": 11020172,
- "renderSeconds": 588,
+ "bytes": 9629994,
+ "renderSeconds": 642,
  "pageErrors": [],
  "events": [
   {
-   "t": 10.55,
+   "t": 8.37,
    "kind": "reinforce",
    "m": "G",
    "f": "F1",
    "vane": "C"
   },
   {
-   "t": 11.55,
+   "t": 9.97,
    "kind": "memory",
    "m": "G",
    "f": "F1"
   },
   {
-   "t": 11.67,
+   "t": 12.17,
    "kind": "reinforce",
    "m": "J",
    "f": "F2",
    "vane": "D"
   },
   {
-   "t": 12.67,
+   "t": 13.77,
    "kind": "memory",
    "m": "J",
    "f": "F2"
   },
   {
-   "t": 19.83,
+   "t": 20.67,
    "kind": "abort",
    "m": "J",
    "f": "F3",
    "why": "line lost before commitment"
   },
   {
-   "t": 23.85,
-   "kind": "abort",
-   "m": "J",
-   "f": "F3",
-   "why": "line lost before commitment"
-  },
-  {
-   "t": 29.98,
+   "t": 26.98,
    "kind": "visitor",
-   "f": "F1",
+   "f": "F2",
    "mode": "prosthetic male"
   },
   {
-   "t": 34.32,
+   "t": 31.85,
    "kind": "reinforce",
    "m": "J",
    "f": "F3",
    "vane": "D"
   },
   {
-   "t": 35.33,
+   "t": 33.47,
    "kind": "memory",
    "m": "J",
    "f": "F3"
   },
   {
-   "t": 37.17,
+   "t": 34.67,
    "kind": "abort",
    "m": null,
-   "f": "F1",
+   "f": "F2",
    "why": "torch: timeout τ (no vanes to close)"
   },
   {
-   "t": 44.32,
-   "kind": "reinforce",
-   "m": "G",
-   "f": "F2",
-   "vane": "C"
-  },
-  {
-   "t": 45.33,
-   "kind": "memory",
-   "m": "G",
-   "f": "F2"
-  },
-  {
-   "t": 55.78,
+   "t": 44.9,
    "kind": "visitor",
    "mode": "occlusion"
   },
   {
-   "t": 56.42,
+   "t": 45.5,
    "kind": "abort",
-   "m": "J",
-   "f": "F1",
+   "m": "G",
+   "f": "F3",
    "why": "occluded by visitor"
   },
   {
-   "t": 67.78,
+   "t": 52.9,
    "kind": "visitor",
    "mode": "occlusion ends"
   },
   {
-   "t": 71.23,
+   "t": 56.27,
    "kind": "reinforce",
    "m": "G",
-   "f": "F1",
+   "f": "F3",
    "vane": "C"
   },
   {
-   "t": 72.25,
+   "t": 57.88,
    "kind": "memory",
    "m": "G",
-   "f": "F1"
+   "f": "F3"
   },
   {
-   "t": 76.08,
+   "t": 79.77,
    "kind": "reinforce",
    "m": "J",
-   "f": "F2",
+   "f": "F3",
    "vane": "C"
   },
   {
-   "t": 77.1,
+   "t": 81.38,
    "kind": "memory",
    "m": "J",
-   "f": "F2"
-  },
-  {
-   "t": 83.83,
-   "kind": "reinforce",
-   "m": "J",
-   "f": "F2",
-   "vane": "D"
+   "f": "F3"
   }
  ]
 }

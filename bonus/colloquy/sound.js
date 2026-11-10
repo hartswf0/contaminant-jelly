@@ -25,16 +25,21 @@ export function makeVoices(ctx, dest) {
   function chirp(t, f0, f1, dur, vol, type = 'sine', pan = 0) { const o = ctx.createOscillator(), g = ctx.createGain(), p = ctx.createStereoPanner(); o.type = type; p.pan.value = pan;
     o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .006); g.gain.exponentialRampToValueAtTime(.0001, t + dur + .05);
     o.connect(g); g.connect(p); p.connect(bus); o.start(t); o.stop(t + dur + .08); }
+  function chord(t, f, vol, dur, pan) { const o = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain(), p = ctx.createStereoPanner(); o.type = 'triangle'; o2.type = 'sine'; o.frequency.value = f; o2.frequency.value = f * 1.003; p.pan.value = pan;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .015); g.gain.exponentialRampToValueAtTime(vol * .35, t + .35); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    o.connect(g); o2.connect(g); g.connect(p); p.connect(bus); o.start(t); o2.start(t); o.stop(t + dur + .05); o2.stop(t + dur + .05); }
   return {
     // st: {fem: [{tone, gate, stage}], mal: [{B, F}], urgency}
     frame(t, st) {
-      st.fem.forEach((f, i) => set(fem[i].g.gain, f.tone > 0 ? (f.gate ? .05 * f.tone + .012 : .004) : 0, t, f.stage === 3 ? .006 : .03));
-      st.mal.forEach((m, i) => { set(buzz[i].g.gain, m.B ? .016 : 0, t, .08); set(buzz[i].lp.frequency, m.B ? 900 : 400, t, .2); });
-      set(hum.g.gain, .012 + st.urgency * .05, t, .6); set(hum.lp.frequency, 120 + st.urgency * 260, t, .6);
+      st.fem.forEach((f, i) => set(fem[i].g.gain, f.tone > 0 ? (f.gate ? .026 * f.tone + .006 : .002) : 0, t, f.stage === 3 ? .006 : .03));
+      st.mal.forEach((m, i) => { set(buzz[i].g.gain, m.B ? .009 : 0, t, .08); set(buzz[i].lp.frequency, m.B ? 900 : 400, t, .2); });
+      set(hum.g.gain, .004 + st.urgency * .02, t, .6); set(hum.lp.frequency, 120 + st.urgency * 260, t, .6);
     },
     event(t, ev) {
       const fi = ev.f ? +String(ev.f).slice(1) - 1 : 0, mi = ev.m === 'J' ? 1 : 0;
-      if (ev.kind === 'reinforce') { const hi = ev.vane === 'C'; chirp(t, MAL[mi] * (hi ? 4 : 3), MAL[mi] * (hi ? 8 : 6), .09, .09, 'square', mi ? .3 : -.3); chirp(t + .13, MAL[mi] * (hi ? 6 : 4.5), MAL[mi] * (hi ? 12 : 9), .11, .07, 'square', mi ? .3 : -.3); }
+      if (ev.kind === 'reinforce') { const hi = ev.vane === 'C';
+        // F = 1: the satisfaction chord, well above the bed (a major triad on his own pitch, struck and left to ring)
+        for (const [k, r] of [[0, 2], [1, 2.52], [2, 3], [3, 4]]) chord(t + k * .012, MAL[mi] * r, .2 - k * .025, 1.5, mi ? .3 : -.3); chirp(t, MAL[mi] * (hi ? 4 : 3), MAL[mi] * (hi ? 8 : 6), .09, .09, 'square', mi ? .3 : -.3); chirp(t + .13, MAL[mi] * (hi ? 6 : 4.5), MAL[mi] * (hi ? 12 : 9), .11, .07, 'square', mi ? .3 : -.3); }
       else if (ev.kind === 'memory') { for (const [k, r] of [[0, 1], [1, 1.25], [2, 1.5]]) chirp(t + .3 + k * .03, FEM[fi] * r / 2, FEM[fi] * r / 2 * 1.002, .9, .022, 'sine', [-.6, .6, 0][fi]);   // the satisfaction chord
        chirp(t + .32, FEM[fi] * 2, FEM[fi] * 2.02, .05, .05, 'sine', [-.6, .6, 0][fi]); chirp(t + .44, FEM[fi] * 2.5, FEM[fi] * 2.52, .07, .045, 'sine', [-.6, .6, 0][fi]); }
       else if (ev.kind === 'energetic') { chirp(t, 140, 70, .18, .12, 'sine'); chirp(t, 2400, 1800, .02, .03, 'square'); }

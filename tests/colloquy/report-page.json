@@ -1,7 +1,7 @@
 {
  "suite": "colloquy page (headless Chromium, SwiftShader)",
- "when": "2026-11-10T11:15:04.815Z",
- "passed": 18,
+ "when": "2026-11-10T12:05:04.143Z",
+ "passed": 20,
  "failed": 0,
  "shots": "/tmp/claude-0/-home-user-moto/d7f14925-adf0-50d2-855d-0417d555d37a/scratchpad/colloquy",
  "results": [
@@ -30,14 +30,14 @@
    "name": "auto-director cuts to the active handshake",
    "ok": true,
    "detail": {
-    "cuts": 18,
+    "cuts": 14,
     "shots": [
+     "two",
+     "bar",
      "mirror",
      "vane",
      "memory",
-     "plan",
-     "two",
-     "bar"
+     "plan"
     ]
    }
   },
@@ -82,7 +82,7 @@
    "ok": true,
    "detail": {
     "handshakesPer10min": {
-     "dark": 34,
+     "dark": 45,
      "lit": 26
     }
    }
@@ -92,14 +92,14 @@
    "ok": true,
    "detail": {
     "t": 3046.383333344512,
-    "handshakes": 177,
+    "handshakes": 189,
     "stuck": 0,
     "sat": [
-     91,
-     86,
-     65,
-     56,
-     53
+     108,
+     81,
+     73,
+     61,
+     52
     ],
     "ghosts": 12
    }
@@ -116,15 +116,15 @@
    "name": "cineulation: cuts per minute in range, every cut on a sim event (within one frame)",
    "ok": true,
    "detail": {
-    "perMin": 19.7,
-    "cuts": 59,
+    "perMin": 15.7,
+    "cuts": 47,
     "bad": [],
-    "minDur": 0.87,
-    "maxDur": 14.87,
+    "minDur": 1.03,
+    "maxDur": 7.47,
     "shots": [
      "two",
-     "mirror",
      "bar",
+     "mirror",
      "vane",
      "memory",
      "plan",
@@ -137,14 +137,61 @@
    "name": "cineulation: a press is the torch, and the director cuts to it",
    "ok": true,
    "detail": {
-    "f": 0,
-    "cut": "visitor torch → F1"
+    "f": 2,
+    "cut": "a stranger’s torch → F3"
    }
   },
   {
    "name": "cineulation: a tap on open water or a key reveals the controls",
    "ok": true,
    "detail": {}
+  },
+  {
+   "name": "satisfaction visible: brightness 0.5 s after closure ≥ 40% below the commit value",
+   "ok": true,
+   "detail": [
+    {
+     "male": "J",
+     "female": "F1",
+     "closureT": 187.57,
+     "commitLum": 215.2,
+     "postLum": 63.8,
+     "drop": 0.703
+    },
+    {
+     "male": "G",
+     "female": "F3",
+     "closureT": 203.03,
+     "commitLum": 202.5,
+     "postLum": 73.6,
+     "drop": 0.637
+    },
+    {
+     "male": "G",
+     "female": "F2",
+     "closureT": 230.62,
+     "commitLum": 203.8,
+     "postLum": 72.1,
+     "drop": 0.646
+    }
+   ]
+  },
+  {
+   "name": "satisfaction audible: momentary loudness ≥ +6 LU above the bed within 0.5 s of each F = 1",
+   "ok": true,
+   "detail": {
+    "bedLUFS": -34.5,
+    "risesLU": [
+     19.3,
+     19.7,
+     19.7,
+     19.5,
+     19.8,
+     19.3
+    ],
+    "closures": 6,
+    "LRA": 12.3
+   }
   },
   {
    "name": "cineulation 390 px: the phone view is uncovered",

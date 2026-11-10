@@ -28,7 +28,7 @@ export const DEFAULTS = {
   maleSpeed: .38, femaleSpeed: .22,         // horizontal motors (rad/s)
   beamHalf: .16, apertureHalf: .3,          // optical cones (rad)
   decode: .3, sync: 1.0, close: .45,      // dwell times (s) to decode u, to phase-lock, to register the reflection
-  register: .9, commitHold: 1.0, closeHold: 1.0,   // INTERPRETATION: cinematic pacing of registration, the held beam before the sweep, and closure before consolidation
+  register: .9, commitHold: 1.5, closeHold: 1.6,   // INTERPRETATION: cinematic pacing of registration, the held beam before the sweep, and closure before consolidation
   mirrorSpeed: .9,                         // servo b (units/s, b ∈ [−1, 1]: +1 up, −1 down)
   grace: .45,                               // a broken line is forgiven this long before the encounter is lost
   seed: 7};
@@ -106,7 +106,7 @@ export function makeColloquy(opts = {}) {
     const halt = wHalt > 0 && wHalt >= wTurn;
     if (wHalt > 0 && wTurn > 0) { if (!S._cont) { S.contentions++; emit('contention', {halt, wHalt: +wHalt.toFixed(3), wTurn: +wTurn.toFixed(3)}); } S._cont = true; } else S._cont = false;
     if (halt !== S.zHalt) { S.zHalt = halt; emit('z', {halt}); }
-    if (!halt) S.z = wrap(S.z + (P.zSpeed * (1 + 1.5 * P.zBias)) * dt);
+    if (!halt) { const z0 = S.z; S.z = wrap(S.z + (P.zSpeed * (1 + 1.5 * P.zBias)) * dt); const sec = a => Math.floor((a + Math.PI) / (Math.PI / 3)); if (sec(z0) !== sec(S.z)) emit('zq', {sector: sec(S.z)}); }   // bar Z passes a 60° mark
 
     // males
     for (const m of males) {
@@ -117,8 +117,9 @@ export function makeColloquy(opts = {}) {
         else m.phi += Math.sin(S.t * .2 + m.side) * .02 * dt;          // satisfied: quiescent drift, lamp dark
         m.desire = d; m.lamp = d ? (Math.sin(S.t * TAU * (m.flashHz * (d === 'P' ? 1.45 : 1))) > .2 ? 1 : 0) : 0;
       } else if (m.stage === 4 || m.stage === 5 || m.stage === 6) {
+        if (m.stage === 6) { m.B = false; m.lamp = 0;   // satisfied: the energetic beam goes out at once
+ if (S.t - m.since > P.closeHold) { m.B = false; setStage(m, 7, 'consolidate and resume'); } continue; }   // F = 1 held while she listens
         m.lamp = 1; m.B = true;                                         // the steady energetic beam
-        if (m.stage === 6) { if (S.t - m.since > P.closeHold) { m.B = false; setStage(m, 7, 'consolidate and resume'); } continue; }   // F = 1 held while she listens
         const f = females[m.partner];
         if (!f) { abort(m, null, 'no partner'); continue; }
         const al = aligned(m, f);
@@ -223,7 +224,7 @@ export function makeColloquy(opts = {}) {
 
   return {S, P, step, run(seconds, dt = 1 / 60) { const n = Math.round(seconds / dt); for (let i = 0; i < n; i++) step(dt); },
     on: f => listeners.push(f), visitor: V, malePos, femalePos, maleHeading, femaleHeading, aligned, regime: (a) => regime(a.O, a.P, P.Lmin, P.Lmax), desireOf,
-    set(o) { Object.assign(P, o); if (o.seed != null) R = rng(o.seed); },
+    set(o) { const a0 = P.ambient; Object.assign(P, o); if (o.seed != null) R = rng(o.seed); if (o.ambient != null && Math.abs(o.ambient - (S._ambEv ?? a0)) > .2) { S._ambEv = o.ambient; emit('ambient', {level: +o.ambient.toFixed(2), rising: o.ambient > a0}); } },
     snapshot() { return {t: +S.t.toFixed(2), z: +S.z.toFixed(3), zHalt: S.zHalt, handshakes: S.handshakes, aborts: S.aborts, contentions: S.contentions,
       males: males.map(m => ({id: m.id, O: +m.O.toFixed(3), P: +m.P.toFixed(3), regime: regime(m.O, m.P, P.Lmin, P.Lmax), stage: m.stage, B: m.B, F: m.F, lamp: m.lamp, phi: +m.phi.toFixed(3), partner: m.partner >= 0 ? females[m.partner].id : null})),
       females: females.map(f => ({id: f.id, O: +f.O.toFixed(3), P: +f.P.toFixed(3), regime: regime(f.O, f.P, P.Lmin, P.Lmax), stage: f.stage, b: +f.b.toFixed(2), tone: f.tone, MA: {...f.MA}, MB: {...f.MB}, partner: f.partner >= 0 ? males[f.partner].id : f.partner === -2 ? 'visitor' : null,

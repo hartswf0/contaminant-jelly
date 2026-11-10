@@ -2,6 +2,7 @@
 // Writes tests/colloquy/report-page.json and screenshots (desktop/phone, with and without plates).
 const {chromium, devices} = require('playwright'), fs = require('fs'), path = require('path');
 const BASE = process.argv[2] || 'http://localhost:8791', SHOTS = process.argv[3] || path.join(__dirname, 'shots');
+const {spawnSync} = require('child_process'), os = require('os');
 fs.mkdirSync(SHOTS, {recursive: true});
 const results = []; let failed = 0;
 async function test(name, fn) { let ok = false, detail; try { detail = await fn(); ok = true; } catch (e) { detail = String(e.message || e).slice(0, 400); } if (!ok) failed++; results.push({name, ok, detail}); console.log((ok ? 'PASS ' : 'FAIL ') + name + (detail ? '  ' + JSON.stringify(detail) : '')); }
@@ -70,13 +71,30 @@ async function open(b, url, ctxOpts) { const ctx = await b.newContext(ctxOpts), 
     for (const s of ['two', 'mirror', 'bar', 'vane', 'memory', 'plan']) assert(r.shots.includes(s), 'never cut to ' + s); return r; });
   // @test the visitor's torch (a press on a female) works in cinema and the director cuts to it on that frame
   await test('cineulation: a press is the torch, and the director cuts to it', async () => {
+    await C.p.evaluate(() => { COLLOQUY.shot('plan'); COLLOQUY.tick(1 / 24); COLLOQUY.shot('auto'); let n = 0; while (!COLLOQUY.sim.S.females.some(f => f.stage === 1 && COLLOQUY.sim.desireOf(f)) && n++ < 2400) COLLOQUY.sim.step(1 / 60); COLLOQUY.tick(1 / 24); });   // the wide plan, so every female is on screen
     const xy = await C.p.evaluate(() => { const i = Math.max(0, COLLOQUY.sim.S.females.findIndex(f => f.stage === 1 && COLLOQUY.sim.desireOf(f))); return {i, ...COLLOQUY.stage.screenOf('female', i)}; });
     await C.p.mouse.move(xy.x, xy.y); await C.p.mouse.down(); await C.p.evaluate(() => { COLLOQUY.tick(1 / 24); COLLOQUY.tick(1 / 24); }); await C.p.mouse.up();
     const r = await C.p.evaluate(() => ({tor: COLLOQUY.sim.S.visitor.torch, last: COLLOQUY.stage.director.log.slice(-1)[0], cinema: document.body.classList.contains('cinema')}));
-    assert(r.tor && r.tor.f === xy.i && r.last.ev.kind === 'visitor' && r.last.shot === 'tri' && r.cinema, JSON.stringify(r)); await ticks(C.p, 6); await C.p.screenshot({path: path.join(SHOTS, 'cine-torch.png')}); return {f: r.tor.f, cut: r.last.why}; });
+    assert(r.tor && r.tor.f === xy.i && r.last.ev.kind === 'visitor' && r.last.shot === 'stranger' && r.cinema, JSON.stringify(r)); await ticks(C.p, 6); await C.p.screenshot({path: path.join(SHOTS, 'cine-torch.png')}); return {f: r.tor.f, cut: r.last.why}; });
   await test('cineulation: a tap on open water or a key reveals the controls', async () => {
     await C.p.mouse.click(30, 300); const a = await C.p.evaluate(() => document.body.classList.contains('cinema')); await C.p.keyboard.press('h'); const b2 = await C.p.evaluate(() => document.body.classList.contains('cinema')); await C.p.keyboard.press('x'); const c = await C.p.evaluate(() => document.body.classList.contains('cinema'));
     assert(!a && b2 && !c, JSON.stringify({a, b2, c})); return {}; });
+  // @test satisfaction is visible: the satisfied male's region, 0.5 s after F = 1, is ≥ 40% darker than at his commitment (rendered frames)
+  await test('satisfaction visible: brightness 0.5 s after closure ≥ 40% below the commit value', async () => {
+    const out = [];
+    for (let k = 0; k < 3; k++) out.push(await C.p.evaluate(() => { const st = COLLOQUY.stage, S = COLLOQUY.sim.S, rr = st.render; st.render = () => {}; const frame = () => { st.render = rr; COLLOQUY.tick(1 / 24); st.R.getContext().finish(); st.render = () => {}; };
+      let n = 0; while (!S.males.some(m => m.stage === 4) && n++ < 24 * 300) COLLOQUY.tick(1 / 24); const mi = S.males.findIndex(m => m.stage === 4), m = S.males[mi], f = S.females[m.partner];
+      st.director.focus = {f, m}; st.setShot('vane'); st.director.focus = {f, m}; for (let i = 0; i < 12; i++) COLLOQUY.tick(1 / 24); frame(); let c = st.screenOf('male', mi); const A = COLLOQUY.lum(c.x, c.y, 60);
+      n = 0; while (m.stage !== 6 && m.stage !== 1 && n++ < 24 * 20) COLLOQUY.tick(1 / 24); if (m.stage !== 6) { st.setShot('auto'); st.render = rr; return {skip: 'aborted'}; } const tc = S.t; while (S.t < tc + .5) COLLOQUY.tick(1 / 24); frame(); c = st.screenOf('male', mi); const B = COLLOQUY.lum(c.x, c.y, 60);
+      st.setShot('auto'); while (m.stage !== 1) COLLOQUY.tick(1 / 24); st.render = rr; return {male: m.id, female: f.id, closureT: +tc.toFixed(2), commitLum: +A.toFixed(1), postLum: +B.toFixed(1), drop: +(1 - B / A).toFixed(3)}; }));
+    const ok = out.filter(o => !o.skip); assert(ok.length && ok.every(o => o.drop >= .4), JSON.stringify(out)); return out; });
+  // @test an EBU R128 momentary peak within 0.5 s of every F = 1, at least 6 LU above the bed
+  await test('satisfaction audible: momentary loudness ≥ +6 LU above the bed within 0.5 s of each F = 1', async () => {
+    const au = await C.p.evaluate(() => COLLOQUY.audioProbe(150)); const wavp = path.join(os.tmpdir(), 'colloquy-probe.wav'); fs.writeFileSync(wavp, Buffer.from(au.wav, 'base64'));
+    const txt = spawnSync('ffmpeg', ['-hide_banner', '-nostats', '-i', wavp, '-af', 'ebur128', '-f', 'null', '-'], {encoding: 'utf8'}).stderr; fs.unlinkSync(wavp);
+    const M = [...txt.matchAll(/t:\s*([\d.]+)\s+TARGET.*?M:\s*(-?[\d.]+|-inf)/g)].map(x => [+x[1], x[2] === '-inf' ? -120 : +x[2]]), live = M.map(x => x[1]).filter(v => v > -70).sort((a, b) => a - b), bed = live[Math.floor(live.length / 2)];
+    const rise = au.reinforce.map(t => +(Math.max(...M.filter(x => x[0] >= t && x[0] <= t + .5).map(x => x[1])) - bed).toFixed(1)), lra = +((txt.match(/LRA:\s*([\d.]+) LU/g) || []).pop() || 'LRA: 0').replace(/[^\d.]/g, '');
+    assert(rise.length >= 3 && rise.every(r => r >= 6), JSON.stringify({bed, rise})); return {bedLUFS: bed, risesLU: rise, closures: rise.length, LRA: lra}; });
   await C.ctx.close();
   // @test phone view uncovered: in cinema on a 390 px phone, nothing but the picture covers the picture
   const PC = await open(b, '/bonus/colloquy.html?test&manual&seed=7', {...devices['iPhone 13'], viewport: {width: 390, height: 844}});
