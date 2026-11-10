@@ -1,0 +1,18 @@
+# WHITNEY · differential motion as a light score, after John Whitney Sr., Digital Harmony (1980)
+@prompt twelve lights at whole-number speeds lock into a figure; a detune lets the figure breathe
+@world lab bpm=120 haze=0.03
+@cast glass:glass at=0,0,0
+@cast veil:veil at=-3,0.5,-1
+@cast golden:golden at=3,-0.4,-1
+@light Permutations intensity=1.4
+@camera orbit dist=10 speed=0.6
+@source whitney basis="theme only" title="Digital Harmony (1980); Permutations (1968); Matrix III (1972); Arabesque (1975)"
+@ekphrasis 0s..8s "Permutations: every light turns at a whole multiple of one speed, so the figure locks"
+@op 8s light Matrix detune=0.004
+@ekphrasis 8s..16s "a small detune: the lights slip out of phase, and the figure breathes"
+@op 16s light Arabesque
+@op 16s camera beneath dist=6 follow=glass
+@ekphrasis 16s..24s "wheels on wheels: a light crossing a bell makes it beat"
+@test 24s beats glass >= 1
+@test 24s visible glass
+@test 24s fps > 1

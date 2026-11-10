@@ -1,0 +1,15 @@
+# ORCHESTRA · FIELD CLOCK played by jellies: every sound is a stimulus to a nerve, and a nerve may refuse
+@prompt the field clock keeps time, and the jellies keep it with their bodies
+@world lab song=a4-clock until=40s
+@cast kick:sentinel role=kick
+@cast snare:celluloid role=snare
+@cast hat:doodle role=hat
+@cast bass:mantle role=bass
+@cast choir:glass role=choir
+@camera orbit dist=11 speed=0.8
+@light "Music Box 1:n"
+@ekphrasis 0s..6s "each jelly is cast to one sound; its onsets fire that jelly's pacemaker"
+@ekphrasis 20s..26s "a refused onset is the refractory nerve, not a bug"
+@test 20s beats kick >= 4
+@test 40s fired kick >= 0.3
+@test 40s visible choir
