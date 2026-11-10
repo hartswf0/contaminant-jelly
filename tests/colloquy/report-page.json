@@ -1,0 +1,215 @@
+{
+ "suite": "colloquy page (headless Chromium, SwiftShader)",
+ "when": "2026-11-10T11:15:04.815Z",
+ "passed": 18,
+ "failed": 0,
+ "shots": "/tmp/claude-0/-home-user-moto/d7f14925-adf0-50d2-855d-0417d555d37a/scratchpad/colloquy",
+ "results": [
+  {
+   "name": "desktop: loads and runs with no page errors",
+   "ok": true,
+   "detail": {
+    "t": 5.3
+   }
+  },
+  {
+   "name": "desktop: plates (wall label, state, legend) open and fill",
+   "ok": true,
+   "detail": {
+    "labelChars": 2355
+   }
+  },
+  {
+   "name": "cinema (H) hides all UI",
+   "ok": true,
+   "detail": {
+    "hidden": true
+   }
+  },
+  {
+   "name": "auto-director cuts to the active handshake",
+   "ok": true,
+   "detail": {
+    "cuts": 18,
+    "shots": [
+     "mirror",
+     "vane",
+     "memory",
+     "plan",
+     "two",
+     "bar"
+    ]
+   }
+  },
+  {
+   "name": "shots: plan, side, mirror close-up, triangulation render",
+   "ok": true,
+   "detail": {
+    "shots": 4
+   }
+  },
+  {
+   "name": "visitor gestures (desktop): stand in by tapping the floor; torch by tapping a female",
+   "ok": true,
+   "detail": {
+    "body": {
+     "x": 0,
+     "z": -0.11
+    },
+    "torch": 0
+   }
+  },
+  {
+   "name": "PEO hook: state, parameters and setters",
+   "ok": true,
+   "detail": {
+    "params": [
+     "delta",
+     "deltas",
+     "omega",
+     "Lmin",
+     "Lmax",
+     "tau",
+     "ambient",
+     "zBias",
+     "seed",
+     "cast"
+    ]
+   }
+  },
+  {
+   "name": "ambient light control has a measurable effect on the page",
+   "ok": true,
+   "detail": {
+    "handshakesPer10min": {
+     "dark": 34,
+     "lit": 26
+    }
+   }
+  },
+  {
+   "name": "exhibition: 30 sim-minutes with the ghost visitor, no stuck states, all satisfied, no errors",
+   "ok": true,
+   "detail": {
+    "t": 3046.383333344512,
+    "handshakes": 177,
+    "stuck": 0,
+    "sat": [
+     91,
+     86,
+     65,
+     56,
+     53
+    ],
+    "ghosts": 12
+   }
+  },
+  {
+   "name": "cineulation: cinema is the default view, controls invisible",
+   "ok": true,
+   "detail": {
+    "cls": "cinema letter",
+    "vis": []
+   }
+  },
+  {
+   "name": "cineulation: cuts per minute in range, every cut on a sim event (within one frame)",
+   "ok": true,
+   "detail": {
+    "perMin": 19.7,
+    "cuts": 59,
+    "bad": [],
+    "minDur": 0.87,
+    "maxDur": 14.87,
+    "shots": [
+     "two",
+     "mirror",
+     "bar",
+     "vane",
+     "memory",
+     "plan",
+     "side",
+     "orbit"
+    ]
+   }
+  },
+  {
+   "name": "cineulation: a press is the torch, and the director cuts to it",
+   "ok": true,
+   "detail": {
+    "f": 0,
+    "cut": "visitor torch → F1"
+   }
+  },
+  {
+   "name": "cineulation: a tap on open water or a key reveals the controls",
+   "ok": true,
+   "detail": {}
+  },
+  {
+   "name": "cineulation 390 px: the phone view is uncovered",
+   "ok": true,
+   "detail": {
+    "bar": 55,
+    "covered": [],
+    "n": 0,
+    "sw": 390
+   }
+  },
+  {
+   "name": "390 px phone: no horizontal overflow, the dock fits, no errors",
+   "ok": true,
+   "detail": {
+    "sw": 390,
+    "iw": 390,
+    "dock": [
+     8,
+     382,
+     751,
+     836
+    ],
+    "over": [],
+    "low": 1.1
+   }
+  },
+  {
+   "name": "390 px phone: plates open as a bottom sheet inside the screen",
+   "ok": true,
+   "detail": [
+    [
+     6,
+     384,
+     479,
+     747
+    ],
+    [
+     6,
+     384,
+     393,
+     747
+    ],
+    [
+     6,
+     384,
+     393,
+     747
+    ]
+   ]
+  },
+  {
+   "name": "390 px phone: touch gestures (tap STAND IN, tap a female with TORCH, drag CONDUCT)",
+   "ok": true,
+   "detail": {
+    "stand": true,
+    "torchF": 1,
+    "zBias": 0.7272727272727273,
+    "tempo": 1.875
+   }
+  },
+  {
+   "name": "390 px phone: cinema hides all UI",
+   "ok": true,
+   "detail": {}
+  }
+ ]
+}

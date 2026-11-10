@@ -1,0 +1,146 @@
+{
+ "film": "bonus/colloquy/colloquy-film.mp4",
+ "seconds": 84,
+ "fps": 24,
+ "size": [
+  1280,
+  720
+ ],
+ "seed": 9,
+ "tempo": 1.8,
+ "director": "the live event-driven director (same page, same clock)",
+ "bytes": 11020172,
+ "renderSeconds": 588,
+ "pageErrors": [],
+ "events": [
+  {
+   "t": 10.55,
+   "kind": "reinforce",
+   "m": "G",
+   "f": "F1",
+   "vane": "C"
+  },
+  {
+   "t": 11.55,
+   "kind": "memory",
+   "m": "G",
+   "f": "F1"
+  },
+  {
+   "t": 11.67,
+   "kind": "reinforce",
+   "m": "J",
+   "f": "F2",
+   "vane": "D"
+  },
+  {
+   "t": 12.67,
+   "kind": "memory",
+   "m": "J",
+   "f": "F2"
+  },
+  {
+   "t": 19.83,
+   "kind": "abort",
+   "m": "J",
+   "f": "F3",
+   "why": "line lost before commitment"
+  },
+  {
+   "t": 23.85,
+   "kind": "abort",
+   "m": "J",
+   "f": "F3",
+   "why": "line lost before commitment"
+  },
+  {
+   "t": 29.98,
+   "kind": "visitor",
+   "f": "F1",
+   "mode": "prosthetic male"
+  },
+  {
+   "t": 34.32,
+   "kind": "reinforce",
+   "m": "J",
+   "f": "F3",
+   "vane": "D"
+  },
+  {
+   "t": 35.33,
+   "kind": "memory",
+   "m": "J",
+   "f": "F3"
+  },
+  {
+   "t": 37.17,
+   "kind": "abort",
+   "m": null,
+   "f": "F1",
+   "why": "torch: timeout τ (no vanes to close)"
+  },
+  {
+   "t": 44.32,
+   "kind": "reinforce",
+   "m": "G",
+   "f": "F2",
+   "vane": "C"
+  },
+  {
+   "t": 45.33,
+   "kind": "memory",
+   "m": "G",
+   "f": "F2"
+  },
+  {
+   "t": 55.78,
+   "kind": "visitor",
+   "mode": "occlusion"
+  },
+  {
+   "t": 56.42,
+   "kind": "abort",
+   "m": "J",
+   "f": "F1",
+   "why": "occluded by visitor"
+  },
+  {
+   "t": 67.78,
+   "kind": "visitor",
+   "mode": "occlusion ends"
+  },
+  {
+   "t": 71.23,
+   "kind": "reinforce",
+   "m": "G",
+   "f": "F1",
+   "vane": "C"
+  },
+  {
+   "t": 72.25,
+   "kind": "memory",
+   "m": "G",
+   "f": "F1"
+  },
+  {
+   "t": 76.08,
+   "kind": "reinforce",
+   "m": "J",
+   "f": "F2",
+   "vane": "C"
+  },
+  {
+   "t": 77.1,
+   "kind": "memory",
+   "m": "J",
+   "f": "F2"
+  },
+  {
+   "t": 83.83,
+   "kind": "reinforce",
+   "m": "J",
+   "f": "F2",
+   "vane": "D"
+  }
+ ]
+}
