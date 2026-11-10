@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The Colloquy of Mobiles · jelly-films</title>
+<meta name="description" content="Gordon Pask's Colloquy of Mobiles (1968) as a live, causally faithful simulation: five asynchronous agents with drives O and P, the seven-stage optical handshake, bar Z's majority decision, memory, and the visitor's four modes, staged with the jelly-films jellies.">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<script type="importmap">{"imports":{"three":"../paeleo/scion/videotext/vendor/three.module.min.js","three/addons/":"../paeleo/scion/videotext/vendor/addons/"}}</script>
+<style>
+:root{color-scheme:dark;--gold:#f0a35a;--or:#ff8a2a;--pu:#c8689a;--dim:#8a9aa6;--ink:#e6edf3;--pan:rgba(4,10,11,.8);--line:#1f2d2c}
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#02080a;color:var(--ink);font:300 14px/1.45 Jost,system-ui,sans-serif;-webkit-user-select:none;user-select:none;overscroll-behavior:none}
+canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.ui{position:fixed;z-index:2;transition:opacity .4s}
+#top{top:max(10px,env(safe-area-inset-top));left:12px;right:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;pointer-events:none}
+#top h1{margin:0;font:400 13px Anton,Impact,sans-serif;letter-spacing:.3em;color:var(--gold)}#top h1 small{display:block;font:300 10px 'JetBrains Mono',monospace;letter-spacing:.08em;color:var(--dim);margin-top:3px}
+#top .st{font:300 11px 'JetBrains Mono',monospace;color:var(--dim);text-align:right;white-space:pre}
+#cap{left:50%;transform:translateX(-50%);bottom:calc(max(8px,env(safe-area-inset-bottom)) + var(--dockH,84px) + 6px);width:min(760px,calc(100vw - 24px));text-align:center;pointer-events:none;font:italic 15px/1.4 Georgia,serif;color:#e8e2d6;text-shadow:0 0 8px #000,0 0 2px #000}
+#cap b{font:400 11px Anton,Impact,sans-serif;letter-spacing:.2em;color:var(--gold);font-style:normal;margin-right:8px}
+#hint{left:50%;transform:translateX(-50%);top:max(54px,calc(env(safe-area-inset-top) + 46px));font:300 11px 'JetBrains Mono',monospace;color:#bfe9ef;background:var(--pan);border:1px solid var(--line);border-radius:12px;padding:5px 10px;display:none;max-width:calc(100vw - 24px);text-align:center}
+#hint.on{display:block}
+.dock{left:max(8px,env(safe-area-inset-left));right:max(8px,env(safe-area-inset-right));bottom:max(8px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:6px;align-items:center}
+.dock .row{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.dock button{all:unset;cursor:pointer;font:400 11px Anton,Impact,sans-serif;letter-spacing:.14em;padding:7px 10px;border-radius:14px;color:var(--dim);background:var(--pan);border:1px solid var(--line)}
+.dock button.on{color:#06100f;background:var(--gold)}.dock .vis button.on{background:#9fe6ef}
+.plate{position:fixed;z-index:3;background:var(--pan);border:1px solid var(--line);border-radius:6px;padding:12px 14px;overflow:auto;display:none;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.plate.open{display:block}.plate h2{margin:0 0 8px;font:400 12px Anton,Impact,sans-serif;letter-spacing:.2em;color:var(--gold);display:flex;justify-content:space-between}.plate h2 b{cursor:pointer;color:var(--dim);font:300 14px system-ui}
+#label{left:max(12px,env(safe-area-inset-left));top:max(60px,calc(env(safe-area-inset-top) + 52px));width:min(420px,calc(100vw - 24px));max-height:calc(100% - 200px);background:rgba(236,230,216,.95);color:#1c1814;border-color:#cbbf9f}
+#label h2{color:#7a2c1c}#label h2 b{color:#6b5f50}
+#label .t{font:700 22px/1.1 Georgia,serif;margin:0}#label .d{font:italic 14px Georgia,serif;margin:2px 0 8px;color:#4b4136}
+#label .mk{font:12px/1.45 Georgia,serif;color:#3a3128;border-top:1px solid #cbbf9f;border-bottom:1px solid #cbbf9f;padding:6px 0;margin:6px 0}
+#label p{font:13.5px/1.5 Georgia,serif;margin:8px 0}#label .note{font:italic 12.5px/1.45 Georgia,serif;color:#5a4c3c}#label .src{font:11px/1.45 Georgia,serif;color:#5a4c3c}
+#state{right:max(12px,env(safe-area-inset-right));top:max(60px,calc(env(safe-area-inset-top) + 52px));width:min(440px,calc(100vw - 24px));max-height:calc(100% - 200px);font:300 11px/1.4 'JetBrains Mono',monospace}
+#state table{width:100%;border-collapse:collapse}#state th{font:400 10px Anton,Impact,sans-serif;letter-spacing:.12em;color:var(--dim);text-align:left;padding:2px 3px;border-bottom:1px solid var(--line)}#state td{padding:3px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;white-space:nowrap}
+.bar{display:inline-block;height:7px;width:46px;background:rgba(255,255,255,.06);position:relative;vertical-align:middle;border-radius:1px}.bar i{position:absolute;left:0;top:0;bottom:0}.bar u{position:absolute;top:-2px;bottom:-2px;width:1px;background:#8a9aa6}
+.rg{font-size:10px;padding:1px 4px;border-radius:3px;background:rgba(255,255,255,.07)}.rg.O{color:var(--or)}.rg.P{color:var(--pu)}.rg.dual{color:#f6d27a}.rg.satisfied{color:#7fc9a0}
+.stg{color:#e8e2d6}.stg.on{color:var(--gold)}#state .sum{margin:8px 0 4px;color:var(--dim);line-height:1.6}#state .sum b{color:var(--ink);font-weight:400}
+#state .log{margin-top:6px;color:#9fb0b8;max-height:7.5em;overflow:hidden;white-space:pre-wrap}
+#legend{left:max(12px,env(safe-area-inset-left));bottom:calc(max(8px,env(safe-area-inset-bottom)) + var(--dockH,84px) + 44px);width:min(400px,calc(100vw - 24px));max-height:52vh}
+#legend dl{display:grid;grid-template-columns:3.6em 1fr;gap:3px 8px;margin:0;font:12px/1.4 Georgia,serif}#legend dt{font:400 12px 'JetBrains Mono',monospace;color:var(--gold)}#legend dd{margin:0;color:#d6dde0}
+#params{right:max(12px,env(safe-area-inset-right));bottom:calc(max(8px,env(safe-area-inset-bottom)) + var(--dockH,84px) + 44px);width:min(340px,calc(100vw - 24px));max-height:60vh}
+#params label{display:grid;grid-template-columns:7.5em 1fr 3em;gap:6px;align-items:center;font:300 11px 'JetBrains Mono',monospace;color:var(--dim);margin:5px 0}#params input[type=range]{width:100%;accent-color:var(--gold)}
+#params select{font:300 11px 'JetBrains Mono',monospace;background:#061010;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:3px;width:100%}
+#params small{display:block;color:var(--dim);font:300 10px/1.5 'JetBrains Mono',monospace;margin-top:6px}
+#glyph{position:fixed;z-index:4;right:max(10px,env(safe-area-inset-right));bottom:max(10px,env(safe-area-inset-bottom));width:30px;height:30px;border-radius:50%;border:1px solid rgba(240,163,90,.5);color:var(--gold);display:none;place-items:center;font:12px system-ui;cursor:pointer;transition:opacity 1.2s;background:rgba(0,0,0,.25)}
+.box{position:fixed;left:0;right:0;height:12.2vh;background:#000;z-index:2;display:none;pointer-events:none}#lbT{top:0}#lbB{bottom:0}
+#card{position:fixed;inset:0;z-index:5;display:none;place-items:center;pointer-events:none;text-align:center;background:radial-gradient(ellipse at center,rgba(0,0,0,.25),rgba(0,0,0,.7))}
+#card .in{font:400 clamp(22px,4.2vw,46px) Anton,Impact,sans-serif;letter-spacing:.28em;color:var(--gold)}#card .in small{display:block;font:italic clamp(12px,1.6vw,18px) Georgia,serif;letter-spacing:.02em;color:#e8e2d6;margin-top:12px}
+body.cinema .ui:not(#cap),body.cinema .plate{opacity:0!important;pointer-events:none!important}body.cinema #glyph{display:grid}body.cinema.still #glyph{opacity:0}
+body.cinema #cap{bottom:max(1.6vh,env(safe-area-inset-bottom));font-size:clamp(12px,1.35vw,17px)}body.cinema:not(.letter) #cap{bottom:max(14px,env(safe-area-inset-bottom))}body.nocap #cap{opacity:0!important}
+@media (orientation:portrait){.box{height:6.5vh}body.cinema.letter #cap{bottom:calc(6.5vh + 6px)}}
+body.letter .box{display:block}
+body.film #glyph{display:none!important}
+body.exhibit #dock .row.vis,body.exhibit #dock .row.tog{opacity:.25}
+@media (max-width:700px),(max-height:520px){
+  .plate{left:max(6px,env(safe-area-inset-left))!important;right:max(6px,env(safe-area-inset-right))!important;top:auto!important;width:auto!important;bottom:calc(max(8px,env(safe-area-inset-bottom)) + var(--dockH,84px) + 4px)!important;max-height:42vh!important;padding:9px 10px}
+  .plate h2{position:sticky;top:-9px;margin:-9px -10px 6px;padding:9px 10px;z-index:1;background:inherit}
+  #state{font-size:10px}#state .bar{width:30px}.dock button{padding:6px 8px;font-size:10px;letter-spacing:.1em}.dock .row{gap:4px}
+  #cap{font-size:13px}#top .st{font-size:9.5px}#top h1{font-size:11px}
+}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div class="box" id="lbT"></div><div class="box" id="lbB"></div>
+<div class="ui" id="top"><h1>THE COLLOQUY OF MOBILES<small>Gordon Pask, 1968 · five agents, live</small></h1><div class="st" id="st">…</div></div>
+<div class="ui" id="hint"></div>
+<div class="ui" id="cap"></div>
+<div id="card"><div class="in" id="cardIn"></div></div>
+
+<section class="plate" id="label" aria-label="Wall label">
+  <h2>WALL LABEL <b data-close="label">×</b></h2>
+  <div class="t">The Colloquy of Mobiles</div>
+  <div class="d">1968 · reconstructed 2018 · simulated here</div>
+  <div class="mk">Gordon Pask (Systems Research Ltd.), with sculpture by Yolanda Sonnabend and engineering by Marc Dowson and Tony Watts.<br>
+  First shown in <i>Cybernetic Serendipity</i>, Institute of Contemporary Arts, London, 2 August – 20 October 1968. Full-scale reconstruction by Paul Pangaro and TJ McLeish (2018), now in the collection of ZKM | Center for Art and Media Karlsruhe.</div>
+  <p>Five mobiles hang from a triangular frame and talk to one another in light and sound. Each carries two drives, O (orange) and P (puce), that rise for as long as they go unmet. None can satisfy itself. A “male” is relieved only when a “female” turns his own beam back onto the right vane with her mirror, and she is relieved only by hearing that it worked.</p>
+  <p>Out of these trades the five learn. Each female remembers which way to tilt for each male, so a second meeting is quicker than the first. Two males share one bar and must agree, by a majority vote weighted by need, whether it turns or stops.</p>
+  <p>Pask wanted an “aesthetically potent environment”, one that lets the visitor in. Here, as at the ICA, you can join the conversation. Shine a torch at a female and you take the male’s part. Hold up a mirror and you take hers. Stand in a beam and you break a conversation. Push the bar and you compose them all.</p>
+  <p class="note">The gender personas are Pask and Sonnabend’s, a deliberate period satire of 1960s courtship clichés built into who must signal and who must reflect. They are kept here as historical labels, not as a claim about anyone.</p>
+  <p class="note">This version runs the machine as five asynchronous state programs, the same for a given seed. Each mobile is played by a jelly from this site: G the Sentinel, J the Celluloid, F1 the Glass Moon, F2 the Afterlight Medusa, F3 the Fleck Veil. Its pulse comes from its state. Where the sources leave gaps, the choices are marked as interpretation in the code.</p>
+  <p class="src">Sources: G. Pask, “A Comment, a Case History and a Plan”, in J. Reichardt (ed.), <i>Cybernetics, Art and Ideas</i>, Studio Vista, 1971, pp. 76–99 · P. Pangaro and TJ McLeish, “Colloquy of Mobiles 2018 Project”, AISB 2018 · ZKM Karlsruhe, collection record, 2021 · T. Dreher, <i>History of Computer Art</i>, ch. II.3, 2013 · as set out in the monograph <i>Gordon Pask’s The Colloquy of Mobiles (1968): System Architecture and Operational Theory</i>.</p>
+</section>
+
+<section class="plate" id="state" aria-label="Machine state"><h2>MACHINE STATE <b data-close="state">×</b></h2><div id="stateBody"></div></section>
+
+<section class="plate" id="legend" aria-label="Legend"><h2>NOTATION <b data-close="legend">×</b></h2>
+<dl>
+<dt>G, J</dt><dd>the two “male” mobiles at the ends of bar Z, each turning 180° on its own axis (played by the Sentinel and the Celluloid)</dd>
+<dt>Z</dt><dd>the bar that carries them through 360°; it halts or turns by majority decision, weighted by drive</dd>
+<dt>F1–F3</dt><dd>the three “female” mobiles near the frame’s outer vertices, each turning through a bounded 90° arc between limit switches</dd>
+<dt>O, P</dt><dd>the two drives, orange and puce: μ ← μ + δ while unmet; μ ← μ − ω on satisfaction</dd>
+<dt>L<sub>min</sub>, L<sub>max</sub></dt><dd>thresholds of the four regimes: satisfied (both below L<sub>min</sub>), O, P, or dual (both above L<sub>max</sub>)</dd>
+<dt>A</dt><dd>the male’s display: his two drives as lit columns</dd>
+<dt>u</dt><dd>his flashing lamp, frequency-coded for who he is and which drive he wants satisfied</dd>
+<dt>B</dt><dd>his steady, energetic beam: the costly commitment of stage 4</dd>
+<dt>C, D</dt><dd>his reinforcement vanes, C for O (up), D for P (down); a reflection on the right one sets F = 1</dd>
+<dt>a</dt><dd>her aperture and photocell, which catches u</dd>
+<dt>b</dt><dd>her servo mirror, tilted up for O, down for P</dd>
+<dt>tone</dt><dd>her emitter, phase-locked to his flashes; his sound sensor listens for it</dd>
+<dt>M<sub>A</sub>, M<sub>B</sub></dt><dd>her memories, per male, of the mirror angle that last satisfied his O (M<sub>A</sub>) or P (M<sub>B</sub>)</dd>
+<dt>τ</dt><dd>the window for her mirror search; if no reinforcement lands within it, both abort and scan again</dd>
+<dt>hue</dt><dd>each mobile’s own colour, on its halo and filament: G red, J green, F1 blue, F2 violet, F3 pale gold; its brightness is its need</dd>
+<dt>1–7</dt><dd>scan · contact · phase-lock · commitment · mirror sweep · closure (F = 1) · consolidate and resume</dd>
+</dl></section>
+
+<section class="plate" id="params" aria-label="Light and parameters"><h2>LIGHT · PARAMETERS <b data-close="params">×</b></h2>
+<label>gallery light <input type="range" id="amb" min="0" max="1" step=".01" value="0"><span id="ambV"></span></label>
+<label>tempo δ <input type="range" id="tempo" min=".2" max="3" step=".05" value="1"><span id="tempoV"></span></label>
+<label>ω <input type="range" id="omega" min=".1" max="1" step=".01" value=".55"><span id="omegaV"></span></label>
+<label>L<sub>min</sub> <input type="range" id="Lmin" min=".05" max=".7" step=".01" value=".3"><span id="LminV"></span></label>
+<label>L<sub>max</sub> <input type="range" id="Lmax" min=".4" max="1.2" step=".01" value=".8"><span id="LmaxV"></span></label>
+<label>τ s <input type="range" id="tau" min="1" max="10" step=".1" value="4.2"><span id="tauV"></span></label>
+<label>bar Z <input type="range" id="zBias" min="-1" max="1" step=".01" value="0"><span id="zBiasV"></span></label>
+<div id="castSel"></div>
+<small>Raise the light and watch the measured handshakes per minute on the state plate fall: in light the photocells lose contrast, as Pask reported. The cast reloads the water.</small>
+</section>
+
+<div class="ui dock" id="dock">
+  <div class="row vis" id="vis"><button data-v="watch" class="on">WATCH</button><button data-v="torch">TORCH</button><button data-v="mirror">MIRROR</button><button data-v="stand">STAND IN</button><button data-v="conduct">CONDUCT</button><button id="torchD" style="display:none">TORCH: AUTO</button></div>
+  <div class="row tog" id="tog"><button id="view">VIEW: AUTO</button><button data-p="label">LABEL</button><button data-p="state">STATE</button><button data-p="legend">LEGEND</button><button data-p="params">LIGHT</button><button id="snd">SOUND</button><button id="cine">CINEMA (H)</button><button id="lb">LETTERBOX</button><button id="exh">EXHIBITION</button></div>
+</div>
+<div id="glyph" title="show controls (H)">◐</div>
+
+<script type="module">
+import * as THREE from 'three';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+import {createJelly, JELLIES} from './jellies.js';
+import {makeColloquy, STAGE, DEFAULTS, regime} from './colloquy/sim.js';
+import {makeStage, CAST} from './colloquy/stage.js';
+import {makeLiveSound, soundState, renderOffline, wav} from './colloquy/sound.js';
+
+const $ = id => document.getElementById(id), Q = new URLSearchParams(location.search), body = document.body;
+const FILM = Q.has('film'), MANUAL = Q.has('manual'), TEST = Q.has('test') || FILM, LOW = Q.has('low') || (!FILM && (matchMedia('(pointer: coarse)').matches || innerWidth < 700));
+const cast = {...CAST}; for (const kv of (Q.get('cast') || '').split(',')) { const [k, v] = kv.split(':'); if (cast[k] && JELLIES.some(j => j.id === v && j.kind === 'rig')) cast[k] = v; }
+const sim = makeColloquy({seed: +(Q.get('seed') || 7), ambient: +(Q.get('ambient') || 0), tempo: +(Q.get('tempo') || 1)});
+const S = sim.S, P = sim.P;
+const stage = makeStage(THREE, {canvas: $('gl'), sim, createJelly, low: LOW, preserve: TEST, EffectComposer, RenderPass, UnrealBloomPass, OutputPass, cast});
+const size = () => { if (FILM) stage.resize(1280, 720, 1); else stage.resize(innerWidth, innerHeight); $('dock') && document.documentElement.style.setProperty('--dockH', $('dock').offsetHeight + 'px'); };
+addEventListener('resize', size); size();
+const sound = makeLiveSound();
+const errors = [];
+addEventListener('error', e => errors.push(String(e.message || e))); addEventListener('unhandledrejection', e => errors.push(String(e.reason)));
+
+// ---------------------------------------------------------------- events: sound, captions, the measured rate
+const recent = [], tail = [], NAME = {G: 'G', J: 'J'}; let REC = null;
+const say = (txt, k = '') => { $('cap').innerHTML = (k ? `<b>${k}</b>` : '') + txt; };
+sim.on(ev => {
+  sound.event(ev); if (FILM) filmEvents.push({...ev}); if (REC) REC.ev.push({...ev});
+  if (ev.kind === 'reinforce') recent.push(ev.t);
+  if (['reinforce', 'abort', 'energetic', 'memory', 'visitor', 'contention', 'adapt'].includes(ev.kind)) { tail.push(ev); if (tail.length > 8) tail.shift(); }
+});
+const perMin = () => { while (recent.length && recent[0] < S.t - 300) recent.shift(); return recent.length / Math.max(1 / 6, Math.min(5, S.t / 60)); };
+const regName = {O: 'O (orange)', P: 'P (puce)'};
+function narrate() {
+  // the most advanced live encounter, told in the plain words of the wall
+  // the caption follows the camera: the director's encounter first, else the most advanced one
+  const df = stage.director.focus && stage.director.focus.f; let f = df && df.partner !== -1 && df.stage > 1 ? df : null; if (!f) for (const x of S.females) if (x.partner !== -1 && x.stage > 1 && (!f || x.stage > f.stage)) f = x;
+  const last = tail[tail.length - 1];
+  if (P.ambient > .3) return say('The gallery lights come up. The photocells lose their contrast: lamps still flash, but no one answers.', 'LIGHT');
+  if (last && last.kind === 'abort' && S.t - last.t < 2.2) return say(last.why === 'occluded by visitor' ? `A visitor’s shadow broke ${last.m}’s beam to ${last.f}: both fall back to scanning.` : /τ/.test(last.why) ? `τ ran out with no reinforcement: ${last.f || ''} and ${last.m || 'her partner'} give up and scan again.` : `The line between ${last.m || '…'} and ${last.f || '…'} was lost: both scan again.`, 'ABORT');
+  if (!f) { const m = S.males.find(m => m.stage >= 6); if (m) return say(`A visitor’s mirror threw ${m.id}’s beam onto vane ${m.vane}: F = 1, and his ${m.desire} drive falls by ω.`, '6 · CLOSURE');
+    const sc = S.males.filter(m => m.desire); if (!sc.length) return say('Every drive is below L<sub>min</sub>: the mobiles are quiet and dark until their needs rebuild.', 'SATISFIED');
+    return say(sc.map(m => `${m.id} scans with lamp u, flashing its code for ${regName[m.desire]}`).join(' · ') + (S.zHalt ? ' · bar Z halted' : ' · bar Z turns'), '1 · SCAN'); }
+  const m = f.partner >= 0 ? S.males[f.partner] : null, who = m ? m.id : 'the visitor’s torch', d = regName[f.desire] || f.desire;
+  const txt = {
+    2: `${f.id} catches ${who}’s flashing u on aperture a, halts, and decodes it: ${who} wants ${d}.`,
+    3: `${f.id} registers ${who} and answers with a tone phase-locked to the flashes.`,
+    4: m ? `${m.id} hears the lock, halts, asks bar Z to stop, and throws the steady beam B. It costs him: an energetic commitment.` : `The torch is held steady on ${f.id}: she takes it as a committed beam.`,
+    5: `${f.id} sweeps mirror b ${f.sweep && f.sweep.mode === 'memory' ? `straight to the angle her memory ${f.desire === 'O' ? 'M<sub>A</sub>' : 'M<sub>B</sub>'} holds for ${who} (${f.sweep.first === 'UP' ? 'up' : 'down'})` : 'in search, with nothing remembered yet'}; τ = ${Math.max(0, P.tau - (S.t - f.since)).toFixed(1)} s left.`,
+    6: `The reflection lands on vane ${m && m.vane || (f.b > 0 ? 'C' : 'D')}: F = 1. ${who}’s ${f.desire} drive falls by ω.`,
+    7: `${f.id} hears his satisfaction tone while still lit, writes ${f.b > 0 ? 'UP' : 'DOWN'} into ${f.desire === 'O' ? 'M<sub>A</sub>' : 'M<sub>B</sub>'}[${who}], and both resume.`}[f.stage];
+  say(txt || '', f.stage + ' · ' + STAGE[f.stage].toUpperCase() + (m ? ` · ${f.id} ↔ ${m.id}` : ` · ${f.id} ↔ VISITOR`));
+}
+
+// ---------------------------------------------------------------- the machine-state plate
+const bar = (v, c) => `<span class="bar"><i style="width:${Math.min(100, v / P.Lcap * 100).toFixed(0)}%;background:${c}"></i><u style="left:${(P.Lmin / P.Lcap * 100).toFixed(0)}%"></u><u style="left:${(P.Lmax / P.Lcap * 100).toFixed(0)}%"></u></span>`;
+function plate() {
+  const row = (a, extra) => `<tr><td><b>${a.id}</b></td><td>${bar(a.O, 'var(--or)')}</td><td>${bar(a.P, 'var(--pu)')}</td><td><span class="rg ${regime(a.O, a.P, P.Lmin, P.Lmax)}">${regime(a.O, a.P, P.Lmin, P.Lmax)}</span></td><td class="stg ${a.stage > 1 ? 'on' : ''}">${a.stage} ${STAGE[a.stage]}</td><td>${extra}</td></tr>`;
+  const mrow = m => row(m, `u ${m.lamp ? '●' : '○'} B ${m.B ? '■' : '□'} F ${m.F}${m.partner >= 0 ? ' → ' + S.females[m.partner].id : ''}`);
+  const frow = f => { const mem = Object.keys({...f.MA, ...f.MB}).map(k => `${k}:${f.MA[k] ? 'A' + (f.MA[k] === 'UP' ? '↑' : '↓') : ''}${f.MB[k] ? 'B' + (f.MB[k] === 'UP' ? '↑' : '↓') : ''}`).join(' ');
+    return row(f, `b ${f.b >= 0 ? '+' : ''}${f.b.toFixed(2)}${f.stage === 5 ? ` τ ${Math.max(0, P.tau - (S.t - f.since)).toFixed(1)}` : ''} ${mem ? '· ' + mem : ''}`); };
+  $('stateBody').innerHTML = `<table><tr><th></th><th>O</th><th>P</th><th>regime</th><th>stage</th><th>parts</th></tr>${S.males.map(mrow).join('')}${S.females.map(frow).join('')}</table>
+  <div class="sum">bar Z <b>${S.zHalt ? 'HALTED' : 'turning'}</b> at ${(S.z * 180 / Math.PI).toFixed(0)}° · contentions <b>${S.contentions}</b><br>handshakes <b>${S.handshakes}</b> · aborts <b>${S.aborts}</b> · <b>${perMin().toFixed(2)}</b> per min (last 5 min) · light <b>${(P.ambient * 100).toFixed(0)}%</b><br>
+  δ×<b>${P.tempo.toFixed(2)}</b> ω <b>${P.omega.toFixed(2)}</b> L<sub>min</sub> <b>${P.Lmin.toFixed(2)}</b> L<sub>max</sub> <b>${P.Lmax.toFixed(2)}</b> τ <b>${P.tau.toFixed(1)}</b> s · t <b>${fmtT(S.t)}</b> · seed ${P.seed}</div>
+  <div class="log">${tail.slice(-6).reverse().map(e => `${fmtT(e.t)} ${e.kind}${e.m ? ' ' + e.m : ''}${e.f ? '/' + e.f : ''}${e.vane ? ' vane ' + e.vane : ''}${e.why ? ' · ' + e.why : ''}${e.mode ? ' · ' + e.mode : ''}`).join('\n')}</div>`;
+}
+const fmtT = t => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
+
+// ---------------------------------------------------------------- UI: plates, toggles, visitor modes
+const plates = ['label', 'state', 'legend', 'params'];
+function openPlate(id, v) { const el = $(id), on = v ?? !el.classList.contains('open'); if (on && innerWidth < 700) for (const o of plates) if (o !== id) { $(o).classList.remove('open'); document.querySelector(`[data-p="${o}"]`)?.classList.remove('on'); }
+  el.classList.toggle('open', on); document.querySelector(`[data-p="${id}"]`)?.classList.toggle('on', on); if (id === 'legend') stage.setLegend(on); }
+document.querySelectorAll('[data-p]').forEach(b => b.onclick = () => openPlate(b.dataset.p));
+document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => openPlate(b.dataset.close, false));
+let mode = 'watch', torchD = 'AUTO';
+const HINT = {watch: '', torch: 'TORCH · tap a female (F1–F3): your torch flashes at her aperture a, as a male would', mirror: 'MIRROR · tap a male whose steady beam B is on: above him tilts your mirror UP onto vane C, below him DOWN onto D', stand: 'STAND IN · tap the floor to stand there, drag to walk, tap yourself to leave: your body blocks any beam it crosses', conduct: 'CONDUCT · drag sideways to push bar Z faster or slower, up and down to quicken or calm every drive (δ)'};
+function setMode(m) { mode = m; document.querySelectorAll('[data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === m)); $('hint').textContent = HINT[m]; $('hint').classList.toggle('on', !!HINT[m]); $('torchD').style.display = m === 'torch' ? '' : 'none'; size();
+  if (m === 'stand') stage.setShot('plan'); else if (m === 'torch' || m === 'mirror') stage.setShot('wide'); else if (m === 'watch' && view === 'AUTO') stage.setShot('auto'); }
+document.querySelectorAll('[data-v]').forEach(b => b.onclick = () => setMode(b.dataset.v));
+$('torchD').onclick = () => { torchD = {AUTO: 'O', O: 'P', P: 'AUTO'}[torchD]; $('torchD').textContent = 'TORCH: ' + torchD; };
+const VIEWS = ['AUTO', 'PLAN', 'SIDE', 'MIRROR', 'TRIANGULATE', 'FREE'], VMAP = {AUTO: 'auto', PLAN: 'plan', SIDE: 'side', MIRROR: 'mirror', TRIANGULATE: 'tri', FREE: 'free'}; let view = 'AUTO';
+function setView(v) { view = v; $('view').textContent = 'VIEW: ' + v; stage.orbit.on = v === 'FREE'; stage.setShot(VMAP[v] === 'free' ? 'orbit' : VMAP[v]); if (v === 'FREE') stage.director.manual = 'free'; }
+$('view').onclick = () => setView(VIEWS[(VIEWS.indexOf(view) + 1) % VIEWS.length]);
+$('snd').onclick = () => { if (sound.on) sound.stop(); else sound.start(); $('snd').classList.toggle('on', sound.on); };
+let glyphT = 0; const cinema = v => { body.classList.toggle('cinema', v ?? !body.classList.contains('cinema')); $('cine').classList.toggle('on', body.classList.contains('cinema')); stage.setLegend(!body.classList.contains('cinema') && $('legend').classList.contains('open')); glyphT = performance.now(); body.classList.remove('still'); };
+$('cine').onclick = () => cinema(); $('glyph').onclick = () => cinema(false);
+const letter = v => { body.classList.toggle('letter', v ?? !body.classList.contains('letter')); $('lb').classList.toggle('on', body.classList.contains('letter')); };
+$('lb').onclick = () => letter();
+addEventListener('keydown', e => { if (e.target.tagName === 'INPUT') return; const k = e.key.toLowerCase(); idleT = performance.now(); wake();
+  if (k === 'h' || k === 'escape') cinema(); else if (k === 'c') body.classList.toggle('nocap'); else if (body.classList.contains('cinema') && !'lem12345'.includes(k)) cinema(false); else if (k === 'l') letter(); else if (k === 'e') exhibit(); else if (k === 's') openPlate('state'); else if (k === 'g') openPlate('legend'); else if (k === 'i') openPlate('label'); else if (k === 'm') $('snd').onclick(); else if (k === 'v') $('view').onclick();
+  else if ('12345'.includes(k)) setMode(['watch', 'torch', 'mirror', 'stand', 'conduct'][+k - 1]); });
+// parameters
+const PR = [['amb', 'ambient', v => v.toFixed(2)], ['tempo', 'tempo', v => v.toFixed(2)], ['omega', 'omega', v => v.toFixed(2)], ['Lmin', 'Lmin', v => v.toFixed(2)], ['Lmax', 'Lmax', v => v.toFixed(2)], ['tau', 'tau', v => v.toFixed(1)], ['zBias', 'zBias', v => v.toFixed(2)]];
+for (const [id, key, f] of PR) { const el = $(id); el.value = P[key]; $(id + 'V').textContent = f(+el.value); el.oninput = () => { sim.set({[key]: +el.value}); $(id + 'V').textContent = f(+el.value); }; }
+const syncSliders = () => { for (const [id, key, f] of PR) { const el = $(id); if (document.activeElement !== el && Math.abs(+el.value - P[key]) > 1e-3) { el.value = P[key]; $(id + 'V').textContent = f(P[key]); } } };
+$('castSel').innerHTML = Object.keys(cast).map(k => `<label>${k} <select data-c="${k}">${JELLIES.filter(j => j.kind === 'rig').map(j => `<option value="${j.id}" ${j.id === cast[k] ? 'selected' : ''}>${j.name}</option>`).join('')}</select><span></span></label>`).join('');
+document.querySelectorAll('[data-c]').forEach(s => s.onchange = () => { cast[s.dataset.c] = s.value; COLLOQUY.setCast(cast); });
+
+// ---------------------------------------------------------------- the visitor's gestures (one finger)
+const cv = $('gl'); let drag = null;
+cv.addEventListener('pointerdown', e => { idleT = performance.now(); wake(); try { cv.setPointerCapture(e.pointerId); } catch (_) {} if (body.classList.contains('cinema') && !FILM) { drag = {cine: true, x0: e.clientX, y0: e.clientY}; if (torchAt(e.clientX, e.clientY)) drag.lit = true; return; } drag = {x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY, moved: false, az: stage.orbit.az, el: stage.orbit.el, zb: P.zBias, tp: P.tempo};
+  if (mode === 'stand') { const q = stage.floorAt(e.clientX, e.clientY); const b = S.visitor.body; if (q && b && Math.hypot(q.x - b.x, q.z - b.z) < .45) drag.onBody = true; } });
+cv.addEventListener('pointermove', e => { if (!drag) return; if (drag.cine) { if (torchAt(e.clientX, e.clientY)) drag.lit = true; return; } const dx = e.clientX - drag.x0, dy = e.clientY - drag.y0; if (Math.hypot(dx, dy) > 8) drag.moved = true; if (!drag.moved) return;
+  if (mode === 'watch') { stage.orbit.on = true; stage.director.manual = 'free'; stage.orbit.az = drag.az + dx * .006; stage.orbit.el = Math.max(-.1, Math.min(1.45, drag.el + dy * .004)); lastTouch = performance.now(); }
+  else if (mode === 'stand') { const q = stage.floorAt(e.clientX, e.clientY); if (q) sim.visitor.stand(q.x, q.z); }
+  else if (mode === 'conduct') { sim.visitor.conduct({zBias: drag.zb + dx / 220, tempo: drag.tp - dy / 160}); $('hint').textContent = `CONDUCT · bar Z ${P.zBias >= 0 ? '+' : ''}${P.zBias.toFixed(2)} · tempo of desire ×${P.tempo.toFixed(2)}`; } });
+cv.addEventListener('pointerup', e => { const d = drag; drag = null; if (d && d.cine) { if (!d.lit && Math.hypot(e.clientX - d.x0, e.clientY - d.y0) < 10) cinema(false); return; } if (!d || d.moved) return; tap(e.clientX, e.clientY); });
+// the torch as a pointer light: wherever the finger or mouse presses, the nearest female in reach is lit (a prosthetic male)
+function torchAt(x, y) { const p = stage.pick(x, y); if (!p || p.kind !== 'female' || p.d > 110) return false; const f = S.females[p.i], tor = S.visitor.torch;
+  if (tor && tor.f === p.i && tor.until > S.t) { tor.until = S.t + 3; return true; } if (f.stage !== 1) return false; sim.visitor.torch(p.i, torchD === 'AUTO' ? (sim.desireOf(f) || 'O') : torchD, 3); return true; }
+// sound wakes on the first gesture (browsers need one); in an unattended room the controls fall back into cinema
+let idleT = performance.now(), woke = false; function wake() { if (woke || Q.has('mute') || TEST) return; woke = true; try { sound.start(); $('snd').classList.add('on'); } catch (_) {} }
+let lastTouch = 0;
+function tap(x, y) {
+  if (mode === 'torch') { const p = stage.pick(x, y); if (p && p.kind === 'female' && p.d < 90) { const f = S.females[p.i], want = torchD === 'AUTO' ? (sim.desireOf(f) || 'O') : torchD; sim.visitor.torch(p.i, want, 6); flash(`your torch flashes ${want} at ${f.id}’s aperture`); } else flash('tap nearer a female: F1, F2 or F3'); }
+  else if (mode === 'mirror') { const p = stage.pick(x, y); if (p && p.kind === 'male' && p.d < 110) { const m = S.males[p.i], dir = y < p.sy ? 'UP' : 'DOWN'; sim.visitor.mirror(p.i, dir, 4); flash(m.B ? `your mirror throws ${m.id}’s beam ${dir === 'UP' ? 'up onto C' : 'down onto D'}` : `your mirror is up (${dir}); ${m.id}’s beam B is not on yet`); } else flash('tap nearer a male: G or J'); }
+  else if (mode === 'stand') { const q = stage.floorAt(x, y), b = S.visitor.body; if (b && q && Math.hypot(q.x - b.x, q.z - b.z) < .45) { sim.visitor.leave(); flash('you step out'); } else if (q) { sim.visitor.stand(q.x, q.z); flash('you stand in the room: any beam through you is cut'); } }
+  else if (mode === 'conduct') { sim.visitor.conduct({zBias: 0, tempo: 1}); flash('the bar and the drives return to their own pace'); }
+}
+let flashT = 0; const flash = t => { $('hint').textContent = t; $('hint').classList.add('on'); flashT = performance.now(); };
+
+// ---------------------------------------------------------------- exhibition: stable for hours, with a ghost visitor now and then
+let EXH = Q.has('exhibit'), exhT = 0, ghost = null;
+function exhibit(v) { EXH = v ?? !EXH; body.classList.toggle('exhibit', EXH); $('exh').classList.toggle('on', EXH); if (EXH) { setMode('watch'); setView('AUTO'); sim.set({ambient: 0}); exhT = S.t; for (const p of plates) openPlate(p, false); } }
+$('exh').onclick = () => exhibit();
+const GHOST = ['torch', 'stand', 'mirror', 'conduct'];
+function exhibitionStep() {
+  if (!EXH) return; const u = S.t - exhT;
+  // plates come and go like a gallery's own captions
+  const lab = (u % 240) > 4 && (u % 240) < 34, st = (u % 300) > 150 && (u % 300) < 185; if ($('label').classList.contains('open') !== lab) openPlate('label', lab); if ($('state').classList.contains('open') !== st) openPlate('state', st);
+  // darkness demonstrated: every 6 minutes the gallery lights come up for 12 s, and the society falls quiet
+  const dk = u % 360; if (dk > 300 && dk < 312) { if (P.ambient < .9) sim.set({ambient: .95}); } else if (P.ambient > .5) sim.set({ambient: 0});
+  // the ghost visitor (every ~2.5 min, one of the four modes in turn)
+  const k = Math.floor(u / 150), slot = u % 150;
+  if (slot > 60 && slot < 62 && (!ghost || ghost.k !== k)) { ghost = {k, mode: GHOST[k % 4], t: S.t};
+    if (ghost.mode === 'torch') { const i = S.females.findIndex(f => f.stage === 1 && sim.desireOf(f)); if (i >= 0) sim.visitor.torch(i, sim.desireOf(S.females[i]), 6); }
+    if (ghost.mode === 'conduct') sim.visitor.conduct({zBias: .6, tempo: 1.4}); }
+  if (ghost && ghost.k === k) { const g = S.t - ghost.t;
+    if (ghost.mode === 'stand') { if (g < 25) { const m = S.males.find(m => m.B) || S.males[0], f = m.partner >= 0 ? S.females[m.partner] : S.females[0], a = sim.malePos(m), b = sim.femalePos(f); if (!S.visitor.body || g < .05) sim.visitor.stand((a.x + b.x) / 2 * .9, (a.z + b.z) / 2 * .9); } else if (S.visitor.body) sim.visitor.leave(); }
+    if (ghost.mode === 'mirror' && g < 30 && !ghost.done) { const mi = S.males.findIndex(m => m.stage === 5); if (mi >= 0) { const m = S.males[mi]; sim.visitor.mirror(mi, (m.desire === 'O') !== m.inverted ? 'UP' : 'DOWN', 3); ghost.done = true; } }
+    if (ghost.mode === 'conduct' && g > 30 && !ghost.done) { sim.visitor.conduct({zBias: 0, tempo: 1}); ghost.done = true; } }
+}
+$('gl').addEventListener('webglcontextlost', e => { e.preventDefault(); setTimeout(() => location.reload(), 2500); });
+
+// ---------------------------------------------------------------- the loop: fixed-step machine, adaptive picture
+let last = performance.now(), acc = 0, fpsS = 0, fpsN = 0, fps = 60, lowT = 0, highT = 0, plateT = 0, narrT = 0, sndT = 0;
+const prMax = Math.min(LOW ? 1.1 : 1.75, devicePixelRatio || 1);
+function tick(dt) {
+  acc += dt; let n = 0; while (acc >= 1 / 60 && n < 6) { sim.step(1 / 60); acc -= 1 / 60; n++; } if (n === 6) acc = 0;
+  exhibitionStep(); stage.update(dt); stage.render();
+  if ((narrT += dt) > .2) { narrT = 0; narrate(); }
+  if ((plateT += dt) > .15 && $('state').classList.contains('open')) { plateT = 0; plate(); }
+  if ((sndT += dt) > 1 / 40) { sndT = 0; sound.frame(S); }
+}
+function frame(now) {
+  requestAnimationFrame(frame); if (FILM || MANUAL) return;
+  const raw = Math.min(.1, (now - last) / 1000); last = now; const dt = TEST ? 1 / 30 : raw;
+  fpsS += raw; fpsN++; if (fpsS > 1) { fps = fpsN / fpsS; fpsS = 0; fpsN = 0;
+    if (!TEST) { if (fps < 40) { lowT++; highT = 0; } else if (fps > 57) { highT++; lowT = 0; } else { lowT = highT = 0; }
+      if (lowT >= 2) { lowT = 0; if (stage.pr > .8) stage.setPR(Math.max(.75, stage.pr - .15)); else stage.bloom.enabled = false; }
+      if (highT >= 8) { highT = 0; if (!stage.bloom.enabled) stage.bloom.enabled = true; else if (stage.pr < prMax - .01) stage.setPR(Math.min(prMax, stage.pr + .1)); } } }
+  if (performance.now() - flashT > 3500 && flashT) { flashT = 0; $('hint').textContent = HINT[mode]; $('hint').classList.toggle('on', !!HINT[mode]); }
+  if (stage.orbit.on && view !== 'FREE' && performance.now() - lastTouch > 9000 && !drag) { stage.orbit.on = false; stage.setShot(VMAP[view]); }
+  if (body.classList.contains('cinema') && performance.now() - glyphT > 3000) body.classList.add('still');
+  if (!TEST && !Q.has('ui') && !body.classList.contains('cinema') && performance.now() - idleT > 30000 && !plates.some(p => $(p).classList.contains('open')) && mode === 'watch') cinema(true);
+  tick(dt); syncSliders();
+  $('st').textContent = `${fmtT(S.t)} · ${S.handshakes} handshakes · ${perMin().toFixed(1)}/min\n${stage.director.manual ? 'view ' + (stage.director.manual) : 'auto · ' + stage.director.shot}${EXH ? ' · exhibition' : ''} · ${fps.toFixed(0)} fps`;
+}
+requestAnimationFrame(frame);
+
+// ---------------------------------------------------------------- film mode: a deterministic, seeded recording (driven frame by frame from outside)
+const filmEvents = [], filmTrace = [];
+const FILMSCRIPT = [
+  {at: 0, card: 'THE COLLOQUY OF MOBILES<small>after Gordon Pask, 1968 · five mobiles, played by jellies</small>', until: 3.6},
+  {at: 27, torch: 1},
+  {at: 42, stand: true}, {leave: 8},
+  {at: 57, ambient: .95}, {at: 67, ambient: 0},
+  {after: 79, card: 'THE COLLOQUY OF MOBILES<small>Gordon Pask with Yolanda Sonnabend, Marc Dowson and Tony Watts · ICA London 1968 · reconstruction Pangaro &amp; McLeish 2018, ZKM Karlsruhe</small>', until: 999}];
+let filmF = 0, standFix = null;
+const film = {fps: 24, duration: +(Q.get('dur') || 88),
+  frame() { const t = filmF / 24;
+    // the end title waits for the last satisfaction to be consolidated (no agent in stages 4–7, no protected shot), or the last 4 s
+    for (const c of FILMSCRIPT) if (c.after != null && c.at == null && t >= c.after && (t >= film.duration - 4 || (![...S.males, ...S.females].some(a => a.stage >= 4) && !stage.director.protectUntil))) c.at = t;
+    const card = FILMSCRIPT.find(c => c.card && c.at != null && t >= c.at && t < c.until); $('card').style.display = card ? 'grid' : 'none';
+    if (card) { if ($('cardIn').innerHTML !== card.card) $('cardIn').innerHTML = card.card; $('card').style.opacity = Math.max(0, Math.min(1, (t - card.at) / .8 + (card.at === 0 ? 1 : 0), (card.until - t) / .8)); }
+    for (const c of FILMSCRIPT) {
+      if (c.ambient != null && t >= c.at && !c.done) { sim.set({ambient: c.ambient}); c.done = true; }
+      if (c.torch && t >= c.at && !c.done) { const i = typeof c.torch === 'number' ? (S.females[c.torch].stage === 1 && sim.desireOf(S.females[c.torch]) ? c.torch : -1) : S.females.findIndex(f => f.stage === 1 && sim.desireOf(f) && f.partner === -1); if (i >= 0) { sim.visitor.torch(i, sim.desireOf(S.females[i]), 4.5); c.done = true; } }
+      if (c.stand && t >= c.at && !c.done) { const m = S.males.find(m => m.stage >= 3 && m.stage <= 5 && m.partner >= 0); if (m) { const f = S.females[m.partner], a = sim.malePos(m), b = sim.femalePos(f); standFix = {x: (a.x + b.x) / 2, z: (a.z + b.z) / 2, at: t}; c.done = true; } }
+      if (c.leave && standFix && t >= standFix.at + c.leave && !c.done) { sim.visitor.leave(); standFix = null; c.done = true; } }
+    if (standFix) { const k = Math.min(1, (S.t - (standFix.t0 ??= S.t)) / .5); sim.visitor.stand(standFix.x * (1.6 - .6 * k), standFix.z * (1.6 - .6 * k)); }
+    tick(1 / 24); filmTrace.push({t: S.t, st: soundState(S)}); filmF++; return {t: S.t, f: filmF}; },
+  async audio(dur) { const buf = await renderOffline(filmTrace, filmEvents, dur, 0); const bytes = wav(buf); let s = ''; for (let i = 0; i < bytes.length; i += 32768) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 32768)); return btoa(s); }};
+if (FILM) { body.classList.add('film'); stage.setShot('auto'); }
+
+// ---------------------------------------------------------------- the PEO hook: state and parameters as a plain object, with setters
+const COLLOQUY = window.COLLOQUY = {
+  version: 1, STAGE, DEFAULTS,
+  get state() { return sim.snapshot(); },
+  get params() { return {delta: P.tempo, deltas: Object.fromEntries([...S.males, ...S.females].map(a => [a.id, {O: a.dO, P: a.dP}])), omega: P.omega, Lmin: P.Lmin, Lmax: P.Lmax, tau: P.tau, ambient: P.ambient, zBias: P.zBias, seed: P.seed, cast: {...cast}}; },
+  set(o) { const k = {delta: 'tempo'}; const out = {}; for (const [a, v] of Object.entries(o)) if (a === 'cast') COLLOQUY.setCast(v); else if (a in P || a in k) out[k[a] || a] = +v; sim.set(out); return COLLOQUY.params; },
+  setDelta(v, id, drive) { if (!id) sim.set({tempo: +v}); else { const a = [...S.males, ...S.females].find(a => a.id === id); if (a) { if (!drive || drive === 'O') a.dO = +v; if (!drive || drive === 'P') a.dP = +v; } } return COLLOQUY.params; },
+  setOmega: v => sim.set({omega: +v}), setLmin: v => sim.set({Lmin: +v}), setLmax: v => sim.set({Lmax: +v}), setTau: v => sim.set({tau: +v}), setAmbient: v => sim.set({ambient: Math.max(0, Math.min(1.5, +v))}),
+  setCast(c) { const q = new URLSearchParams(location.search); q.set('cast', Object.entries({...cast, ...c}).map(([k, v]) => k + ':' + v).join(',')); location.search = q.toString(); },
+  visitor: sim.visitor, invert(id, v = true) { const m = S.males.find(m => m.id === id); if (m) m.inverted = v; },
+  shot: v => setView(Object.keys(VMAP).find(k => VMAP[k] === v || k === String(v).toUpperCase()) || 'AUTO'), mode: setMode, cinema, letterbox: letter, exhibit, plate: openPlate,
+  events: (n = 20) => S.log.slice(-n), director: () => ({shot: stage.director.shot, manual: stage.director.manual, cuts: stage.director.cuts, log: stage.director.log.slice(-10)}),
+  handshakesPerMinute: perMin, step(seconds) { sim.run(seconds); },
+  // test probes: the sound of a stretch of the live run (offline, same voices), and the measured brightness of a screen region
+  async audioProbe(seconds, script = []) { const rr = stage.render; stage.render = () => {}; REC = {ev: [], tr: []}; const t0 = S.t; for (let i = 0; i < seconds * 24; i++) { for (const c of script) if (!c.done && i / 24 >= c.at) { sim.set({ambient: c.ambient}); c.done = true; } tick(1 / 24); REC.tr.push({t: S.t, st: soundState(S)}); } stage.render = rr;
+    const R0 = REC; REC = null; const buf = await renderOffline(R0.tr, R0.ev, seconds, t0); const bytes = wav(buf); let s = ''; for (let i = 0; i < bytes.length; i += 32768) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 32768));
+    return {wav: btoa(s), reinforce: R0.ev.filter(e => e.kind === 'reinforce' && e.t - t0 < seconds - 1).map(e => +(e.t - t0).toFixed(3))}; },
+  lum(x, y, r) { const c = $('gl'), w = c.width, h = c.height, k = w / innerWidth, cv2 = document.createElement('canvas'); cv2.width = w; cv2.height = h; const g = cv2.getContext('2d'); g.drawImage(c, 0, 0);
+    const X = Math.max(0, Math.round((x - r) * k)), Y = Math.max(0, Math.round((y - r) * k)), W2 = Math.min(w - X, Math.round(2 * r * k)), H2 = Math.min(h - Y, Math.round(2 * r * k)), d = g.getImageData(X, Y, W2, H2).data; let sum = 0;
+    for (let i = 0; i < d.length; i += 4) sum += .2126 * d[i] + .7152 * d[i + 1] + .0722 * d[i + 2]; return sum / (d.length / 4); },
+  soak(seconds) { const n = Math.round(seconds * 60); for (let i = 0; i < n; i++) { sim.step(1 / 60); exhibitionStep(); } narrate(); if ($('state').classList.contains('open')) plate(); return {t: S.t, handshakes: S.handshakes, stuck: S.stuck, sat: [...S.males, ...S.females].map(a => a.sat), ghosts: ghost ? ghost.k + 1 : 0}; }, tick: (dt = 1 / 30) => tick(dt), errors, fps: () => fps, film, sim, stage, sound};
+// cineulation: the live machine plays as cinema by default (letterboxed, controls hidden, darkness as the stage); ?ui starts with the controls
+if (!Q.has('ui') || FILM) { cinema(true); letter(!Q.has('noletter')); } if (EXH) exhibit(true);
+if (Q.has('plates')) for (const p of Q.get('plates').split(',')) if (plates.includes(p)) openPlate(p, true);
+size();
+</script>
+</body>
+</html>

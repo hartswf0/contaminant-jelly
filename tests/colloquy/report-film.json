@@ -1,0 +1,336 @@
+{
+ "film": "bonus/colloquy/colloquy-film.mp4",
+ "seconds": 88,
+ "fps": 24,
+ "size": [
+  1280,
+  720
+ ],
+ "seed": 7,
+ "tempo": 1.8,
+ "director": [
+  {
+   "t": 3.8667,
+   "shot": "two",
+   "why": "contact: F1 catches u",
+   "deferred": false
+  },
+  {
+   "t": 5.7833,
+   "shot": "bar",
+   "why": "commit: G asks bar Z to halt",
+   "deferred": false
+  },
+  {
+   "t": 7.3167,
+   "shot": "mirror",
+   "why": "sweep within τ",
+   "deferred": false
+  },
+  {
+   "t": 8.3667,
+   "shot": "vane",
+   "why": "F = 1: G’s drive falls by ω",
+   "deferred": false
+  },
+  {
+   "t": 9.9833,
+   "shot": "memory",
+   "why": "consolidate: F1’s memory glow",
+   "deferred": false
+  },
+  {
+   "t": 12.2,
+   "shot": "vane",
+   "why": "F = 1: J’s drive falls by ω",
+   "deferred": false
+  },
+  {
+   "t": 13.7833,
+   "shot": "memory",
+   "why": "consolidate: F2’s memory glow",
+   "deferred": false
+  },
+  {
+   "t": 15.2833,
+   "shot": "tri",
+   "why": "the satisfied pair part",
+   "deferred": true
+  },
+  {
+   "t": 19.4833,
+   "shot": "two",
+   "why": "contact: F3 catches u",
+   "deferred": false
+  },
+  {
+   "t": 25.5333,
+   "shot": "plan",
+   "why": "establishing (no event for 6 s)",
+   "deferred": false
+  },
+  {
+   "t": 27.0333,
+   "shot": "stranger",
+   "why": "a stranger’s torch → F2",
+   "deferred": false
+  },
+  {
+   "t": 30.45,
+   "shot": "mirror",
+   "why": "sweep within τ",
+   "deferred": false
+  },
+  {
+   "t": 31.8667,
+   "shot": "vane",
+   "why": "F = 1: J’s drive falls by ω",
+   "deferred": false
+  },
+  {
+   "t": 33.4833,
+   "shot": "memory",
+   "why": "consolidate: F3’s memory glow",
+   "deferred": false
+  },
+  {
+   "t": 35.0333,
+   "shot": "tri",
+   "why": "the satisfied pair part",
+   "deferred": true
+  },
+  {
+   "t": 40.1167,
+   "shot": "plan",
+   "why": "scan: limit",
+   "deferred": false
+  },
+  {
+   "t": 43.9833,
+   "shot": "two",
+   "why": "contact: F3 catches u",
+   "deferred": false
+  },
+  {
+   "t": 44.95,
+   "shot": "visit",
+   "why": "visitor steps into the room",
+   "deferred": false
+  },
+  {
+   "t": 49.9833,
+   "shot": "plan",
+   "why": "scan: limit",
+   "deferred": false
+  },
+  {
+   "t": 51.7833,
+   "shot": "two",
+   "why": "contact: F3 catches u",
+   "deferred": false
+  },
+  {
+   "t": 53.7,
+   "shot": "bar",
+   "why": "commit: G asks bar Z to halt",
+   "deferred": false
+  },
+  {
+   "t": 55.2,
+   "shot": "mirror",
+   "why": "sweep within τ",
+   "deferred": false
+  },
+  {
+   "t": 56.2833,
+   "shot": "vane",
+   "why": "F = 1: G’s drive falls by ω",
+   "deferred": false
+  },
+  {
+   "t": 57.9,
+   "shot": "memory",
+   "why": "consolidate: F3’s memory glow",
+   "deferred": false
+  },
+  {
+   "t": 59.45,
+   "shot": "plan",
+   "why": "the lights come up: the society falls quiet",
+   "deferred": true
+  },
+  {
+   "t": 65.4833,
+   "shot": "side",
+   "why": "establishing (no event for 6 s)",
+   "deferred": false
+  },
+  {
+   "t": 67.0333,
+   "shot": "plan",
+   "why": "darkness again: the conversation resumes",
+   "deferred": false
+  },
+  {
+   "t": 72.2333,
+   "shot": "side",
+   "why": "scan: limit",
+   "deferred": false
+  },
+  {
+   "t": 75.2833,
+   "shot": "two",
+   "why": "contact: F3 catches u",
+   "deferred": false
+  },
+  {
+   "t": 77.2,
+   "shot": "bar",
+   "why": "commit: J asks bar Z to halt",
+   "deferred": false
+  },
+  {
+   "t": 78.7,
+   "shot": "mirror",
+   "why": "sweep within τ",
+   "deferred": false
+  },
+  {
+   "t": 79.7833,
+   "shot": "vane",
+   "why": "F = 1: J’s drive falls by ω",
+   "deferred": false
+  },
+  {
+   "t": 81.4,
+   "shot": "memory",
+   "why": "consolidate: F3’s memory glow",
+   "deferred": false
+  },
+  {
+   "t": 82.95,
+   "shot": "tri",
+   "why": "the satisfied pair part",
+   "deferred": true
+  },
+  {
+   "t": 85.5333,
+   "shot": "two",
+   "why": "contact: F2 catches u",
+   "deferred": false
+  },
+  {
+   "t": 87.45,
+   "shot": "bar",
+   "why": "commit: G asks bar Z to halt",
+   "deferred": false
+  }
+ ],
+ "bytes": 10669481,
+ "renderSeconds": 632,
+ "pageErrors": [],
+ "events": [
+  {
+   "t": 8.37,
+   "kind": "reinforce",
+   "m": "G",
+   "f": "F1",
+   "vane": "C"
+  },
+  {
+   "t": 9.97,
+   "kind": "memory",
+   "m": "G",
+   "f": "F1"
+  },
+  {
+   "t": 12.17,
+   "kind": "reinforce",
+   "m": "J",
+   "f": "F2",
+   "vane": "D"
+  },
+  {
+   "t": 13.77,
+   "kind": "memory",
+   "m": "J",
+   "f": "F2"
+  },
+  {
+   "t": 20.67,
+   "kind": "abort",
+   "m": "J",
+   "f": "F3",
+   "why": "line lost before commitment"
+  },
+  {
+   "t": 26.98,
+   "kind": "visitor",
+   "f": "F2",
+   "mode": "prosthetic male"
+  },
+  {
+   "t": 31.85,
+   "kind": "reinforce",
+   "m": "J",
+   "f": "F3",
+   "vane": "D"
+  },
+  {
+   "t": 33.47,
+   "kind": "memory",
+   "m": "J",
+   "f": "F3"
+  },
+  {
+   "t": 34.67,
+   "kind": "abort",
+   "m": null,
+   "f": "F2",
+   "why": "torch: timeout τ (no vanes to close)"
+  },
+  {
+   "t": 44.9,
+   "kind": "visitor",
+   "mode": "occlusion"
+  },
+  {
+   "t": 45.5,
+   "kind": "abort",
+   "m": "G",
+   "f": "F3",
+   "why": "occluded by visitor"
+  },
+  {
+   "t": 52.9,
+   "kind": "visitor",
+   "mode": "occlusion ends"
+  },
+  {
+   "t": 56.27,
+   "kind": "reinforce",
+   "m": "G",
+   "f": "F3",
+   "vane": "C"
+  },
+  {
+   "t": 57.88,
+   "kind": "memory",
+   "m": "G",
+   "f": "F3"
+  },
+  {
+   "t": 79.77,
+   "kind": "reinforce",
+   "m": "J",
+   "f": "F3",
+   "vane": "C"
+  },
+  {
+   "t": 81.38,
+   "kind": "memory",
+   "m": "J",
+   "f": "F3"
+  }
+ ]
+}

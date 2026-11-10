@@ -1,0 +1,175 @@
+{
+ "suite": "colloquy sim",
+ "when": "2026-11-10T12:32:59.320Z",
+ "passed": 13,
+ "failed": 0,
+ "results": [
+  {
+   "name": "regime classification matches the drive table",
+   "ok": true,
+   "detail": {
+    "cases": 8
+   }
+  },
+  {
+   "name": "a full 7-stage handshake completes in order; F = 1 decrements the drive by ω",
+   "ok": true,
+   "detail": {
+    "male": "G",
+    "female": "F1",
+    "desire": "O",
+    "vane": "C",
+    "before": 0.7857,
+    "after": 0.2357,
+    "t": 8.37
+   }
+  },
+  {
+   "name": "an unreinforced τ aborts and scanning resumes",
+   "ok": true,
+   "detail": {
+    "f": "F1",
+    "m": "G",
+    "window": 4.2,
+    "handshakes": 0
+   }
+  },
+  {
+   "name": "memory: after an UP reinforcement the next encounter with that male sweeps UP first",
+   "ok": true,
+   "detail": {
+    "reencounters": 102,
+    "upWrites": 65
+   }
+  },
+  {
+   "name": "memory adapts when a male has inverted preferences",
+   "ok": true,
+   "detail": {
+    "adaptations": 6,
+    "reinforcementsAfterInversion": 28
+   }
+  },
+  {
+   "name": "majority arbitration resolves contention over bar Z",
+   "ok": true,
+   "detail": {
+    "contentions": 43,
+    "haltWins": 33,
+    "turnWins": 10
+   }
+  },
+  {
+   "name": "raising the ambient light gives fewer handshakes per minute",
+   "ok": true,
+   "detail": {
+    "perMinute": {
+     "dark": 3.69,
+     "dim": 3.42,
+     "lit": 2.31
+    }
+   }
+  },
+  {
+   "name": "visitor · prosthetic male (torch) engages a female",
+   "ok": true,
+   "detail": {
+    "stages": [
+     2,
+     4,
+     5
+    ]
+   }
+  },
+  {
+   "name": "visitor · prosthetic female (hand mirror) reinforces a committed male",
+   "ok": true,
+   "detail": {
+    "m": "G",
+    "vane": "C",
+    "before": 0.7731,
+    "after": 0.2231
+   }
+  },
+  {
+   "name": "visitor · occlusion breaks the beam and aborts",
+   "ok": true,
+   "detail": {
+    "m": "G",
+    "f": "F1"
+   }
+  },
+  {
+   "name": "visitor · higher-order composition changes bar Z and the tempo of desire",
+   "ok": true,
+   "detail": {
+    "zRadPerS": {
+     "slow": 0.04,
+     "fast": 0.352
+    },
+    "handshakes15min": {
+     "calm": 42,
+     "urgent": 72
+    }
+   }
+  },
+  {
+   "name": "30-minute exhibition: no stuck states, every agent satisfied",
+   "ok": true,
+   "detail": [
+    {
+     "seed": 7,
+     "handshakes": 114,
+     "perMin": 3.8,
+     "aborts": 28,
+     "contentions": 142,
+     "satisfied": [
+      64,
+      50,
+      39,
+      34,
+      41
+     ],
+     "maxHoldS": 3.67
+    },
+    {
+     "seed": 19,
+     "handshakes": 107,
+     "perMin": 3.57,
+     "aborts": 36,
+     "contentions": 141,
+     "satisfied": [
+      59,
+      48,
+      39,
+      31,
+      37
+     ],
+     "maxHoldS": 3.73
+    },
+    {
+     "seed": 42,
+     "handshakes": 117,
+     "perMin": 3.9,
+     "aborts": 33,
+     "contentions": 150,
+     "satisfied": [
+      57,
+      60,
+      41,
+      36,
+      40
+     ],
+     "maxHoldS": 3.72
+    }
+   ]
+  },
+  {
+   "name": "deterministic for a seed",
+   "ok": true,
+   "detail": {
+    "t": 300
+   }
+  }
+ ]
+}
