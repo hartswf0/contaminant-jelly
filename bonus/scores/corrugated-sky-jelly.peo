@@ -1,0 +1,132 @@
+# CORRUGATED SKY · JELLY CUT, written as a PEO score (port of moto/scion/jelly-cuts/corrugated-sky, r4b)
+# Timing, onsets, memory windows and crops are the cut's own: bpm 141.05, offset 0.345, cast.json onsets, full-res bloom frames.
+# Repairs the last critic named, as tests: blooms >= 45% of frame height and above the caption band; fire and rain must read;
+# the let-go stream lasts >= 1.5 s and the painting is gone by 86.8 s. Nine memories, five stagings, a camera beat for each.
+@prompt the Afterlight Medusa remembers a house: memories condense in its bell, bloom, and are let go at the gate
+@world lab bpm=141.05 offset=0.345 haze=0.03 duration=145.73 audio="https://hartswf0.github.io/moto/Et%20tu%2C%20Brute%20(BOXBACK)/Et%20tu%2C%20Brute_%20-%20Corrugated%20Sky%20-%20Treblo.ogg" onsets=corrugated-sky.onsets.json
+@source song basis="producer's own work" title="Et tu, Brute? · Corrugated Sky · Treblo"
+@source film basis="producer's own work" title="Corrugated Sky, SCION 02 Reiniger (BOXBACK track 11)" url="https://hartswf0.github.io/moto/scion/corrugated-sky/"
+@source family basis="CC0" title="Samuel Medford, Father, Mother, and Boy, 1841 (SAAM 1981.172.33)" url=https://smithsonian-open-access.s3-us-west-2.amazonaws.com/media/saam/SAAM-1981.172.33_1.jpg
+@source girl_dog basis="CC0" title="Percy Moran, Young Girl and Dog, 1890 (SAAM 1939.4.1)" url=https://smithsonian-open-access.s3-us-west-2.amazonaws.com/media/saam/SAAM-1939.4.1_1.jpg
+@source lamp basis="probable US government work (MSHA, archive.org gov.msha)" title="Anthracite: Pre-Shift Examinations of Underground Mines" url=https://archive.org/details/gov.msha.dvd614
+@source survivor basis="probable US government work (NLM historical audiovisuals)" title="Survival Stresses (1961)" url=https://archive.org/details/hmdvid-101704143
+@source boy_dog basis="CC0" title="Unidentified artist, Boy with Dog (SAAM 1981.172.31)" url=https://smithsonian-open-access.s3-us-west-2.amazonaws.com/media/saam/SAAM-1981.172.31_1.jpg
+@source cut basis="producer's own work" title="the jelly cut's direction: scene windows, let-go, cards" url="https://hartswf0.github.io/moto/scion/jelly-cuts/corrugated-sky/jellycut.json"
+@cast call:medusa role=call at=0,0.4,0
+@cast kick:sentinel role=kick at=-4.2,-1.2,-2.4
+@cast snare:celluloid role=snare at=4.2,-1.2,-2.4
+@cast hat:doodle role=hat at=-3.4,2.2,1.6
+@cast bass:mantle role=bass at=3.4,-2.6,1.6
+@cast choir:glass role=choir at=0,2.8,-4.5
+@cast bed:filmbell role=bed at=2.2,-3.2,3
+@light Permutations intensity=0.85
+@camera track dist=7 follow=call speed=0.7
+@ekphrasis 0.3s..5.4s "CORRUGATED SKY · the Afterlight Medusa remembers"
+
+# 1 · the house wakes · surface
+@op 5.8s memory house holder=call src=media/corrugated-sky/house.mp4 source=film label="the house wakes"
+@op 7.4s..9.4s condense house
+@op 9.6s camera crane dist=8 follow=call frame=top
+@op 10s..16.5s bloom house stage=surface size=0.56
+@ekphrasis 10.4s..14s "the house wakes"
+@op 17.3s..18.6s release house to=choir
+@op 17.3s camera track dist=7 frame=center
+
+# 2 · a family, 1841 · caught from the left
+@op 18.5s memory family holder=call still=media/corrugated-sky/family.jpg source=family
+@op 20.5s..22.5s condense family from=bed
+@op 23s camera track dist=6 follow=call frame=top cut=on
+@op 23s..30s bloom family stage=catch side=left size=0.52
+@ekphrasis 23.4s..27s "a family, 1841"
+@op 30.8s..32s release family to=bass
+@op 30.8s camera orbit dist=9 frame=center
+
+# 3 · a girl and her dog · pulled in slowly, kept, then let go at the gate
+@op 36s memory girl holder=call still=media/corrugated-sky/girl_dog.jpg source=girl_dog
+@op 38s..55.5s condense girl from=-7,4,-6
+@op 52s..56.5s camera dolly dist=9 to=5.5 follow=call
+@op 56.5s camera dolly frame=top
+@op 56.5s..64.5s bloom girl stage=pull-in size=0.56
+@ekphrasis 57s..61s "a girl and her dog"
+@op 64.8s..75.8s keep girl beside=call size=0.24 dx=0.34 dy=0.12
+@op 64.8s camera track dist=7 frame=center
+
+# 4 · the gate · surfaces under the kept painting
+@op 71s memory gate holder=call src=media/corrugated-sky/gate.mp4 source=film
+@op 73.2s..75.2s condense gate from=choir
+@op 75.4s camera crane dist=8 follow=call frame=top
+@op 75.8s..89s bloom gate stage=surface size=0.56
+@op 75.8s..84.83s keep girl beside=gate size=0.22 dx=0.7 dy=0.05
+@ekphrasis 76.2s..80s "the gate"
+# the let-go: rapid pulses, the picture breaks into flecks, they land in the gate's dog
+@op 84.6s pulse call k=1.5
+@op 84.83s..86.75s release girl to=gate uv=0.83,0.8 arc=0.9
+@op 84.9s pulse call k=1.2
+@op 85.1s pulse call k=1.2
+@ekphrasis 85s..88s "let go"
+@op 89.8s..91s release gate to=hat
+@op 89.8s camera track dist=7 frame=center
+
+# 5 · a lamp, checked · handed off to the bed
+@op 90.8s memory lamp holder=call src=media/corrugated-sky/lamp.mp4 source=lamp
+@op 92s..93.2s condense lamp
+@op 93.4s camera orbit dist=9 follow=call frame=top
+@op 93.6s..97.4s bloom lamp stage=hand-off to=bed size=0.54
+@ekphrasis 93.8s..96.6s "a lamp, checked"
+@op 98s..99.4s release lamp to=kick
+
+# 6 · the fire · swallowed
+@op 104.5s memory fire holder=call src=media/corrugated-sky/fire.mp4 gain=1.15 source=film
+@op 106s..107.5s condense fire
+@op 107.8s camera beneath dist=6 follow=call frame=top cut=on
+@op 108s..115.5s bloom fire stage=swallow size=0.56
+@ekphrasis 108.4s..112s "the fire"
+@op 116.3s..117.5s release fire to=choir
+@op 116.3s camera track dist=7 frame=center
+
+# 7 · someone who stayed outside · pulled in from the left
+@op 117.8s memory survivor holder=call src=media/corrugated-sky/survivor.mp4 source=survivor
+@op 119.2s..120.4s condense survivor from=snare
+@op 120.6s camera dolly dist=8 to=6 follow=call frame=top
+@op 120.8s..126.6s bloom survivor stage=pull-in at=left size=0.54
+@ekphrasis 121.2s..125s "someone who stayed outside"
+@op 127.2s..128.4s release survivor to=snare
+
+# 8 · the rain · surfaces, brightened to read
+@op 127.6s memory rain holder=call src=media/corrugated-sky/rain.mp4 gain=1.35 source=film
+@op 128.8s..130s condense rain
+@op 130.2s camera crane dist=8 follow=call frame=top
+@op 130.4s..135.6s bloom rain stage=surface size=0.55
+@ekphrasis 130.8s..134s "the rain"
+@op 136.2s..137.4s release rain to=bed
+
+# 9 · a child and a dog, kept · caught from the right, and held to the end
+@op 136s memory boy holder=call still=media/corrugated-sky/boy_dog.jpg source=boy_dog
+@op 137s..138s condense boy
+@op 138.2s camera track dist=6 follow=call frame=top cut=on
+@op 138.4s..144.4s bloom boy stage=catch side=right size=0.52
+@ekphrasis 138.8s..142s "a child and a dog, kept"
+@ekphrasis 144.6s..145.7s "CORRUGATED SKY"
+
+# the orchestra and the holder
+@test 20s visible call
+@test 30s beats kick >= 12
+@test 30s fired kick >= 0.2
+@test 60s beats call >= 3
+@test 90s fired hat >= 0.2
+# the critic's repairs, read cold off the rendered frame
+@test 13s bloomh house >= 0.45
+@test 27s bloomh family >= 0.45
+@test 60s bloomh girl >= 0.45
+@test 80s bloomh gate >= 0.45
+@test 80s bloomb gate >= 0.2
+@test 80s legible gate >= 0.08
+@test 80s inbox call 0,0,1,0.34 >= 0.6
+@test 84.9s..86.75s streamed girl >= 1.5
+@test 86.6s flecks girl in gate >= 0.5
+@test 86.8s gone girl
+@test 112s bloomh fire >= 0.45
+@test 112s legible fire >= 0.12
+@test 133s bloomh rain >= 0.45
+@test 133s legible rain >= 0.1
+@test 141s bloomh boy >= 0.45

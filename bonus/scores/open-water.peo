@@ -1,0 +1,18 @@
+# OPEN WATER · a swim to a beacon and home again, on the jelly's own strokes
+@prompt a medusa swims out toward the orchestra's beacon and comes home
+@world open bpm=96 haze=0.02
+@cast medusa:medusa at=0,0,0
+@cast sentinel:sentinel at=-3,1,-2 role=kick
+@camera chase dist=7 follow=medusa
+@steer medusa scheme=glide thrust=2.6 turn=1.8 drag=0.9
+@ekphrasis 0s..5s "the open water: a dune floor, stones, kelp, and six lit rings, each a door to another piece"
+@op b2..b22 swim medusa to=8,1,10
+@ekphrasis b8..b18 "it does not glide: every push is a beat of its bell"
+@op b22 pulse sentinel
+@op b24..b48 swim medusa to=0,0,0
+@ekphrasis b24..b34 "and home again"
+@test 1s visible medusa
+@test b2..b22 dir medusa +z > 1
+@test b22 moved medusa > 3
+@test b48 near medusa 0,0,0 < 6
+@test b48 beats medusa >= 4

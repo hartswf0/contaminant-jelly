@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The Lab · jelly-films</title>
+<meta name="description" content="One lab, one water: inspect every jelly, swim one through the open water, steer it with arms, orchestrate and light them, and write it all down as a PEO score that plays back.">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<script type="importmap">{"imports":{"three":"../paeleo/scion/videotext/vendor/three.module.min.js","three/addons/":"../paeleo/scion/videotext/vendor/addons/"}}</script>
+<style>
+:root{color-scheme:dark;--gold:#f0a35a;--dim:#8293a4;--ink:#e6edf3;--pan:rgba(6,12,13,.78);--line:#1f2d2c}
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#0b1413;color:var(--ink);font:300 14px/1.45 Jost,system-ui,sans-serif;-webkit-user-select:none;user-select:none;overscroll-behavior:none}
+canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.ui{position:fixed;z-index:2;transition:opacity .35s}
+#top{top:max(10px,env(safe-area-inset-top));left:12px;right:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;pointer-events:none}
+#top h1{margin:0;font:400 13px Anton,Impact,sans-serif;letter-spacing:.3em;color:var(--gold)}#top .st{font:300 11px 'JetBrains Mono',monospace;color:var(--dim);text-align:right}
+.dock{left:max(8px,env(safe-area-inset-left));right:max(8px,env(safe-area-inset-right));bottom:max(8px,env(safe-area-inset-bottom));display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.dock button{all:unset;cursor:pointer;font:400 11px Anton,Impact,sans-serif;letter-spacing:.14em;padding:7px 10px;border-radius:14px;color:var(--dim);background:var(--pan);border:1px solid var(--line)}
+.dock button.on{color:#0b1413;background:var(--gold)}
+.panel{position:fixed;z-index:3;background:var(--pan);border:1px solid var(--line);border-radius:10px;padding:10px 12px;max-height:calc(100% - 140px);overflow:auto;width:min(340px,calc(100vw - 24px));display:none;backdrop-filter:blur(6px)}
+.panel.open{display:block}.panel h2{margin:0 0 6px;font:400 12px Anton,Impact,sans-serif;letter-spacing:.2em;color:var(--gold);display:flex;justify-content:space-between}
+.panel h2 b{cursor:pointer;color:var(--dim);font:300 13px system-ui}
+.panel .row{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}.panel button{all:unset;cursor:pointer;font:300 11px 'JetBrains Mono',monospace;padding:5px 8px;border-radius:10px;border:1px solid var(--line);color:var(--ink);background:rgba(255,255,255,.03)}
+.panel button.on{background:var(--gold);color:#0b1413}.panel label{display:grid;grid-template-columns:1fr 1.3fr 2.6em;gap:6px;align-items:center;font:300 11px 'JetBrains Mono',monospace;color:var(--dim);margin:4px 0}
+.panel input[type=range]{width:100%;accent-color:var(--gold)}.panel select{width:100%;font:300 11px 'JetBrains Mono',monospace;background:#0b1413;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:4px}
+.panel .card{white-space:pre-line;font:italic 12px/1.45 Georgia,serif;color:#cfd8d4;border-left:2px solid var(--gold);padding-left:8px;margin:6px 0}
+.panel small{display:block;color:var(--dim);font:300 10px/1.5 'JetBrains Mono',monospace}
+#pL{left:max(10px,env(safe-area-inset-left));top:max(56px,calc(env(safe-area-inset-top) + 46px))}#pR{right:max(10px,env(safe-area-inset-right));top:max(56px,calc(env(safe-area-inset-top) + 46px))}
+.tag{position:fixed;z-index:1;pointer-events:none;font:300 10px 'JetBrains Mono',monospace;color:#cfe3e0;text-shadow:0 0 6px #000;transform:translate(-50%,-160%);white-space:nowrap}.tag.sel{color:var(--gold)}
+#glyph{position:fixed;z-index:4;right:max(10px,env(safe-area-inset-right));bottom:max(10px,env(safe-area-inset-bottom));width:30px;height:30px;border-radius:50%;border:1px solid rgba(240,163,90,.5);color:var(--gold);display:none;place-items:center;font:12px system-ui;cursor:pointer;transition:opacity 1.2s;background:rgba(0,0,0,.25)}
+.box{position:fixed;left:0;right:0;height:11vh;background:#000;z-index:2;display:none}#lbT{top:0}#lbB{bottom:0}
+body.cinema .ui,body.cinema .panel,body.cinema .tag{opacity:0!important;pointer-events:none!important}body.cinema #glyph{display:grid}body.cinema.still #glyph{opacity:0}
+body.letter .box{display:block}
+/* phones: panels are a short bottom sheet so the water stays visible above it */
+@media (max-width:700px),(max-height:520px){
+  .panel{left:max(6px,env(safe-area-inset-left))!important;right:max(6px,env(safe-area-inset-right))!important;top:auto!important;width:auto;
+    bottom:calc(max(8px,env(safe-area-inset-bottom)) + var(--dockH,44px));max-height:var(--sheetH,34vh);padding:8px 10px;background:rgba(6,12,13,.62);border-radius:12px}
+  .panel h2{position:sticky;top:-8px;background:rgba(6,12,13,.92);margin:-8px -10px 6px;padding:8px 10px;z-index:1;cursor:pointer}
+  .panel.min{max-height:40px;overflow:hidden}
+  .panel .card{font-size:11px}.panel .card.fold{max-height:3.1em;overflow:hidden;position:relative}
+  .panel .card.fold::after{content:'… tap for the whole card';position:absolute;right:0;bottom:0;background:rgba(6,12,13,.9);padding-left:6px;font:300 10px 'JetBrains Mono',monospace;color:var(--gold)}
+  .dock{gap:4px}.dock button{padding:6px 8px;font-size:10px;letter-spacing:.1em}
+  #top .st{font-size:10px}
+}
+#pS{left:max(10px,env(safe-area-inset-left));top:max(56px,calc(env(safe-area-inset-top) + 46px));width:min(460px,calc(100vw - 24px))}
+#pS textarea{width:100%;height:38vh;min-height:150px;resize:vertical;background:#071010;color:#d9e6e2;border:1px solid var(--line);border-radius:8px;padding:6px;font:300 11.5px/1.5 'JetBrains Mono',ui-monospace,monospace;white-space:pre;overflow:auto;-webkit-user-select:text;user-select:text;tab-size:2}
+#pS #errs{font:300 10.5px/1.45 'JetBrains Mono',monospace;color:#ff8a7a;margin:4px 0;max-height:7em;overflow:auto}#pS #errs.ok{color:#8fd6a0}
+#pS input[type=range]{width:100%;accent-color:var(--gold)}#pS .clock{font:300 11px 'JetBrains Mono',monospace;color:var(--dim)}
+#tests{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}#tests span{font:300 10px 'JetBrains Mono',monospace;padding:3px 6px;border-radius:8px;border:1px solid var(--line);color:var(--dim)}#tests span.pass{border-color:#3f8f5a;color:#9fe0b0}#tests span.fail{border-color:#a8473b;color:#ffab9e}
+.dock .modes{display:flex;gap:4px;flex-basis:100%;justify-content:center}.dock .modes button{border-color:rgba(240,163,90,.35)}
+#cap{left:50%;bottom:calc(max(8px,env(safe-area-inset-bottom)) + var(--dockH,44px) + 14px);transform:translateX(-50%);max-width:min(720px,calc(100vw - 32px));text-align:center;font:italic 15px/1.4 Georgia,serif;color:#f3ead8;text-shadow:0 0 8px #000,0 0 2px #000;pointer-events:none;opacity:0;z-index:2;position:fixed;transition:opacity .5s}#cap.on{opacity:1}
+body.cinema #cap{bottom:max(18px,calc(env(safe-area-inset-bottom) + 12px))}body.letter #cap{bottom:calc(11vh + 10px)}
+#stick{position:fixed;z-index:2;width:84px;height:84px;margin:-42px 0 0 -42px;border-radius:50%;border:1px solid rgba(240,163,90,.55);pointer-events:none;display:none}#stick i{position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px;border-radius:50%;background:rgba(240,163,90,.6)}
+#hint{left:50%;top:max(34px,calc(env(safe-area-inset-top) + 26px));transform:translateX(-50%);font:300 10.5px 'JetBrains Mono',monospace;color:var(--dim);pointer-events:none;text-align:center;max-width:calc(100vw - 24px)}
+@media (max-width:700px),(max-height:520px){#pS textarea{height:calc(var(--sheetH,34vh) - 120px);min-height:96px;font-size:11px}#cap{font-size:13px}}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div class="box" id="lbT"></div><div class="box" id="lbB"></div>
+<div class="ui" id="top"><h1>THE LAB</h1><div class="st" id="st">…</div></div>
+<div class="panel" id="pL"><h2>SPECIMENS <b data-close="pL">×</b></h2><div class="row" id="spawn"></div><small>tap a name to add it to the water · tap a jelly (or its tag) to inspect it</small><div class="row" id="live"></div><h2 style="margin-top:10px">INSPECT</h2><div id="insp"><small>nothing selected</small></div></div>
+<div class="panel" id="pR">
+  <div id="secCam"><h2>CAMERA <b data-close="pR">×</b></h2><div class="row" id="camModes"></div>
+    <label>speed <input type="range" id="cSpd" min="0" max="3" step=".01" value="1"><span id="cSpdV"></span></label>
+    <label>easing <input type="range" id="cEase" min=".2" max="6" step=".05" value="1.6"><span id="cEaseV"></span></label>
+    <label>distance <input type="range" id="cDist" min="2" max="24" step=".1" value="9"><span id="cDistV"></span></label>
+    <label>lens mm <input type="range" id="cFov" min="18" max="120" step="1" value="45"><span id="cFovV"></span></label>
+    <div class="row"><button id="auto">AUTO CINEMATOGRAPHER</button><button id="cutBeat" class="on">cut on beat</button></div>
+    <label>min hold s <input type="range" id="hold" min="1" max="12" step=".5" value="4"><span id="holdV"></span></label>
+    <div class="row"><button id="share">COPY SHOT LINK</button></div></div>
+  <div id="secSong"><h2>ORCHESTRA</h2><select id="song"></select><div class="row"><button id="play">PLAY</button><button id="entrain" class="on">entrain the nerves</button></div><div id="cast"></div><small id="castNote"></small></div>
+  <div id="secLight"><h2>WHITNEY LIGHT ORGAN</h2><div class="row" id="presets"></div><div id="organ"></div><small>differential motion: light i turns at base·(i+1)·ratio (+ detune·i) turns a bar; whole-number ratios lock, detune drifts. After John Whitney Sr., <i>Digital Harmony</i> (1980); Permutations (1968), Matrix III (1972), Arabesque (1975).</small></div>
+  <div id="secView"><h2>PICTURE</h2><div class="row"><button id="fps30">30 fps cap</button><button id="low">phone quality</button><button id="snowB" class="on">marine snow</button><button id="raysB" class="on">light shafts</button></div><label>haze <input type="range" id="haze" min="0" max=".08" step=".001" value=".028"><span id="hazeV"></span></label></div>
+</div>
+<div class="panel" id="pS"><h2>SCORE · PEO <b data-close="pS">×</b></h2>
+  <textarea id="peo" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="PEO score"></textarea>
+  <div id="errs" class="ok">…</div>
+  <div class="row"><button id="sPlay">PLAY</button><button id="sStop">STOP</button><button id="sStep">STEP 1 BEAT</button><button id="sApply">APPLY</button><button id="sFrom">PANELS → SCORE</button><button id="sCopy">COPY SCORE</button><button id="sLink">COPY SCORE LINK</button></div>
+  <input type="range" id="scrub" min="0" max="60" step=".01" value="0" aria-label="scrub"><div class="clock" id="sClock">0.00 s · beat 0</div>
+  <div id="tests"></div><small>@prompt · @world · @cast · @light · @camera · @steer · @ekphrasis · @op · @test · @source. Times: b16 (beats), 12.5s, 1:02. Spec: SCION_PEO.md · <a href="./scores/" style="color:var(--gold)">example scores</a></small></div>
+<div class="ui" id="hint"></div><div id="cap"></div><div id="stick"><i></i></div>
+<div class="ui dock" id="dock"><div class="modes" id="modes"><button data-mode="inspect">INSPECT</button><button data-mode="open">OPEN WATER</button><button data-mode="steer">STEER</button></div><button data-p="pL">SPECIMENS</button><button data-p="pR">CAMERA · MUSIC · LIGHT</button><button data-p="pS">SCORE</button><button id="cine">CINEMA (H)</button><button id="lb">LETTERBOX</button><button id="clean">CLEAN</button></div>
+<div id="glyph" title="show controls (H)">◐</div>
+<script type="module">
+import * as THREE from 'three';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+import {JELLIES, REAL, createJelly, SPECIES, speciesCard} from './jellies.js';
+import {makeOrgan, PRESETS} from './whitney.js';
+import {filmTexture, fitFilm} from './film.js';
+import * as PEO from './peo.js';
+import {makeWater, makeBody, makeArms, STEER_DEFAULTS, PLACES} from './swim.js';
+import {makeMemories, CAPTION_BAND} from './memory.js';
+const $ = id => document.getElementById(id), Q = new URLSearchParams(location.search), V3 = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z), TAU = Math.PI * 2;
+const REC = Q.has('rec'); let shareT = 0, LOW = Q.has('low') || matchMedia('(pointer: coarse)').matches || innerWidth < 700;
+// ---------------------------------------------------------------- the water
+const R = new THREE.WebGLRenderer({canvas: $('gl'), antialias: false, powerPreference: 'high-performance', preserveDrawingBuffer: Q.has('test')}); R.toneMapping = THREE.ACESFilmicToneMapping; R.toneMappingExposure = 1.05;
+const scene = new THREE.Scene(), FOG = new THREE.Color('#0f2224'); scene.fog = new THREE.FogExp2(FOG, .028);
+const bg = document.createElement('canvas'); bg.width = 4; bg.height = 256; { const g = bg.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, '#2b5a5c'); gr.addColorStop(.45, '#10282a'); gr.addColorStop(1, '#040b0b'); g.fillStyle = gr; g.fillRect(0, 0, 4, 256); } const bgt = new THREE.CanvasTexture(bg); bgt.colorSpace = THREE.SRGBColorSpace; scene.background = bgt;
+scene.add(new THREE.HemisphereLight(0x9fd6e0, 0x0a1414, .9)); const sun = new THREE.DirectionalLight(0xdff4ff, 1.1); sun.position.set(-2, 8, 3); scene.add(sun);
+{ const env = new THREE.Scene(); env.add(new THREE.Mesh(new THREE.BoxGeometry(20, 12, 20), new THREE.MeshBasicMaterial({color: 0x16282c, side: THREE.BackSide}))); const p = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), new THREE.MeshBasicMaterial({color: new THREE.Color(1.6, 1.9, 2)})); p.position.y = 5.9; p.rotation.x = Math.PI / 2; env.add(p); scene.environment = new THREE.PMREMGenerator(R).fromScene(env, .03).texture; }
+const cam = new THREE.PerspectiveCamera(45, 1, .1, 200), comp = new EffectComposer(R); comp.addPass(new RenderPass(scene, cam)); const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), .45, .6, .7); comp.addPass(bloom); comp.addPass(new OutputPass());
+function size() { const pr = Math.min(LOW ? 1.2 : 1.8, devicePixelRatio); R.setPixelRatio(pr); R.setSize(innerWidth, innerHeight, false); comp.setPixelRatio(pr); comp.setSize(innerWidth, innerHeight); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); } addEventListener('resize', size); size();
+const SNOW = (() => { const n = LOW ? 600 : 1600, P = new Float32Array(n * 3); for (let i = 0; i < n * 3; i++) P[i] = (Math.random() - .5) * 40; const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(P, 3)); const p = new THREE.Points(g, new THREE.PointsMaterial({size: .05, color: 0xbfe6ee, transparent: true, opacity: .4, depthWrite: false})); p.frustumCulled = false; scene.add(p); return {p, P, n}; })();
+const RAYS = (() => { const c = document.createElement('canvas'); c.width = 64; c.height = 256; const x = c.getContext('2d'), gr = x.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, 'rgba(210,240,255,.55)'); gr.addColorStop(1, 'rgba(210,240,255,0)'); x.fillStyle = gr; x.fillRect(0, 0, 64, 256); const t = new THREE.CanvasTexture(c), g = new THREE.Group(); for (let i = 0; i < (LOW ? 4 : 8); i++) { const m = new THREE.Mesh(new THREE.PlaneGeometry(1.4 + (i % 3), 30), new THREE.MeshBasicMaterial({map: t, transparent: true, opacity: .045, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, fog: false})); const a = i * 2.4; m.position.set(Math.cos(a) * (3 + i * 1.2), 9, Math.sin(a) * (3 + i * 1.2) - 2); m.rotation.set(0, a, .15); g.add(m); } scene.add(g); return g; })();
+const lamp = new THREE.Mesh(new THREE.SphereGeometry(.12, 14, 10), new THREE.MeshBasicMaterial({color: 0xfff2c8, toneMapped: false})); lamp.position.set(2.5, 3, 0); scene.add(lamp); const lampL = new THREE.PointLight(0xfff0c8, 4, 14, 2); lamp.add(lampL);
+// ---------------------------------------------------------------- the jellies
+const LIVE = [], HOMES = [V3(0, 0, 0), V3(-4, .6, -1.5), V3(4, -.4, -1.2), V3(-2.4, 1.6, 2.6), V3(2.6, 1.4, 2.8), V3(-5.4, -1.2, 2), V3(5.4, -1.6, 1.8), V3(0, 2.6, -4), V3(-1.4, -2.4, -3.6), V3(1.6, -2.6, 3.8), V3(-6.2, 1.8, -3.2), V3(6.2, 1.6, -3.2), V3(0, -3.4, 0)];
+let SEL = null, uid = 0;
+function add(id, opts = {}) { const meta = JELLIES.find(j => j.id === id); if (!meta) return; const J = createJelly(THREE, id, {low: LOW, seed: uid + 1}), holder = new THREE.Group(), slot = HOMES[LIVE.length % HOMES.length];
+  holder.position.copy(opts.at || slot); holder.add(J.group); if (J.kind !== 'real') J.group.scale.setScalar(J.norm * (id === 'filmbell' || id === 'golden' ? .62 : .78)); scene.add(holder);
+  const tag = document.createElement('div'); tag.className = 'tag'; tag.textContent = J.name.replace(/^The /, ''); document.body.appendChild(tag); tag.style.pointerEvents = 'auto'; tag.onclick = () => select(E);
+  const E = {key: ++uid, id, name: opts.name || null, J, holder, tag, role: null, muted: false, solo: false, refused: 0, fired: 0, onsets: []}; J.onBeat(b => { E.lastBeat = b.t; E.beats = (E.beats || 0) + 1; if (E.B) { const k = E.B.kick ? 1 : E.B.drive ? 1 : 0; E.B.kick = false; if (k) E.B.stroke(T, k, STEER); } if (AUTO.on && CUT.beat && (!AUTO.follow || AUTO.follow === E)) AUTO.beat = true; }); LIVE.push(E); paintLive(); return E; }
+function remove(E) { const i = LIVE.indexOf(E); if (i < 0) return; LIVE.splice(i, 1); scene.remove(E.holder); E.J.dispose(); E.tag.remove(); if (SEL === E) select(null); paintLive(); }
+function select(E) { SEL = E; LIVE.forEach(x => x.tag.classList.toggle('sel', x === E)); paintInsp(); share(true); }
+// ---------------------------------------------------------------- panels
+$('spawn').innerHTML = JELLIES.map(j => `<button data-add="${j.id}" title="${j.line.replace(/"/g, '&quot;')}">${j.name.replace(/^The /, '')}${j.kind === 'real' ? ' ●' : ''}</button>`).join(''); $('spawn').onclick = e => { const b = e.target.closest('[data-add]'); if (b) select(add(b.dataset.add)); };
+function paintLive() { $('live').innerHTML = LIVE.map(E => `<button data-k="${E.key}" class="${E === SEL ? 'on' : ''}">${E.J.name.replace(/^The /, '')} ✕</button>`).join(''); $('live').querySelectorAll('button').forEach(b => b.onclick = e => { const E = LIVE.find(x => x.key === +b.dataset.k); if (!E) return; if (e.offsetX > b.clientWidth - 18) remove(E); else select(E); }); paintCast(); }
+function paintInsp() { const d = $('insp'); if (!SEL) { d.innerHTML = '<small>nothing selected</small>'; return; } const J = SEL.J, sp = SPECIES[SEL.id], meta = JELLIES.find(j => j.id === SEL.id);
+  d.innerHTML = `<div class="card${PHONE() ? ' fold' : ''}" onclick="this.classList.toggle('fold')">${sp ? speciesCard(SEL.id).replace(/\n/g, '<br>') : `${J.name}: ${meta.line}`}</div>` + (J.views.length > 1 ? `<div class="row">${J.views.map(v => `<button data-view="${v}">${v.toUpperCase()}</button>`).join('')}</div>` : '') + `<div class="row" id="ctlB"></div><div id="ctlR"></div><div class="row"><button id="follow">CAMERA: TRACK THIS ONE</button><button id="rm">REMOVE</button></div>` + (sp ? `<small>${speciesTable(SEL.id)}</small>` : '');
+  d.querySelectorAll('[data-view]').forEach(b => b.onclick = () => { J.setLook({view: b.dataset.view}); d.querySelectorAll('[data-view]').forEach(x => x.classList.toggle('on', x === b)); });
+  const cb = $('ctlB'), cr = $('ctlR'); for (const c of J.controls) { if (c.kind === 'button') { const b = document.createElement('button'); b.textContent = c.label; b.onclick = c.run; cb.appendChild(b); } else { const l = document.createElement('label'), i = document.createElement('input'), v = document.createElement('span'); l.append(c.label, i, v); Object.assign(i, {type: 'range', min: c.min, max: c.max, step: c.step, value: c.get()}); v.textContent = (+c.get()).toFixed(2); i.oninput = () => { c.set(i.value); v.textContent = (+i.value).toFixed(2); }; cr.appendChild(l); } }
+  $('follow').onclick = () => { CAM.follow = SEL; setMode('track'); }; $('rm').onclick = () => remove(SEL); }
+const speciesTable = id => { const s = SPECIES[id]; return `pacemakers ${s.n}${s.rings ? ` × ${s.rings} rings (lag ${s.lag}s)` : ''} · period ${s.pace}s ±${Math.round(s.spread * 50)}% · ring ${s.loop}s round · refractory ${s.refr}s · muscle ${s.musc} · bell stiffness ${s.stiff} · thrust ${s.thrust} · light ${s.photo} · balance ${s.stato} · touch ${s.touch} · tentacles ${s.tent[0]}×${s.tent[1]} · glow ${s.lum[0]}`; };
+const PHONE = () => innerWidth <= 700 || innerHeight <= 520;
+function syncSheet() { const d = $('dock'); document.documentElement.style.setProperty('--dockH', (d ? d.offsetHeight + 8 : 44) + 'px'); }
+document.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { const p = $(b.dataset.p);
+  if (PHONE() || p.id === 'pL' || p.id === 'pS') document.querySelectorAll('.panel.open').forEach(o => { if (o !== p && (PHONE() || o.id === 'pL' || o.id === 'pS')) { o.classList.remove('open', 'min'); const ob = document.querySelector(`[data-p="${o.id}"]`); if (ob) ob.classList.remove('on'); } });
+  p.classList.remove('min'); p.classList.toggle('open'); b.classList.toggle('on', p.classList.contains('open')); syncSheet(); share(true); });
+document.querySelectorAll('.panel h2').forEach(h => h.addEventListener('click', e => { if (!PHONE() || e.target.dataset.close) return; h.closest('.panel').classList.toggle('min'); }));
+addEventListener('resize', syncSheet); syncSheet();
+document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => { $(b.dataset.close).classList.remove('open'); document.querySelector(`[data-p="${b.dataset.close}"]`).classList.remove('on'); });
+// ---------------------------------------------------------------- cinema: everything hideable
+let glyphT = 0; const cinema = on => { document.body.classList.toggle('cinema', on); $('cine').classList.toggle('on', on); glyphT = 0; document.body.classList.remove('still'); share(true); };
+$('cine').onclick = () => cinema(true); $('glyph').onclick = () => cinema(false); $('lb').onclick = () => { document.body.classList.toggle('letter'); $('lb').classList.toggle('on'); share(true); };
+$('clean').onclick = () => { LIVE.forEach(E => E.tag.style.display = E.tag.style.display === 'none' ? '' : 'none'); $('clean').classList.toggle('on'); ORG.line = !ORG.line; };
+addEventListener('keydown', e => { if (e.target && /^(TEXTAREA|INPUT|SELECT)$/.test(e.target.tagName)) return; if (e.key === 'h' || e.key === 'H') cinema(!document.body.classList.contains('cinema')); if (e.key === 'l' || e.key === 'L') $('lb').click(); });
+// ---------------------------------------------------------------- camera
+const MODES = ['orbit', 'dolly', 'crane', 'track', 'beneath', 'far', 'free', 'chase'], CAM = {frameY: 0, cut: false, mode: Q.get('cam') || 'orbit', spd: +(Q.get('spd') || 1), ease: +(Q.get('ease') || 1.6), dist: +(Q.get('dist') || 9), fov: +(Q.get('fov') || 45), t: 0, pos: V3(0, 2, 9), look: V3(), follow: null, yaw: 0, pitch: .15, drag: null};
+$('camModes').innerHTML = MODES.map(m => `<button data-cam="${m}">${m.toUpperCase()}</button>`).join(''); const setMode = m => { CAM.mode = m; document.querySelectorAll('[data-cam]').forEach(b => b.classList.toggle('on', b.dataset.cam === m)); share(true); }; $('camModes').onclick = e => { const b = e.target.closest('[data-cam]'); if (b) setMode(b.dataset.cam); }; setMode(CAM.mode);
+const bindR = (id, key, fmt = v => (+v).toFixed(2)) => { const i = $(id), v = $(id + 'V'); i.value = CAM[key] ?? i.value; v.textContent = fmt(i.value); i.oninput = () => { CAM[key] = +i.value; v.textContent = fmt(i.value); share(true); }; };
+bindR('cSpd', 'spd'); bindR('cEase', 'ease'); bindR('cDist', 'dist', v => (+v).toFixed(1)); bindR('cFov', 'fov', v => Math.round(v));
+const AUTO = {on: Q.has('auto'), t: 0, hold: 4, beat: false, follow: null, shot: 0}, CUT = {beat: true}; $('auto').classList.toggle('on', AUTO.on);
+$('auto').onclick = () => { AUTO.on = !AUTO.on; $('auto').classList.toggle('on', AUTO.on); share(true); }; $('cutBeat').onclick = () => { CUT.beat = !CUT.beat; $('cutBeat').classList.toggle('on', CUT.beat); }; { const i = $('hold'); $('holdV').textContent = i.value; i.oninput = () => { AUTO.hold = +i.value; $('holdV').textContent = i.value; }; }
+function autoCut(dt) { if (!AUTO.on) return; AUTO.t += dt; const ready = AUTO.t >= AUTO.hold, beatOk = !CUT.beat || AUTO.beat || AUTO.t > AUTO.hold * 2.5; AUTO.beat = false; if (!ready || !beatOk || !LIVE.length) return;
+  AUTO.t = 0; AUTO.shot++; const E = LIVE[(AUTO.shot * 7) % LIVE.length], modes = ['track', 'beneath', 'orbit', 'crane', 'far', 'dolly']; CAM.follow = E; AUTO.follow = E; CAM.mode = modes[AUTO.shot % modes.length]; CAM.dist = [3.6, 4.2, 8, 6, 16, 5][AUTO.shot % 6]; CAM.t = 0; setMode(CAM.mode); }
+const target = () => (CAM.follow && LIVE.includes(CAM.follow)) ? CAM.follow.J.state().com : V3(0, .4, 0);
+function camera(dt) { CAM.t += dt * CAM.spd; const t = CAM.t, d = CAM.dist, tg = target(), want = V3(); let look = tg;
+  if (CAM.mode === 'orbit') want.set(Math.cos(t * .12) * d, 1.6 + Math.sin(t * .07) * 1.2, Math.sin(t * .12) * d).add(tg);
+  else if (CAM.mode === 'dolly') want.set(0, 1.2, d * (1.25 - .5 * (Math.sin(t * .18) * .5 + .5))).add(tg);
+  else if (CAM.mode === 'crane') want.set(Math.sin(t * .05) * d * .6, -1.5 + 6 * (Math.sin(t * .1) * .5 + .5), d * .8).add(tg);
+  else if (CAM.mode === 'track') want.set(Math.cos(t * .2) * d * .55, .9, Math.sin(t * .2) * d * .55).add(tg);
+  else if (CAM.mode === 'beneath') want.set(Math.cos(t * .1) * .8, -d * .55, Math.sin(t * .1) * .8).add(tg);
+  else if (CAM.mode === 'far') want.set(Math.cos(t * .03) * d * 2, 3, Math.sin(t * .03) * d * 2);
+  else if (CAM.mode === 'chase') { const E = PILOT(), B = E && E.B; if (B) { const H = MODE === 'steer' ? V3(Math.sin(CAM.yaw), 0, Math.cos(CAM.yaw)).negate() : B.H; want.copy(B.p).addScaledVector(H, -d * .62).add(V3(0, d * .2 + .8, 0)); look = B.p.clone().addScaledVector(H, 2); } else want.set(0, 2, d).add(tg); }
+  else { want.set(Math.sin(CAM.yaw) * Math.cos(CAM.pitch) * d, Math.sin(CAM.pitch) * d, Math.cos(CAM.yaw) * Math.cos(CAM.pitch) * d).add(tg); }
+  if (CAM.frameY) { const dd = want.distanceTo(look); look = look.clone().add(V3(0, -CAM.frameY * dd * Math.tan(CAM.fov * Math.PI / 360), 0)); }
+  const k = CAM.cut ? 1 : 1 - Math.exp(-dt * CAM.ease); CAM.cut = false; CAM.pos.lerp(want, k); CAM.look.lerp(look, k); cam.position.copy(CAM.pos); cam.lookAt(CAM.look); if (Math.abs(cam.fov - CAM.fov) > .01) { cam.fov += (CAM.fov - cam.fov) * k; cam.updateProjectionMatrix(); } }
+// tap a jelly to inspect it; drag in FREE mode to look around; tap the water to move the light
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(); let down = null;
+$('gl').addEventListener('pointerdown', e => { if (MODE !== 'inspect') return; down = {x: e.clientX, y: e.clientY, yaw: CAM.yaw, pitch: CAM.pitch}; if (PHONE()) document.querySelectorAll('.panel.open').forEach(o => o.classList.add('min')); });
+$('gl').addEventListener('pointermove', e => { if (!down || CAM.mode !== 'free') return; CAM.yaw = down.yaw - (e.clientX - down.x) * .006; CAM.pitch = Math.max(-1.3, Math.min(1.3, down.pitch + (e.clientY - down.y) * .006)); });
+$('gl').addEventListener('pointerup', e => { if (MODE !== 'inspect' || !down) return; const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y) > 8; down = null; if (moved) return; ndc.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); ray.setFromCamera(ndc, cam);
+  let best = null, bd = 1e9; for (const E of LIVE) { const c = E.J.state().com, d = ray.ray.distanceToPoint(c); if (d < 1.2 && d < bd) { bd = d; best = E; } } if (best) { select(best); if (best.J.touch) best.J.touch(Math.floor(Math.random() * 8)); else best.J.pulse(.6); return; }
+  lamp.position.copy(ray.ray.at(cam.position.distanceTo(CAM.look), V3())); });
+// ---------------------------------------------------------------- the orchestra: a song's roles entrain the jellies' pacemakers
+const CASTING = {kick: 'sentinel', snare: 'celluloid', hat: 'doodle', tick: 'doodle', bass: 'mantle', choir: 'glass', phrase: 'golden', glide: 'reel', call: 'medusa', breath: 'medusa', hole: 'veil', tail: 'veil', bed: 'filmbell', texture: 'filmbell', quiet: 'glass', random: 'celluloid'}, BYLANE = {primary: 'choir', support: 'call', drums: 'tick', bass: 'bass', texture: 'bed'};
+const roleOf = (k, sp, lane) => sp.role in CASTING ? sp.role : /kick/.test(k) ? 'kick' : /snare/.test(k) ? 'snare' : /hat/.test(k) ? 'hat' : /sub|bass/.test(k) ? 'bass' : BYLANE[lane] || 'phrase';
+const SONG = {list: [], G: null, aud: null, parts: [], on: false, entrain: true, t0: 0, bpm: 120, barS: 2};
+fetch('./jellystudio/tracks.json').then(r => r.json()).then(tr => { SONG.list = tr; $('song').innerHTML = '<option value="">— no song —</option>' + tr.map(t => `<option value="${t.id}">${t.title}</option>`).join(''); if (Q.get('song')) { $('song').value = Q.get('song'); loadSong(Q.get('song')); } }).catch(() => { $('castNote').textContent = 'songs unavailable here'; });
+$('song').onchange = () => loadSong($('song').value);
+async function loadSong(id) { SONG.id = id; if (SONG.aud) { SONG.aud.pause(); SONG.aud = null; } SONG.parts = []; SONG.on = false; $('play').textContent = 'PLAY'; if (!id) { paintCast(); return; }
+  const base = `./jellystudio/${id}/`, G = await (await fetch(base + 'scion.json')).json(), main = G.scenes.song ? 'song' : 'full', bs = G.beat_samples, SR = G.sample_rate; SONG.G = G; SONG.bpm = G.bpm; SONG.barS = 4 * bs / SR; ORG.bpm = G.bpm;
+  const by = {}; for (const p of G.placements) if (p.scene === main) (by[p.span] = by[p.span] || []).push({t: ((p.bar - 1) * 4 * bs + Math.round((p.beat - 1) * bs) + p.timing_offset) / SR, lane: p.lane});
+  const names = Object.keys(by).filter(k => !/hiss|riser/.test(k)).sort((a, b) => by[b].length - by[a].length).slice(0, LOW ? 6 : 10);
+  for (const k of names) { const sp = G.spans[k], ev = by[k].sort((a, b) => a.t - b.t), role = roleOf(k, sp, ev[0].lane), species = CASTING[role]; let E = LIVE.find(x => x.id === species && !SONG.parts.some(p => p.E === x)); if (!E) E = add(species); SONG.parts.push({k, role, label: sp.blind || k, E, ev, next: 0}); E.role = role; }
+  SONG.aud = new Audio(base + `renders/${main}.mp3`); SONG.aud.preload = 'auto'; SONG.aud.onended = () => { SONG.on = false; $('play').textContent = 'PLAY'; }; paintCast(); share(true); }
+$('play').onclick = () => { if (!SONG.aud) return; audio(); if (SONG.on) { SONG.aud.pause(); SONG.on = false; $('play').textContent = 'PLAY'; } else { SONG.aud.play().catch(() => {}); SONG.on = true; $('play').textContent = 'PAUSE'; } };
+$('entrain').onclick = () => { SONG.entrain = !SONG.entrain; $('entrain').classList.toggle('on', SONG.entrain); };
+function paintCast() { const c = $('cast'); if (!SONG.parts.length) { c.innerHTML = '<small>choose a song: each sound is cast to a jelly, and its onsets fire that jelly\'s pacemakers (the real nerve model, refractory and all)</small>'; return; }
+  c.innerHTML = SONG.parts.map((p, i) => `<div class="row"><button data-solo="${i}" class="${p.E.solo ? 'on' : ''}">S</button><button data-mute="${i}" class="${p.E.muted ? 'on' : ''}">M</button><small style="display:inline">${p.label.toLowerCase()} · ${p.role} → <select data-re="${i}">${JELLIES.filter(j => j.kind === 'rig').map(j => `<option value="${j.id}" ${j.id === p.E.id ? 'selected' : ''}>${j.name.replace(/^The /, '')}</option>`).join('')}</select> · fired ${p.E.fired}, refused ${p.E.refused}</small></div>`).join('');
+  c.querySelectorAll('[data-solo]').forEach(b => b.onclick = () => { const E = SONG.parts[+b.dataset.solo].E; E.solo = !E.solo; paintCast(); });
+  c.querySelectorAll('[data-mute]').forEach(b => b.onclick = () => { const E = SONG.parts[+b.dataset.mute].E; E.muted = !E.muted; paintCast(); });
+  c.querySelectorAll('[data-re]').forEach(s => s.onchange = () => { const p = SONG.parts[+s.dataset.re]; const E = add(s.value); E.role = p.role; p.E = E; paintCast(); }); }
+function orchestra() { const t = SC.usesSong && SC.playing ? SC.t : SONG.on && SONG.aud ? SONG.aud.currentTime : null; if (t == null || !SONG.parts.length) return; const anySolo = SONG.parts.some(p => p.E.solo);
+  for (const p of SONG.parts) { while (p.next < p.ev.length && p.ev[p.next].t <= t) { const ev = p.ev[p.next++]; if (t - ev.t > .25) continue; if (p.E.muted || (anySolo && !p.E.solo) || !SONG.entrain) continue; const ok = p.E.J.pulse(1); if (ok) p.E.fired++; else p.E.refused++; p.E.onsets.push({t: ev.t, at: t, ok}); if (p.E.onsets.length > 200) p.E.onsets.shift(); } }
+  ORG.env = .6 + .4 * Math.exp(-((t % SONG.barS) / SONG.barS) * 3); }
+let AC = null, BUS = null; function audio() { if (AC) return; const A = window.AudioContext || window.webkitAudioContext; if (!A) return; AC = new A(); BUS = AC.createGain(); BUS.gain.value = .5; BUS.connect(AC.destination); ORG.audio(AC, BUS); }
+// ---------------------------------------------------------------- Whitney light organ
+const ORG = makeOrgan(THREE, scene, {lights: LOW ? 2 : 4}); ORG.line = true; if (Q.get('org')) ORG.set(decodeURIComponent(Q.get('org'))); if (Q.get('orgp')) try { ORG.set(JSON.parse(atob(Q.get('orgp')))); } catch (e) {}
+$('presets').innerHTML = Object.keys(PRESETS).map(k => `<button data-pre="${k}">${k}</button>`).join('') + '<button id="orgOn" class="on">lights on</button><button id="notes">music box notes</button>';
+$('presets').onclick = e => { const b = e.target.closest('[data-pre]'); if (b) { ORG.set(b.dataset.pre); paintOrgan(); share(true); } }; $('orgOn').onclick = () => { ORG.on = !ORG.on; $('orgOn').classList.toggle('on', ORG.on); };
+$('notes').onclick = () => { audio(); ORG.params.notes = !ORG.params.notes; $('notes').classList.toggle('on', ORG.params.notes); };
+const OKNOB = [['mode', null], ['n', [2, 16, 1]], ['base', [.0156, .5, .0001]], ['ratio', [.25, 4, .25]], ['detune', [-.03, .03, .0005]], ['radius', [.5, 6, .05]], ['dR', [-.4, .6, .01]], ['dTheta', [0, TAU, .01]], ['k', [1, 7, 1]], ['height', [-2, 4, .05]], ['intensity', [0, 3, .05]]];
+function paintOrgan() { const d = $('organ'); d.innerHTML = `<label>path <select id="oMode">${['rose', 'lissajous', 'epicycle', 'musicbox'].map(m => `<option ${m === ORG.params.mode ? 'selected' : ''}>${m}</option>`).join('')}</select><span></span></label>` + OKNOB.slice(1).map(([k, [a, b, s]]) => `<label>${k === 'dR' ? 'radius diff dR' : k === 'dTheta' ? 'theta diff dθ' : k === 'base' ? 'base turns/bar' : k} <input type="range" data-ok="${k}" min="${a}" max="${b}" step="${s}" value="${ORG.params[k]}"><span>${(+ORG.params[k]).toFixed(k === 'detune' ? 4 : 2)}</span></label>`).join('');
+  $('oMode').onchange = () => { ORG.params.mode = $('oMode').value; share(true); }; d.querySelectorAll('[data-ok]').forEach(i => i.oninput = () => { ORG.params[i.dataset.ok] = +i.value; i.nextElementSibling.textContent = (+i.value).toFixed(i.dataset.ok === 'detune' ? 4 : 2); share(true); }); }
+paintOrgan(); ORG.onCross = (i, p) => { let best = null, bd = 1e9; for (const E of LIVE) { const d = E.J.state().com.distanceTo(p); if (d < bd) { bd = d; best = E; } } if (best && bd < 4) best.J.pulse(.5); };
+// ---------------------------------------------------------------- picture options
+let CAP30 = Q.has('fps30'); $('fps30').classList.toggle('on', CAP30); $('fps30').onclick = () => { CAP30 = !CAP30; $('fps30').classList.toggle('on', CAP30); };
+$('low').classList.toggle('on', LOW); $('low').onclick = () => { LOW = !LOW; $('low').classList.toggle('on', LOW); size(); };
+$('snowB').onclick = () => { SNOW.p.visible = !SNOW.p.visible; $('snowB').classList.toggle('on', SNOW.p.visible); }; $('raysB').onclick = () => { RAYS.visible = !RAYS.visible; $('raysB').classList.toggle('on', RAYS.visible); };
+{ const i = $('haze'); $('hazeV').textContent = i.value; i.oninput = () => { scene.fog.density = +i.value; $('hazeV').textContent = i.value; }; }
+// ---------------------------------------------------------------- the shot, in the URL
+function share(soon) { if (soon) { shareT = .4; return; } const p = new URLSearchParams(); p.set('j', LIVE.map(E => E.id).join(',')); p.set('cam', CAM.mode); p.set('spd', CAM.spd.toFixed(2)); p.set('ease', CAM.ease.toFixed(2)); p.set('dist', CAM.dist.toFixed(1)); p.set('fov', Math.round(CAM.fov));
+  if (SEL) p.set('sel', LIVE.indexOf(SEL)); if (AUTO.on) p.set('auto', 1); if (SONG.G && SONG.id && !SC.srcKey) p.set('song', SONG.id); p.set('orgp', btoa(JSON.stringify(ORG.params))); if (document.body.classList.contains('cinema')) p.set('cinema', 1); if (document.body.classList.contains('letter')) p.set('letter', 1); if (Q.has('test')) p.set('test', 1); if (Q.get('film')) p.set('film', Q.get('film')); if (SC.srcKey) p.set(SC.srcKey, SC.src); if (MODE !== 'inspect') p.set('mode', MODE);
+  history.replaceState(null, '', '?' + p.toString()); }
+$('share').onclick = () => { share(); navigator.clipboard?.writeText(location.href).then(() => { $('share').textContent = 'COPIED'; setTimeout(() => $('share').textContent = 'COPY SHOT LINK', 1200); }).catch(() => {}); };
+// ---------------------------------------------------------------- ONE LAB: one water, three ways in (inspect · open water · steer), and the score
+// The open water and the steer lab share one body model (swim.js); the score (peo.js) drives the same functions the panels do.
+const WATER = makeWater(THREE, scene, {low: LOW}); WATER.visible = false;
+const STEER = {...STEER_DEFAULTS, current: [0, 0, 0], beats: 2};
+let MODE = 'inspect', PILOT_E = null, ARMS = null;
+const PILOT = () => (PILOT_E && LIVE.includes(PILOT_E)) ? PILOT_E : null;
+const byName = n => LIVE.find(E => E.name === n) || LIVE.find(E => E.id === n) || null;
+const arr = v => [+v.x.toFixed(3), +v.y.toFixed(3), +v.z.toFixed(3)];
+const posOf = E => E.B ? E.B.p.clone() : E.holder.position.clone();
+function ensureBody(E) { if (!E.B) { E.B = makeBody(THREE, E.holder.position.clone()); E.tryT = -9; } if (E.J.kind === 'real') E.J.puppet = true; return E.B; }
+const hint = t => { $('hint').textContent = t || ''; };
+function openPanel(id) { const b = document.querySelector(`[data-p="${id}"]`); if (b && !$(id).classList.contains('open')) b.click(); }
+function setLabMode(m, who) {
+  if (!['inspect', 'open', 'steer'].includes(m)) { if (m === 'orchestra') openPanel('pR'); if (m === 'score') openPanel('pS'); return; }
+  MODE = m; document.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('on', b.dataset.mode === m)); WATER.visible = m !== 'inspect';
+  if (ARMS) { ARMS.group.visible = m === 'steer'; if (m !== 'steer') ARMS.AR.releaseAll(ARMS.env, T0()); }
+  if (m === 'inspect') { HAND.drive = false; HAND.id = null; $('stick').style.display = 'none'; if (CAM.mode === 'chase') setMode('orbit'); hint(''); share(true); return; }
+  const E = (who && byName(who)) || PILOT() || SEL || LIVE[0]; if (!E) return; PILOT_E = E; if (SEL !== E) select(E); const B = ensureBody(E); B.mode = m === 'steer' ? 'steer' : 'open';
+  CAM.follow = E; CAM.dist = m === 'steer' ? 11 : 7; setMode('chase');
+  if (m === 'steer') { if (!ARMS) { ARMS = makeArms(THREE, WATER, cam, {arms: STEER.arms, reach: STEER.reach, onEvent: n => hint(n)}); scene.add(ARMS.group); } ARMS.group.visible = true; CAM.yaw = 0; }
+  hint(m === 'open' ? `swimming: ${E.J.name.replace(/^The /, '')} · hold the water to swim toward your finger · double-tap: pulse · keys WASD R F, space`
+    : `steering: ${E.J.name.replace(/^The /, '')} · touch a stone, kelp or the floor and an arm grabs it · drag to pull · lift to let go · more fingers, more arms`);
+  share(true); }
+const T0 = () => T;
+document.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => setLabMode(b.dataset.mode));
+// the hand in open water: glide (hold toward the finger) · tap (point and go) · drag (fling) · keys
+const HAND = {want: V3(0, 0, -1), drive: false, id: null, x0: 0, y0: 0, x: 0, y: 0, t0: 0, lastTap: -9, dbl: false, hist: []}, KEYS = new Set();
+const rayAt = (x, y) => { ndc.set(x / innerWidth * 2 - 1, -(y / innerHeight) * 2 + 1); ray.setFromCamera(ndc, cam); return ray.ray.clone(); };
+const atBell = (r, B) => r.at(cam.position.distanceTo(B.p), V3());
+const gl = $('gl');
+gl.addEventListener('pointerdown', e => { if (MODE === 'inspect') return; try { gl.setPointerCapture(e.pointerId); } catch (_) {} if (PHONE()) document.querySelectorAll('.panel.open').forEach(o => o.classList.add('min'));
+  const E = PILOT(); if (!E) return; const now = performance.now();
+  if (MODE === 'steer') { ARMS.AR.down(e.pointerId, rayAt(e.clientX, e.clientY), e.clientX, e.clientY, E.B, ARMS.env, T); return; }
+  if (HAND.id != null) return; Object.assign(HAND, {id: e.pointerId, x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY, t0: now, hist: [{x: e.clientX, y: e.clientY, t: now}]});
+  HAND.dbl = now - HAND.lastTap < 320; if (HAND.dbl) { E.B.kick = true; if (!E.J.pulse(1)) E.B.kick = false; }
+  if (STEER.scheme === 'glide') { const s = $('stick'); s.style.left = e.clientX + 'px'; s.style.top = e.clientY + 'px'; s.firstChild.style.transform = ''; s.style.display = 'block'; } });
+gl.addEventListener('pointermove', e => { if (MODE === 'steer') { if (ARMS) ARMS.AR.move(e.pointerId, rayAt(e.clientX, e.clientY), e.clientX, e.clientY, T); return; } if (MODE !== 'open' || e.pointerId !== HAND.id) return;
+  HAND.x = e.clientX; HAND.y = e.clientY; const now = performance.now(); HAND.hist.push({x: HAND.x, y: HAND.y, t: now}); while (HAND.hist.length > 2 && now - HAND.hist[0].t > 120) HAND.hist.shift();
+  const dx = Math.max(-42, Math.min(42, HAND.x - HAND.x0)), dy = Math.max(-42, Math.min(42, HAND.y - HAND.y0)); $('stick').firstChild.style.transform = `translate(${dx}px,${dy}px)`; });
+const lift = e => { if (MODE === 'steer') { const E = PILOT(); if (ARMS && E) ARMS.AR.up(e.pointerId, e.type === 'pointercancel', E.B, ARMS.env, T); return; }
+  if (e.pointerId !== HAND.id) return; const E = PILOT(), now = performance.now(), moved = Math.hypot(HAND.x - HAND.x0, HAND.y - HAND.y0) > 10, quick = now - HAND.t0 < 280;
+  if (E && !moved && quick) { if (!HAND.dbl) HAND.lastTap = now; else HAND.lastTap = -9; if (STEER.scheme === 'tap' && !HAND.dbl) { E.goal = atBell(rayAt(HAND.x, HAND.y), E.B); E.goalHold = false; } }
+  if (E && STEER.scheme === 'drag' && moved && HAND.hist.length > 1) { const a = HAND.hist[0], b = HAND.hist[HAND.hist.length - 1], dt = Math.max(.016, (b.t - a.t) / 1000), r = V3().setFromMatrixColumn(cam.matrixWorld, 0), u = V3().setFromMatrixColumn(cam.matrixWorld, 1);
+    E.B.v.addScaledVector(r, (b.x - a.x) / dt / 600 * STEER.thrust).addScaledVector(u, -(b.y - a.y) / dt / 600 * STEER.thrust); E.B.H.copy(E.B.v).normalize(); E.B.kick = true; E.J.pulse(.6); }
+  HAND.id = null; $('stick').style.display = 'none'; };
+gl.addEventListener('pointerup', lift); gl.addEventListener('pointercancel', lift);
+const typing = e => e.target && /^(TEXTAREA|INPUT|SELECT)$/.test(e.target.tagName);
+addEventListener('keydown', e => { if (typing(e) || MODE !== 'open') return; const k = e.key.toLowerCase(); if ('wasdrf'.includes(k) && k.length === 1) KEYS.add(k); if (k === ' ') { const E = PILOT(); if (E) { E.B.kick = true; if (!E.J.pulse(1)) E.B.kick = false; } e.preventDefault(); } });
+addEventListener('keyup', e => KEYS.delete(e.key.toLowerCase())); addEventListener('blur', () => KEYS.clear());
+function hand() { const E = PILOT(); if (MODE !== 'open' || !E) { HAND.drive = false; return; } const B = E.B, f = cam.getWorldDirection(V3()), r = V3().setFromMatrixColumn(cam.matrixWorld, 0), up = V3(0, 1, 0);
+  if (KEYS.size) { if (!HAND.kb) HAND.kb = {f: f.clone(), r: r.clone()}; f.copy(HAND.kb.f); r.copy(HAND.kb.r); f.y = 0; f.normalize(); const v = V3(); if (KEYS.has('w')) v.add(f); if (KEYS.has('s')) v.sub(f); if (KEYS.has('d')) v.add(r); if (KEYS.has('a')) v.sub(r); if (KEYS.has('r')) v.add(up); if (KEYS.has('f')) v.sub(up); HAND.drive = v.lengthSq() > 0; if (HAND.drive) HAND.want.copy(v.normalize()); return; }
+  if (HAND.id != null && STEER.scheme === 'glide' && (performance.now() - HAND.t0 > 140 || Math.hypot(HAND.x - HAND.x0, HAND.y - HAND.y0) > 10)) { HAND.kb = null; HAND.want.copy(atBell(rayAt(HAND.x, HAND.y), B)).sub(B.p).addScaledVector(f, 1.5); HAND.drive = true; return; }
+  HAND.kb = null; HAND.drive = false; }
+// every body in the water: strokes land on its own beats; with nothing to beat for, the lab nudges its nerve on the score's beat grid
+function bodies(dt) { hand(); const P = PILOT();
+  for (const E of LIVE) { const B = E.B; if (!B) continue; const piloted = E === P && MODE !== 'inspect';
+    if (piloted && HAND.drive) { E.goal = null; B.want.copy(HAND.want); B.drive = true; }
+    else if (E.goal) { const G = typeof E.goal === 'string' ? byName(E.goal) : null, g = G ? posOf(G) : E.goal; if (g && g.isVector3) { B.want.copy(g).sub(B.p); B.drive = B.want.length() > .9; if (!B.drive && !E.goalHold) E.goal = null; } else E.goal = null; }
+    else B.drive = false;
+    const every = (STEER.beats || 2) * 60 / (SC.bpm || 120);
+    if (B.drive && T - B.lastStroke > every && T - E.tryT > .25) { E.tryT = T; B.kick = true; if (!E.J.pulse(1)) B.kick = false; }
+    if (piloted && MODE === 'steer' && ARMS) { B.mode = 'steer'; const o = ARMS.AR.step(dt, T, B, ARMS.env); B.steer(dt, T, STEER, o, WATER); ARMS.draw(); }
+    else { B.mode = 'open'; B.open(dt, T, STEER, WATER); }
+    E.holder.position.copy(B.p); E.holder.quaternion.copy(B.q); } }
+// ---------------------------------------------------------------- the score: PEO text → JSON → the same calls the panels make
+const SC = {tweens: [], text: '', applied: null, score: null, errors: [], t: 0, playing: false, done: false, next: 0, timeline: [], active: [], results: [], marks: {}, caps: [], stepTo: null, dur: 30, aud: null, onsets: null, bpm: 120, off: 0, usesSong: false, src: null, srcKey: null, loading: null, uiT: 0};
+const ONSETS = new Map(), abs = u => { try { return new URL(u, SC.base || location.href).href; } catch (_) { return u; } };
+const ts = x => PEO.toSeconds(x, SC.bpm, SC.off);
+function paintErrs() { const d = $('errs'); if (SC.errors.length) { d.className = ''; d.innerHTML = SC.errors.map(e => `line ${e.line}: ${e.msg.replace(/</g, '&lt;')}`).join('<br>'); } else { d.className = 'ok'; d.textContent = SC.score ? `ok · ${SC.score.cast.length} cast · ${SC.score.ops.length} ops · ${SC.score.ekphrasis.length} ekphrasis · ${SC.score.tests.length} tests` : 'ok'; } }
+function compile(text) { const r = PEO.parse(text); SC.errors = r.errors; SC.parsed = r.score; paintErrs(); return r; }
+function paintTests() { $('tests').innerHTML = SC.results.map(r => `<span class="${r.pass === true ? 'pass' : r.pass === false ? 'fail' : ''}" title="line ${r.line}">${r.pass === true ? '✓' : r.pass === false ? '✗' : '·'} L${r.line} ${r.kind} ${(r.args || []).join(' ')}${r.op ? ' ' + r.op + ' ' + r.rhs : ''}${r.got != null ? ' = ' + r.got : ''}${r.note ? ' (' + r.note + ')' : ''}</span>`).join(''); }
+const num = v => typeof v === 'number' ? v : Array.isArray(v) ? v : isNaN(+v) ? v : +v;
+const vec = v => Array.isArray(v) ? V3(+v[0] || 0, +v[1] || 0, +v[2] || 0) : typeof v === 'string' && v.includes(',') ? V3(...v.split(',').map(Number)) : null;
+function applyLight(L) { if (!L || !Object.keys(L).length) return; if (L.path && PRESETS[L.path]) ORG.set(L.path); else if (L.path) ORG.params.mode = L.path;
+  for (const [k, v] of Object.entries(L)) if (k !== 'path' && k !== 'line' && k in ORG.params) ORG.params[k] = num(v); if ('on' in L) { ORG.on = !!L.on; $('orgOn').classList.toggle('on', ORG.on); } paintOrgan(); }
+function applyCamera(C) { if (!C || !Object.keys(C).length) return; if (C.mode && MODES.includes(C.mode)) setMode(C.mode); const m = {speed: 'spd', ease: 'ease', dist: 'dist', fov: 'fov'};
+  for (const [k, key] of Object.entries(m)) if (C[k] != null) { CAM[key] = +C[k]; const i = $({spd: 'cSpd', ease: 'cEase', dist: 'cDist', fov: 'cFov'}[key]); i.value = CAM[key]; i.oninput(); }
+  if (C.follow) CAM.follow = byName(C.follow); if (C.frame != null) CAM.frameY = C.frame === 'top' ? .55 : C.frame === 'bottom' ? -.5 : C.frame === 'center' ? 0 : +C.frame || 0; if (C.cut) CAM.cut = true; if (C.auto != null) { AUTO.on = !!C.auto; $('auto').classList.toggle('on', AUTO.on); } }
+function applySteer(S) { for (const [k, v] of Object.entries(S || {})) if (k in STEER && k !== 'line') STEER[k] = k === 'current' ? (vec(v) ? arr(vec(v)) : STEER.current) : num(v); }
+async function loadScore(score, o = {}) {
+  const tok = SC.loading = {}; SC.playing = false; if (SC.aud) { SC.aud.pause(); } if (SONG.aud) { SONG.aud.pause(); SONG.on = false; $('play').textContent = 'PLAY'; }
+  for (const E of [...LIVE]) remove(E); PILOT_E = null; ARMS && ARMS.AR.releaseAll(ARMS.env, T);
+  Object.assign(SC, {score, t: 0, done: false, next: 0, active: [], tweens: [], results: [], marks: {}, caps: [], stepTo: null, onsets: null, usesSong: false});
+  const w = score.world || {}; SC.bpm = +w.bpm || 120; SC.off = +w.offset || 0;
+  Object.assign(STEER, STEER_DEFAULTS, {current: [0, 0, 0], beats: 2}); applySteer(w.current != null ? {current: w.current} : {}); applySteer(score.steer);
+  if (w.haze != null) { scene.fog.density = +w.haze; $('haze').value = w.haze; $('hazeV').textContent = w.haze; }
+  for (const c of score.cast) { const E = add(c.jelly, {name: c.name, at: vec(c.at)}); if (!E) { SC.errors.push({line: c.line, msg: `no jelly called "${c.jelly}" (known: ${JELLIES.map(j => j.id).join(', ')})`}); continue; }
+    E.name = c.name; if (c.role) E.role = c.role; if (c.view) E.J.setLook({view: c.view}); if (c.tag === false) E.tag.style.visibility = 'hidden'; }
+  paintLive(); paintErrs();
+  CAM.frameY = 0; applyLight(score.light); applyCamera(score.camera);
+  // the music: a jelly-studio song (its own casting) or any audio file with an onsets file of roles (cast.json form)
+  if (w.song) { SC.usesSong = true; $('song').value = w.song; await loadSong(w.song); if (tok !== SC.loading) return; if (!w.bpm) SC.bpm = SONG.bpm; for (const p of SONG.parts) { const c = score.cast.find(c => c.role === p.role); const E = c && byName(c.name); if (E) p.E = E; } paintCast(); }
+  else if (SONG.G) { $('song').value = ''; await loadSong(''); }
+  if (w.audio) { if (!SC.aud || SC.aud.dataset.src !== abs(w.audio)) { SC.aud = new Audio(abs(w.audio)); SC.aud.dataset.src = abs(w.audio); SC.aud.preload = 'auto'; SC.aud.crossOrigin = 'anonymous'; } } else SC.aud = null;
+  if (w.onsets) { try { const ou = abs(w.onsets); if (!ONSETS.has(ou)) ONSETS.set(ou, await (await fetch(ou)).json()); if (tok !== SC.loading) return; const J = ONSETS.get(ou); SC.onsets = Object.entries(J.roles || {}).map(([role, ev]) => ({role, ev: ev.map(x => Array.isArray(x) ? x[0] : x), next: 0})); if (J.duration) SC.durA = J.duration; }
+    catch (e) { SC.errors.push({line: 0, msg: 'onsets file did not load: ' + w.onsets}); paintErrs(); } }
+  // the timeline
+  const TL = []; score.ekphrasis.forEach(x => TL.push({k: 'e', x, at: ts(x.t), end: x.until ? ts(x.until) : ts(x.t) + 5}));
+  score.ops.forEach(x => TL.push({k: 'o', x, at: ts(x.t), end: x.until ? ts(x.until) : null}));
+  score.tests.forEach((x, i) => { const at = ts(x.t); if (x.until) TL.push({k: 'm', x, at, i}); if (x.from != null) TL.push({k: 'f', x, at: ts(x.from), i}); TL.push({k: 't', x, at: x.until ? ts(x.until) : at, i}); });
+  TL.sort((a, b) => a.at - b.at || 'mfoet'.indexOf(a.k) - 'mfoet'.indexOf(b.k)); SC.timeline = TL;
+  SC.results = score.tests.map(x => ({line: x.line, kind: x.kind, args: x.args, op: x.op, rhs: x.rhs, pass: null, got: null}));
+  SC.dur = Math.max(4, ...TL.map(e => (e.end || e.at)), +w.duration || 0) + .5; if (w.until) SC.dur = ts(w.until); $('scrub').max = SC.dur.toFixed(2);
+  for (const E of LIVE) { E.start = arr(posOf(E)); E.beats0 = E.beats || 0; E.fired = 0; E.refused = 0; }
+  const water = w.water || (score.steer && score.steer.who ? 'open' : 'lab'); setLabMode(water === 'open' || water === 'steer' ? water : 'inspect', score.steer && score.steer.who !== 'you' ? score.steer.who : null);
+  if (water !== 'open' && water !== 'steer' && score.camera && score.camera.mode) applyCamera(score.camera);
+  SC.frameQ = []; SC.streams = new Map(); MEMS.load(score.ops, ts);
+  SC.applied = score; paintTests(); clock(); share(true); return true; }
+// the world adapter the @tests read
+const need = n => { const E = byName(n); if (!E) throw new Error(`no "${n}" in the water`); return E; };
+const W = {pos: n => arr(posOf(need(n))), start: n => need(n).start, mark(n, key) { const k = n + '|' + key, E = need(n); if (key.startsWith('from:')) return SC.marks[k] || E.start; const m = SC.marks[k] || E.start; SC.marks[k] = arr(posOf(E)); return m; },
+  beats: n => (need(n).beats || 0) - (need(n).beats0 || 0), rate: n => need(n).J.state().rate, fired: n => { const E = need(n), all = E.fired + E.refused; return all ? E.fired / all : 0; },
+  visible: n => { const p = need(n).J.state().com.project(cam); return p.z < 1 && Math.abs(p.x) < 1 && Math.abs(p.y) < 1; }, fps: () => fps, ui: () => document.body.classList.contains('cinema') ? 'hidden' : 'shown'};
+function run(op, ent) { const a = op.args || [], E = a[0] ? byName(a[0]) : null;
+  try { switch (op.verb) {
+    case 'pulse': if (E) { const ok = E.J.pulse(+op.k || 1); if (ok) E.fired++; else E.refused++; } break;
+    case 'swim': if (E) { ensureBody(E); E.goal = typeof op.to === 'string' && !op.to.includes(',') ? op.to : vec(op.to) || vec(a[1]); E.goalHold = !!ent.end; if (ent.end) SC.active.push({end: ent.end, done: () => { if (E.goal) E.goal = null; }}); } break;
+    case 'steer': applySteer(op); if (E) { PILOT_E = E; setLabMode(MODE === 'inspect' ? 'open' : MODE, E.name); if (op.to) run({...op, verb: 'swim'}, ent); } break;
+    case 'view': if (E) E.J.setLook({view: a[1] || op.as || 'flesh'}); break;
+    case 'film': if (E && E.J.kind !== 'real') { const F = filmTexture(THREE, abs(op.src), {loop: op.loop !== false}); F.ready.then(() => { if (op.from) try { F.video.currentTime = +op.from; } catch (_) {} fitFilm(E.J, F); E.J.setFilm(F.tex, F.aspect); }); if (E.F) E.F.dispose(); E.F = F; if (ent.end) SC.active.push({end: ent.end, done: () => run({verb: 'clear', args: [a[0]]}, {})}); } break;
+    case 'clear': if (E && E.F) { try { E.J.setFilm(null); } catch (_) {} E.F.dispose(); E.F = null; } break;
+    case 'camera': { const to = op.to; applyCamera({mode: a[0], ...op, follow: op.follow}); if (ent.end && to != null && !isNaN(+to)) SC.tweens.push({a: ent.at, b: ent.end, from: CAM.dist, to: +to, set: v => { CAM.dist = v; }}); } break;
+    case 'light': applyLight({path: a[0], ...op}); break;
+    case 'say': SC.caps.push({text: op.text || a.join(' '), from: ent.at, to: ent.end || ent.at + 4}); break;
+    case 'mode': setLabMode(a[0], a[1]); break;
+    case 'set': for (const [k, v] of Object.entries(op)) { if (!k.includes('.')) continue; const [n, ctl] = k.split('.'), J = byName(n); if (!J) continue; const c = J.J.controls.find(c => c.kind === 'range' && c.label.toLowerCase().includes(ctl.toLowerCase()));
+      if (c) c.set(+v); else if (ctl in STEER) STEER[ctl] = num(v); if (SEL === J) paintInsp(); } break;
+    case 'current': STEER.current = arr(vec(a[0] ?? op.v) || V3()); break;
+    case 'haze': scene.fog.density = +a[0]; break;
+    case 'memory': case 'condense': case 'bloom': case 'keep': case 'release': case 'stream': break; } } catch (e) { console.warn('op', op.line, e); } }
+function fire(ent) { const x = ent.x;
+  if (ent.k === 'e') SC.caps.push({text: x.text, from: ent.at, to: ent.end});
+  else if (ent.k === 'o') run(x, ent);
+  else if (ent.k === 'm' && x.kind === 'streamed') { SC.streams.set(x.line, {id: x.args[0], sec: 0}); }
+  else if (ent.k === 'm' && PEO.MEMORY_TESTS.includes(x.kind)) {}
+  else if (ent.k === 'm') { try { W.mark(x.args[0], 'dir'); } catch (_) {} SC.marks[x.args[0] + '|from:' + x.t] = W.pos(x.args[0]); }
+  else if (ent.k === 'f') { try { SC.marks[x.args[0] + '|from:' + x.from] = W.pos(x.args[0]); } catch (_) {} }
+  else if (ent.k === 't' && (PEO.MEMORY_TESTS.includes(x.kind) || x.kind === 'inbox')) SC.frameQ.push(ent);
+  else if (ent.k === 't') { const t = x.until && x.kind === 'moved' && x.from == null ? {...x, from: x.t} : x; SC.results[ent.i] = PEO.evalTest(t, W); paintTests(); } }
+function entrain(t) { if (!SC.onsets) return; for (const R of SC.onsets) { const who = LIVE.filter(E => E.role === R.role); while (R.next < R.ev.length && R.ev[R.next] <= t) { const at = R.ev[R.next++]; if (t - at > .25) continue;
+  for (const E of who) { if (E.muted) continue; const ok = E.J.pulse(1); if (ok) E.fired++; else E.refused++; } } } }
+function clock() { $('sClock').textContent = `${SC.t.toFixed(2)} / ${SC.dur.toFixed(1)} s · beat ${Math.max(0, Math.floor((SC.t - SC.off) * SC.bpm / 60))}${SC.done ? ' · done' : SC.playing ? ' · playing' : ''}`; $('scrub').value = SC.t; $('sPlay').textContent = SC.playing ? 'PAUSE' : 'PLAY'; }
+function scoreStep(dt) { if (!SC.score) return;
+  if (SC.playing) { const A = SC.aud && !Q.has('test') && !SC.aud.paused ? SC.aud : SC.usesSong && SONG.on && SONG.aud && !Q.has('test') ? SONG.aud : null; SC.t = A ? A.currentTime : SC.t + dt;
+    while (SC.next < SC.timeline.length && SC.timeline[SC.next].at <= SC.t) fire(SC.timeline[SC.next++]);
+    SC.tweens = SC.tweens.filter(w => { const u = Math.min(1, (SC.t - w.a) / Math.max(.001, w.b - w.a)); w.set(w.from + (w.to - w.from) * u * u * (3 - 2 * u)); return u < 1; });
+    SC.active = SC.active.filter(a => { if (SC.t >= a.end) { a.done(); return false; } return true; });
+    entrain(SC.t); if (SC.stepTo != null && SC.t >= SC.stepTo) { SC.stepTo = null; pause(); }
+    if (SC.t >= SC.dur) { pause(); SC.done = true; while (SC.next < SC.timeline.length) fire(SC.timeline[SC.next++]); } }
+  const cap = SC.caps.filter(c => SC.t >= c.from && SC.t < c.to).pop(); const el = $('cap'); if (cap) { if (el.textContent !== cap.text) el.textContent = cap.text; el.classList.add('on'); } else el.classList.remove('on');
+  if ((SC.uiT += dt) > .2) { SC.uiT = 0; clock(); } }
+function audioAt(t) { const A = SC.aud || (SC.usesSong ? SONG.aud : null); if (!A || Q.has('test')) return; try { A.currentTime = t; } catch (_) {} if (SC.playing) { audio(); A.play().catch(() => {}); if (A === SONG.aud) SONG.on = true; } else { A.pause(); if (A === SONG.aud) SONG.on = false; } }
+function play() { if (!SC.score) return; if (SC.done) { seek(0).then(play); return; } audio(); SC.playing = true; audioAt(SC.t); clock(); }
+function pause() { SC.playing = false; audioAt(SC.t); clock(); }
+async function seek(t) { if (!SC.score) return; const was = SC.playing; await loadScore(SC.score); t = Math.max(0, Math.min(SC.dur, t)); SC.t = t; SC.scrubbed = t > 0;
+  while (SC.next < SC.timeline.length && SC.timeline[SC.next].at <= t) { const ent = SC.timeline[SC.next++]; if (ent.k === 't') SC.results[ent.i] = {...SC.results[ent.i], pass: null, note: 'scrubbed past'}; else if (ent.k !== 'm' && ent.k !== 'f') fire(ent); }
+  for (const E of LIVE) { E.start = arr(posOf(E)); E.beats0 = E.beats || 0; } if (SC.onsets) for (const R of SC.onsets) { R.next = 0; while (R.next < R.ev.length && R.ev[R.next] <= t) R.next++; }
+  paintTests(); if (was) play(); else clock(); }
+async function apply() { const r = compile($('peo').value); if (r.errors.length) return false; SC.text = $('peo').value; await loadScore(r.score); return true; }
+function currentScore() {
+  const S = SC.applied ? JSON.parse(JSON.stringify(SC.applied)) : {version: PEO.VERSION, prompt: '', world: {}, cast: [], light: {}, camera: {}, steer: {}, ekphrasis: [], ops: [], tests: [], sources: []};
+  const used = new Set(); for (const E of LIVE) { let n = E.name || E.id.replace(/[^\w-]/g, ''), i = 2; if (!E.name) { while (used.has(n) || LIVE.some(x => x !== E && x.name === n)) n = E.id + i++; E.name = n; } used.add(n); }
+  const old = new Map((S.cast || []).map(c => [c.name, c]));
+  S.cast = LIVE.map(E => { const c = {name: E.name, jelly: E.id}, o = old.get(E.name) || {}; for (const [k, v] of Object.entries(o)) if (!['name', 'jelly', 'line', 'at'].includes(k)) c[k] = v; c.at = arr(E.holder.position).map(v => +v.toFixed(2)); if (E.role) c.role = E.role; return c; });
+  S.world = {...S.world, water: MODE === 'inspect' ? 'lab' : MODE, haze: +scene.fog.density.toFixed(4)}; if (SC.bpm !== 120 || S.world.bpm) S.world.bpm = SC.bpm; if (STEER.current.some(v => v)) S.world.current = STEER.current.slice(); else delete S.world.current;
+  if (SONG.G && SONG.id) S.world.song = SONG.id; else delete S.world.song;
+  S.light = {path: ORG.params.mode}; for (const [k] of OKNOB.slice(1)) S.light[k] = +(+ORG.params[k]).toFixed(4); if (!ORG.on) S.light.on = false;
+  S.camera = {mode: CAM.mode, speed: +CAM.spd.toFixed(2), ease: +CAM.ease.toFixed(2), dist: +CAM.dist.toFixed(2), fov: Math.round(CAM.fov)}; if (CAM.follow && LIVE.includes(CAM.follow)) S.camera.follow = CAM.follow.name; if (AUTO.on) S.camera.auto = true;
+  if (MODE !== 'inspect' || Object.keys(S.steer || {}).length) { S.steer = {}; if (PILOT()) S.steer.who = PILOT().name; for (const k of ['scheme', 'thrust', 'turn', 'drag', 'grav', 'reach', 'arms', 'beats']) S.steer[k] = STEER[k]; }
+  return S; }
+// score panel
+let parseT = 0; $('peo').addEventListener('input', () => { clearTimeout(parseT); parseT = setTimeout(() => compile($('peo').value), 220); });
+$('peo').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Tab') { e.preventDefault(); document.execCommand('insertText', false, '  '); } if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { apply().then(ok => ok && play()); } });
+$('sApply').onclick = () => apply();
+$('sPlay').onclick = async () => { if (SC.playing) { pause(); return; } if (!SC.score || $('peo').value !== SC.text) { if (!await apply()) return; } play(); };
+$('sStop').onclick = () => { pause(); seek(0); };
+$('sStep').onclick = async () => { if (!SC.score || $('peo').value !== SC.text) { if (!await apply()) return; } SC.stepTo = SC.t + 60 / SC.bpm; SC.playing = true; clock(); };
+$('scrub').oninput = () => { SC.t = +$('scrub').value; clock(); }; $('scrub').onchange = () => seek(+$('scrub').value);
+$('sFrom').onclick = () => { $('peo').value = PEO.serialize(currentScore()); compile($('peo').value); };
+const b64 = t => btoa(unescape(encodeURIComponent(t))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''), unb64 = s => decodeURIComponent(escape(atob(s.replace(/-/g, '+').replace(/_/g, '/'))));
+const flash = (id, txt) => { const b = $(id), o = b.textContent; b.textContent = txt; setTimeout(() => b.textContent = o, 1200); };
+$('sCopy').onclick = () => { const t = PEO.serialize(currentScore()); navigator.clipboard?.writeText(t).then(() => flash('sCopy', 'COPIED'), () => flash('sCopy', 'COPY FAILED')); window.__lastCopy = t; };
+$('sLink').onclick = () => { const u = new URL(location.href); u.search = '?s=' + b64($('peo').value); navigator.clipboard?.writeText(u.href).then(() => flash('sLink', 'COPIED'), () => {}); window.__lastLink = u.href; };
+async function loadText(text) { $('peo').value = text; const r = compile(text); if (r.errors.length) return false; SC.text = text; await loadScore(r.score); return true; }
+
+// ---------------------------------------------------------------- film memories and the cold read
+const MEMS = makeMemories(THREE, {scene, cam, low: LOW, byName, posOf, abs});
+SC.frameQ = []; SC.streams = new Map();
+function memVideo(m, ct) { const v = m.video; if (!v || REC) return; const want = Math.max(0, Math.min((v.duration || 1e9) - .05, ct));
+  if (Q.has('test') || !SC.playing) { if (!v.paused) v.pause(); if (Math.abs(v.currentTime - want) > (Q.has('test') ? .12 : .06) && !v.seeking) v.currentTime = want; return; }
+  if (v.paused && (m.panel.visible || m.fl.visible)) v.play().catch(() => {}); if (Math.abs(v.currentTime - want) > .3 && !v.seeking) v.currentTime = want; }
+// captions drawn into the picture itself (recording, or ?caps3d): the lower band, under every bloom
+const CAP3 = (() => { if (!REC && !Q.has('caps3d')) return null; const c = document.createElement('canvas'); c.width = 1600; c.height = 160; const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({map: tex, transparent: true, toneMapped: false, fog: false, depthTest: false, depthWrite: false})); m.renderOrder = 30; m.frustumCulled = false; scene.add(m); $('cap').style.display = 'none'; return {c, g: c.getContext('2d'), tex, m, text: null}; })();
+function cap3d() { if (!CAP3) return; const cap = SC.caps.filter(c => SC.t >= c.from && SC.t < c.to).pop(), text = cap ? cap.text : '';
+  if (text !== CAP3.text) { CAP3.text = text; const {g, c} = CAP3; g.clearRect(0, 0, c.width, c.height); if (text) { g.font = 'italic 54px Georgia, "DejaVu Serif", serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.shadowColor = '#000'; g.shadowBlur = 14; g.fillStyle = '#f3ead8'; g.fillText(text, c.width / 2, c.height / 2, c.width - 40); } CAP3.tex.needsUpdate = true; }
+  const d = 2, H = 2 * d * Math.tan(cam.fov * Math.PI / 360), Wf = H * cam.aspect, f = cam.getWorldDirection(V3()), u = V3().setFromMatrixColumn(cam.matrixWorld, 1);
+  CAP3.m.visible = !!text; CAP3.m.position.copy(cam.position).addScaledVector(f, d).addScaledVector(u, (-1 + CAPTION_BAND) * H / 2); CAP3.m.quaternion.copy(cam.quaternion); CAP3.m.scale.set(Wf * .9, Wf * .9 / 10, 1); }
+// cold reads: render the frame, render a clean plate without the thing, and measure the difference (320 × 180)
+const MW = 320, MH = 180, MC = document.createElement('canvas'); MC.width = MW; MC.height = MH; const MG = MC.getContext('2d', {willReadFrequently: true});
+const grab = () => { comp.render(); MG.drawImage(R.domElement, 0, 0, MW, MH); return MG.getImageData(0, 0, MW, MH).data; };
+function plate(hide) { const A = grab(), un = hide(), B = grab(); un(); grab(); const M = new Uint8Array(MW * MH); let n = 0;
+  for (let i = 0; i < MW * MH; i++) { const k = i * 4, d = Math.abs(A[k] - B[k]) + Math.abs(A[k + 1] - B[k + 1]) + Math.abs(A[k + 2] - B[k + 2]); if (d > 42) { M[i] = 1; n++; } } return {A, M, n}; }
+// rows count only when they carry a real share of the thing (a quarter of its widest row): glow fringes and stray pixels do not
+function bbox(M, minRow = 3) { const rows = new Int32Array(MH); let mx = 0; for (let y = 0; y < MH; y++) { let c = 0; for (let x = 0; x < MW; x++) c += M[y * MW + x]; rows[y] = c; mx = Math.max(mx, c); }
+  const need = Math.max(minRow, mx * .25); let y0 = -1, y1 = -1, x0 = MW, x1 = -1; for (let y = 0; y < MH; y++) { if (rows[y] < need) continue; if (y0 < 0) y0 = y; y1 = y; for (let x = 0; x < MW; x++) if (M[y * MW + x]) { if (x < x0) x0 = x; if (x > x1) x1 = x; } } return y0 < 0 ? null : {x0, x1, y0, y1}; }
+const hideMem = (id, part) => () => { const m = MEMS.MEM.get(id); if (!m) throw new Error(`no memory "${id}"`); const a = m.panel.visible, b = m.fl.visible; if (part !== 'fl') m.panel.visible = false; if (part !== 'panel') m.fl.visible = false; return () => { m.panel.visible = a; m.fl.visible = b; }; };
+const hideJelly = n => () => { const E = need(n); E.holder.visible = false; return () => { E.holder.visible = true; }; };
+const boxOf = name => { const r = MEMS.MEM.has(name) ? plate(hideMem(name, 'panel')) : plate(hideJelly(name)), b = bbox(r.M, 2); if (!b) return null; const ex = (b.x1 - b.x0) * .12 + 3, ey = (b.y1 - b.y0) * .12 + 3; return {x0: b.x0 - ex, x1: b.x1 + ex, y0: b.y0 - ey, y1: b.y1 + ey}; };
+const shareIn = (M, b) => { let all = 0, inn = 0; for (let y = 0; y < MH; y++) for (let x = 0; x < MW; x++) if (M[y * MW + x]) { all++; if (b && x >= b.x0 && x <= b.x1 && y >= b.y0 && y <= b.y1) inn++; } return all < 8 ? 0 : inn / all; };
+function measure(kind, args) {
+  if (kind === 'bloomh' || kind === 'bloomb' || kind === 'coverage' || kind === 'legible') { const r = plate(hideMem(args[0], 'panel')), b = bbox(r.M, 6);
+    if (kind === 'coverage') return r.n / (MW * MH); if (!b) return 0; if (kind === 'bloomh') return (b.y1 - b.y0 + 1) / MH; if (kind === 'bloomb') return (MH - 1 - b.y1) / MH;
+    let s = 0, s2 = 0, n = 0; for (let i = 0; i < MW * MH; i++) if (r.M[i]) { const k = i * 4, L = (r.A[k] * .2126 + r.A[k + 1] * .7152 + r.A[k + 2] * .0722) / 255; s += L; s2 += L * L; n++; } return n ? Math.sqrt(Math.max(0, s2 / n - (s / n) ** 2)) : 0; }
+  if (kind === 'flecks') { const r = plate(hideMem(args[0], 'fl')), b = boxOf(args[2]); return shareIn(r.M, b); }
+  if (kind === 'fleckpx') return plate(hideMem(args[0], 'fl')).n;
+  if (kind === 'inbox') { const r = plate(hideJelly(args[0])), [x0, y0, x1, y1] = String(args[1]).split(',').map(Number); return shareIn(r.M, {x0: x0 * MW, y0: y0 * MH, x1: x1 * MW, y1: y1 * MH}); }
+  throw new Error('unknown measure ' + kind); }
+W.frame = (kind, args) => measure(kind, args);
+W.streamed = t => { const s = SC.streams.get(t.line); return s ? +s.sec.toFixed(3) : 0; };
+function afterRender(dt) { if (!SC.score) return;
+  for (const [line, s] of SC.streams) { if (s.done) continue; try { if (measure('fleckpx', [s.id]) > 25) s.sec += dt; } catch (_) {} }
+  while (SC.frameQ.length) { const ent = SC.frameQ.shift(); const x = ent.x; if (x.kind === 'streamed') { const s = SC.streams.get(x.line); if (s) s.done = true; } SC.results[ent.i] = PEO.evalTest(x, W); paintTests(); } }
+// ---------------------------------------------------------------- start
+(Q.get('j') ? Q.get('j').split(',') : (LOW ? ['realjelly', 'medusa', 'sentinel'] : ['realjelly', 'thinkjelly', 'medusa', 'sentinel', 'celluloid', 'mantle'])).forEach(id => add(id));
+if (Q.get('sel') != null && LIVE[+Q.get('sel')]) select(LIVE[+Q.get('sel')]); if (Q.has('cinema')) cinema(true); if (Q.has('letter')) document.body.classList.add('letter');
+if (Q.get('film')) { const F = filmTexture(THREE, Q.get('film')); F.ready.then(() => { for (const E of LIVE) if (E.J.kind !== 'real') { fitFilm(E.J, F); E.J.setFilm(F.tex, F.aspect); } window.__film = F; }); }
+const SKIP = Q.has('test') ? +(Q.get('skip') || 0) : 0; let frameN = 0, last = performance.now(), acc = 0, T = 0, fpsS = 0, fpsN = 0, fps = 60; const LOOKS = new Map();
+function frame(now) { requestAnimationFrame(frame); if (REC) { last = now; return; } const raw = Math.min(.1, (now - last) / 1000); if (CAP30 && raw < 1 / 31) return; last = now; const dt = Q.has('test') ? 1 / 30 : raw; fpsS += raw; fpsN++; if (fpsS > 1) { fps = fpsN / fpsS; fpsS = 0; fpsN = 0; if (!CAP30 && fps < 28 && R.getPixelRatio() > 1) { R.setPixelRatio(Math.max(1, R.getPixelRatio() - .2)); comp.setPixelRatio(R.getPixelRatio()); } }
+  simulate(dt, raw); present(dt); }
+function simulate(dt, raw) { T += dt;
+  scoreStep(dt); orchestra(); ORG.update(T, dt); autoCut(dt); bodies(dt); WATER.update(T, cam);
+  const ps = innerHeight * R.getPixelRatio() * .0095;
+  for (const E of LIVE) { const near = ORG.on ? ORG.nearest(E.J.state().com) : 9; E.J.setLook({glow: Math.max(0, 1.2 - near / 2.2) * ORG.params.intensity * .6}); E.J.update({t: T, dt, cam: cam.position, camObj: cam, light: lamp.position, glow: .15, scale: ps * (E.J.kind === 'real' ? 1 : 1.05), drive: true}); }
+  { const P = SNOW.P; for (let i = 1; i < SNOW.n * 3; i += 3) { P[i] -= dt * .12; if (P[i] < -20) P[i] = 20; } SNOW.p.geometry.attributes.position.needsUpdate = true; }
+  camera(dt); if (SC.score) MEMS.update(SC.t, memVideo); cap3d();
+  for (const E of LIVE) { const p = E.J.state().com.project(cam); const vis = p.z < 1 && Math.abs(p.x) < 1.1 && Math.abs(p.y) < 1.1; E.tag.style.display = vis && !$('clean').classList.contains('on') ? '' : 'none'; E.tag.style.left = ((p.x + 1) / 2 * innerWidth) + 'px'; E.tag.style.top = ((1 - p.y) / 2 * innerHeight) + 'px'; }
+  if (document.body.classList.contains('cinema')) { glyphT += raw; if (glyphT > 2.5) document.body.classList.add('still'); }
+  if (shareT > 0 && (shareT -= raw) <= 0) share();
+  $('st').textContent = `${LIVE.length} jellies · ${Math.round(fps)} fps${SONG.on ? ` · ${SONG.bpm} bpm` : ''}${SEL ? ` · ${SEL.J.name.replace(/^The /, '')} ${Math.round(SEL.J.state().rate)} beats/min` : ''}`;
+  { let cover = 0; if (PHONE()) document.querySelectorAll('.panel.open').forEach(o => { const r = o.getBoundingClientRect(); cover = Math.max(cover, innerHeight - r.top); });
+    const off = Math.round(Math.min(cover, innerHeight * .5) * .5);
+    if (off !== (cam._off || 0)) { cam._off = off; if (off) cam.setViewOffset(innerWidth, innerHeight, 0, off, innerWidth, innerHeight); else cam.clearViewOffset(); } }
+  }
+function present(dt, force) { const due = SC.frameQ.length || SC.streams.size; if (force || due || !SKIP || ++frameN % SKIP === 0) comp.render(); afterRender(dt); }
+// the recorder's frame: simulate one fixed step, wait for every memory film to reach its clip time, render, measure
+async function recStep(dt) { simulate(dt, dt); await MEMS.sync(); present(dt, true); return SC.t; }
+requestAnimationFrame(frame);
+window.__lab = {recStep, seek, play, pause, MEMS, measure, ARMS_STATE: () => ARMS ? ARMS.AR.arms.map(a => a.mode) : null, LIVE, ORG, SONG, CAM, AUTO, add, remove, select, cinema, scene, cam, THREE, R, comp, camera, T: () => T, PEO, SC, STEER, WATER, setLabMode, PILOT, byName, loadScore, currentScore, keys: KEYS, mode: () => MODE, fps: () => fps};
+// boot: a score in the URL (?score=<url> or ?s=<base64 text>), else the panels written as a score; ?mode=open|steer enters a mode
+(async () => { let text = null;
+  if (Q.get('s')) { try { text = unb64(Q.get('s')); SC.srcKey = 's'; SC.src = Q.get('s'); } catch (e) { SC.errors = [{line: 0, msg: 'the ?s= score is not valid base64'}]; paintErrs(); } }
+  else if (Q.get('score')) { try { const r = await fetch(Q.get('score')); if (!r.ok) throw new Error(r.status); text = await r.text(); SC.srcKey = 'score'; SC.src = Q.get('score'); SC.base = r.url; } catch (e) { SC.errors = [{line: 0, msg: 'could not load ' + Q.get('score')}]; paintErrs(); } }
+  if (text != null) { const ok = await loadText(text); if (!Q.has('cinema') && !PHONE()) openPanel('pS'); if (ok && Q.has('play')) play(); }
+  else { if (Q.get('mode')) setLabMode(Q.get('mode')); $('peo').value = PEO.serialize(currentScore()); compile($('peo').value); }
+  window.__lab.ready = true; })();
+</script>
+</body>
+</html>

@@ -182,7 +182,7 @@ const MKN = 48 + 16 + 30, markPts = pts(geoOf({position: [new Float32Array(MKN *
 let rig = null; const body = new THREE.Group(); scene.add(body);
 const setRig = id => { if (rig) { body.remove(rig.group); rig.dispose(); } RID = id; rig = makeRig(THREE, id); rig.group.scale.setScalar(rig.norm * 1.5); body.add(rig.group); try { localStorage.setItem('cj-rig', id); } catch (e) {} };
 setRig(RID);
-$('rigs').innerHTML = `YOUR JELLY · ${RIGS.map(r => `<button data-rig="${r.id}" class="${r.id === RID ? 'on' : ''}">${r.name.replace(/^The /, '')}</button>`).join('')} · <a href="../current/drift/characters.html?rig=${RID}&next=${encodeURIComponent('../../bonus/sea.html')}">try them in the tank →</a>`;
+$('rigs').innerHTML = `YOUR JELLY · ${RIGS.map(r => `<button data-rig="${r.id}" class="${r.id === RID ? 'on' : ''}">${r.name.replace(/^The /, '')}</button>`).join('')} · <a href="../current/drift/characters.html?rig=${RID}&next=${encodeURIComponent('../../bonus/sea.html')}">try them in the tank →</a> · <a href="lab.html?score=scores/open-water.peo">open in the Lab →</a>`;
 $('rigs').querySelectorAll('button').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); setRig(b.dataset.rig); $('rigs').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); }));
 const UP = new THREE.Vector3(0, 1, 0);
 const J = {p: new THREE.Vector3(SITES[4].x + 22, 0, SITES[4].z + 36), v: new THREE.Vector3(), dir: new THREE.Vector3(0, 0, -1), ph: .9, lastStroke: -9, interval: .84, kick: 0, boost: 0, got: 0, seen: new Set(), alt: 10, goal: null, trail: []};

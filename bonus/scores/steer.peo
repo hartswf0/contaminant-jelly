@@ -1,0 +1,17 @@
+# STEER LAB · an experiment: the same strokes in a thin sea, then in a thick one
+@prompt does the same bell go as far when the water thickens?
+@world steer bpm=120
+@cast glass:glass at=0,1,0
+@steer glass thrust=3 drag=0.9 grav=0.25 reach=8.5 arms=6
+@ekphrasis 0s..5s "the steer lab: no finger holds an arm, so the bell can only beat, sink and right itself; touch a stone to give it an arm"
+@op 1s pulse glass
+@op 2s pulse glass
+@op 3s pulse glass
+@op 6s set glass.drag=4
+@ekphrasis 6s..11s "now the water is four times as thick"
+@op 7s pulse glass
+@op 8s pulse glass
+@op 9s pulse glass
+@test 0s..5s moved glass > 0.8
+@test 6s..11s moved glass < 2
+@test 11s beats glass >= 6
