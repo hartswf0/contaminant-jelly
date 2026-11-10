@@ -184,6 +184,319 @@
 "sub_G": "SUB G (new)",
 "hiss": "AIR (new)",
 "riser": "RISER (new)"
+},
+"s01-cut-answers": {
+"phrase2": "Parchman Hollow Square 1:01.34",
+"tick2": "Subterranean Dreams 0:19.91",
+"kick2": "Heavy Weather in the Boiler Room 2:58.15",
+"snare2": "The Presto Disc & The Hollow-Square Field Engine 0:26.80",
+"hat2": "Subterranean Dreams 0:02.28",
+"bass2": "Steppe Telegraph & The 6,500-Voice Lavender Shanty 1:49.18"
+},
+"s02-three-clocks": {
+"choir4": "Hollow Square Roar-Brute 0:48.72",
+"choir3": "Hollow Square Roar-Brute 1:47.66",
+"kick3": "Cathedral Dub Vigil 0:02.25",
+"snare3": "Subterranean Dreams 0:23.97",
+"hat1": "Subterranean Dreams 0:18.55",
+"bass3": "Blown-Out Sanctuary 1:59.95"
+},
+"s03-wrong-turn": {
+"texture1": "Choral-First Motorik 1:25.38",
+"tick4": "Cathedral Dub Vigil 0:09.23",
+"bed1": "Steppe Telegraph & The 6,500-Voice Lavender Shanty 2:27.77",
+"random1": "Capsae in Tergo Meo 0:51.23",
+"kick4": "Boxes on My Back 0:07.98",
+"snare1": "The Cathedral of Tape Echo 0:54.55",
+"hat2": "Subterranean Dreams 0:02.28"
+},
+"s04-floor-plan": {
+"bass2": "Steppe Telegraph & The 6,500-Voice Lavender Shanty 1:49.18",
+"tail1": "Echoes of the Black Chapel 2:30.32",
+"kick1": "Trap-Tox & Cardboard 1:07.11",
+"snare2": "The Presto Disc & The Hollow-Square Field Engine 0:26.80",
+"tail2": "The Cathedral of Tape Echo 2:31.84",
+"bed2": "Grand Opera Chorus & Dub-Mud Catacomb 1:15.88"
+},
+"s05-threshold": {
+"choir2": "Hollow Square Roar-Brute 0:41.62",
+"kick2": "Heavy Weather in the Boiler Room 2:58.15",
+"snare3": "Subterranean Dreams 0:23.97",
+"bass3": "Blown-Out Sanctuary 1:59.95"
+},
+"s06-room-document": {
+"choir1": "Hollow Square Roar-Brute 0:10.12",
+"bed1": "Steppe Telegraph & The 6,500-Voice Lavender Shanty 2:27.77",
+"kick3": "Cathedral Dub Vigil 0:02.25",
+"hole1": "The Ancient-Chant Singularity 0:04.54",
+"bass1": "Boxes 2:57.83"
+},
+"s07-sentence-chorus": {
+"choir3": "Hollow Square Roar-Brute 1:47.66",
+"breath2": "Boxes on My Back 1:06.33",
+"phrase9": "Steppe Telegraph & The 6,500-Voice Lavender Shanty 0:01.83",
+"kick4": "Boxes on My Back 0:07.98",
+"snare2": "The Presto Disc & The Hollow-Square Field Engine 0:26.80",
+"hat2": "Subterranean Dreams 0:02.28",
+"bass2": "Steppe Telegraph & The 6,500-Voice Lavender Shanty 1:49.18"
+},
+"s08-rule": {
+"quiet2": "Choral-First Motorik 2:21.73",
+"tail2": "The Cathedral of Tape Echo 2:31.84",
+"glide2": "Brutus Protocol 1:24.71",
+"tail3": "Boxes on My Back 2:46.14",
+"quiet1": "Parchman Hollow Square 1:02.00",
+"glide1": "Sunbaked Field Chant 1:40.68",
+"tail4": "Chiral Cargo & The Rope-Not-Stick Choir 1:28.78"
+},
+"s09-narrator": {
+"bed2": "Grand Opera Chorus & Dub-Mud Catacomb 1:15.88",
+"choir3": "Hollow Square Roar-Brute 1:47.66",
+"tick5": "Sirens, Part 2 0:23.68",
+"phrase3": "Echoes of the Black Chapel 1:57.34",
+"kick2": "Heavy Weather in the Boiler Room 2:58.15",
+"snare1": "The Cathedral of Tape Echo 0:54.55",
+"hat2": "Subterranean Dreams 0:02.28",
+"bass1": "Boxes 2:57.83",
+"texture1": "Choral-First Motorik 1:25.38"
+},
+"s10-audible-past": {
+"choir3": "Hollow Square Roar-Brute 1:47.66",
+"glide1": "Sunbaked Field Chant 1:40.68",
+"kick3": "Cathedral Dub Vigil 0:02.25",
+"snare2": "The Presto Disc & The Hollow-Square Field Engine 0:26.80",
+"hat1": "Subterranean Dreams 0:18.55",
+"bass2": "Steppe Telegraph & The 6,500-Voice Lavender Shanty 1:49.18"
+},
+"s11-one-breath": {
+"phrase6": "Blown-Out Sanctuary 2:31.60",
+"phrase7": "HUNH! (92 BPM Field Clock) 1:37.48",
+"choir2": "Hollow Square Roar-Brute 0:41.62",
+"breath3": "Boxes on My Back 0:46.95"
+},
+"s12-landscape": {
+"texture2": "BUH-BOX _ -CK! (80 Voices as Drum Kit) 0:56.26",
+"phrase9": "Steppe Telegraph & The 6,500-Voice Lavender Shanty 0:01.83",
+"tick3": "Boxes On My Back 0:04.98",
+"glide1": "Sunbaked Field Chant 1:40.68",
+"kick1": "Trap-Tox & Cardboard 1:07.11",
+"snare1": "The Cathedral of Tape Echo 0:54.55",
+"bass1": "Boxes 2:57.83"
+},
+"s13-missing-downbeat": {
+"kick2": "Heavy Weather in the Boiler Room 2:58.15",
+"tick4": "Cathedral Dub Vigil 0:09.23",
+"breath2": "Boxes on My Back 1:06.33",
+"phrase2": "Parchman Hollow Square 1:01.34"
+},
+"s14-clothes": {
+"choir3": "Hollow Square Roar-Brute 1:47.66",
+"glide2": "Brutus Protocol 1:24.71",
+"tick2": "Subterranean Dreams 0:19.91",
+"kick3": "Cathedral Dub Vigil 0:02.25",
+"snare3": "Subterranean Dreams 0:23.97",
+"hat1": "Subterranean Dreams 0:18.55",
+"bass3": "Blown-Out Sanctuary 1:59.95",
+"kick4": "Boxes on My Back 0:07.98",
+"snare1": "The Cathedral of Tape Echo 0:54.55",
+"hat2": "Subterranean Dreams 0:02.28"
+},
+"s15-understatement": {
+"bed3": "Boxes on My Back 1:30.86",
+"kick4": "Boxes on My Back 0:07.98",
+"snare1": "The Cathedral of Tape Echo 0:54.55",
+"hat2": "Subterranean Dreams 0:02.28",
+"choir2": "Hollow Square Roar-Brute 0:41.62",
+"tick4": "Cathedral Dub Vigil 0:09.23"
+},
+"s16-scene-cut": {
+"texture1": "Choral-First Motorik 1:25.38",
+"kick1": "Trap-Tox & Cardboard 1:07.11",
+"snare2": "The Presto Disc & The Hollow-Square Field Engine 0:26.80",
+"hat1": "Subterranean Dreams 0:18.55",
+"bed3": "Boxes on My Back 1:30.86",
+"kick2": "Heavy Weather in the Boiler Room 2:58.15",
+"snare3": "Subterranean Dreams 0:23.97",
+"hat2": "Subterranean Dreams 0:02.28",
+"bass2": "Steppe Telegraph & The 6,500-Voice Lavender Shanty 1:49.18",
+"glide1": "Sunbaked Field Chant 1:40.68",
+"kick3": "Cathedral Dub Vigil 0:02.25"
+},
+"s17-room-for-voice": {
+"choir4": "Hollow Square Roar-Brute 0:48.72",
+"bass3": "Blown-Out Sanctuary 1:59.95",
+"kick2": "Heavy Weather in the Boiler Room 2:58.15",
+"snare3": "Subterranean Dreams 0:23.97",
+"hat2": "Subterranean Dreams 0:02.28"
+},
+"s18-horn-remembers": {
+"choir3": "Hollow Square Roar-Brute 1:47.66",
+"bed3": "Boxes on My Back 1:30.86",
+"glide1": "Sunbaked Field Chant 1:40.68",
+"choir4": "Hollow Square Roar-Brute 0:48.72",
+"kick3": "Cathedral Dub Vigil 0:02.25",
+"snare1": "The Cathedral of Tape Echo 0:54.55",
+"hat1": "Subterranean Dreams 0:18.55",
+"bass1": "Boxes 2:57.83"
+},
+"s19-seam-sings": {
+"phrase1": "Brutus Never Learned to Read 1:16.48",
+"kick4": "Boxes on My Back 0:07.98",
+"snare2": "The Presto Disc & The Hollow-Square Field Engine 0:26.80",
+"hat2": "Subterranean Dreams 0:02.28",
+"bass2": "Steppe Telegraph & The 6,500-Voice Lavender Shanty 1:49.18"
+},
+"s20-one-hit-kit": {
+"tail3": "Boxes on My Back 2:46.14",
+"phrase5": "Hollow Square Roar 1:03.80",
+"bass3": "Blown-Out Sanctuary 1:59.95",
+"kick1": "Trap-Tox & Cardboard 1:07.11",
+"snare3": "Subterranean Dreams 0:23.97",
+"hat1": "Subterranean Dreams 0:18.55"
+},
+"s21-collision": {
+"choir1": "Hollow Square Roar-Brute 0:10.12",
+"call1": "HUNH! (92 BPM Field Clock) 0:47.62",
+"phrase1": "Brutus Never Learned to Read 1:16.48",
+"kick2": "Heavy Weather in the Boiler Room 2:58.15",
+"snare1": "The Cathedral of Tape Echo 0:54.55",
+"hat2": "Subterranean Dreams 0:02.28",
+"bass1": "Boxes 2:57.83"
+},
+"s22-one-shadow": {
+"tail2": "The Cathedral of Tape Echo 2:31.84",
+"kick3": "Cathedral Dub Vigil 0:02.25",
+"snare2": "The Presto Disc & The Hollow-Square Field Engine 0:26.80",
+"hat1": "Subterranean Dreams 0:18.55",
+"bass2": "Steppe Telegraph & The 6,500-Voice Lavender Shanty 1:49.18",
+"glide2": "Brutus Protocol 1:24.71",
+"tick4": "Cathedral Dub Vigil 0:09.23"
+},
+"s23-the-one": {
+"tick4": "Cathedral Dub Vigil 0:09.23",
+"tick5": "Sirens, Part 2 0:23.68",
+"call1": "HUNH! (92 BPM Field Clock) 0:47.62",
+"phrase4": "BUH-BOX _ -CK! (80 Voices as Drum Kit) 0:06.24",
+"kick4": "Boxes on My Back 0:07.98",
+"bass3": "Blown-Out Sanctuary 1:59.95"
+},
+"s24-break-grammar": {
+"kick1": "Trap-Tox & Cardboard 1:07.11",
+"snare1": "The Cathedral of Tape Echo 0:54.55",
+"hat1": "Subterranean Dreams 0:18.55",
+"tick5": "Sirens, Part 2 0:23.68",
+"phrase8": "Heavy Weather in the Boiler Room 3:25.57",
+"bass1": "Boxes 2:57.83"
+},
+"s25-exclamation": {
+"call1": "HUNH! (92 BPM Field Clock) 0:47.62",
+"kick2": "Heavy Weather in the Boiler Room 2:58.15",
+"snare2": "The Presto Disc & The Hollow-Square Field Engine 0:26.80",
+"hat2": "Subterranean Dreams 0:02.28",
+"bass2": "Steppe Telegraph & The 6,500-Voice Lavender Shanty 1:49.18",
+"choir1": "Hollow Square Roar-Brute 0:10.12",
+"tick5": "Sirens, Part 2 0:23.68"
+},
+"s26-pressure": {
+"choir1": "Hollow Square Roar-Brute 0:10.12",
+"texture2": "BUH-BOX _ -CK! (80 Voices as Drum Kit) 0:56.26",
+"random3": "Brutus Protocol 2:24.52",
+"kick3": "Cathedral Dub Vigil 0:02.25",
+"snare3": "Subterranean Dreams 0:23.97",
+"hat1": "Subterranean Dreams 0:18.55",
+"bass3": "Blown-Out Sanctuary 1:59.95"
+},
+"s27-two-rooms": {
+"phrase4": "BUH-BOX _ -CK! (80 Voices as Drum Kit) 0:06.24",
+"call1": "HUNH! (92 BPM Field Clock) 0:47.62",
+"kick4": "Boxes on My Back 0:07.98",
+"snare1": "The Cathedral of Tape Echo 0:54.55",
+"hat2": "Subterranean Dreams 0:02.28",
+"bass1": "Boxes 2:57.83",
+"choir1": "Hollow Square Roar-Brute 0:10.12",
+"kick1": "Trap-Tox & Cardboard 1:07.11",
+"snare2": "The Presto Disc & The Hollow-Square Field Engine 0:26.80",
+"tick5": "Sirens, Part 2 0:23.68"
+},
+"s28-negative-space": {
+"kick1": "Trap-Tox & Cardboard 1:07.11",
+"tick5": "Sirens, Part 2 0:23.68",
+"phrase8": "Heavy Weather in the Boiler Room 3:25.57",
+"snare2": "The Presto Disc & The Hollow-Square Field Engine 0:26.80",
+"bass2": "Steppe Telegraph & The 6,500-Voice Lavender Shanty 1:49.18"
+},
+"s29-counterline": {
+"choir2": "Hollow Square Roar-Brute 0:41.62",
+"phrase7": "HUNH! (92 BPM Field Clock) 1:37.48",
+"kick2": "Heavy Weather in the Boiler Room 2:58.15",
+"snare3": "Subterranean Dreams 0:23.97",
+"hat2": "Subterranean Dreams 0:02.28",
+"bass3": "Blown-Out Sanctuary 1:59.95"
+},
+"s30-persona": {
+"choir1": "Hollow Square Roar-Brute 0:10.12",
+"bed1": "Steppe Telegraph & The 6,500-Voice Lavender Shanty 2:27.77",
+"tick4": "Cathedral Dub Vigil 0:09.23",
+"kick3": "Cathedral Dub Vigil 0:02.25",
+"snare1": "The Cathedral of Tape Echo 0:54.55",
+"bass1": "Boxes 2:57.83",
+"texture2": "BUH-BOX _ -CK! (80 Voices as Drum Kit) 0:56.26"
+},
+"s31-space-to-speak": {
+"bass2": "Steppe Telegraph & The 6,500-Voice Lavender Shanty 1:49.18",
+"choir4": "Hollow Square Roar-Brute 0:48.72",
+"tick1": "The Cathedral of Tape Echo 0:54.55",
+"hat2": "Subterranean Dreams 0:02.28",
+"phrase2": "Parchman Hollow Square 1:01.34"
+},
+"s32-bass-conversation": {
+"bass3": "Blown-Out Sanctuary 1:59.95",
+"choir2": "Hollow Square Roar-Brute 0:41.62",
+"phrase9": "Steppe Telegraph & The 6,500-Voice Lavender Shanty 0:01.83",
+"kick1": "Trap-Tox & Cardboard 1:07.11",
+"snare3": "Subterranean Dreams 0:23.97",
+"hat1": "Subterranean Dreams 0:18.55"
+},
+"s33-hand-to-room": {
+"call1": "HUNH! (92 BPM Field Clock) 0:47.62",
+"choir4": "Hollow Square Roar-Brute 0:48.72",
+"breath2": "Boxes on My Back 1:06.33",
+"kick2": "Heavy Weather in the Boiler Room 2:58.15",
+"snare1": "The Cathedral of Tape Echo 0:54.55",
+"hat2": "Subterranean Dreams 0:02.28",
+"bass1": "Boxes 2:57.83"
+},
+"s34-harmony-arrives": {
+"phrase2": "Parchman Hollow Square 1:01.34",
+"phrase3": "Echoes of the Black Chapel 1:57.34",
+"choir1": "Hollow Square Roar-Brute 0:10.12",
+"breath2": "Boxes on My Back 1:06.33",
+"bass2": "Steppe Telegraph & The 6,500-Voice Lavender Shanty 1:49.18"
+},
+"s35-uneasy-room": {
+"tail1": "Echoes of the Black Chapel 2:30.32",
+"choir3": "Hollow Square Roar-Brute 1:47.66",
+"bass3": "Blown-Out Sanctuary 1:59.95",
+"kick4": "Boxes on My Back 0:07.98"
+},
+"s36-slow-anchor": {
+"choir1": "Hollow Square Roar-Brute 0:10.12",
+"tick4": "Cathedral Dub Vigil 0:09.23",
+"choir2": "Hollow Square Roar-Brute 0:41.62",
+"kick1": "Trap-Tox & Cardboard 1:07.11",
+"snare1": "The Cathedral of Tape Echo 0:54.55",
+"bass1": "Boxes 2:57.83"
+},
+"s37-meter": {
+"tick3": "Boxes On My Back 0:04.98",
+"kick2": "Heavy Weather in the Boiler Room 2:58.15",
+"bass2": "Steppe Telegraph & The 6,500-Voice Lavender Shanty 1:49.18",
+"phrase9": "Steppe Telegraph & The 6,500-Voice Lavender Shanty 0:01.83"
+},
+"s38-spoken-cut": {
+"choir3": "Hollow Square Roar-Brute 1:47.66",
+"choir1": "Hollow Square Roar-Brute 0:10.12",
+"tick2": "Subterranean Dreams 0:19.91"
 }
 },
 "sources": {
@@ -215,13 +528,11 @@
 "S5fd772": {
 "title": "Blown-Out Sanctuary",
 "catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Blown-Out Sanctuary - Treblo.ogg",
 "sha256": "5fd772ace4752c52702dcfd6619c6f49d5beff199f249a433ce161a9bad5a641"
 },
 "S87c116": {
 "title": "Chiral Cargo & The Rope-Not-Stick Choir",
 "catalog": "et-tu-brute-boxback",
-"path": "Et tu, Brute (BOXBACK)/Et tu, Brute_ - Chiral Cargo & The Rope-Not-Stick Choir - Treblo.ogg",
 "sha256": "87c116139dbe49cf37b6616c5c86d000606394ebbcc2e11cdc25bd0ffccb591a"
 },
 "S1a4289": {
@@ -283,6 +594,86 @@
 "title": "The Knife I Carry",
 "catalog": "et-tu-brute-beats",
 "sha256": "a0fea16a0d881ea66a680467c3a94fea21e37641c72cf11e5c9990d685924225"
+},
+"S6dd5bc": {
+"title": "Heavy Weather in the Boiler Room",
+"catalog": "et-tu-brute",
+"sha256": "6dd5bc31b133c521846dfe8748edaa539a44dab32e92325226aef4621dd3ab62"
+},
+"S99f524": {
+"title": "The Presto Disc & The Hollow-Square Field Engine",
+"catalog": "et-tu-brute-boxes-on-my-back",
+"sha256": "99f524b407029ae3a9b7efbc11a238dfb5f00666027685f36c0226abf73972fc"
+},
+"S94f385": {
+"title": "Cathedral Dub Vigil",
+"catalog": "et-tu-brute-beats",
+"sha256": "94f3859f572d26aa909286edcda37029cda7bc45d161b3889d27d7a7f6fd77e4"
+},
+"Sc7ef54": {
+"title": "Blown-Out Sanctuary",
+"catalog": "et-tu-brute",
+"sha256": "c7ef5492e53de08355b05c94b8b5fc0a339e46104c038362a58ef3fafe92d524"
+},
+"Se63160": {
+"title": "Capsae in Tergo Meo",
+"catalog": "et-tu-brute-boxes-on-my-back",
+"sha256": "e631609edbbf4c21f57acbd8c9d054aa3d112ed694b2b221038a85d18ff875aa"
+},
+"Sf6312d": {
+"title": "Boxes on My Back",
+"catalog": "et-tu-brute-boxes-on-my-back",
+"sha256": "f6312da519fa06727f5e9843d95ba89c92ce3149f7c1e5dbb326fa28ff7fdceb"
+},
+"Secf58a": {
+"title": "Grand Opera Chorus & Dub-Mud Catacomb",
+"catalog": "et-tu-brute-beats",
+"sha256": "ecf58a9b519a58a1fc4752611fc96f616810ab966cbee70848cc524ecb84d69b"
+},
+"S73db4b": {
+"title": "Boxes",
+"catalog": "et-tu-brute-boxback",
+"sha256": "73db4b5946e465a66e340a59d11cbd02929d4619ed8f02b188ffe42c352c8ace"
+},
+"Sa8bb63": {
+"title": "Boxes on My Back",
+"catalog": "et-tu-brute-boxes-on-my-back",
+"sha256": "a8bb630d4b8cab3b353d268a4f738f65504325f3256e7303652db5d25baa619e"
+},
+"S66ff79": {
+"title": "Boxes on My Back",
+"catalog": "et-tu-brute-boxback",
+"sha256": "66ff79bfafdda742ea0bba91995f1edf913d6da037707b7d0174fc64170a81ad"
+},
+"S3adb59": {
+"title": "Sirens, Part 2",
+"catalog": "et-tu-brute",
+"sha256": "3adb5910fd9dce94c5ceb27ba413d37c0a641989ae1f9a2a16705019260d8d0b"
+},
+"S2222ca": {
+"title": "Boxes on My Back",
+"catalog": "et-tu-brute-boxes-on-my-back",
+"sha256": "2222ca48d9fd72de7aba0148b0bc75dff648cd391445c6ade22df23e62d3e03d"
+},
+"S1ff4b7": {
+"title": "BUH-BOX _ -CK! (80 Voices as Drum Kit)",
+"catalog": "et-tu-brute-beats",
+"sha256": "1ff4b7a1d9cda31cb61dcd8c2898eaaeca71fedb546139e5e7f5a7ee42aab329"
+},
+"Sf3b786": {
+"title": "Boxes On My Back",
+"catalog": "et-tu-brute-boxes-on-my-back",
+"sha256": "f3b786d60ae71ab64ae405e2b1635992052baa9511aeda6af0d71a08f520c805"
+},
+"Sf5930e": {
+"title": "Brutus Never Learned to Read",
+"catalog": "et-tu-brute-boxes-on-my-back",
+"sha256": "f5930e8d5f8a1509d272e836567a0c9cc8f7c907b18bf549e7e03916c0c88e88"
+},
+"S25d45a": {
+"title": "Hollow Square Roar",
+"catalog": "et-tu-brute-boxes-on-my-back",
+"sha256": "25d45af7702d3c0936d0f16ed2a7d5ce2563f32f901ca196c8ec21b1065666a3"
 }
 }
 }

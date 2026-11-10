@@ -90,5 +90,347 @@
   "title": "REMIX 3 \u00b7 HALF-TIME",
   "bpm": 70,
   "group": "earlier"
+ },
+ {
+  "id": "s01-cut-answers",
+  "label": "01 \u00b7 THE CUT ANSWERS BACK",
+  "title": "THE CUT ANSWERS BACK",
+  "bpm": 90,
+  "group": "swarm",
+  "seconds": 45.3,
+  "mechanism": "micro-chop syntax"
+ },
+ {
+  "id": "s02-three-clocks",
+  "label": "02 \u00b7 THREE CLOCKS IN ONE ROOM",
+  "title": "THREE CLOCKS IN ONE ROOM",
+  "bpm": 86,
+  "group": "swarm",
+  "seconds": 47.4,
+  "mechanism": "relational pocket"
+ },
+ {
+  "id": "s03-wrong-turn",
+  "label": "03 \u00b7 THE PRODUCTIVE WRONG TURN",
+  "title": "THE PRODUCTIVE WRONG TURN",
+  "bpm": 80,
+  "group": "swarm",
+  "seconds": 51.0,
+  "mechanism": "collage as discovery"
+ },
+ {
+  "id": "s04-floor-plan",
+  "label": "04 \u00b7 DREAD HAS A FLOOR PLAN",
+  "title": "DREAD HAS A FLOOR PLAN",
+  "bpm": 66,
+  "group": "swarm",
+  "seconds": 61.8,
+  "mechanism": "atmosphere as arrangement"
+ },
+ {
+  "id": "s05-threshold",
+  "label": "05 \u00b7 THE RECOGNITION THRESHOLD",
+  "title": "THE RECOGNITION THRESHOLD",
+  "bpm": 72,
+  "group": "swarm",
+  "seconds": 56.7,
+  "mechanism": "recurrence under loss"
+ },
+ {
+  "id": "s06-room-document",
+  "label": "06 \u00b7 THE ROOM AROUND THE DOCUMENT",
+  "title": "THE ROOM AROUND THE DOCUMENT",
+  "bpm": 60,
+  "group": "swarm",
+  "seconds": 68.0,
+  "mechanism": "space and contextual reframe"
+ },
+ {
+  "id": "s07-sentence-chorus",
+  "label": "07 \u00b7 THE HUMAN SENTENCE BECOMES A CHORUS",
+  "title": "THE HUMAN SENTENCE BECOMES A CHORUS",
+  "bpm": 104,
+  "group": "swarm",
+  "seconds": 39.2,
+  "mechanism": "prosody as form"
+ },
+ {
+  "id": "s08-rule",
+  "label": "08 \u00b7 THE RULE MAKES THE MUSIC",
+  "title": "THE RULE MAKES THE MUSIC",
+  "bpm": 60,
+  "group": "swarm",
+  "seconds": 68.0,
+  "mechanism": "generative recurrence"
+ },
+ {
+  "id": "s09-narrator",
+  "label": "09 \u00b7 THE INTERRUPTION CHANGES THE NARRATOR",
+  "title": "THE INTERRUPTION CHANGES THE NARRATOR",
+  "bpm": 84,
+  "group": "swarm",
+  "seconds": 48.6,
+  "mechanism": "radio-play logic"
+ },
+ {
+  "id": "s10-audible-past",
+  "label": "10 \u00b7 A FUTURE WITH AN AUDIBLE PAST",
+  "title": "A FUTURE WITH AN AUDIBLE PAST",
+  "bpm": 88,
+  "group": "swarm",
+  "seconds": 46.4,
+  "mechanism": "time layers in one groove"
+ },
+ {
+  "id": "s11-one-breath",
+  "label": "11 \u00b7 A CHOIR BUILT FROM ONE BREATH",
+  "title": "A CHOIR BUILT FROM ONE BREATH",
+  "bpm": 70,
+  "group": "swarm",
+  "seconds": 58.3,
+  "mechanism": "long-cycle vocal harmony"
+ },
+ {
+  "id": "s12-landscape",
+  "label": "12 \u00b7 THE LANDSCAPE JOINS THE BAND",
+  "title": "THE LANDSCAPE JOINS THE BAND",
+  "bpm": 76,
+  "group": "swarm",
+  "seconds": 53.7,
+  "mechanism": "environment as a performer"
+ },
+ {
+  "id": "s13-missing-downbeat",
+  "label": "13 \u00b7 THE MISSING DOWNBEAT IS THE HOOK",
+  "title": "THE MISSING DOWNBEAT IS THE HOOK",
+  "bpm": 96,
+  "group": "swarm",
+  "seconds": 42.5,
+  "mechanism": "minimal syncopation"
+ },
+ {
+  "id": "s14-clothes",
+  "label": "14 \u00b7 A GROOVE THAT CHANGES ITS CLOTHES",
+  "title": "A GROOVE THAT CHANGES ITS CLOTHES",
+  "bpm": 92,
+  "group": "swarm",
+  "seconds": 44.3,
+  "mechanism": "translation between palettes"
+ },
+ {
+  "id": "s15-understatement",
+  "label": "15 \u00b7 THE UNDERSTATEMENT LANDS",
+  "title": "THE UNDERSTATEMENT LANDS",
+  "bpm": 70,
+  "group": "swarm",
+  "seconds": 58.3,
+  "mechanism": "conversation, timing and scale"
+ },
+ {
+  "id": "s16-scene-cut",
+  "label": "16 \u00b7 THE SPLICE IS A SCENE CUT",
+  "title": "THE SPLICE IS A SCENE CUT",
+  "bpm": 84,
+  "group": "swarm",
+  "seconds": 48.6,
+  "mechanism": "instrumental montage"
+ },
+ {
+  "id": "s17-room-for-voice",
+  "label": "17 \u00b7 THE BASS LEAVES ROOM FOR THE VOICE",
+  "title": "THE BASS LEAVES ROOM FOR THE VOICE",
+  "bpm": 80,
+  "group": "swarm",
+  "seconds": 51.0,
+  "mechanism": "low-end and lead hierarchy"
+ },
+ {
+  "id": "s18-horn-remembers",
+  "label": "18 \u00b7 THE HORN REMEMBERS THE VERSE",
+  "title": "THE HORN REMEMBERS THE VERSE",
+  "bpm": 88,
+  "group": "swarm",
+  "seconds": 46.4,
+  "mechanism": "answer phrase and warm pocket"
+ },
+ {
+  "id": "s19-seam-sings",
+  "label": "19 \u00b7 THE SEAM SINGS",
+  "title": "THE SEAM SINGS",
+  "bpm": 82,
+  "group": "swarm",
+  "seconds": 49.8,
+  "mechanism": "melodic micro-chopping"
+ },
+ {
+  "id": "s20-one-hit-kit",
+  "label": "20 \u00b7 ONE HIT BECOMES A KIT",
+  "title": "ONE HIT BECOMES A KIT",
+  "bpm": 90,
+  "group": "swarm",
+  "seconds": 45.3,
+  "mechanism": "percussion extraction"
+ },
+ {
+  "id": "s21-collision",
+  "label": "21 \u00b7 THE COLLISION STILL READS",
+  "title": "THE COLLISION STILL READS",
+  "bpm": 100,
+  "group": "swarm",
+  "seconds": 40.8,
+  "mechanism": "dense montage intelligibility"
+ },
+ {
+  "id": "s22-one-shadow",
+  "label": "22 \u00b7 ONE SHADOW HOLDS THE SCENE",
+  "title": "ONE SHADOW HOLDS THE SCENE",
+  "bpm": 78,
+  "group": "swarm",
+  "seconds": 52.3,
+  "mechanism": "timbre as tonal glue"
+ },
+ {
+  "id": "s23-the-one",
+  "label": "23 \u00b7 THE ONE IS A SOCIAL AGREEMENT",
+  "title": "THE ONE IS A SOCIAL AGREEMENT",
+  "bpm": 104,
+  "group": "swarm",
+  "seconds": 39.2,
+  "mechanism": "ensemble accents and collective reset"
+ },
+ {
+  "id": "s24-break-grammar",
+  "label": "24 \u00b7 A BREAK HAS GRAMMAR",
+  "title": "A BREAK HAS GRAMMAR",
+  "bpm": 92,
+  "group": "swarm",
+  "seconds": 44.3,
+  "mechanism": "pickup and break continuity"
+ },
+ {
+  "id": "s25-exclamation",
+  "label": "25 \u00b7 THE EXCLAMATION IS A DRUM",
+  "title": "THE EXCLAMATION IS A DRUM",
+  "bpm": 98,
+  "group": "swarm",
+  "seconds": 41.6,
+  "mechanism": "vocal interjection as percussion"
+ },
+ {
+  "id": "s26-pressure",
+  "label": "26 \u00b7 NOISE GIVES THE ARGUMENT PRESSURE",
+  "title": "NOISE GIVES THE ARGUMENT PRESSURE",
+  "bpm": 90,
+  "group": "swarm",
+  "seconds": 45.3,
+  "mechanism": "density around a statement"
+ },
+ {
+  "id": "s27-two-rooms",
+  "label": "27 \u00b7 TWO ROOMS, ONE CITY",
+  "title": "TWO ROOMS, ONE CITY",
+  "bpm": 74,
+  "group": "swarm",
+  "seconds": 55.1,
+  "mechanism": "plural viewpoints and situated place"
+ },
+ {
+  "id": "s28-negative-space",
+  "label": "28 \u00b7 THE POCKET HAS NEGATIVE SPACE",
+  "title": "THE POCKET HAS NEGATIVE SPACE",
+  "bpm": 94,
+  "group": "swarm",
+  "seconds": 43.4,
+  "mechanism": "paired groove and hook design"
+ },
+ {
+  "id": "s29-counterline",
+  "label": "29 \u00b7 THE COUNTERLINE HIDES IN PLAIN SIGHT",
+  "title": "THE COUNTERLINE HIDES IN PLAIN SIGHT",
+  "bpm": 80,
+  "group": "swarm",
+  "seconds": 51.0,
+  "mechanism": "instrumental counterline"
+ },
+ {
+  "id": "s30-persona",
+  "label": "30 \u00b7 A PERSONA MOVES BETWEEN WORLDS",
+  "title": "A PERSONA MOVES BETWEEN WORLDS",
+  "bpm": 72,
+  "group": "swarm",
+  "seconds": 56.7,
+  "mechanism": "voice and perspective"
+ },
+ {
+  "id": "s31-space-to-speak",
+  "label": "31 \u00b7 THE ENSEMBLE MAKES SPACE TO SPEAK",
+  "title": "THE ENSEMBLE MAKES SPACE TO SPEAK",
+  "bpm": 88,
+  "group": "swarm",
+  "seconds": 46.4,
+  "mechanism": "distributed conversational entrances"
+ },
+ {
+  "id": "s32-bass-conversation",
+  "label": "32 \u00b7 THE BASS LINE CARRIES THE CONVERSATION",
+  "title": "THE BASS LINE CARRIES THE CONVERSATION",
+  "bpm": 90,
+  "group": "swarm",
+  "seconds": 45.3,
+  "mechanism": "loop stability and variable phrasing"
+ },
+ {
+  "id": "s33-hand-to-room",
+  "label": "33 \u00b7 A HOOK YOU CAN HAND TO A ROOM",
+  "title": "A HOOK YOU CAN HAND TO A ROOM",
+  "bpm": 100,
+  "group": "swarm",
+  "seconds": 40.8,
+  "mechanism": "participatory call and response"
+ },
+ {
+  "id": "s34-harmony-arrives",
+  "label": "34 \u00b7 HARMONY ARRIVES BEFORE THE WORD",
+  "title": "HARMONY ARRIVES BEFORE THE WORD",
+  "bpm": 66,
+  "group": "swarm",
+  "seconds": 61.8,
+  "mechanism": "vocal voicing as tension"
+ },
+ {
+  "id": "s35-uneasy-room",
+  "label": "35 \u00b7 THE ROOM MAKES THE LINE UNEASY",
+  "title": "THE ROOM MAKES THE LINE UNEASY",
+  "bpm": 64,
+  "group": "swarm",
+  "seconds": 63.8,
+  "mechanism": "voice against unsettling space"
+ },
+ {
+  "id": "s36-slow-anchor",
+  "label": "36 \u00b7 THE SLOW PHRASE CAN BE AN ANCHOR",
+  "title": "THE SLOW PHRASE CAN BE AN ANCHOR",
+  "bpm": 84,
+  "group": "swarm",
+  "seconds": 48.6,
+  "mechanism": "slow harmonic motion under cuts"
+ },
+ {
+  "id": "s37-meter",
+  "label": "37 \u00b7 THE METER TEACHES THE EAR",
+  "title": "THE METER TEACHES THE EAR",
+  "bpm": 100,
+  "group": "swarm",
+  "seconds": 40.8,
+  "mechanism": "asymmetrical grouping"
+ },
+ {
+  "id": "s38-spoken-cut",
+  "label": "38 \u00b7 THE SPOKEN CUT CHANGES THE SENTENCE",
+  "title": "THE SPOKEN CUT CHANGES THE SENTENCE",
+  "bpm": 72,
+  "group": "swarm",
+  "seconds": 56.7,
+  "mechanism": "spoken-word and chance montage"
  }
 ]
