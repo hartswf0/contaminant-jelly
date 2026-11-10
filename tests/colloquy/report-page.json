@@ -1,7 +1,7 @@
 {
  "suite": "colloquy page (headless Chromium, SwiftShader)",
- "when": "2026-11-10T12:05:04.143Z",
- "passed": 20,
+ "when": "2026-11-10T12:34:17.117Z",
+ "passed": 21,
  "failed": 0,
  "shots": "/tmp/claude-0/-home-user-moto/d7f14925-adf0-50d2-855d-0417d555d37a/scratchpad/colloquy",
  "results": [
@@ -30,14 +30,15 @@
    "name": "auto-director cuts to the active handshake",
    "ok": true,
    "detail": {
-    "cuts": 14,
+    "cuts": 17,
     "shots": [
      "two",
-     "bar",
      "mirror",
      "vane",
      "memory",
-     "plan"
+     "tri",
+     "plan",
+     "side"
     ]
    }
   },
@@ -116,17 +117,19 @@
    "name": "cineulation: cuts per minute in range, every cut on a sim event (within one frame)",
    "ok": true,
    "detail": {
-    "perMin": 15.7,
-    "cuts": 47,
+    "outBack": 0,
+    "perMin": 18,
+    "cuts": 54,
     "bad": [],
     "minDur": 1.03,
-    "maxDur": 7.47,
+    "maxDur": 6.05,
     "shots": [
      "two",
      "bar",
      "mirror",
      "vane",
      "memory",
+     "tri",
      "plan",
      "side",
      "orbit"
@@ -147,51 +150,98 @@
    "detail": {}
   },
   {
-   "name": "satisfaction visible: brightness 0.5 s after closure ≥ 40% below the commit value",
-   "ok": true,
-   "detail": [
-    {
-     "male": "J",
-     "female": "F1",
-     "closureT": 187.57,
-     "commitLum": 215.2,
-     "postLum": 63.8,
-     "drop": 0.703
-    },
-    {
-     "male": "G",
-     "female": "F3",
-     "closureT": 203.03,
-     "commitLum": 202.5,
-     "postLum": 73.6,
-     "drop": 0.637
-    },
-    {
-     "male": "G",
-     "female": "F2",
-     "closureT": 230.62,
-     "commitLum": 203.8,
-     "postLum": 72.1,
-     "drop": 0.646
-    }
-   ]
-  },
-  {
    "name": "satisfaction audible: momentary loudness ≥ +6 LU above the bed within 0.5 s of each F = 1",
    "ok": true,
    "detail": {
-    "bedLUFS": -34.5,
+    "bedLUFS": -34.9,
     "risesLU": [
-     19.3,
-     19.7,
-     19.7,
-     19.5,
-     19.8,
-     19.3
+     19.9,
+     20.1,
+     20.2,
+     19.9,
+     20.1,
+     20.1
     ],
     "closures": 6,
-    "LRA": 12.3
+    "peaks": 6,
+    "peaksWithoutF1": 0,
+    "LRA": 12.5
    }
+  },
+  {
+   "name": "darkness: the lit room is audibly quieter (≥ 8 LU)",
+   "ok": true,
+   "detail": {
+    "darkLUFS": -35.2,
+    "litLUFS": -49.3,
+    "dipLU": 14.1
+   }
+  },
+  {
+   "name": "every closure: satisfied agent framed ≥ 1.5 s, ≥ 40% darker within 0.5 s, no clipping",
+   "ok": true,
+   "detail": [
+    {
+     "m": "G",
+     "f": "F1",
+     "t": 8.37,
+     "framed": true,
+     "onScreen": true,
+     "shotS": 1.62,
+     "lumAtF1": 154.9,
+     "lum05": 44.8,
+     "drop": 0.711,
+     "clip": 0.007
+    },
+    {
+     "m": "J",
+     "f": "F2",
+     "t": 12.17,
+     "framed": true,
+     "onScreen": true,
+     "shotS": 1.58,
+     "lumAtF1": 157.6,
+     "lum05": 51.9,
+     "drop": 0.671,
+     "clip": 0
+    },
+    {
+     "m": "J",
+     "f": "F3",
+     "t": 31.85,
+     "framed": true,
+     "onScreen": true,
+     "shotS": 1.62,
+     "lumAtF1": 162.2,
+     "lum05": 66.9,
+     "drop": 0.587,
+     "clip": 0.007
+    },
+    {
+     "m": "G",
+     "f": "F3",
+     "t": 56.27,
+     "framed": true,
+     "onScreen": true,
+     "shotS": 1.62,
+     "lumAtF1": 169.6,
+     "lum05": 71.8,
+     "drop": 0.577,
+     "clip": 0.012
+    },
+    {
+     "m": "J",
+     "f": "F3",
+     "t": 79.77,
+     "framed": true,
+     "onScreen": true,
+     "shotS": 1.62,
+     "lumAtF1": 164.8,
+     "lum05": 72.3,
+     "drop": 0.561,
+     "clip": 0.012
+    }
+   ]
   },
   {
    "name": "cineulation 390 px: the phone view is uncovered",

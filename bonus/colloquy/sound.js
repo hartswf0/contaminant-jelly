@@ -14,13 +14,13 @@ export function makeVoices(ctx, dest) {
   const rev = ctx.createConvolver(), len = Math.floor(ctx.sampleRate * 2.2), ir = ctx.createBuffer(2, len, ctx.sampleRate); let s = 12345;
   for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); for (let i = 0; i < len; i++) { s = (s * 16807) % 2147483647; d[i] = (s / 2147483647 * 2 - 1) * Math.pow(1 - i / len, 3.2); } }
   rev.buffer = ir; const wet = ctx.createGain(); wet.gain.value = .28; rev.connect(wet); wet.connect(master);
-  const bus = ctx.createGain(); bus.connect(master); bus.connect(rev);
+  const bed = ctx.createGain(); bed.connect(master); bed.connect(rev); const bus = ctx.createGain(); bus.connect(bed);
   const fem = FEM.map((f0, i) => { const o = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain(), pan = ctx.createStereoPanner(); o.type = 'triangle'; o.frequency.value = f0; o2.type = 'sine'; o2.frequency.value = f0 * 2.003;
     const g2 = ctx.createGain(); g2.gain.value = .25; o2.connect(g2); g2.connect(g); o.connect(g); g.gain.value = 0; pan.pan.value = [-.6, .6, 0][i]; g.connect(pan); pan.connect(bus); o.start(); o2.start(); return {o, g}; });
   const buzz = MAL.map((f0, i) => { const o = ctx.createOscillator(), lp = ctx.createBiquadFilter(), g = ctx.createGain(), pan = ctx.createStereoPanner(); o.type = 'sawtooth'; o.frequency.value = f0; lp.type = 'lowpass'; lp.frequency.value = 700; lp.Q.value = 2; g.gain.value = 0; pan.pan.value = i ? .35 : -.35;
     o.connect(lp); lp.connect(g); g.connect(pan); pan.connect(bus); o.start(); return {o, g, lp}; });
   const hum = (() => { const a = ctx.createOscillator(), b = ctx.createOscillator(), lp = ctx.createBiquadFilter(), g = ctx.createGain(); a.type = b.type = 'sawtooth'; a.frequency.value = 55; b.frequency.value = 55.37; lp.type = 'lowpass'; lp.frequency.value = 160; g.gain.value = 0;
-    a.connect(lp); b.connect(lp); lp.connect(g); g.connect(master); a.start(); b.start(); return {g, lp}; })();
+    a.connect(lp); b.connect(lp); lp.connect(g); g.connect(bed); a.start(); b.start(); return {g, lp}; })();
   const set = (p, v, t, tc = .012) => p.setTargetAtTime(v, t, tc);
   function chirp(t, f0, f1, dur, vol, type = 'sine', pan = 0) { const o = ctx.createOscillator(), g = ctx.createGain(), p = ctx.createStereoPanner(); o.type = type; p.pan.value = pan;
     o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .006); g.gain.exponentialRampToValueAtTime(.0001, t + dur + .05);
@@ -33,7 +33,8 @@ export function makeVoices(ctx, dest) {
     frame(t, st) {
       st.fem.forEach((f, i) => set(fem[i].g.gain, f.tone > 0 ? (f.gate ? .026 * f.tone + .006 : .002) : 0, t, f.stage === 3 ? .006 : .03));
       st.mal.forEach((m, i) => { set(buzz[i].g.gain, m.B ? .009 : 0, t, .08); set(buzz[i].lp.frequency, m.B ? 900 : 400, t, .2); });
-      set(hum.g.gain, .004 + st.urgency * .02, t, .6); set(hum.lp.frequency, 120 + st.urgency * 260, t, .6);
+      set(hum.g.gain, .004 + st.urgency * .02, t, .6);
+      set(bed.gain, 1 - .82 * Math.min(1, (st.ambient || 0) / .8), t, .5); set(hum.lp.frequency, 120 + st.urgency * 260, t, .6);   // the lit room is quiet: the photocells lose contrast and the whole society hushes
     },
     event(t, ev) {
       const fi = ev.f ? +String(ev.f).slice(1) - 1 : 0, mi = ev.m === 'J' ? 1 : 0;
@@ -52,7 +53,7 @@ export function makeVoices(ctx, dest) {
 export function soundState(S) {
   const males = S.males, P = S.P;
   return {fem: S.females.map(f => { const m = f.partner >= 0 ? males[f.partner] : null; return {tone: f.tone, stage: f.stage, gate: f.stage >= 4 ? 1 : m ? m.lamp : f.partner === -2 ? (Math.sin(S.t * Math.PI * 2 * 3.6) > .2 ? 1 : 0) : 0}; }),
-    mal: males.map(m => ({B: m.B, F: m.F})), urgency: [...males, ...S.females].reduce((a, x) => a + Math.max(x.O, x.P), 0) / 5 / P.Lcap};
+    mal: males.map(m => ({B: m.B, F: m.F})), ambient: P.ambient, urgency: [...males, ...S.females].reduce((a, x) => a + Math.max(x.O, x.P), 0) / 5 / P.Lcap};
 }
 export function makeLiveSound() {
   let ctx = null, V = null, on = false, vol = null;

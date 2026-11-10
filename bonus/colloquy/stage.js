@@ -7,7 +7,7 @@ import {GEOM, STAGE} from './sim.js';
 const TAU = Math.PI * 2;
 export const ORANGE = 0xff8a2a, PUCE = 0xc8689a, TORCH = 0xd9f7ff;
 // each mobile's own hue, so it can be told apart without captions (its halo and filament carry it)
-export const IDENT = {G: 0xff4a2e, J: 0x37d69a, F1: 0x5aa8ff, F2: 0xb07cff, F3: 0xf2e27a};
+export const IDENT = {G: 0xff4a2e, J: 0x37d69a, F1: 0x5aa8ff, F2: 0xb07cff, F3: 0xd9c66a};
 export const CAST = {G: 'sentinel', J: 'celluloid', F1: 'glass', F2: 'medusa', F3: 'veil'};
 
 export function makeStage(THREE, {canvas, sim, createJelly, low = false, preserve = false, EffectComposer, RenderPass, UnrealBloomPass, OutputPass, cast = CAST}) {
@@ -82,6 +82,7 @@ export function makeStage(THREE, {canvas, sim, createJelly, low = false, preserv
     return U; }
   function makeJelly(id, seed, scale) { const J = createJelly(THREE, id, {puppet: true, low, seed}); J.group.scale.setScalar(J.norm * scale); J.dim = dimmer(J); return J; }
   const dimOf = u => .1 + 1.1 * Math.pow(u, 1.3);
+  const AURA = {F1: 1, F2: 1, F3: .55}, DIMCAP = {F1: 1.2, F2: 1.2, F3: .78};   // the Fleck Veil is cream and dense: held lower so she never clips
 
   const haloTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d'), g = x.createRadialGradient(64, 64, 0, 64, 64, 64); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(.35, 'rgba(255,255,255,.35)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
   // males: hang from the bar ends; local +X is the heading of lamp u and beam B
@@ -146,14 +147,17 @@ export function makeStage(THREE, {canvas, sim, createJelly, low = false, preserv
     side: (u, a0) => { const a = a0 + u * .025; return {pos: V3(Math.cos(a) * 6.6, 2.35, Math.sin(a) * 6.6), look: V3(0, 2.25, 0), fov: 40}; },
     orbit: (u, a0) => { const a = a0 + u * .05; return {pos: V3(Math.cos(a) * 4.8, 3.3 + Math.sin(u * .1) * .3, Math.sin(a) * 4.8), look: V3(0, 2.1, 0), fov: 42}; },
     mirror: (u, a0, foc) => { const f = foc.f; if (!f) return SHOTS.side(u, a0); const p = fpos(f), h = sim.femaleHeading(f), fw = V3(Math.cos(h), 0, Math.sin(h)), sd = V3(-fw.z, 0, fw.x);
-      return {pos: p.clone().addScaledVector(fw, .7).addScaledVector(sd, Math.max(1.05, 1.9 - u * .14)).add(V3(0, .14, 0)), look: p.clone().addScaledVector(fw, .62).add(V3(0, -.1, 0)), fov: 36}; },   // in profile: the tilt of b reads
+      return {pos: p.clone().addScaledVector(fw, .7).addScaledVector(sd, Math.max(1.05, 1.9 - u * .14)).add(V3(0, .14, 0)), look: p.clone().addScaledVector(fw, cam.aspect < 1 ? .2 : .62).add(V3(0, -.1, 0)), fov: 36}; },   // in profile: the tilt of b reads
     tri: (u, a0, foc) => { if (!foc.f) return SHOTS.orbit(u, a0); const b = fpos(foc.f), hf = sim.femaleHeading(foc.f), a = foc.m && foc.m !== 'V' ? mpos(foc.m) : b.clone().add(V3(Math.cos(hf) * 1.5, 0, Math.sin(hf) * 1.5)), mid = a.clone().lerp(b, .5), d = b.clone().sub(a); const n = V3(-d.z, 0, d.x).normalize(); if (n.dot(mid) < 0) n.negate();
       const L = Math.max(1.6, d.length()); return {pos: mid.clone().addScaledVector(n, L * 1.25 + 1 - u * .02).add(V3(0, .75, 0)), look: mid.clone().add(V3(0, -.05, 0)), fov: 38}; },
     wide: () => ({pos: V3(0, 6.2, 5.4), look: V3(0, 1.5, 0), fov: 44}),
     stranger: (u, a0, foc) => { if (!foc.f) return SHOTS.plan(u); const p = fpos(foc.f), h = sim.femaleHeading(foc.f), fw = V3(Math.cos(h), 0, Math.sin(h)), sd = V3(-fw.z, 0, fw.x), base = p.clone().addScaledVector(fw, 1.7).setY(0);   // over the stranger's shoulder, the torch to her
-      return {pos: base.clone().addScaledVector(fw, 1.35 - u * .05).addScaledVector(sd, .8).add(V3(0, 1.85, 0)), look: p.clone().lerp(base.clone().setY(1.3), .4), fov: 44}; },
+      // pick the shoulder whose line of sight passes farthest from the males (less clutter), once per shot
+      if (foc._sd == null) { const look0 = p.clone(), score = k => { const c = base.clone().addScaledVector(fw, 1.35).addScaledVector(sd, .8 * k).add(V3(0, 1.85, 0)), dir = look0.clone().sub(c).normalize(); let mn = 9; for (const m of S.males) { const q = mpos(m).sub(c), along = q.dot(dir); if (along > 0) mn = Math.min(mn, q.addScaledVector(dir, -along).length()); } return mn; }; foc._sd = score(1) >= score(-1) ? 1 : -1; }
+      const port = cam.aspect < 1;   // portrait: keep the solicited female in frame (look at her, not between)
+      return {pos: base.clone().addScaledVector(fw, 1.35).addScaledVector(sd, .8 * foc._sd).add(V3(0, 1.85, 0)), look: p.clone().lerp(base.clone().setY(1.3), port ? .12 : .35), fov: 44}; },
     two: (u, a0, foc) => { if (!foc.f || !foc.m) return SHOTS.tri(u, a0, foc); const b = fpos(foc.f), hf = sim.femaleHeading(foc.f), a = foc.m === 'V' ? b.clone().add(V3(Math.cos(hf) * 1.5, 0, Math.sin(hf) * 1.5)) : mpos(foc.m), d = b.clone().sub(a).normalize(), sd = V3(-d.z, 0, d.x);   // along beam B, over his shoulder
-      return {pos: a.clone().addScaledVector(d, -1.4 + u * .04).addScaledVector(sd, .75).add(V3(0, .4, 0)), look: a.clone().lerp(b, .68), fov: 40}; },
+      return {pos: a.clone().addScaledVector(d, -1.4 + u * .04).addScaledVector(sd, .75).add(V3(0, .4, 0)), look: a.clone().lerp(b, cam.aspect < 1 ? .85 : .68), fov: 40}; },
     bar: (u, a0) => { const a = a0 + u * .05; return {pos: V3(Math.cos(a) * 1.75, 2.25, Math.sin(a) * 1.75), look: V3(0, GEOM.barY - .12, 0), fov: 52}; },   // bar Z from below, the males hanging
     vane: (u, a0, foc) => { if (!foc.m || foc.m === 'V') return SHOTS.mirror(u, a0, foc); const p = mpos(foc.m), h = sim.maleHeading(foc.m), fw = V3(Math.cos(h), 0, Math.sin(h)), sd = V3(-fw.z, 0, fw.x);
       return {pos: p.clone().addScaledVector(fw, -.25).addScaledVector(sd, 1.25 - u * .03).add(V3(0, .25, 0)), look: p.clone().addScaledVector(fw, .25), fov: 38}; },   // from the side, behind his lamp: the vanes and his dimming bell, not the beam
@@ -164,7 +168,7 @@ export function makeStage(THREE, {canvas, sim, createJelly, low = false, preserv
   // ---------------------------------------------------------------- the director: every cut lands on a machine event
   // Events arrive from the sim as they happen; each rendered frame the director weighs the ones from that frame and cuts (or not).
   // A cut is never made without an event in the same frame; min/max holds keep it from thrashing or going stale.
-  const D = {shot: 'plan', since: 0, a0: .6, focus: {f: null, m: null}, cuts: 0, manual: null, log: [], pending: [], minHold: 1.8, stepHold: 1.4, keyHold: .9, maxHold: 6, capHold: 8, jump: true, frame: 0};
+  const D = {shot: 'plan', since: 0, a0: .6, focus: {f: null, m: null}, cuts: 0, manual: null, log: [], pending: [], minHold: 1.8, stepHold: 1.4, keyHold: .9, maxHold: 6, idleHold: 4.5, capHold: 6, protectHold: 1.5, protectUntil: 0, queued: null, prev: null, jump: true, frame: 0};
   sim.on(ev => D.pending.push(ev));
   const femaleOf = id => S.females.find(f => f.id === id) || null, maleOf = id => S.males.find(m => m.id === id) || null;
   // event → {shot, focus, pri}; pri ≥ 4 may cut after minHold, anything may refresh a shot past maxHold
@@ -177,30 +181,47 @@ export function makeStage(THREE, {canvas, sim, createJelly, low = false, preserv
     if (ev.kind === 'stage' && /^F/.test(ev.who)) { const f = femaleOf(ev.who), m = f.partner >= 0 ? S.males[f.partner] : f.partner === -2 ? 'V' : null, foc = {f, m};
       if (ev.stage === 2) return {shot: 'two', focus: foc, pri: adj(f, 6), why: 'contact: ' + f.id + ' catches u'};
       if (ev.stage === 3) return {shot: 'mirror', focus: foc, pri: adj(f, 6), why: 'phase-lock: push to mirror b'};
-      if (ev.stage === 5) return {shot: 'mirror', focus: foc, pri: adj(f, 4), why: 'sweep within τ'};
-      if (ev.stage === 7) return {shot: 'memory', focus: foc, pri: adj(f, 8), why: 'consolidate: memory glow'}; }
+      if (ev.stage === 5) return {shot: 'mirror', focus: foc, pri: f.sweep && f.sweep.mode === 'memory' ? 2 : adj(f, 4), why: 'sweep within τ'};   // a remembered sweep closes within ~1 s: stay on the commitment and let F = 1 cut
+      if (ev.stage === 7) return {shot: 'memory', focus: foc, pri: 9, protect: true, why: 'consolidate: ' + f.id + '’s memory glow'}; }
     if (ev.kind === 'energetic') { const f = femaleOf(ev.f); return {shot: 'bar', focus: {f, m: maleOf(ev.m)}, pri: adj(f, 7), why: 'commit: ' + ev.m + ' asks bar Z to halt'}; }
-    if (ev.kind === 'reinforce') { const f = femaleOf(ev.f); return {shot: 'vane', focus: {f, m: maleOf(ev.m)}, pri: f ? adj(f, 8) : 8, why: 'F = 1: drive falls by ω'}; }
-    if (ev.kind === 'ambient') return {shot: 'plan', focus: {f: null, m: null}, pri: 10, why: ev.rising ? 'the lights come up: the society falls quiet' : 'darkness again: the conversation resumes'};
+    // satisfaction is always the story: the satisfied agent is framed, whichever pair it is
+    if (ev.kind === 'reinforce') { const f = femaleOf(ev.f); return {shot: 'vane', focus: {f, m: maleOf(ev.m)}, pri: 9, protect: true, why: 'F = 1: ' + ev.m + '’s drive falls by ω'}; }
+    if (ev.kind === 'ambient') return {shot: D.shot === 'plan' ? 'side' : 'plan', focus: {f: null, m: null}, pri: 10, why: ev.rising ? 'the lights come up: the society falls quiet' : 'darkness again: the conversation resumes'};
     if (ev.kind === 'contention') return {shot: 'bar', focus: D.focus, pri: focusBusy ? 2 : 5, why: 'Z arbitration'};
     if (ev.kind === 'abort') { const f = femaleOf(ev.f); return {shot: 'side', focus: D.focus, pri: f && !mine(f) ? 0 : 5, why: 'abort: ' + ev.why}; }
+    if (ev.kind === 'zq' && !focusBusy) return {shot: 'bar', focus: D.focus, pri: 3, idle: true, why: 'bar Z passes a mark'};
     return {shot: null, pri: 1, why: ev.kind};
   }
   function idleShot() { const seq = ['plan', 'side', 'orbit']; return seq[(seq.indexOf(D.shot) + 1) % 3] || 'plan'; }
-  function cut(r, ev) { const same = r.shot === D.shot && r.focus === D.focus; D.shot = r.shot; if (r.focus) D.focus = r.focus; D.since = S.t; D.a0 = (D.a0 + 1.9 + (D.cuts * 2.39) % 1.3) % TAU; D.cuts++; D.jump = true;
-    D.log.push({t: +S.t.toFixed(4), shot: r.shot, why: r.why, ev: {kind: ev.kind, t: +ev.t.toFixed(4), who: ev.who || ev.f || ev.m || null}, frame: D.frame}); if (D.log.length > 400) D.log.shift(); }
+  function cut(r, ev, deferred) { D.prev = {shot: D.shot, dur: S.t - D.since}; D.shot = r.shot; if (r.focus) D.focus = r.focus; D.since = S.t; D.a0 = (D.a0 + 1.9 + (D.cuts * 2.39) % 1.3) % TAU; D.cuts++; D.jump = true;
+    D.protectUntil = r.protect ? S.t + D.protectHold : 0;
+    D.log.push({t: +S.t.toFixed(4), shot: r.shot, why: r.why, ev: {kind: ev.kind, t: +ev.t.toFixed(4), who: ev.who || ev.f || ev.m || null}, deferred: !!deferred, frame: D.frame}); if (D.log.length > 400) D.log.shift(); }
+  // an out-and-back (A → B for under 2 s → A) reads as a glitch: refuse it unless it is satisfaction or a visitor
+  const outAndBack = r => D.prev && r.shot === D.prev.shot && S.t - D.since < 2 && D.prev.shot !== 'vane' && r.pri < 9;
   function director() {
     D.frame++; const evs = D.pending; D.pending = []; if (D.manual) return; const held = S.t - D.since;
-    if (!evs.length) { if (held >= D.capHold) cut({shot: idleShot(), focus: D.focus, why: 'establishing (no event for ' + D.capHold + ' s)'}, {kind: 'none', t: S.t}); return; }
     let best = null, bestEv = null;
     for (const ev of evs) { const r = reading(ev); if (!best || r.pri > best.pri) { best = r; bestEv = ev; } }
-    const sameStory = best.focus && best.focus.f && best.focus.f === D.focus.f, need = best.pri >= 10 ? 0 : sameStory ? (best.pri >= 8 ? D.keyHold : D.stepHold) : D.minHold;   // the next beat of the same encounter may come sooner
-    if (sim.P.ambient > .3 && best.pri < 10) { if (held >= D.capHold) cut({shot: idleShot(), focus: {f: null, m: null}, why: 'the lit room, quiet'}, bestEv); return; }   // lights up: hold the quiet room
-    if (best.pri >= 4 && held >= need && (best.shot !== D.shot || !sameStory)) return cut(best, bestEv);
-    if (held >= D.maxHold) {   // stale: refresh on this frame's event, to the live encounter if there is one
-      let live = null; for (const f of S.females) if (f.partner !== -1 && f.stage > 1 && (!live || f.stage > live.stage)) live = f;
-      const r = live ? {shot: live.stage >= 5 ? 'mirror' : 'tri', focus: {f: live, m: live.partner >= 0 ? S.males[live.partner] : 'V'}, why: 'hold refresh: ' + live.id} : {shot: idleShot(), focus: D.focus, why: 'scan: wide'};
-      cut(r, bestEv);
+    // a satisfaction shot is protected: nothing, not even a visitor or the lights, cuts it short; the strongest event waits behind it
+    if (D.protectUntil) {
+      // the same pair's consolidation follows its F = 1: it may take the protected slot (and protects anew); the queue waits behind both
+      if (best && best.protect && best.focus.f && best.focus.f === D.focus.f && held >= D.protectHold - 1e-6) return cut(best, bestEv);
+      if (S.t < D.protectUntil) { if (best && best.pri >= 4 && !best.protect && (!D.queued || best.pri >= D.queued.r.pri)) D.queued = {r: best, ev: bestEv}; return; }
+      if (D.shot === 'vane' && D.focus.f && D.focus.f.stage === 6) { D.protectUntil = S.t + 1e-3; if (best && best.pri >= 4 && !best.protect && (!D.queued || best.pri >= D.queued.r.pri)) D.queued = {r: best, ev: bestEv}; return; }   // her consolidation is coming: keep holding
+      const q = D.queued, was = D.shot; D.queued = null; D.protectUntil = 0;
+      if (q && (q.r.pri >= 9 || S.t - q.ev.t < 3)) return cut(q.r, q.ev, true);
+      if (was === 'memory' && !S.males.some(m => m.stage >= 5 && m.stage <= 6)) return cut({shot: 'tri', focus: D.focus, why: 'the satisfied pair part'}, {kind: 'protect-end', t: S.t}, true);   // a wider look as they swing apart
+    }
+    if (!best) { if (held >= D.capHold) cut({shot: idleShot(), focus: D.focus, why: 'establishing (no event for ' + D.capHold + ' s)'}, {kind: 'none', t: S.t}); return; }
+    const sameStory = best.focus && best.focus.f && best.focus.f === D.focus.f, need = best.pri >= 9 ? 0 : sameStory ? (best.pri >= 8 ? D.keyHold : D.stepHold) : D.minHold;
+    if (sim.P.ambient > .3 && best.pri < 9) { if (held >= D.capHold) cut({shot: idleShot(), focus: {f: null, m: null}, why: 'the lit room, quiet'}, bestEv); return; }   // lights up: hold the quiet room
+    const imminent = best.pri < 9 && S.females.some(f => f.stage === 5 && f.partner >= 0 && Math.abs(f.b) > .35);   // a reflection is nearing a vane: F = 1 is coming, do not cut away just before it
+    if (best.pri >= 4 && held >= need && (best.shot !== D.shot || !sameStory) && !outAndBack(best) && !imminent) return cut(best, bestEv);
+    const live = S.females.some(f => f.partner !== -1 && f.stage > 1);
+    if (held >= (live ? D.maxHold : D.idleHold)) {   // stale: refresh on this frame's event, to the live encounter if there is one
+      let lf = null; for (const f of S.females) if (f.partner !== -1 && f.stage > 1 && (!lf || f.stage > lf.stage)) lf = f;
+      const r = lf ? {shot: lf.stage >= 5 ? 'mirror' : 'tri', focus: {f: lf, m: lf.partner >= 0 ? S.males[lf.partner] : 'V'}, why: 'hold refresh: ' + lf.id} : best.idle && D.shot !== 'bar' ? best : {shot: idleShot(), focus: D.focus, why: 'scan: ' + (best.why || 'wide')};
+      if (!outAndBack(r)) cut(r, bestEv);
     }
   }
   function setShot(name) { if (name === 'auto') { D.manual = null; return; } D.manual = name; if (!D.focus.f) { const f = S.females.find(f => f.stage > 1) || S.females[0]; D.focus = {f, m: f.partner >= 0 ? S.males[f.partner] : S.males[0]}; } D.shot = name; D.since = S.t; D.jump = true; }
@@ -223,7 +244,7 @@ export function makeStage(THREE, {canvas, sim, createJelly, low = false, preserv
     bar.rotation.y = -S.z; zLampMat.color.setHex(S.zHalt ? 0xffa040 : 0x2a6066).multiplyScalar(S.zHalt ? 1.6 : 1);
     const ps = ps0();
     for (const M of males) {
-      const m = M.m, p = mpos(m).add(M.recoil), h = sim.maleHeading(m); M.g.position.copy(p); M.g.rotation.y = -h; M.recoil.multiplyScalar(Math.exp(-dt * .9));
+      const m = M.m, p = mpos(m).add(M.recoil), h = sim.maleHeading(m); M.g.position.copy(p); M.g.rotation.y = -h; M.recoil.multiplyScalar(Math.exp(-dt * .3));
       M.fil.geometry.setFromPoints([p.clone().add(V3(0, .5, 0)), V3(p.x, GEOM.barY, p.z)]);
       const d = m.desire || 'O', col = lampColor(d); M.lampMat.color.setHex(m.lamp ? col : 0x1a1410);
       M.lampMat.color.multiplyScalar(m.lamp ? (m.B ? 2.2 : 1.6) : 1);
@@ -247,11 +268,11 @@ export function makeStage(THREE, {canvas, sim, createJelly, low = false, preserv
       // brightness IS need: the bell and its halo are lit by the drive level, so rising need brightens and F = 1 visibly dims it
       if (m.stage === 6 && M.satT !== m.since) M.satT = m.since; M.bright += (Math.min(1, (m.O + m.P) / 2 / P.Lcap * (m.B ? 1.5 : 1 - .7 * Math.exp(-(S.t - (M.satT ?? -99)) / 7))) - M.bright) * Math.min(1, dt * 7); const lumM = brightOf(M.bright);
       // committed (B on) he burns brighter; satisfied, he goes dark and need slowly relights him
-      M.J.setLook({glow: lumM}); M.J.dim.value = dimOf(M.bright); M.aura.material.opacity = .03 + 1.1 * Math.pow(M.bright, 1.7); M.aura.scale.setScalar(.7 + .5 * M.bright);
+      M.J.setLook({glow: lumM}); M.J.dim.value = dimOf(M.bright); M.aura.material.opacity = Math.min(.55, .03 + 1.0 * Math.pow(M.bright, 1.7)); M.aura.scale.setScalar(.7 + .5 * M.bright);
       M.J.update({t: T, dt, cam: cam.position, camObj: cam, light: p.clone().add(V3(0, 2, 0)), glow: -.45 + ambient * .15, scale: ps * .3, drive: true});
     }
     for (const F of females) {
-      const f = F.f, p = fpos(f).add(F.recoil), h = sim.femaleHeading(f); F.g.position.copy(p); F.g.rotation.y = -h; F.recoil.multiplyScalar(Math.exp(-dt * .9));
+      const f = F.f, p = fpos(f).add(F.recoil), h = sim.femaleHeading(f); F.g.position.copy(p); F.g.rotation.y = -h; F.recoil.multiplyScalar(Math.exp(-dt * .3));
       F.fil.geometry.setFromPoints([p.clone().add(V3(0, .45, 0)), V3(p.x, GEOM.frameY, p.z)]);
       const m = f.partner >= 0 ? S.males[f.partner] : null, lit = f.stage >= 2 && f.stage <= 6;
       F.apMat.color.setHex(lit ? (f.desire === 'P' ? PUCE : ORANGE) : 0x3a6670); F.apMat.color.multiplyScalar(lit ? 1.8 : .8);
@@ -271,9 +292,9 @@ export function makeStage(THREE, {canvas, sim, createJelly, low = false, preserv
       F.refl.material.uniforms.uA.value += (ra - F.refl.material.uniforms.uA.value) * Math.min(1, dt * 8); F.refl.material.uniforms.uT.value = T; F.refl.material.uniforms.uCore.value = .8; F.refl.visible = F.refl.material.uniforms.uA.value > .005;
       const urg = Math.max(f.O, f.P) / P.Lcap; if (F.J.nerve) for (const nv of F.J.rings) nv.warm = .45 + urg * 1.1;
       if (f.stage !== F.last) { if (f.stage === 2 || f.stage === 5) F.J.pulse(1); F.last = f.stage; }
-      if (f.stage === 7 && F.satT !== f.since) F.satT = f.since; F.bright += ((f.O + f.P) / 2 / P.Lcap * (1 - .7 * Math.exp(-(S.t - (F.satT ?? -99)) / 7)) - F.bright) * Math.min(1, dt * 7); F.J.setLook({glow: brightOf(F.bright)}); F.J.dim.value = dimOf(F.bright); F.aura.material.opacity = .03 + 1.1 * Math.pow(F.bright, 1.7); F.aura.scale.setScalar(.75 + .55 * F.bright);
+      if (f.stage === 7 && F.satT !== f.since) F.satT = f.since; F.bright += ((f.O + f.P) / 2 / P.Lcap * (1 - .7 * Math.exp(-(S.t - (F.satT ?? -99)) / 7)) - F.bright) * Math.min(1, dt * 7); F.J.setLook({glow: brightOf(F.bright)}); F.J.dim.value = Math.min(DIMCAP[f.id], dimOf(F.bright)); F.aura.material.opacity = Math.min(.5 * AURA[f.id], (.03 + 1.0 * Math.pow(F.bright, 1.7)) * AURA[f.id]); F.aura.scale.setScalar(.75 + .55 * F.bright);
       // her memory being written (stage 7): a slow glow in the colour of the drive she has just satisfied
-      const ho = f.stage === 7 ? .22 * Math.min(1, (S.t - f.since) * 2) : 0; F.halo.material.opacity += (ho - F.halo.material.opacity) * Math.min(1, dt * 3); F.halo.material.color.setHex(f.desire === 'P' ? PUCE : ORANGE); F.halo.visible = F.halo.material.opacity > .01;
+      const ho = f.stage === 7 ? .22 * Math.min(1, (S.t - f.since) * 2) : 0; F.halo.material.opacity += (ho - F.halo.material.opacity) * Math.min(1, dt * 3); F.halo.material.color.setHex(IDENT[f.id]); F.halo.visible = F.halo.material.opacity > .01;
       F.J.update({t: T, dt, cam: cam.position, camObj: cam, light: p.clone().add(V3(0, 2, 0)), glow: -.45 + ambient * .15, scale: ps * .32, drive: true});
     }
     // the visitor

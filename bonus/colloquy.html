@@ -299,11 +299,13 @@ const FILMSCRIPT = [
   {at: 27, torch: 1},
   {at: 42, stand: true}, {leave: 8},
   {at: 57, ambient: .95}, {at: 67, ambient: 0},
-  {at: 78.5, card: 'THE COLLOQUY OF MOBILES<small>Gordon Pask with Yolanda Sonnabend, Marc Dowson and Tony Watts · ICA London 1968 · reconstruction Pangaro &amp; McLeish 2018, ZKM Karlsruhe</small>', until: 84.5}];
+  {after: 79, card: 'THE COLLOQUY OF MOBILES<small>Gordon Pask with Yolanda Sonnabend, Marc Dowson and Tony Watts · ICA London 1968 · reconstruction Pangaro &amp; McLeish 2018, ZKM Karlsruhe</small>', until: 999}];
 let filmF = 0, standFix = null;
-const film = {fps: 24, duration: +(Q.get('dur') || 84),
+const film = {fps: 24, duration: +(Q.get('dur') || 88),
   frame() { const t = filmF / 24;
-    const card = FILMSCRIPT.find(c => c.card && t >= c.at && t < c.until); $('card').style.display = card ? 'grid' : 'none';
+    // the end title waits for the last satisfaction to be consolidated (no agent in stages 4–7, no protected shot), or the last 4 s
+    for (const c of FILMSCRIPT) if (c.after != null && c.at == null && t >= c.after && (t >= film.duration - 4 || (![...S.males, ...S.females].some(a => a.stage >= 4) && !stage.director.protectUntil))) c.at = t;
+    const card = FILMSCRIPT.find(c => c.card && c.at != null && t >= c.at && t < c.until); $('card').style.display = card ? 'grid' : 'none';
     if (card) { if ($('cardIn').innerHTML !== card.card) $('cardIn').innerHTML = card.card; $('card').style.opacity = Math.max(0, Math.min(1, (t - card.at) / .8 + (card.at === 0 ? 1 : 0), (card.until - t) / .8)); }
     for (const c of FILMSCRIPT) {
       if (c.ambient != null && t >= c.at && !c.done) { sim.set({ambient: c.ambient}); c.done = true; }
@@ -329,7 +331,7 @@ const COLLOQUY = window.COLLOQUY = {
   events: (n = 20) => S.log.slice(-n), director: () => ({shot: stage.director.shot, manual: stage.director.manual, cuts: stage.director.cuts, log: stage.director.log.slice(-10)}),
   handshakesPerMinute: perMin, step(seconds) { sim.run(seconds); },
   // test probes: the sound of a stretch of the live run (offline, same voices), and the measured brightness of a screen region
-  async audioProbe(seconds) { const rr = stage.render; stage.render = () => {}; REC = {ev: [], tr: []}; const t0 = S.t; for (let i = 0; i < seconds * 24; i++) { tick(1 / 24); REC.tr.push({t: S.t, st: soundState(S)}); } stage.render = rr;
+  async audioProbe(seconds, script = []) { const rr = stage.render; stage.render = () => {}; REC = {ev: [], tr: []}; const t0 = S.t; for (let i = 0; i < seconds * 24; i++) { for (const c of script) if (!c.done && i / 24 >= c.at) { sim.set({ambient: c.ambient}); c.done = true; } tick(1 / 24); REC.tr.push({t: S.t, st: soundState(S)}); } stage.render = rr;
     const R0 = REC; REC = null; const buf = await renderOffline(R0.tr, R0.ev, seconds, t0); const bytes = wav(buf); let s = ''; for (let i = 0; i < bytes.length; i += 32768) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 32768));
     return {wav: btoa(s), reinforce: R0.ev.filter(e => e.kind === 'reinforce' && e.t - t0 < seconds - 1).map(e => +(e.t - t0).toFixed(3))}; },
   lum(x, y, r) { const c = $('gl'), w = c.width, h = c.height, k = w / innerWidth, cv2 = document.createElement('canvas'); cv2.width = w; cv2.height = h; const g = cv2.getContext('2d'); g.drawImage(c, 0, 0);

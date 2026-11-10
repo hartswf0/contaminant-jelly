@@ -106,6 +106,19 @@ The page has no separate cinematic layer. The simulation is the film:
   - Exhibition mode does the same every 6 minutes.
 - **Pacing:** `commitHold` is 1.5 s and `closeHold` 1.6 s, so the director can show the commitment, the sweep, the satisfaction and the consolidation.
 
+## Critic round 2 → repairs (nothing cuts away from satisfaction)
+- **Protected satisfaction:**
+  - Every F = 1 cuts at once to the **satisfied male** (`vane`), whichever pair it is, and that shot is protected for 1.5 s. The same pair's consolidation may take the slot (`memory`, also protected 1.5 s).
+  - Every other event, the lights and the visitor included, is queued behind it. The strongest queued event is cut on the frame the protection ends; the log marks these cuts `deferred`.
+  - After consolidation, a wider `tri` shot shows the pair swinging apart. The swing now decays slowly (time constant about 3 s).
+  - The director does not cut away while a reflection is nearing a vane (|b| > 0.35 in the sweep).
+  - A remembered sweep, which closes within about 1 s, no longer earns its own cut.
+- **The end title** waits until no agent is in stages 4–7 and no shot is protected. The film is 88 s.
+- **Holds:** with no live encounter, shots refresh after 4.5 s on any event (bar Z passing a 60° mark cuts to the bar). With no event at all, the director cuts to an establishing shot after 6 s. An out-and-back insert (A → B for under 2 s → A) is refused.
+- **Bloom:** F3 (the cream Fleck Veil) has her halo and dimmer capped. The memory glow uses each female's own hue, so F1 stays blue. In the film, no frame has more than 1.7% of its pixels above 230.
+- **Stranger shot:** the director picks the shoulder whose line of sight passes farthest from the males. On portrait screens, the stranger, mirror and two-shots look at the solicited female.
+- **Darkness is audible:** the bed (tones, hum, buzz) is ducked by up to 15 dB while the room is lit. Measured dip: 14.5 LU.
+
 ## The staging
 - **Cast** (`?cast=G:sentinel,J:celluloid,F1:glass,F2:medusa,F3:veil` is the default):
   - Each mobile is `createJelly(THREE, id, {puppet: true})`, hung on a filament.
@@ -184,6 +197,14 @@ The page has no separate cinematic layer. The simulation is the film:
   - the 390 px phone picture is uncovered.
   - Satisfaction is visible: the region brightness 0.5 s after F = 1 is at least 40% below the commit value.
   - Satisfaction is audible: an EBU R128 momentary peak at least 6 LU above the bed within 0.5 s of each F = 1.
+  - **Every closure** in the recorded cineulation:
+    - the satisfied male is framed, on screen, in a shot of at least 1.5 s;
+    - his region is at least 40% darker within 0.5 s;
+    - at most 5% of the frame's pixels clip.
+  - No chord-level loudness peak occurs without an F = 1 near it.
+  - The lit room is at least 8 LU quieter than the dark room.
+  - No out-and-back inserts.
+  - Deferred cuts land on the end of the protected shot.
 
 **Run:**
 - `node tests/colloquy/test_sim.mjs`
