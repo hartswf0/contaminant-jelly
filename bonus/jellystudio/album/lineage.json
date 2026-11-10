@@ -1,0 +1,1612 @@
+{
+ "album": "THE WEIGHT ARRIVES",
+ "tracks": [
+  {
+   "id": "boxes-found",
+   "label": "1 · BOXES ON MY BACK",
+   "title": "ET TU, BRUTE · BOXES ON MY BACK",
+   "bpm": 72,
+   "group": "album",
+   "seconds": 120.0
+  },
+  {
+   "id": "a2-pickup",
+   "label": "2 · PICKUP",
+   "title": "PICKUP",
+   "bpm": 80,
+   "group": "album",
+   "seconds": 48.0
+  },
+  {
+   "id": "a3-late",
+   "label": "3 · LATE",
+   "title": "LATE",
+   "bpm": 76,
+   "group": "album",
+   "seconds": 50.5
+  },
+  {
+   "id": "a4-clock",
+   "label": "4 · FIELD CLOCK",
+   "title": "FIELD CLOCK",
+   "bpm": 92,
+   "group": "album",
+   "seconds": 52.2
+  },
+  {
+   "id": "a5-remains",
+   "label": "5 · WHAT REMAINS",
+   "title": "WHAT REMAINS",
+   "bpm": 72,
+   "group": "album",
+   "seconds": 70.0
+  },
+  {
+   "id": "a6-sixty",
+   "label": "6 · SIXTY BEATS",
+   "title": "SIXTY BEATS",
+   "bpm": 90,
+   "group": "album",
+   "seconds": 42.7
+  },
+  {
+   "id": "a7-room",
+   "label": "7 · ONE ROOM",
+   "title": "ONE ROOM",
+   "bpm": 60,
+   "group": "album",
+   "seconds": 64.0
+  },
+  {
+   "id": "a8-rebuilt",
+   "label": "8 · THE CHOIR, REBUILT",
+   "title": "THE CHOIR, REBUILT",
+   "bpm": 72,
+   "group": "album",
+   "seconds": 63.3
+  }
+ ],
+ "thesis": {
+  "a2-pickup": {
+   "operator": "Cut",
+   "thesis": "When the glide’s attack moves half a beat before the barline, the listener should feel the downbeat shift from the sample to the kick.",
+   "falsifier": "scenes A and B: four bars, identical but for where the glide starts",
+   "rejected": null
+  },
+  "a3-late": {
+   "operator": "Feel",
+   "thesis": "With the sample’s timing kept and only the drums moved by a few milliseconds, the groove should lean back at bar 9.",
+   "falsifier": "scenes A and B",
+   "rejected": null
+  },
+  "a4-clock": {
+   "operator": "Reframe",
+   "thesis": "The same half-second of voice should be heard as a call for four bars and as a drum from bar 5, with nothing changed but where it falls.",
+   "falsifier": "mute DRUMS from bar 5: if the voice still reads as a call, the reframing failed",
+   "rejected": null
+  },
+  "a5-remains": {
+   "operator": "Haunt",
+   "thesis": "The motif should stay recognisable while its bandwidth shrinks from 600 Hz to 40 Hz, because the sub keeps playing its roots.",
+   "falsifier": "mute SUB: if the motif is lost a stage earlier, the weight was carrying it",
+   "measured": [
+    {
+     "stage": "full",
+     "bandwidth_Hz": [
+      285,
+      742
+     ],
+     "envelope_match": 1.0
+    },
+    {
+     "stage": "dim",
+     "bandwidth_Hz": [
+      274,
+      725
+     ],
+     "envelope_match": 0.84
+    },
+    {
+     "stage": "band",
+     "bandwidth_Hz": [
+      364,
+      442
+     ],
+     "envelope_match": 0.61
+    },
+    {
+     "stage": "thread",
+     "bandwidth_Hz": [
+      430,
+      443
+     ],
+     "envelope_match": 0.35
+    },
+    {
+     "stage": "ghost",
+     "bandwidth_Hz": [
+      430,
+      443
+     ],
+     "envelope_match": 0.31
+    }
+   ],
+   "rejected": null
+  },
+  "a6-sixty": {
+   "operator": "Recombine",
+   "thesis": "Cycles of 3, 5 and 6 beats against a 4-beat bar should make the kick, which only marks their meetings, sound composed.",
+   "falsifier": "mute DRUMS and SUB: the meetings should still be audible as moments of density",
+   "measured": [
+    {
+     "beat": 0,
+     "bar": 1,
+     "beat_in_bar": 1,
+     "cycles": [
+      "quiet",
+      "drawn",
+      "long"
+     ]
+    },
+    {
+     "beat": 6,
+     "bar": 2,
+     "beat_in_bar": 3,
+     "cycles": [
+      "quiet",
+      "long"
+     ]
+    },
+    {
+     "beat": 12,
+     "bar": 4,
+     "beat_in_bar": 1,
+     "cycles": [
+      "quiet",
+      "long"
+     ]
+    },
+    {
+     "beat": 15,
+     "bar": 4,
+     "beat_in_bar": 4,
+     "cycles": [
+      "quiet",
+      "drawn"
+     ]
+    },
+    {
+     "beat": 18,
+     "bar": 5,
+     "beat_in_bar": 3,
+     "cycles": [
+      "quiet",
+      "long"
+     ]
+    },
+    {
+     "beat": 24,
+     "bar": 7,
+     "beat_in_bar": 1,
+     "cycles": [
+      "quiet",
+      "long"
+     ]
+    },
+    {
+     "beat": 30,
+     "bar": 8,
+     "beat_in_bar": 3,
+     "cycles": [
+      "quiet",
+      "drawn",
+      "long"
+     ]
+    },
+    {
+     "beat": 36,
+     "bar": 10,
+     "beat_in_bar": 1,
+     "cycles": [
+      "quiet",
+      "long"
+     ]
+    },
+    {
+     "beat": 42,
+     "bar": 11,
+     "beat_in_bar": 3,
+     "cycles": [
+      "quiet",
+      "long"
+     ]
+    },
+    {
+     "beat": 45,
+     "bar": 12,
+     "beat_in_bar": 2,
+     "cycles": [
+      "quiet",
+      "drawn"
+     ]
+    },
+    {
+     "beat": 48,
+     "bar": 13,
+     "beat_in_bar": 1,
+     "cycles": [
+      "quiet",
+      "long"
+     ]
+    },
+    {
+     "beat": 54,
+     "bar": 14,
+     "beat_in_bar": 3,
+     "cycles": [
+      "quiet",
+      "long"
+     ]
+    },
+    {
+     "beat": 60,
+     "bar": 16,
+     "beat_in_bar": 1,
+     "cycles": [
+      "quiet",
+      "drawn",
+      "long"
+     ]
+    }
+   ],
+   "rejected": null
+  },
+  "a7-room": {
+   "operator": "Worldbuild",
+   "thesis": "One shared room and one shared pulse should make four unrelated sources sound like one place, and the broadcast should feel like an event because the pulse stops after it.",
+   "falsifier": "the flips are stored dry as well: replace them and the place should fall apart",
+   "rejected": null
+  },
+  "a8-rebuilt": {
+   "operator": "Resynthesize",
+   "thesis": "At bar 9 the recording leaves and a synthetic copy stays: the listener should still hear the same two chords, and should hear the choir return at bar 15 as a different thing.",
+   "falsifier": "mute ANSWER (the rebuilt layer) in bars 5 to 8: if nothing is missed, the copy adds nothing",
+   "measured": {
+    "envelope_match": 0.99,
+    "spectrum_match": 0.75
+   },
+   "rejected": null
+  }
+ },
+ "sources": [
+  {
+   "id": "S29988c",
+   "title": "Hollow Square Roar-Brute",
+   "sha256": "29988cce89b7a1d185d83698807c1d7f2bd4ff20ad5a931e6199be63886ebfe9",
+   "location": "github.com/hartswf0/moto @ 44ce7a8 : Et Tu, Brute (Box on the back)/Et tu, Brute_ - Hollow Square Roar-Brute - Treblo.ogg",
+   "format": "ogg, decoded to 44.1 kHz stereo float",
+   "acquisition": "in the owner’s own repository; the four catalogs named in the first brief",
+   "credits": "generated with Treblo (from the file name); published by the owner",
+   "catalog": "et-tu-brute-boxes-on-my-back"
+  },
+  {
+   "id": "Sd3ac86",
+   "title": "Boxes on My Back",
+   "sha256": "d3ac8625d68e7c1110cad7fdd422ed8f25e625f4fc3b4ddfd791827bb94cac53",
+   "location": "github.com/hartswf0/moto @ 44ce7a8 : Et Tu, Brute (Box on the back)/Et tu, Brute_ - Boxes on My Back - Treblo (1).ogg",
+   "format": "ogg, decoded to 44.1 kHz stereo float",
+   "acquisition": "in the owner’s own repository; the four catalogs named in the first brief",
+   "credits": "generated with Treblo (from the file name); published by the owner",
+   "catalog": "et-tu-brute-boxes-on-my-back"
+  },
+  {
+   "id": "S484319",
+   "title": "Trap-Tox & Cardboard",
+   "sha256": "484319c635d936de82707abfd95a6201b5377edc738f12579a1571c7ab7d17f8",
+   "location": "github.com/hartswf0/moto @ 44ce7a8 : Et tu, Brute (BOXBACK)/Et tu, Brute_ - Trap-Tox & Cardboard - Treblo.ogg",
+   "format": "ogg, decoded to 44.1 kHz stereo float",
+   "acquisition": "in the owner’s own repository; the four catalogs named in the first brief",
+   "credits": "generated with Treblo (from the file name); published by the owner",
+   "catalog": "et-tu-brute-boxback"
+  },
+  {
+   "id": "S5bb2f2",
+   "title": "The Cathedral of Tape Echo",
+   "sha256": "5bb2f26bf5b8af87e4854e84d155f80be229738f9d88929c43a3e8716353c1cb",
+   "location": "github.com/hartswf0/moto @ 44ce7a8 : Et Tu, Brute (beats)/Et tu, Brute_ - The Cathedral of Tape Echo - Treblo.ogg",
+   "format": "ogg, decoded to 44.1 kHz stereo float",
+   "acquisition": "in the owner’s own repository; the four catalogs named in the first brief",
+   "credits": "generated with Treblo (from the file name); published by the owner",
+   "catalog": "et-tu-brute-beats"
+  },
+  {
+   "id": "S5e8b37",
+   "title": "Subterranean Dreams",
+   "sha256": "5e8b3760353b2028554deae829fd2255775804f573c346ef6e8897fd30bc8ec7",
+   "location": "github.com/hartswf0/moto @ 44ce7a8 : Et tu, Brute/Et tu, Brute_ - Subterranean Dreams - Treblo.ogg",
+   "format": "ogg, decoded to 44.1 kHz stereo float",
+   "acquisition": "in the owner’s own repository; the four catalogs named in the first brief",
+   "credits": "generated with Treblo (from the file name); published by the owner",
+   "catalog": "et-tu-brute"
+  },
+  {
+   "id": "Sc5f934",
+   "title": "Sunbaked Field Chant",
+   "sha256": "c5f934c638b4bb1a86622b41ebedc65fc68e822a04ac77701ad048fc7e449de6",
+   "location": "github.com/hartswf0/moto @ 44ce7a8 : JUKEBOX TIME COLLAPSE/Jukebox Time Collapse - Sunbaked Field Chant - Sonauto.ogg",
+   "format": "ogg, decoded to 44.1 kHz stereo float",
+   "acquisition": "in the owner’s own repository; seeded random (1906), one per album",
+   "credits": "generated with Sonauto (from the file name); published by the owner",
+   "catalog": "forage:JUKEBOX TIME COLLAPSE"
+  },
+  {
+   "id": "S8ee5a1",
+   "title": "Echoes of the Black Chapel",
+   "sha256": "8ee5a1761abe01ddedc745d554f56dd13a209eae59e3eb53ae6f11b6b33bdebf",
+   "location": "github.com/hartswf0/moto @ 44ce7a8 : Et Tu, Brute (beats)/Et tu, Brute_ - Echoes of the Black Chapel - Treblo.ogg",
+   "format": "ogg, decoded to 44.1 kHz stereo float",
+   "acquisition": "in the owner’s own repository; the four catalogs named in the first brief",
+   "credits": "generated with Treblo (from the file name); published by the owner",
+   "catalog": "et-tu-brute-beats"
+  },
+  {
+   "id": "S1a4289",
+   "title": "Steppe Telegraph & The 6,500-Voice Lavender Shanty",
+   "sha256": "1a4289394ef855981f96bd64f4011b02382913d61146a2bdb6508b5b74231d6b",
+   "location": "github.com/hartswf0/moto @ 44ce7a8 : Et Tu, Brute (beats)/Et tu, Brute_ - Steppe Telegraph & The 6,500-Voice Lavender Shanty - Treblo.ogg",
+   "format": "ogg, decoded to 44.1 kHz stereo float",
+   "acquisition": "in the owner’s own repository; the four catalogs named in the first brief",
+   "credits": "generated with Treblo (from the file name); published by the owner",
+   "catalog": "et-tu-brute-beats"
+  },
+  {
+   "id": "S45d9be",
+   "title": "Fa Sol La Mi",
+   "sha256": "45d9be599a44bbb1535dabcf90ce40d3deda69239bf9a6bbc6437b528bd41b65",
+   "location": "github.com/hartswf0/moto @ 44ce7a8 : Et Tu, Brute (Box on the back)/Et tu, Brute_ - Fa Sol La Mi - Treblo.ogg",
+   "format": "ogg, decoded to 44.1 kHz stereo float",
+   "acquisition": "in the owner’s own repository; the four catalogs named in the first brief",
+   "credits": "generated with Treblo (from the file name); published by the owner",
+   "catalog": "et-tu-brute-boxes-on-my-back"
+  },
+  {
+   "id": "S79bf9a",
+   "title": "HUNH! (92 BPM Field Clock)",
+   "sha256": "79bf9a506eebbdb28e89472592dba21d589ee4575af98dc963fdb2cb1cb7de32",
+   "location": "github.com/hartswf0/moto @ 44ce7a8 : Et Tu, Brute (Box on the back)/Et tu, Brute_ - HUNH! (92 BPM Field Clock) - Treblo.ogg",
+   "format": "ogg, decoded to 44.1 kHz stereo float",
+   "acquisition": "in the owner’s own repository; the four catalogs named in the first brief",
+   "credits": "generated with Treblo (from the file name); published by the owner",
+   "catalog": "et-tu-brute-boxes-on-my-back"
+  },
+  {
+   "id": "S2159e0",
+   "title": "Boxes",
+   "sha256": "2159e0ea6f41ceca2c918ec0091ed906051af684a8260c991cec86bbad88b1ad",
+   "location": "github.com/hartswf0/moto @ 44ce7a8 : Et tu, Brute (BOXBACK)/Et tu, Brute_ - Boxes - Treblo (3).ogg",
+   "format": "ogg, decoded to 44.1 kHz stereo float",
+   "acquisition": "in the owner’s own repository; the four catalogs named in the first brief",
+   "credits": "generated with Treblo (from the file name); published by the owner",
+   "catalog": "et-tu-brute-boxback"
+  },
+  {
+   "id": "Sadac8e",
+   "title": "Choral-First Motorik",
+   "sha256": "adac8e22ae30d280d09f68711ac0612da439b493db0a466d009c088ca91e3cef",
+   "location": "github.com/hartswf0/moto @ 44ce7a8 : Et Tu, Brute (beats)/Et tu, Brute_ - Choral-First Motorik - Treblo.ogg",
+   "format": "ogg, decoded to 44.1 kHz stereo float",
+   "acquisition": "in the owner’s own repository; the four catalogs named in the first brief",
+   "credits": "generated with Treblo (from the file name); published by the owner",
+   "catalog": "et-tu-brute-beats"
+  },
+  {
+   "id": "S2331ca",
+   "title": "Parchman Hollow Square",
+   "sha256": "2331ca7becfe0d88f0be732f6d068860d18d790a6df474dbb4c355a3574656a8",
+   "location": "github.com/hartswf0/moto @ 44ce7a8 : Et Tu, Brute (Box on the back)/Et tu, Brute_ - Parchman Hollow Square - Treblo.ogg",
+   "format": "ogg, decoded to 44.1 kHz stereo float",
+   "acquisition": "in the owner’s own repository; the four catalogs named in the first brief",
+   "credits": "generated with Treblo (from the file name); published by the owner",
+   "catalog": "et-tu-brute-boxes-on-my-back"
+  },
+  {
+   "id": "S1c3f8a",
+   "title": "What It Do_",
+   "sha256": "1c3f8ae9f75511c5ff8a189551fa9c01a26634df6acf0a8f615843bbbe6cbed1",
+   "location": "github.com/hartswf0/moto @ 44ce7a8 : DOWN IN THE COLD RUN/Down in the Cold Run - What It Do_ - Treblo (1).ogg",
+   "format": "ogg, decoded to 44.1 kHz stereo float",
+   "acquisition": "in the owner’s own repository; seeded random (1906), one per album",
+   "credits": "generated with Treblo (from the file name); published by the owner",
+   "catalog": "forage:DOWN IN THE COLD RUN"
+  },
+  {
+   "id": "S823ae3",
+   "title": "Brutus Protocol",
+   "sha256": "823ae33a7343f3693f727c540018870c968b1d311c958dd164e4fc58f81dac42",
+   "location": "github.com/hartswf0/moto @ 44ce7a8 : Et Tu, Brute (Box on the back)/Et tu, Brute_ - Brutus Protocol - Treblo.ogg",
+   "format": "ogg, decoded to 44.1 kHz stereo float",
+   "acquisition": "in the owner’s own repository; the four catalogs named in the first brief",
+   "credits": "generated with Treblo (from the file name); published by the owner",
+   "catalog": "et-tu-brute-boxes-on-my-back"
+  },
+  {
+   "id": "Secb35f",
+   "title": "The Ancient-Chant Singularity",
+   "sha256": "ecb35fcd72efca737d2846eae5432b93b575ee2ecce305f0048a0d0a4380f0f3",
+   "location": "github.com/hartswf0/moto @ 44ce7a8 : Et Tu, Brute (beats)/Et tu, Brute_ - The Ancient-Chant Singularity - Treblo.ogg",
+   "format": "ogg, decoded to 44.1 kHz stereo float",
+   "acquisition": "in the owner’s own repository; the four catalogs named in the first brief",
+   "credits": "generated with Treblo (from the file name); published by the owner",
+   "catalog": "et-tu-brute-beats"
+  },
+  {
+   "id": "Sa0fea1",
+   "title": "The Knife I Carry",
+   "sha256": "a0fea16a0d881ea66a680467c3a94fea21e37641c72cf11e5c9990d685924225",
+   "location": "github.com/hartswf0/moto @ 44ce7a8 : Et Tu, Brute (beats)/Et tu, Brute_ - The Knife I Carry - Treblo.ogg",
+   "format": "ogg, decoded to 44.1 kHz stereo float",
+   "acquisition": "in the owner’s own repository; the four catalogs named in the first brief",
+   "credits": "generated with Treblo (from the file name); published by the owner",
+   "catalog": "et-tu-brute-beats"
+  }
+ ],
+ "moments": [
+  {
+   "src": "Sc5f934",
+   "t0": 100.682,
+   "t1": 101.946,
+   "score": 1.68,
+   "obs": "a glide of 1.8 semitones (551 to 612 Hz) in 1.3 s, periodic throughout (0.92)",
+   "kind": "unstable pitch",
+   "id": "M01",
+   "sample_in": 4440076,
+   "sample_out": 4495819,
+   "source_rate": 44100,
+   "context": [
+    4351876,
+    4584019
+   ],
+   "use": "a lead that will not sit still: a hook, or a transition",
+   "source_hash": "c5f934c638b4bb1a86622b41ebedc65fc68e822a04ac77701ad048fc7e449de6",
+   "status": "provisional: located by measurement, not heard",
+   "title_revealed_after_freeze": "Sunbaked Field Chant"
+  },
+  {
+   "src": "S823ae3",
+   "t0": 84.706,
+   "t1": 85.971,
+   "score": 1.67,
+   "obs": "a glide of 1.8 semitones (596 to 538 Hz) in 1.3 s, periodic throughout (0.94)",
+   "kind": "unstable pitch",
+   "id": "M02",
+   "sample_in": 3735535,
+   "sample_out": 3791321,
+   "source_rate": 44100,
+   "context": [
+    3647335,
+    3879521
+   ],
+   "use": "a lead that will not sit still: a hook, or a transition",
+   "source_hash": "823ae33a7343f3693f727c540018870c968b1d311c958dd164e4fc58f81dac42",
+   "status": "provisional: located by measurement, not heard",
+   "title_revealed_after_freeze": "Brutus Protocol"
+  },
+  {
+   "src": "Secb35f",
+   "t0": 4.541,
+   "t1": 7.025,
+   "score": 19.41,
+   "obs": "a hole of 1.18 s, 73 dB down, with sound on both sides; the re-entry rises 72 dB",
+   "kind": "negative space",
+   "id": "M03",
+   "sample_in": 200258,
+   "sample_out": 309802,
+   "source_rate": 44100,
+   "context": [
+    112058,
+    398002
+   ],
+   "use": "a ready-made stop: the hole can become the place for a voice",
+   "source_hash": "ecb35fcd72efca737d2846eae5432b93b575ee2ecce305f0048a0d0a4380f0f3",
+   "status": "provisional: located by measurement, not heard",
+   "title_revealed_after_freeze": "The Ancient-Chant Singularity"
+  },
+  {
+   "src": "Sa0fea1",
+   "t0": 83.512,
+   "t1": 85.346,
+   "score": 18.14,
+   "obs": "a hole of 0.53 s, 69 dB down, with sound on both sides; the re-entry rises 66 dB",
+   "kind": "negative space",
+   "id": "M04",
+   "sample_in": 3682879,
+   "sample_out": 3763759,
+   "source_rate": 44100,
+   "context": [
+    3594679,
+    3851959
+   ],
+   "use": "a ready-made stop: the hole can become the place for a voice",
+   "source_hash": "a0fea16a0d881ea66a680467c3a94fea21e37641c72cf11e5c9990d685924225",
+   "status": "provisional: located by measurement, not heard",
+   "title_revealed_after_freeze": "The Knife I Carry"
+  },
+  {
+   "src": "S5bb2f2",
+   "t0": 54.524,
+   "t1": 54.994,
+   "score": 105.51,
+   "obs": "rises 49 dB in under 50 ms, falls 56 dB in 0.3 s; centre 2609 Hz",
+   "kind": "transient",
+   "id": "M05",
+   "sample_in": 2404508,
+   "sample_out": 2425235,
+   "source_rate": 44100,
+   "context": [
+    2316308,
+    2513435
+   ],
+   "use": "a percussion voice: something to move across the barline",
+   "source_hash": "5bb2f26bf5b8af87e4854e84d155f80be229738f9d88929c43a3e8716353c1cb",
+   "status": "provisional: located by measurement, not heard",
+   "title_revealed_after_freeze": "The Cathedral of Tape Echo"
+  },
+  {
+   "src": "S8ee5a1",
+   "t0": 150.19,
+   "t1": 151.137,
+   "score": 49.88,
+   "obs": "falls 25 dB in 0.63 s with no step over 7 dB; centre 819 Hz",
+   "kind": "decay",
+   "id": "M06",
+   "sample_in": 6623379,
+   "sample_out": 6665142,
+   "source_rate": 44100,
+   "context": [
+    6535179,
+    6753342
+   ],
+   "use": "a tail: something to leave ringing across a dropout",
+   "source_hash": "8ee5a1761abe01ddedc745d554f56dd13a209eae59e3eb53ae6f11b6b33bdebf",
+   "status": "provisional: located by measurement, not heard",
+   "title_revealed_after_freeze": "Echoes of the Black Chapel"
+  },
+  {
+   "src": "S2159e0",
+   "t0": 239.387,
+   "t1": 240.087,
+   "score": 48.79,
+   "obs": "half a second of unpitched air (periodicity 0.44, centre 4724 Hz) standing 47 dB above what comes before",
+   "kind": "breath",
+   "id": "M07",
+   "sample_in": 10556967,
+   "sample_out": 10587837,
+   "source_rate": 44100,
+   "context": [
+    10468767,
+    10676037
+   ],
+   "use": "a human-scale event to stand where a snare would",
+   "source_hash": "2159e0ea6f41ceca2c918ec0091ed906051af684a8260c991cec86bbad88b1ad",
+   "status": "provisional: located by measurement, not heard",
+   "title_revealed_after_freeze": "Boxes"
+  },
+  {
+   "src": "S1a4289",
+   "t0": 147.772,
+   "t1": 149.772,
+   "score": 9.82,
+   "obs": "the level trembles 10.8 times a second (depth 26.9 dB) under a steady pitch",
+   "kind": "modulation",
+   "id": "M08",
+   "sample_in": 6516745,
+   "sample_out": 6604945,
+   "source_rate": 44100,
+   "context": [
+    6428545,
+    6693145
+   ],
+   "use": "a bed that already moves, so the drums can be sparse",
+   "source_hash": "1a4289394ef855981f96bd64f4011b02382913d61146a2bdb6508b5b74231d6b",
+   "status": "provisional: located by measurement, not heard",
+   "title_revealed_after_freeze": "Steppe Telegraph & The 6,500-Voice Lavender Shanty"
+  },
+  {
+   "src": "Sadac8e",
+   "t0": 85.38,
+   "t1": 89.38,
+   "score": 2.22,
+   "obs": "four seconds at a steady level while the brightness moves from 328 to 29 Hz",
+   "kind": "evolving texture",
+   "id": "M09",
+   "sample_in": 3765258,
+   "sample_out": 3941658,
+   "source_rate": 44100,
+   "context": [
+    3677058,
+    4029858
+   ],
+   "use": "a long cycle to run shorter loops against",
+   "source_hash": "adac8e22ae30d280d09f68711ac0612da439b493db0a466d009c088ca91e3cef",
+   "status": "provisional: located by measurement, not heard",
+   "title_revealed_after_freeze": "Choral-First Motorik"
+  },
+  {
+   "src": "S2331ca",
+   "t0": 61.997,
+   "t1": 63.597,
+   "score": 0.99,
+   "obs": "quiet (29 dB under the loud passages) but pitched (periodicity 0.99): easy to pass over",
+   "kind": "quiet",
+   "id": "M10",
+   "sample_in": 2734068,
+   "sample_out": 2804628,
+   "source_rate": 44100,
+   "context": [
+    2645868,
+    2892828
+   ],
+   "use": "an event that only works if everything else gets out of the way",
+   "source_hash": "2331ca7becfe0d88f0be732f6d068860d18d790a6df474dbb4c355a3574656a8",
+   "status": "provisional: located by measurement, not heard",
+   "title_revealed_after_freeze": "Parchman Hollow Square"
+  },
+  {
+   "src": "S1c3f8a",
+   "t0": 129.779,
+   "t1": 131.779,
+   "score": 0,
+   "obs": "no test applied",
+   "kind": "random draw",
+   "id": "M11",
+   "sample_in": 5723254,
+   "sample_out": 5811454,
+   "source_rate": 44100,
+   "context": [
+    5635054,
+    5899654
+   ],
+   "use": "unknown: drawn, not chosen",
+   "source_hash": "1c3f8ae9f75511c5ff8a189551fa9c01a26634df6acf0a8f615843bbbe6cbed1",
+   "status": "provisional: located by measurement, not heard",
+   "title_revealed_after_freeze": "What It Do_"
+  },
+  {
+   "src": "S45d9be",
+   "t0": 36.981,
+   "t1": 38.981,
+   "score": 0,
+   "obs": "no test applied",
+   "kind": "random draw",
+   "id": "M12",
+   "sample_in": 1630862,
+   "sample_out": 1719062,
+   "source_rate": 44100,
+   "context": [
+    1542662,
+    1807262
+   ],
+   "use": "unknown: drawn, not chosen",
+   "source_hash": "45d9be599a44bbb1535dabcf90ce40d3deda69239bf9a6bbc6437b528bd41b65",
+   "status": "provisional: located by measurement, not heard",
+   "title_revealed_after_freeze": "Fa Sol La Mi"
+  },
+  {
+   "id": "C1",
+   "kind": "context-led",
+   "src": "S79bf9a",
+   "sample_in": 2099831,
+   "sample_out": 2118353,
+   "t0": 47.61521541950113,
+   "t1": 48.035215419501135,
+   "obs": "the strongest onset in the file (chosen after the names were revealed, from the title)",
+   "use": "a voice that becomes the snare",
+   "title_revealed_after_freeze": "HUNH! (92 BPM Field Clock)"
+  }
+ ],
+ "blind_shortlist_sha256": "b8602966bb3a89f5b24f61a0fc2585109519bdbfe8c39b73786e3e35bcb7b54f",
+ "flips": [
+  {
+   "track": "a2-pickup",
+   "flip": "glide",
+   "moment": "M01",
+   "source": "Sc5f934",
+   "sample_in": 4440076,
+   "sample_out": 4489688,
+   "operations": [],
+   "seed": 0,
+   "hypothesis": "a rising glide: where its attack falls decides where the bar starts",
+   "wet_sha256": "8e0d6e53dbcd4b41b6f532e170335c77f64503e7ee9b1bc8e313d73bf855bd81"
+  },
+  {
+   "track": "a2-pickup",
+   "flip": "tick",
+   "moment": "M05",
+   "source": "S5bb2f2",
+   "sample_in": 2405478,
+   "sample_out": 2418708,
+   "operations": [],
+   "seed": 0,
+   "hypothesis": "a dry tick to mark the off-beats",
+   "wet_sha256": "8de22ebf885a8ddf7c7f87bdb536e27d00c848946b8069c1919bb4a9146c1077"
+  },
+  {
+   "track": "a2-pickup",
+   "flip": "tail",
+   "moment": "M06",
+   "source": "S8ee5a1",
+   "sample_in": 6638868,
+   "sample_out": 6687378,
+   "operations": [
+    [
+     "room",
+     500,
+     0.25
+    ]
+   ],
+   "seed": 6,
+   "hypothesis": "the last hit of the passage, left to ring in a room",
+   "wet_sha256": "040bbe3eacc37943178180e5b3cd0e4130f3b51ccafc1ca0f49b9461552fd79d"
+  },
+  {
+   "track": "a3-late",
+   "flip": "tremble",
+   "moment": "M08",
+   "source": "S1a4289",
+   "sample_in": 6516745,
+   "sample_out": 6586377,
+   "operations": [],
+   "seed": 0,
+   "hypothesis": "a note whose level already trembles 10.8 times a second: it carries its own pulse",
+   "wet_sha256": "c6888a7dcbd0f57ecdb2c931ae08536781dbd2802c1eed590732a47cb5789a0f"
+  },
+  {
+   "track": "a3-late",
+   "flip": "drawn",
+   "moment": "M12",
+   "source": "S45d9be",
+   "sample_in": 1630862,
+   "sample_out": 1683086,
+   "operations": [
+    [
+     "hp",
+     300
+    ]
+   ],
+   "seed": 0,
+   "hypothesis": "a random draw, thinned so it sits above the bed",
+   "wet_sha256": "eda13caf4c81f15c10cf15d4b7cf79f3fc00dac05022d2dc7a96ea1b525863dd"
+  },
+  {
+   "track": "a4-clock",
+   "flip": "hunh",
+   "moment": "C1",
+   "source": "S79bf9a",
+   "sample_in": 2099831,
+   "sample_out": 2118353,
+   "operations": [],
+   "seed": 0,
+   "hypothesis": "context-led: the title names a work-song grunt and a 92 BPM clock. The strongest onset in the file is taken as that grunt",
+   "wet_sha256": "ceac6cd46ce388469861fb67933263b23b7acdb57dec967ec0a6d20c7f3ee6dd"
+  },
+  {
+   "track": "a4-clock",
+   "flip": "breath",
+   "moment": "M07",
+   "source": "S2159e0",
+   "sample_in": 10558398,
+   "sample_out": 10582653,
+   "operations": [],
+   "seed": 0,
+   "hypothesis": "half a second of air, as the answer to the call",
+   "wet_sha256": "5b879a6d933ecc79e80e5cdd43922eb19452994b31f7798b0e8bc27be9b98f97"
+  },
+  {
+   "track": "a5-remains",
+   "flip": "full_D",
+   "moment": "roar",
+   "source": "S29988c",
+   "sample_in": 446292,
+   "sample_out": 593292,
+   "operations": [],
+   "seed": 5,
+   "hypothesis": "Haunt, stage 0: the whole motif",
+   "wet_sha256": "49395a648ae5de7048cb6f28b574626290636936088588d76af282fb737f3646"
+  },
+  {
+   "track": "a5-remains",
+   "flip": "full_C",
+   "moment": "roar",
+   "source": "S29988c",
+   "sample_in": 1835442,
+   "sample_out": 1982442,
+   "operations": [],
+   "seed": 5,
+   "hypothesis": "Haunt, stage 0: the whole motif",
+   "wet_sha256": "f880e66e6a6594dd478cb3541d7e3f0f57aa5d7410719245f3f7ba9c6e21baaf"
+  },
+  {
+   "track": "a5-remains",
+   "flip": "dim_D",
+   "moment": "roar",
+   "source": "S29988c",
+   "sample_in": 446292,
+   "sample_out": 593292,
+   "operations": [
+    [
+     "lp",
+     560
+    ],
+    [
+     "gain",
+     2
+    ]
+   ],
+   "seed": 5,
+   "hypothesis": "Haunt, stage 1: nothing above 560 Hz",
+   "wet_sha256": "7bbc43ecf950be9522f4c5e4aed341f5f96875eadbf2249a400bc5b6d58611f3"
+  },
+  {
+   "track": "a5-remains",
+   "flip": "dim_C",
+   "moment": "roar",
+   "source": "S29988c",
+   "sample_in": 1835442,
+   "sample_out": 1982442,
+   "operations": [
+    [
+     "lp",
+     560
+    ],
+    [
+     "gain",
+     2
+    ]
+   ],
+   "seed": 5,
+   "hypothesis": "Haunt, stage 1: nothing above 560 Hz",
+   "wet_sha256": "5de8952d42dfec71d82fdbecd22f3936742467a11ac7e2e596edd2db80460c9b"
+  },
+  {
+   "track": "a5-remains",
+   "flip": "band_D",
+   "moment": "roar",
+   "source": "S29988c",
+   "sample_in": 446292,
+   "sample_out": 593292,
+   "operations": [
+    [
+     "bp",
+     380,
+     520
+    ],
+    [
+     "gain",
+     6
+    ]
+   ],
+   "seed": 5,
+   "hypothesis": "Haunt, stage 2: only 380 to 520 Hz",
+   "wet_sha256": "ec2b40d3599eb3c34a067d447eb01700f7e716ab6e43a96a25f8fd1caf442d6e"
+  },
+  {
+   "track": "a5-remains",
+   "flip": "band_C",
+   "moment": "roar",
+   "source": "S29988c",
+   "sample_in": 1835442,
+   "sample_out": 1982442,
+   "operations": [
+    [
+     "bp",
+     380,
+     520
+    ],
+    [
+     "gain",
+     6
+    ]
+   ],
+   "seed": 5,
+   "hypothesis": "Haunt, stage 2: only 380 to 520 Hz",
+   "wet_sha256": "279c2824a28adf6f3c881837f6d43e401ca049f904278bd76949920ecf16de3b"
+  },
+  {
+   "track": "a5-remains",
+   "flip": "thread_D",
+   "moment": "roar",
+   "source": "S29988c",
+   "sample_in": 446292,
+   "sample_out": 593292,
+   "operations": [
+    [
+     "bp",
+     420,
+     460
+    ],
+    [
+     "gain",
+     10
+    ],
+    [
+     "room",
+     700,
+     0.5
+    ]
+   ],
+   "seed": 5,
+   "hypothesis": "Haunt, stage 3: only 420 to 460 Hz, in a room",
+   "wet_sha256": "e199915609a0fa4381e1284a88e561de43bed6ba93a662f59f09236f83b0012f"
+  },
+  {
+   "track": "a5-remains",
+   "flip": "thread_C",
+   "moment": "roar",
+   "source": "S29988c",
+   "sample_in": 1835442,
+   "sample_out": 1982442,
+   "operations": [
+    [
+     "bp",
+     420,
+     460
+    ],
+    [
+     "gain",
+     10
+    ],
+    [
+     "room",
+     700,
+     0.5
+    ]
+   ],
+   "seed": 5,
+   "hypothesis": "Haunt, stage 3: only 420 to 460 Hz, in a room",
+   "wet_sha256": "29785cbdca990f6602d5b510cadca1c32254d02cd7fac3faa26985feb9309908"
+  },
+  {
+   "track": "a5-remains",
+   "flip": "ghost_D",
+   "moment": "roar",
+   "source": "S29988c",
+   "sample_in": 446292,
+   "sample_out": 593292,
+   "operations": [
+    [
+     "bp",
+     420,
+     460
+    ],
+    [
+     "gain",
+     12
+    ],
+    [
+     "room",
+     1100,
+     0.9
+    ]
+   ],
+   "seed": 5,
+   "hypothesis": "Haunt, stage 4: only 420 to 460 Hz, mostly room, every other bar",
+   "wet_sha256": "beee3fcae52ba7e541ff0e2bea73911d061548f2480f0ba4a7eb016d65edfdfc"
+  },
+  {
+   "track": "a5-remains",
+   "flip": "ghost_C",
+   "moment": "roar",
+   "source": "S29988c",
+   "sample_in": 1835442,
+   "sample_out": 1982442,
+   "operations": [
+    [
+     "bp",
+     420,
+     460
+    ],
+    [
+     "gain",
+     12
+    ],
+    [
+     "room",
+     1100,
+     0.9
+    ]
+   ],
+   "seed": 5,
+   "hypothesis": "Haunt, stage 4: only 420 to 460 Hz, mostly room, every other bar",
+   "wet_sha256": "ce43490fcd5eaa60646808539d100eb2c674a72a6bc43b755fc8219c5c4c2f67"
+  },
+  {
+   "track": "a6-sixty",
+   "flip": "long",
+   "moment": "M09",
+   "source": "Sadac8e",
+   "sample_in": 3765258,
+   "sample_out": 3941658,
+   "operations": [],
+   "seed": 0,
+   "hypothesis": "a texture that darkens over four seconds: the long cycle, six beats",
+   "wet_sha256": "248dece65bec0bca637a2148ff0297f5d231c97e9d565091386b60f15b475a9a"
+  },
+  {
+   "track": "a6-sixty",
+   "flip": "quiet",
+   "moment": "M10",
+   "source": "S2331ca",
+   "sample_in": 2734068,
+   "sample_out": 2778168,
+   "operations": [
+    [
+     "gain",
+     14
+    ]
+   ],
+   "seed": 0,
+   "hypothesis": "a quiet, perfectly steady pitch, raised 14 dB: the three-beat cycle",
+   "wet_sha256": "f1818e5533b693e5ac5e0631978afa5d745ca7f8a4a23b23dad239be0ed9fce0"
+  },
+  {
+   "track": "a6-sixty",
+   "flip": "drawn",
+   "moment": "M11",
+   "source": "S1c3f8a",
+   "sample_in": 5723254,
+   "sample_out": 5782054,
+   "operations": [],
+   "seed": 0,
+   "hypothesis": "a random draw: the five-beat cycle",
+   "wet_sha256": "f1e6548384708204fba7eda717a351a069f196f4015f6be505abe633de9239a5"
+  },
+  {
+   "track": "a7-room",
+   "flip": "glide2",
+   "moment": "M02",
+   "source": "S823ae3",
+   "sample_in": 3735535,
+   "sample_out": 3791542,
+   "operations": [
+    [
+     "gain",
+     12
+    ],
+    [
+     "room",
+     1400,
+     0.55
+    ]
+   ],
+   "seed": 60,
+   "hypothesis": "a quiet falling glide, raised and put in the room",
+   "wet_sha256": "bdd0842f9dceb745dc5bb2496739faee6929fb78eb2e5ff67a1b4fed82a9ce9c"
+  },
+  {
+   "track": "a7-room",
+   "flip": "hole",
+   "moment": "M03",
+   "source": "Secb35f",
+   "sample_in": 200258,
+   "sample_out": 308303,
+   "operations": [
+    [
+     "room",
+     1400,
+     0.55
+    ]
+   ],
+   "seed": 60,
+   "hypothesis": "a passage with 1.18 s of silence inside it: the room fills the hole",
+   "wet_sha256": "b5f2881cf3bef651539cd55d11918ee8341050dceafb354f1285271e862eed87"
+  },
+  {
+   "track": "a7-room",
+   "flip": "stop",
+   "moment": "M04",
+   "source": "Sa0fea1",
+   "sample_in": 3682879,
+   "sample_out": 3735799,
+   "operations": [
+    [
+     "room",
+     1400,
+     0.55
+    ]
+   ],
+   "seed": 60,
+   "hypothesis": "a second source that stops dead; in the same room its stop rings like the first",
+   "wet_sha256": "b6da8ec067470dc202adf0b1f1fb4ecff4b7812c150b4e496b8bd5583070175f"
+  },
+  {
+   "track": "a7-room",
+   "flip": "radio",
+   "moment": "M12",
+   "source": "S45d9be",
+   "sample_in": 1674962,
+   "sample_out": 1741112,
+   "operations": [
+    [
+     "bp",
+     500,
+     2800
+    ],
+    [
+     "room",
+     1400,
+     0.55
+    ]
+   ],
+   "seed": 60,
+   "hypothesis": "a random draw, narrowed to a small speaker: the broadcast that interrupts",
+   "wet_sha256": "6f9c98309b2f9f0fe3c9d9cc4c622be3ea96df7ee4c7142f4d9c790197c909dc"
+  },
+  {
+   "track": "a8-rebuilt",
+   "flip": "roar_D",
+   "moment": "roar",
+   "source": "S29988c",
+   "sample_in": 446292,
+   "sample_out": 593292,
+   "operations": [],
+   "seed": 0,
+   "hypothesis": "the source",
+   "wet_sha256": "49395a648ae5de7048cb6f28b574626290636936088588d76af282fb737f3646"
+  },
+  {
+   "track": "a8-rebuilt",
+   "flip": "roar_C",
+   "moment": "roar",
+   "source": "S29988c",
+   "sample_in": 1835442,
+   "sample_out": 1982442,
+   "operations": [],
+   "seed": 0,
+   "hypothesis": "the source",
+   "wet_sha256": "f880e66e6a6594dd478cb3541d7e3f0f57aa5d7410719245f3f7ba9c6e21baaf"
+  }
+ ],
+ "placements": "in each track’s scion.json",
+ "reviews": [
+  {
+   "revision": "r1 of each album piece",
+   "method": "measurement of the rendered files (length, peak, stems, bounds, mono fold)",
+   "reviewer": "the builder (one agent)",
+   "verdict": "objective checks pass",
+   "evidence": [
+    {
+     "track": "boxes-found",
+     "bars": 36.0,
+     "whole_bars": true,
+     "peak_dBFS": -1.0,
+     "stems_residual_dB": -79,
+     "intervals_in_bounds": true,
+     "every_layer_resolves": true,
+     "mono_fold_loss_dB": -0.17,
+     "placements": 1122
+    },
+    {
+     "track": "a2-pickup",
+     "bars": 16.0,
+     "whole_bars": true,
+     "peak_dBFS": -1.0,
+     "stems_residual_dB": -78,
+     "intervals_in_bounds": true,
+     "every_layer_resolves": true,
+     "mono_fold_loss_dB": -0.12,
+     "placements": 615
+    },
+    {
+     "track": "a3-late",
+     "bars": 16.0,
+     "whole_bars": true,
+     "peak_dBFS": -1.0,
+     "stems_residual_dB": -80,
+     "intervals_in_bounds": true,
+     "every_layer_resolves": true,
+     "mono_fold_loss_dB": -0.02,
+     "placements": 582
+    },
+    {
+     "track": "a4-clock",
+     "bars": 20.0,
+     "whole_bars": true,
+     "peak_dBFS": -1.0,
+     "stems_residual_dB": -77,
+     "intervals_in_bounds": true,
+     "every_layer_resolves": true,
+     "mono_fold_loss_dB": -0.45,
+     "placements": 379
+    },
+    {
+     "track": "a5-remains",
+     "bars": 21.0,
+     "whole_bars": true,
+     "peak_dBFS": -1.0,
+     "stems_residual_dB": -81,
+     "intervals_in_bounds": true,
+     "every_layer_resolves": true,
+     "mono_fold_loss_dB": -0.22,
+     "placements": 344
+    },
+    {
+     "track": "a6-sixty",
+     "bars": 16.0,
+     "whole_bars": true,
+     "peak_dBFS": -1.0,
+     "stems_residual_dB": -77,
+     "intervals_in_bounds": true,
+     "every_layer_resolves": true,
+     "mono_fold_loss_dB": -0.67,
+     "placements": 204
+    },
+    {
+     "track": "a7-room",
+     "bars": 16.0,
+     "whole_bars": true,
+     "peak_dBFS": -1.0,
+     "stems_residual_dB": -79,
+     "intervals_in_bounds": true,
+     "every_layer_resolves": true,
+     "mono_fold_loss_dB": -0.8,
+     "placements": 71
+    },
+    {
+     "track": "a8-rebuilt",
+     "bars": 19.0,
+     "whole_bars": true,
+     "peak_dBFS": -1.0,
+     "stems_residual_dB": -80,
+     "intervals_in_bounds": true,
+     "every_layer_resolves": true,
+     "mono_fold_loss_dB": -0.1,
+     "placements": 421
+    }
+   ]
+  },
+  {
+   "revision": "r1",
+   "method": "listening",
+   "reviewer": "none",
+   "verdict": "PENDING: no one has heard these pieces; every aesthetic choice is provisional",
+   "next_test": "the falsifier named for each piece, by ear"
+  }
+ ],
+ "use_decisions": [
+  {
+   "source": "S29988c",
+   "handling": "permitted: supplied by the owner in their repository and named in the brief (“the samples we have”)",
+   "audition": "permitted: the owner asked for an album from these samples",
+   "release": "published to the owner’s project site on their standing instruction to push to main. NOT CHECKED: the terms of use of Treblo for these generated recordings",
+   "decided_by": "the owner (direction); the builder recorded it",
+   "date": "2026-11-10",
+   "status": "release approval is the owner’s to confirm"
+  },
+  {
+   "source": "Sd3ac86",
+   "handling": "permitted: supplied by the owner in their repository and named in the brief (“the samples we have”)",
+   "audition": "permitted: the owner asked for an album from these samples",
+   "release": "published to the owner’s project site on their standing instruction to push to main. NOT CHECKED: the terms of use of Treblo for these generated recordings",
+   "decided_by": "the owner (direction); the builder recorded it",
+   "date": "2026-11-10",
+   "status": "release approval is the owner’s to confirm"
+  },
+  {
+   "source": "S484319",
+   "handling": "permitted: supplied by the owner in their repository and named in the brief (“the samples we have”)",
+   "audition": "permitted: the owner asked for an album from these samples",
+   "release": "published to the owner’s project site on their standing instruction to push to main. NOT CHECKED: the terms of use of Treblo for these generated recordings",
+   "decided_by": "the owner (direction); the builder recorded it",
+   "date": "2026-11-10",
+   "status": "release approval is the owner’s to confirm"
+  },
+  {
+   "source": "S5bb2f2",
+   "handling": "permitted: supplied by the owner in their repository and named in the brief (“the samples we have”)",
+   "audition": "permitted: the owner asked for an album from these samples",
+   "release": "published to the owner’s project site on their standing instruction to push to main. NOT CHECKED: the terms of use of Treblo for these generated recordings",
+   "decided_by": "the owner (direction); the builder recorded it",
+   "date": "2026-11-10",
+   "status": "release approval is the owner’s to confirm"
+  },
+  {
+   "source": "S5e8b37",
+   "handling": "permitted: supplied by the owner in their repository and named in the brief (“the samples we have”)",
+   "audition": "permitted: the owner asked for an album from these samples",
+   "release": "published to the owner’s project site on their standing instruction to push to main. NOT CHECKED: the terms of use of Treblo for these generated recordings",
+   "decided_by": "the owner (direction); the builder recorded it",
+   "date": "2026-11-10",
+   "status": "release approval is the owner’s to confirm"
+  },
+  {
+   "source": "Sc5f934",
+   "handling": "permitted: supplied by the owner in their repository and named in the brief (“the samples we have”)",
+   "audition": "permitted: the owner asked for an album from these samples",
+   "release": "published to the owner’s project site on their standing instruction to push to main. NOT CHECKED: the terms of use of Sonauto for these generated recordings",
+   "decided_by": "the owner (direction); the builder recorded it",
+   "date": "2026-11-10",
+   "status": "release approval is the owner’s to confirm"
+  },
+  {
+   "source": "S8ee5a1",
+   "handling": "permitted: supplied by the owner in their repository and named in the brief (“the samples we have”)",
+   "audition": "permitted: the owner asked for an album from these samples",
+   "release": "published to the owner’s project site on their standing instruction to push to main. NOT CHECKED: the terms of use of Treblo for these generated recordings",
+   "decided_by": "the owner (direction); the builder recorded it",
+   "date": "2026-11-10",
+   "status": "release approval is the owner’s to confirm"
+  },
+  {
+   "source": "S1a4289",
+   "handling": "permitted: supplied by the owner in their repository and named in the brief (“the samples we have”)",
+   "audition": "permitted: the owner asked for an album from these samples",
+   "release": "published to the owner’s project site on their standing instruction to push to main. NOT CHECKED: the terms of use of Treblo for these generated recordings",
+   "decided_by": "the owner (direction); the builder recorded it",
+   "date": "2026-11-10",
+   "status": "release approval is the owner’s to confirm"
+  },
+  {
+   "source": "S45d9be",
+   "handling": "permitted: supplied by the owner in their repository and named in the brief (“the samples we have”)",
+   "audition": "permitted: the owner asked for an album from these samples",
+   "release": "published to the owner’s project site on their standing instruction to push to main. NOT CHECKED: the terms of use of Treblo for these generated recordings",
+   "decided_by": "the owner (direction); the builder recorded it",
+   "date": "2026-11-10",
+   "status": "release approval is the owner’s to confirm"
+  },
+  {
+   "source": "S79bf9a",
+   "handling": "permitted: supplied by the owner in their repository and named in the brief (“the samples we have”)",
+   "audition": "permitted: the owner asked for an album from these samples",
+   "release": "published to the owner’s project site on their standing instruction to push to main. NOT CHECKED: the terms of use of Treblo for these generated recordings",
+   "decided_by": "the owner (direction); the builder recorded it",
+   "date": "2026-11-10",
+   "status": "release approval is the owner’s to confirm"
+  },
+  {
+   "source": "S2159e0",
+   "handling": "permitted: supplied by the owner in their repository and named in the brief (“the samples we have”)",
+   "audition": "permitted: the owner asked for an album from these samples",
+   "release": "published to the owner’s project site on their standing instruction to push to main. NOT CHECKED: the terms of use of Treblo for these generated recordings",
+   "decided_by": "the owner (direction); the builder recorded it",
+   "date": "2026-11-10",
+   "status": "release approval is the owner’s to confirm"
+  },
+  {
+   "source": "Sadac8e",
+   "handling": "permitted: supplied by the owner in their repository and named in the brief (“the samples we have”)",
+   "audition": "permitted: the owner asked for an album from these samples",
+   "release": "published to the owner’s project site on their standing instruction to push to main. NOT CHECKED: the terms of use of Treblo for these generated recordings",
+   "decided_by": "the owner (direction); the builder recorded it",
+   "date": "2026-11-10",
+   "status": "release approval is the owner’s to confirm"
+  },
+  {
+   "source": "S2331ca",
+   "handling": "permitted: supplied by the owner in their repository and named in the brief (“the samples we have”)",
+   "audition": "permitted: the owner asked for an album from these samples",
+   "release": "published to the owner’s project site on their standing instruction to push to main. NOT CHECKED: the terms of use of Treblo for these generated recordings",
+   "decided_by": "the owner (direction); the builder recorded it",
+   "date": "2026-11-10",
+   "status": "release approval is the owner’s to confirm"
+  },
+  {
+   "source": "S1c3f8a",
+   "handling": "permitted: supplied by the owner in their repository and named in the brief (“the samples we have”)",
+   "audition": "permitted: the owner asked for an album from these samples",
+   "release": "published to the owner’s project site on their standing instruction to push to main. NOT CHECKED: the terms of use of Treblo for these generated recordings",
+   "decided_by": "the owner (direction); the builder recorded it",
+   "date": "2026-11-10",
+   "status": "release approval is the owner’s to confirm"
+  },
+  {
+   "source": "S823ae3",
+   "handling": "permitted: supplied by the owner in their repository and named in the brief (“the samples we have”)",
+   "audition": "permitted: the owner asked for an album from these samples",
+   "release": "published to the owner’s project site on their standing instruction to push to main. NOT CHECKED: the terms of use of Treblo for these generated recordings",
+   "decided_by": "the owner (direction); the builder recorded it",
+   "date": "2026-11-10",
+   "status": "release approval is the owner’s to confirm"
+  },
+  {
+   "source": "Secb35f",
+   "handling": "permitted: supplied by the owner in their repository and named in the brief (“the samples we have”)",
+   "audition": "permitted: the owner asked for an album from these samples",
+   "release": "published to the owner’s project site on their standing instruction to push to main. NOT CHECKED: the terms of use of Treblo for these generated recordings",
+   "decided_by": "the owner (direction); the builder recorded it",
+   "date": "2026-11-10",
+   "status": "release approval is the owner’s to confirm"
+  },
+  {
+   "source": "Sa0fea1",
+   "handling": "permitted: supplied by the owner in their repository and named in the brief (“the samples we have”)",
+   "audition": "permitted: the owner asked for an album from these samples",
+   "release": "published to the owner’s project site on their standing instruction to push to main. NOT CHECKED: the terms of use of Treblo for these generated recordings",
+   "decided_by": "the owner (direction); the builder recorded it",
+   "date": "2026-11-10",
+   "status": "release approval is the owner’s to confirm"
+  }
+ ],
+ "audition_reel": [
+  {
+   "moment": "M01",
+   "kind": "unstable pitch",
+   "track": "2 · PICKUP",
+   "flip": "glide",
+   "source": "Sunbaked Field Chant",
+   "at": "1:40.68",
+   "reel_context": "0:00.00",
+   "reel_dry": "0:05.62",
+   "reel_in_piece": "0:07.25"
+  },
+  {
+   "moment": "M05",
+   "kind": "transient",
+   "track": "2 · PICKUP",
+   "flip": "tick",
+   "source": "The Cathedral of Tape Echo",
+   "at": "0:54.55",
+   "reel_context": "0:14.45",
+   "reel_dry": "0:19.25",
+   "reel_in_piece": "0:20.05"
+  },
+  {
+   "moment": "M06",
+   "kind": "decay",
+   "track": "2 · PICKUP",
+   "flip": "tail",
+   "source": "Echoes of the Black Chapel",
+   "at": "2:30.54",
+   "reel_context": "0:27.25",
+   "reel_dry": "0:32.85",
+   "reel_in_piece": "0:34.45"
+  },
+  {
+   "moment": "M08",
+   "kind": "modulation",
+   "track": "3 · LATE",
+   "flip": "tremble",
+   "source": "Steppe Telegraph & The 6,500-Voice Lavender Shanty",
+   "at": "2:27.77",
+   "reel_context": "0:43.15",
+   "reel_dry": "0:49.23",
+   "reel_in_piece": "0:51.31"
+  },
+  {
+   "moment": "M12",
+   "kind": "random draw",
+   "track": "3 · LATE",
+   "flip": "drawn",
+   "source": "Fa Sol La Mi",
+   "at": "0:36.98",
+   "reel_context": "0:58.82",
+   "reel_dry": "1:04.51",
+   "reel_in_piece": "1:06.19"
+  },
+  {
+   "moment": "C1",
+   "kind": "context-led",
+   "track": "4 · FIELD CLOCK",
+   "flip": "hunh",
+   "source": "HUNH! (92 BPM Field Clock)",
+   "at": "0:47.62",
+   "reel_context": "1:15.29",
+   "reel_dry": "1:20.21",
+   "reel_in_piece": "1:21.13"
+  },
+  {
+   "moment": "M07",
+   "kind": "breath",
+   "track": "4 · FIELD CLOCK",
+   "flip": "breath",
+   "source": "Boxes",
+   "at": "3:59.42",
+   "reel_context": "1:27.54",
+   "reel_dry": "1:32.59",
+   "reel_in_piece": "1:33.64"
+  },
+  {
+   "moment": "M09",
+   "kind": "evolving texture",
+   "track": "6 · SIXTY BEATS",
+   "flip": "long",
+   "source": "Choral-First Motorik",
+   "at": "1:25.38",
+   "reel_context": "1:41.37",
+   "reel_dry": "1:49.87",
+   "reel_in_piece": "1:54.37"
+  },
+  {
+   "moment": "M10",
+   "kind": "quiet",
+   "track": "6 · SIXTY BEATS",
+   "flip": "quiet",
+   "source": "Parchman Hollow Square",
+   "at": "1:02.00",
+   "reel_context": "2:00.90",
+   "reel_dry": "2:06.40",
+   "reel_in_piece": "2:07.90"
+  },
+  {
+   "moment": "M11",
+   "kind": "random draw",
+   "track": "6 · SIXTY BEATS",
+   "flip": "drawn",
+   "source": "What It Do_",
+   "at": "2:09.78",
+   "reel_context": "2:14.43",
+   "reel_dry": "2:20.27",
+   "reel_in_piece": "2:22.10"
+  },
+  {
+   "moment": "M02",
+   "kind": "unstable pitch",
+   "track": "7 · ONE ROOM",
+   "flip": "glide2",
+   "source": "Brutus Protocol",
+   "at": "1:24.71",
+   "reel_context": "2:28.63",
+   "reel_dry": "2:34.40",
+   "reel_in_piece": "2:36.17"
+  },
+  {
+   "moment": "M03",
+   "kind": "negative space",
+   "track": "7 · ONE ROOM",
+   "flip": "hole",
+   "source": "The Ancient-Chant Singularity",
+   "at": "0:04.54",
+   "reel_context": "2:45.37",
+   "reel_dry": "2:52.32",
+   "reel_in_piece": "2:55.27"
+  },
+  {
+   "moment": "M04",
+   "kind": "negative space",
+   "track": "7 · ONE ROOM",
+   "flip": "stop",
+   "source": "The Knife I Carry",
+   "at": "1:23.51",
+   "reel_context": "3:06.47",
+   "reel_dry": "3:12.17",
+   "reel_in_piece": "3:13.87"
+  }
+ ],
+ "failures": [
+  {
+   "what": "decay M06, first pick",
+   "observation": "the envelope bounced: it was a kick pattern, not one decaying sound",
+   "decision": "rejected; the decay test now refuses any rise after the peak"
+  },
+  {
+   "what": "room tone",
+   "observation": "no passage in 93 sources is quiet, steady and noise-like for 1.6 s: these masters have no room",
+   "decision": "category left empty; the room in ONE ROOM is synthetic and is labelled as such"
+  },
+  {
+   "what": "quiet moments, first pass",
+   "observation": "my own gate against near-silence threw out every quiet candidate",
+   "decision": "gate lowered for that category; one quiet moment kept"
+  },
+  {
+   "what": "WHAT REMAINS, first staging",
+   "observation": "the first thinning stage (nothing above 1200 Hz) changed nothing: the choir has no energy there",
+   "decision": "stages redrawn inside the choir's own band"
+  },
+  {
+   "what": "SIXTY BEATS, first description",
+   "observation": "cycles of 3, 5 and 6 beats meet after 30 beats, not 60; only the meeting on a barline takes 60",
+   "decision": "the piece keeps both meetings; the mid-bar one at beat 30 is marked like any other"
+  },
+  {
+   "what": "remix chops at 918.8 Hz (earlier pass)",
+   "observation": "three sources 'sang' the same pitch: the edge of the pitch search",
+   "decision": "rejected"
+  },
+  {
+   "what": "top tail and top answer (first pass)",
+   "observation": "a hard cut to digital silence; a fade 30 to 60 dB down",
+   "decision": "rejected"
+  }
+ ]
+}

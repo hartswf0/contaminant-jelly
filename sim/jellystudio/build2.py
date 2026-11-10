@@ -1,7 +1,7 @@
 # BUILDERS, second pass: two new drum kits (FOUND in the catalog, and MADE again properly), an 808-style sub, and a remix engine for other sources.
 # Source time is in samples; arrangement time is bar/beat. Each track has its own tempo; a beat is always a whole number of samples.
 import json, numpy as np, hashlib, os, wave, sys; from sig import *
-OUT = 'out2'; reg = {r['id']: r for r in json.load(open('registry.json')) if r.get('status') == 'decoded'}; SC = json.load(open('scout.json')); SRCINFO = {s['id']: s for s in SC['sources']}
+OUT = 'out2'; reg = {r['id']: r for r in json.load(open('registry2.json' if os.path.exists('registry2.json') else 'registry.json')) if r.get('status') == 'decoded'}; SC = json.load(open('scout.json')); SRCINFO = {s['id']: s for s in SC['sources']}
 def wav_write(path, x): x = np.clip(x, -1, 1); w = wave.open(path, 'wb'); w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR); w.writeframes((x * 32767).round().astype('<i2').tobytes()); w.close()
 def wav_read(path): w = wave.open(path, 'rb'); x = np.frombuffer(w.readframes(w.getnframes()), '<i2').reshape(-1, 2).astype(np.float64) / 32767; w.close(); return x
 t_ = lambda n: np.arange(n) / SR
@@ -37,6 +37,21 @@ def fold(f, lo=41, hi=82):
     while f > hi: f /= 2
     while f < lo: f *= 2
     return f
+def fx(y, ops, seed=0):
+    rng = np.random.default_rng(seed)
+    for op in ops:
+        k = op[0]
+        if k == 'lp': y = filt(y, None, op[1])
+        elif k == 'hp': y = filt(y, op[1], None)
+        elif k == 'bp': y = filt(y, op[1], op[2])
+        elif k == 'reverse': y = y[::-1].copy()
+        elif k == 'gain': y = y * 10 ** (op[1] / 20)
+        elif k == 'norm': y = y * op[1] / (np.abs(y).max() + 1e-12)
+        elif k == 'room':
+            n = int(op[1] / 1000 * SR); out = []
+            for c in range(2): ir = rng.standard_normal(n) * np.exp(-t_(n) / (op[1] / 1000 / 5)); ir = filt(ir, 250, 6000); ir /= np.sqrt((ir ** 2).sum()); w = signal.fftconvolve(y[:, c], ir); d = np.zeros(len(w)); d[:len(y)] = y[:, c]; out.append(d + op[2] * w)
+            y = np.stack(out, 1)
+    return y
 class Track:
     def __init__(s, tid, title, bpm, kit, seed=1):
         s.id, s.title, s.bpm = tid, title, bpm; s.BEAT = int(round(SR * 60 / bpm)); s.BAR = 4 * s.BEAT; s.dir = '%s/%s' % (OUT, tid); os.makedirs(s.dir + '/clips', exist_ok=True); s.spans = {}; s.lane = {}; s.PL = []; s.scenes = {}; s.gain = {}; s.rng = np.random.default_rng(seed); s.pads = []; s.kit = kit
@@ -44,6 +59,10 @@ class Track:
         p = '%s/clips/%s.wav' % (s.dir, name); wav_write(p, y); h = hashlib.sha256(open(p, 'rb').read()).hexdigest(); s.spans[name] = {'source': 'new:' + name, 'source_hash': h, 'sample_in': 0, 'sample_out': len(y), 'channel_mode': 'stereo', 'fades': {'in': 0, 'out': 128}, 'role': 'made here', 'file': 'clips/%s.wav' % name, 'note': note, 'blind': blind, 'kick': kick}; s.lane[name] = lane; s.gain[name] = gain
     def cut(s, name, src, s_in, s_out, lane, gain, blind, fin=.004, fout=.04, note='', role='', kick=False):
         y = load(src)[s_in:s_out].astype(np.float64); wav_write('%s/clips/%s.wav' % (s.dir, name), y); s.spans[name] = {'source': src, 'source_hash': reg[src]['sha256'], 'sample_in': int(s_in), 'sample_out': int(s_out), 'channel_mode': 'stereo', 'fades': {'in': int(fin * SR), 'out': int(fout * SR)}, 'role': role, 'file': 'clips/%s.wav' % name, 'note': note, 'blind': blind, 'kick': kick}; s.lane[name] = lane; s.gain[name] = gain
+    def flip(s, name, src, s_in, s_out, lane, gain, blind, ops, hyp, mid='', fin=.004, fout=.04, seed=0, note=''):
+        dry = load(src)[s_in:s_out].astype(np.float64); os.makedirs(s.dir + '/dry', exist_ok=True); wav_write('%s/dry/%s.wav' % (s.dir, name), dry); wet = fx(dry, ops, seed); pk = np.abs(wet).max()
+        if pk > .98: wet = wet * .98 / pk
+        p = '%s/clips/%s.wav' % (s.dir, name); wav_write(p, wet); s.spans[name] = {'source': src, 'source_hash': reg[src]['sha256'], 'sample_in': int(s_in), 'sample_out': int(s_out), 'source_rate': SR, 'channel_mode': 'stereo', 'fades': {'in': int(fin * SR), 'out': int(fout * SR)}, 'role': 'flip', 'file': 'clips/%s.wav' % name, 'note': note or hyp, 'blind': blind, 'kick': False, 'moment': mid, 'operations': [list(o) for o in ops], 'seed': seed, 'hypothesis': hyp, 'wet_sha256': hashlib.sha256(open(p, 'rb').read()).hexdigest()}; s.lane[name] = lane; s.gain[name] = gain
     def drums(s, which):
         if which == 'made':
             K = made_kit(); s.raw('kick', K['kick'], 'drums', -4, 'KICK', 'made again: a driven body, a click and a thump', True); s.raw('snare', K['snare'], 'drums', -9, 'SNARE', 'two tones, two layers of noise, a short room'); s.raw('hat', K['hat'], 'drums', -19, 'HAT', 'six square waves, as the old drum machines did'); s.raw('ohat', K['ohat'], 'drums', -21, 'OPEN HAT'); s.raw('knock', K['knock'], 'drums', -11, 'KNOCK', 'the kick with its weight taken out')
@@ -56,9 +75,9 @@ class Track:
         if fin is not None: fades['in'] = fin
         s.PL.append({'id': 'p%04d' % len(s.PL), 'scene': scene, 'span': name, 'source_hash': sp['source_hash'], 'sample_in': sp['sample_in'], 'sample_out': sp['sample_out'], 'channel_mode': 'stereo', 'fades': fades, 'stretch': 1, 'pitch_shift': pitch, 'gain': round(s.gain[name] + gain, 2), 'pan': pan, 'lane': s.lane[name], 'bar': bar, 'beat': beat, 'timing_offset': int(off), 'intent': intent, 'evidence': evidence, 'parent_revision': rev})
     # one bar of drums. k/sn: beats; hats: '8' or '16'; swing delays the off sixteenths; small seeded differences in time and level so no two bars are the same machine
-    def beatbar(s, sc, bar, k=(1,), sn=(2, 4), ghosts=(), hats='16', low=True, openhat=None, swing=.14, kg=0, hatg=0):
-        for b in k: s.put(sc, 'kick' if low else 'knock', bar, b, 'the weight' if low else 'the pattern without its weight', '', (0 if b == 1 else -2.5) + kg)
-        for b in sn: s.put(sc, 'snare', bar, b, 'backbeat')
+    def beatbar(s, sc, bar, k=(1,), sn=(2, 4), ghosts=(), hats='16', low=True, openhat=None, swing=.14, kg=0, hatg=0, feel=(0, 0, 0)):
+        for b in k: s.put(sc, 'kick' if low else 'knock', bar, b, 'the weight' if low else 'the pattern without its weight', '', (0 if b == 1 else -2.5) + kg, off=feel[0])
+        for b in sn: s.put(sc, 'snare', bar, b, 'backbeat', off=feel[1])
         for b in ghosts: s.put(sc, 'snare', bar, b, 'ghost note', '', -11 + s.rng.uniform(-1.5, 1.5), off=s.rng.integers(-150, 250))
         if hats:
             step = .25 if hats == '16' else .5
@@ -66,7 +85,7 @@ class Track:
                 b = 1 + i * step; 
                 if openhat and abs(b - openhat) < 1e-6: s.put(sc, 'ohat', bar, b, 'lift'); continue
                 acc = 0 if i % (2 if hats == '8' else 4) == 0 else (-3 if hats == '16' and i % 2 == 0 else -6.5); sw = int(swing * step * s.BEAT) if (i % 2 == 1) else 0
-                s.put(sc, 'hat', bar, b, 'grid', '', acc + hatg + s.rng.uniform(-1, 1), pan=.12, off=sw + s.rng.integers(-90, 90))
+                s.put(sc, 'hat', bar, b, 'grid', '', acc + hatg + s.rng.uniform(-1, 1), pan=.12, off=sw + s.rng.integers(-90, 90) + feel[2])
     def subnote(s, sc, name, bar, beat, with_kick=True, gain=0): s.put(sc, name, bar, beat, 'the floor', s.spans[name]['note'], gain, fin=int(.028 * SR) if with_kick else 200)   # under a kick the sub fades in over 28 ms, so the kick's click is heard first
     def render(s, sc, only=None):
         n = s.scenes[sc]['bars'] * s.BAR; stems = {l: np.zeros((n, 2)) for l in LANES}; edges = []; cl = {}

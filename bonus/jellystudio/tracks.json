@@ -1,32 +1,94 @@
 [
  {
   "id": "boxes-found",
-  "label": "BOXES \u00b7 FOUND DRUMS",
+  "label": "1 \u00b7 BOXES ON MY BACK",
   "title": "ET TU, BRUTE \u00b7 BOXES ON MY BACK",
-  "bpm": 72
+  "bpm": 72,
+  "group": "album",
+  "seconds": 120.0
+ },
+ {
+  "id": "a2-pickup",
+  "label": "2 \u00b7 PICKUP",
+  "title": "PICKUP",
+  "bpm": 80,
+  "group": "album",
+  "seconds": 48.0
+ },
+ {
+  "id": "a3-late",
+  "label": "3 \u00b7 LATE",
+  "title": "LATE",
+  "bpm": 76,
+  "group": "album",
+  "seconds": 50.5
+ },
+ {
+  "id": "a4-clock",
+  "label": "4 \u00b7 FIELD CLOCK",
+  "title": "FIELD CLOCK",
+  "bpm": 92,
+  "group": "album",
+  "seconds": 52.2
+ },
+ {
+  "id": "a5-remains",
+  "label": "5 \u00b7 WHAT REMAINS",
+  "title": "WHAT REMAINS",
+  "bpm": 72,
+  "group": "album",
+  "seconds": 70.0
+ },
+ {
+  "id": "a6-sixty",
+  "label": "6 \u00b7 SIXTY BEATS",
+  "title": "SIXTY BEATS",
+  "bpm": 90,
+  "group": "album",
+  "seconds": 42.7
+ },
+ {
+  "id": "a7-room",
+  "label": "7 \u00b7 ONE ROOM",
+  "title": "ONE ROOM",
+  "bpm": 60,
+  "group": "album",
+  "seconds": 64.0
+ },
+ {
+  "id": "a8-rebuilt",
+  "label": "8 \u00b7 THE CHOIR, REBUILT",
+  "title": "THE CHOIR, REBUILT",
+  "bpm": 72,
+  "group": "album",
+  "seconds": 63.3
  },
  {
   "id": "boxes-made",
   "label": "BOXES \u00b7 MADE DRUMS",
   "title": "ET TU, BRUTE \u00b7 BOXES ON MY BACK",
-  "bpm": 72
+  "bpm": 72,
+  "group": "earlier"
  },
  {
   "id": "remix-boom",
   "label": "REMIX 1 \u00b7 BOOM-BAP",
   "title": "REMIX 1 \u00b7 BOOM-BAP",
-  "bpm": 86
+  "bpm": 86,
+  "group": "earlier"
  },
  {
   "id": "remix-dub",
   "label": "REMIX 2 \u00b7 DUB",
   "title": "REMIX 2 \u00b7 DUB",
-  "bpm": 63
+  "bpm": 63,
+  "group": "earlier"
  },
  {
   "id": "remix-half",
   "label": "REMIX 3 \u00b7 HALF-TIME",
   "title": "REMIX 3 \u00b7 HALF-TIME",
-  "bpm": 70
+  "bpm": 70,
+  "group": "earlier"
  }
 ]

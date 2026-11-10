@@ -1,0 +1,230 @@
+[
+ {
+  "src": "Sc5f934",
+  "t0": 100.682,
+  "t1": 101.946,
+  "score": 1.68,
+  "obs": "a glide of 1.8 semitones (551 to 612 Hz) in 1.3 s, periodic throughout (0.92)",
+  "kind": "unstable pitch",
+  "id": "M01",
+  "sample_in": 4440076,
+  "sample_out": 4495819,
+  "source_rate": 44100,
+  "context": [
+   4351876,
+   4584019
+  ],
+  "use": "a lead that will not sit still: a hook, or a transition",
+  "source_hash": "c5f934c638b4bb1a86622b41ebedc65fc68e822a04ac77701ad048fc7e449de6",
+  "status": "provisional: located by measurement, not heard"
+ },
+ {
+  "src": "S823ae3",
+  "t0": 84.706,
+  "t1": 85.971,
+  "score": 1.67,
+  "obs": "a glide of 1.8 semitones (596 to 538 Hz) in 1.3 s, periodic throughout (0.94)",
+  "kind": "unstable pitch",
+  "id": "M02",
+  "sample_in": 3735535,
+  "sample_out": 3791321,
+  "source_rate": 44100,
+  "context": [
+   3647335,
+   3879521
+  ],
+  "use": "a lead that will not sit still: a hook, or a transition",
+  "source_hash": "823ae33a7343f3693f727c540018870c968b1d311c958dd164e4fc58f81dac42",
+  "status": "provisional: located by measurement, not heard"
+ },
+ {
+  "src": "Secb35f",
+  "t0": 4.541,
+  "t1": 7.025,
+  "score": 19.41,
+  "obs": "a hole of 1.18 s, 73 dB down, with sound on both sides; the re-entry rises 72 dB",
+  "kind": "negative space",
+  "id": "M03",
+  "sample_in": 200258,
+  "sample_out": 309802,
+  "source_rate": 44100,
+  "context": [
+   112058,
+   398002
+  ],
+  "use": "a ready-made stop: the hole can become the place for a voice",
+  "source_hash": "ecb35fcd72efca737d2846eae5432b93b575ee2ecce305f0048a0d0a4380f0f3",
+  "status": "provisional: located by measurement, not heard"
+ },
+ {
+  "src": "Sa0fea1",
+  "t0": 83.512,
+  "t1": 85.346,
+  "score": 18.14,
+  "obs": "a hole of 0.53 s, 69 dB down, with sound on both sides; the re-entry rises 66 dB",
+  "kind": "negative space",
+  "id": "M04",
+  "sample_in": 3682879,
+  "sample_out": 3763759,
+  "source_rate": 44100,
+  "context": [
+   3594679,
+   3851959
+  ],
+  "use": "a ready-made stop: the hole can become the place for a voice",
+  "source_hash": "a0fea16a0d881ea66a680467c3a94fea21e37641c72cf11e5c9990d685924225",
+  "status": "provisional: located by measurement, not heard"
+ },
+ {
+  "src": "S5bb2f2",
+  "t0": 54.524,
+  "t1": 54.994,
+  "score": 105.51,
+  "obs": "rises 49 dB in under 50 ms, falls 56 dB in 0.3 s; centre 2609 Hz",
+  "kind": "transient",
+  "id": "M05",
+  "sample_in": 2404508,
+  "sample_out": 2425235,
+  "source_rate": 44100,
+  "context": [
+   2316308,
+   2513435
+  ],
+  "use": "a percussion voice: something to move across the barline",
+  "source_hash": "5bb2f26bf5b8af87e4854e84d155f80be229738f9d88929c43a3e8716353c1cb",
+  "status": "provisional: located by measurement, not heard"
+ },
+ {
+  "src": "S8ee5a1",
+  "t0": 150.19,
+  "t1": 151.137,
+  "score": 49.88,
+  "obs": "falls 25 dB in 0.63 s with no step over 7 dB; centre 819 Hz",
+  "kind": "decay",
+  "id": "M06",
+  "sample_in": 6623379,
+  "sample_out": 6665142,
+  "source_rate": 44100,
+  "context": [
+   6535179,
+   6753342
+  ],
+  "use": "a tail: something to leave ringing across a dropout",
+  "source_hash": "8ee5a1761abe01ddedc745d554f56dd13a209eae59e3eb53ae6f11b6b33bdebf",
+  "status": "provisional: located by measurement, not heard"
+ },
+ {
+  "src": "S2159e0",
+  "t0": 239.387,
+  "t1": 240.087,
+  "score": 48.79,
+  "obs": "half a second of unpitched air (periodicity 0.44, centre 4724 Hz) standing 47 dB above what comes before",
+  "kind": "breath",
+  "id": "M07",
+  "sample_in": 10556967,
+  "sample_out": 10587837,
+  "source_rate": 44100,
+  "context": [
+   10468767,
+   10676037
+  ],
+  "use": "a human-scale event to stand where a snare would",
+  "source_hash": "2159e0ea6f41ceca2c918ec0091ed906051af684a8260c991cec86bbad88b1ad",
+  "status": "provisional: located by measurement, not heard"
+ },
+ {
+  "src": "S1a4289",
+  "t0": 147.772,
+  "t1": 149.772,
+  "score": 9.82,
+  "obs": "the level trembles 10.8 times a second (depth 26.9 dB) under a steady pitch",
+  "kind": "modulation",
+  "id": "M08",
+  "sample_in": 6516745,
+  "sample_out": 6604945,
+  "source_rate": 44100,
+  "context": [
+   6428545,
+   6693145
+  ],
+  "use": "a bed that already moves, so the drums can be sparse",
+  "source_hash": "1a4289394ef855981f96bd64f4011b02382913d61146a2bdb6508b5b74231d6b",
+  "status": "provisional: located by measurement, not heard"
+ },
+ {
+  "src": "Sadac8e",
+  "t0": 85.38,
+  "t1": 89.38,
+  "score": 2.22,
+  "obs": "four seconds at a steady level while the brightness moves from 328 to 29 Hz",
+  "kind": "evolving texture",
+  "id": "M09",
+  "sample_in": 3765258,
+  "sample_out": 3941658,
+  "source_rate": 44100,
+  "context": [
+   3677058,
+   4029858
+  ],
+  "use": "a long cycle to run shorter loops against",
+  "source_hash": "adac8e22ae30d280d09f68711ac0612da439b493db0a466d009c088ca91e3cef",
+  "status": "provisional: located by measurement, not heard"
+ },
+ {
+  "src": "S2331ca",
+  "t0": 61.997,
+  "t1": 63.597,
+  "score": 0.99,
+  "obs": "quiet (29 dB under the loud passages) but pitched (periodicity 0.99): easy to pass over",
+  "kind": "quiet",
+  "id": "M10",
+  "sample_in": 2734068,
+  "sample_out": 2804628,
+  "source_rate": 44100,
+  "context": [
+   2645868,
+   2892828
+  ],
+  "use": "an event that only works if everything else gets out of the way",
+  "source_hash": "2331ca7becfe0d88f0be732f6d068860d18d790a6df474dbb4c355a3574656a8",
+  "status": "provisional: located by measurement, not heard"
+ },
+ {
+  "src": "S1c3f8a",
+  "t0": 129.779,
+  "t1": 131.779,
+  "score": 0,
+  "obs": "no test applied",
+  "kind": "random draw",
+  "id": "M11",
+  "sample_in": 5723254,
+  "sample_out": 5811454,
+  "source_rate": 44100,
+  "context": [
+   5635054,
+   5899654
+  ],
+  "use": "unknown: drawn, not chosen",
+  "source_hash": "1c3f8ae9f75511c5ff8a189551fa9c01a26634df6acf0a8f615843bbbe6cbed1",
+  "status": "provisional: located by measurement, not heard"
+ },
+ {
+  "src": "S45d9be",
+  "t0": 36.981,
+  "t1": 38.981,
+  "score": 0,
+  "obs": "no test applied",
+  "kind": "random draw",
+  "id": "M12",
+  "sample_in": 1630862,
+  "sample_out": 1719062,
+  "source_rate": 44100,
+  "context": [
+   1542662,
+   1807262
+  ],
+  "use": "unknown: drawn, not chosen",
+  "source_hash": "45d9be599a44bbb1535dabcf90ce40d3deda69239bf9a6bbc6437b528bd41b65",
+  "status": "provisional: located by measurement, not heard"
+ }
+]

@@ -82,37 +82,134 @@
 "sub_D#": "SUB D# (new)",
 "hiss": "AIR (new)",
 "riser": "RISER (new)"
+},
+"a2-pickup": {
+"glide": "Sunbaked Field Chant 1:40.68",
+"tick": "The Cathedral of Tape Echo 0:54.55",
+"tail": "Echoes of the Black Chapel 2:30.54",
+"kick": "Trap-Tox & Cardboard 1:07.11",
+"snare": "The Cathedral of Tape Echo 2:00.23",
+"hat": "Subterranean Dreams 0:18.55",
+"knock": "KNOCK (new)",
+"ohat": "OPEN HAT (new)",
+"sub_Cs": "SUB C# (new)",
+"hiss": "AIR (new)",
+"riser": "RISER (new)"
+},
+"a3-late": {
+"tremble": "Steppe Telegraph & The 6,500-Voice Lavender Shanty 2:27.77",
+"drawn": "Fa Sol La Mi 0:36.98",
+"kick": "KICK (new)",
+"snare": "SNARE (new)",
+"hat": "HAT (new)",
+"ohat": "OPEN HAT (new)",
+"knock": "KNOCK (new)",
+"hiss": "AIR (new)",
+"riser": "RISER (new)"
+},
+"a4-clock": {
+"hunh": "HUNH! (92 BPM Field Clock) 0:47.62",
+"breath": "Boxes 3:59.42",
+"kick": "Trap-Tox & Cardboard 1:07.11",
+"snare": "The Cathedral of Tape Echo 2:00.23",
+"hat": "Subterranean Dreams 0:18.55",
+"knock": "KNOCK (new)",
+"ohat": "OPEN HAT (new)",
+"sub_X": "SUB X (new)",
+"hiss": "AIR (new)",
+"riser": "RISER (new)"
+},
+"a5-remains": {
+"full_D": "Hollow Square Roar-Brute 0:10.12",
+"full_C": "Hollow Square Roar-Brute 0:41.62",
+"dim_D": "Hollow Square Roar-Brute 0:10.12",
+"dim_C": "Hollow Square Roar-Brute 0:41.62",
+"band_D": "Hollow Square Roar-Brute 0:10.12",
+"band_C": "Hollow Square Roar-Brute 0:41.62",
+"thread_D": "Hollow Square Roar-Brute 0:10.12",
+"thread_C": "Hollow Square Roar-Brute 0:41.62",
+"ghost_D": "Hollow Square Roar-Brute 0:10.12",
+"ghost_C": "Hollow Square Roar-Brute 0:41.62",
+"kick": "KICK (new)",
+"snare": "SNARE (new)",
+"hat": "HAT (new)",
+"ohat": "OPEN HAT (new)",
+"knock": "KNOCK (new)",
+"sub_D": "SUB D (new)",
+"sub_A": "SUB A (new)",
+"sub_C": "SUB C (new)",
+"sub_G": "SUB G (new)",
+"hiss": "AIR (new)",
+"riser": "RISER (new)"
+},
+"a6-sixty": {
+"long": "Choral-First Motorik 1:25.38",
+"quiet": "Parchman Hollow Square 1:02.00",
+"drawn": "What It Do_ 2:09.78",
+"kick": "Trap-Tox & Cardboard 1:07.11",
+"snare": "The Cathedral of Tape Echo 2:00.23",
+"hat": "Subterranean Dreams 0:18.55",
+"knock": "KNOCK (new)",
+"ohat": "OPEN HAT (new)",
+"sub_Q": "SUB Q (new)"
+},
+"a7-room": {
+"glide2": "Brutus Protocol 1:24.71",
+"hole": "The Ancient-Chant Singularity 0:04.54",
+"stop": "The Knife I Carry 1:23.51",
+"radio": "Fa Sol La Mi 0:37.98",
+"kick": "KICK (new)",
+"snare": "SNARE (new)",
+"hat": "HAT (new)",
+"ohat": "OPEN HAT (new)",
+"knock": "KNOCK (new)",
+"sub_R": "SUB R (new)",
+"hiss": "AIR (new)",
+"riser": "RISER (new)"
+},
+"a8-rebuilt": {
+"roar_D": "Hollow Square Roar-Brute 0:10.12",
+"roar_C": "Hollow Square Roar-Brute 0:41.62",
+"roar_out": "Hollow Square Roar-Brute 1:52.00",
+"built_D": "REBUILT D (new)",
+"built_C": "REBUILT C (new)",
+"kick": "KICK (new)",
+"snare": "SNARE (new)",
+"hat": "HAT (new)",
+"ohat": "OPEN HAT (new)",
+"knock": "KNOCK (new)",
+"sub_D": "SUB D (new)",
+"sub_A": "SUB A (new)",
+"sub_C": "SUB C (new)",
+"sub_G": "SUB G (new)",
+"hiss": "AIR (new)",
+"riser": "RISER (new)"
 }
 },
 "sources": {
 "S29988c": {
 "title": "Hollow Square Roar-Brute",
 "catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Hollow Square Roar-Brute - Treblo.ogg",
 "sha256": "29988cce89b7a1d185d83698807c1d7f2bd4ff20ad5a931e6199be63886ebfe9"
 },
 "Sd3ac86": {
 "title": "Boxes on My Back",
 "catalog": "et-tu-brute-boxes-on-my-back",
-"path": "Et Tu, Brute (Box on the back)/Et tu, Brute_ - Boxes on My Back - Treblo (1).ogg",
 "sha256": "d3ac8625d68e7c1110cad7fdd422ed8f25e625f4fc3b4ddfd791827bb94cac53"
 },
 "S484319": {
 "title": "Trap-Tox & Cardboard",
 "catalog": "et-tu-brute-boxback",
-"path": "Et tu, Brute (BOXBACK)/Et tu, Brute_ - Trap-Tox & Cardboard - Treblo.ogg",
 "sha256": "484319c635d936de82707abfd95a6201b5377edc738f12579a1571c7ab7d17f8"
 },
 "S5bb2f2": {
 "title": "The Cathedral of Tape Echo",
 "catalog": "et-tu-brute-beats",
-"path": "Et Tu, Brute (beats)/Et tu, Brute_ - The Cathedral of Tape Echo - Treblo.ogg",
 "sha256": "5bb2f26bf5b8af87e4854e84d155f80be229738f9d88929c43a3e8716353c1cb"
 },
 "S5e8b37": {
 "title": "Subterranean Dreams",
 "catalog": "et-tu-brute",
-"path": "Et tu, Brute/Et tu, Brute_ - Subterranean Dreams - Treblo.ogg",
 "sha256": "5e8b3760353b2028554deae829fd2255775804f573c346ef6e8897fd30bc8ec7"
 },
 "S5fd772": {
@@ -130,8 +227,62 @@
 "S1a4289": {
 "title": "Steppe Telegraph & The 6,500-Voice Lavender Shanty",
 "catalog": "et-tu-brute-beats",
-"path": "Et Tu, Brute (beats)/Et tu, Brute_ - Steppe Telegraph & The 6,500-Voice Lavender Shanty - Treblo.ogg",
 "sha256": "1a4289394ef855981f96bd64f4011b02382913d61146a2bdb6508b5b74231d6b"
+},
+"Sc5f934": {
+"title": "Sunbaked Field Chant",
+"catalog": "forage:JUKEBOX TIME COLLAPSE",
+"sha256": "c5f934c638b4bb1a86622b41ebedc65fc68e822a04ac77701ad048fc7e449de6"
+},
+"S8ee5a1": {
+"title": "Echoes of the Black Chapel",
+"catalog": "et-tu-brute-beats",
+"sha256": "8ee5a1761abe01ddedc745d554f56dd13a209eae59e3eb53ae6f11b6b33bdebf"
+},
+"S45d9be": {
+"title": "Fa Sol La Mi",
+"catalog": "et-tu-brute-boxes-on-my-back",
+"sha256": "45d9be599a44bbb1535dabcf90ce40d3deda69239bf9a6bbc6437b528bd41b65"
+},
+"S79bf9a": {
+"title": "HUNH! (92 BPM Field Clock)",
+"catalog": "et-tu-brute-boxes-on-my-back",
+"sha256": "79bf9a506eebbdb28e89472592dba21d589ee4575af98dc963fdb2cb1cb7de32"
+},
+"S2159e0": {
+"title": "Boxes",
+"catalog": "et-tu-brute-boxback",
+"sha256": "2159e0ea6f41ceca2c918ec0091ed906051af684a8260c991cec86bbad88b1ad"
+},
+"Sadac8e": {
+"title": "Choral-First Motorik",
+"catalog": "et-tu-brute-beats",
+"sha256": "adac8e22ae30d280d09f68711ac0612da439b493db0a466d009c088ca91e3cef"
+},
+"S2331ca": {
+"title": "Parchman Hollow Square",
+"catalog": "et-tu-brute-boxes-on-my-back",
+"sha256": "2331ca7becfe0d88f0be732f6d068860d18d790a6df474dbb4c355a3574656a8"
+},
+"S1c3f8a": {
+"title": "What It Do_",
+"catalog": "forage:DOWN IN THE COLD RUN",
+"sha256": "1c3f8ae9f75511c5ff8a189551fa9c01a26634df6acf0a8f615843bbbe6cbed1"
+},
+"S823ae3": {
+"title": "Brutus Protocol",
+"catalog": "et-tu-brute-boxes-on-my-back",
+"sha256": "823ae33a7343f3693f727c540018870c968b1d311c958dd164e4fc58f81dac42"
+},
+"Secb35f": {
+"title": "The Ancient-Chant Singularity",
+"catalog": "et-tu-brute-beats",
+"sha256": "ecb35fcd72efca737d2846eae5432b93b575ee2ecce305f0048a0d0a4380f0f3"
+},
+"Sa0fea1": {
+"title": "The Knife I Carry",
+"catalog": "et-tu-brute-beats",
+"sha256": "a0fea16a0d881ea66a680467c3a94fea21e37641c72cf11e5c9990d685924225"
 }
 }
 }
