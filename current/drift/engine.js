@@ -1,5 +1,5 @@
 // DRIFT ENGINE: open water in depth layers; a celluloid jelly; films only as clouds of flecks; no buttons.
-// Gestures: hold the water = swim there; tap a film = take a frame; hold on a film = watch it bloom; double-tap = pulse; pinch = pull back; two fingers = look.
+// Gestures: hold the water = swim there; tap a film = take a frame; hold on a film = watch it bloom; double-tap = pulse; pinch = zoom; two-finger drag = carve or glide.
 import * as THREE from 'three';
 import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
@@ -139,13 +139,15 @@ export async function play(L, ALL) {
         float r2 = dot(uv, uv); vec3 im = vec3(0.); float l = 0.;
         if (b.x >= 0.) { float fr = mod(floor(b.z), ${BLOCK}.), slot = b.x * ${BLOCK}. + fr, col = mod(slot, ${COLS}.), rw = floor(slot / ${COLS}.); vec2 iu = clamp(uv * .5 + .5, .01, .99);
           im = texture2D(uAtlas, vec2((col + iu.x) * ${SWd}. / ${ATW}., 1. - (rw + 1. - iu.y) * ${SHt}. / ${ATW}.)).rgb; l = dot(im, vec3(.3, .55, .15)); }
-        float dz = (l - .5) * c.y * a.w, dist = max(.5, length(a.xyz - cameraPosition));
+        float resolve = clamp(e.z, 0., 1.);
+        float dz = (l - .5) * c.y * a.w * (1. - .65 * resolve), dist = max(.5, length(a.xyz - cameraPosition));
         vec3 off = (uR * uv.x * b.y + uU * uv.y) * a.w * (dist - dz) / dist + uF * dz, fl3 = vec3(sin(uTime * 1.3 + seed * 41.), cos(uTime * 1.05 + seed * 31.), sin(uTime * .9 + seed * 17.));
-        off += a.w * (.006 + .11 * r2 * r2 + e.w * (.08 + .3 * r2)) * fl3;   // fluid: far films are drifting flecks, near films a picture
+        off += a.w * (.006 + .11 * r2 * r2 + e.w * (.08 + .3 * r2)) * mix(1., .24, resolve) * fl3;   // fluid: far films are drifting flecks, near films a picture
         if (bad > .5 && !tick) { float t = floor(uTime * 22.); off += a.w * .1 * vec3(hs(seed + t) - .5, hs(seed * 3. + t) - .5, 0.); }
-        vec3 p = a.xyz + off; vec3 dj = p - uJ; float w = exp(-dot(dj, dj) / 2.4); vec3 jv = uJv + vec3(1e-4); p += (normalize(dj + 1e-4) * .5 + cross(normalize(jv), dj) * .35 + jv * .1) * w;   // the jelly's wake
+        vec3 p = a.xyz + off; vec3 dj = p - uJ; float w = exp(-dot(dj, dj) / 2.4); vec3 jv = uJv + vec3(1e-4); p += (normalize(dj + 1e-4) * .5 + cross(normalize(jv), dj) * .35 + jv * .1) * w * mix(1., .28, resolve);   // the jelly's wake
         if (c.w > 0.) { float q = clamp(c.w * 1.7 - seed * .7, 0., 1.); q = q * q * (3. - 2. * q); p = mix(p, d.xyz, q); }
         float lf = .06 + .94 * smoothstep(.06, .82, l); vec3 tc = mix(vec3(lf), im + .1, .55), g = b.x >= 0. ? mix(tc * vec3(.9, .98, 1.) * 1.5, tc * vec3(1., .86, .62) * 1.45, d.w) : vec3(1., .64, .26) * .55;
+        if (b.x >= 0.) g = mix(g, im * 1.35, .76 * resolve);
         if (bad > .5) g = tick ? vec3(1., .25, .1) * 1.4 : vec3(1., .16, .06) * (.2 + .9 * hs(seed * 9. + floor(uTime * 16.)));
         vec4 mv = viewMatrix * vec4(p, 1.); float fog = exp(-pow(uFog * .9 * -mv.z, 2.)) * smoothstep(.8, 2.2, -mv.z);
         vC = g * (1. + .1 * uBeat); vA = b.w / (sf * sf) * exp(-r2 * (e.y > 0. ? e.y : 2.4)) * fog * (c.w > 0. ? 1. - c.w : 1.) * (tick ? 2.5 : 1.);
@@ -335,7 +337,14 @@ export async function play(L, ALL) {
   // ------------------------------------------------ input: gestures only
   const TRAILER = Q.has('trailer'), AUTO = Q.has('auto') || TRAILER ? {} : null, CINE = cinema(['guide', 'hud', 'say', 'hint', 'dbg', 'tag', 'card']);   // cinema: no words on screen (H, or a three-finger tap)
   const G = {colored: 0, state: 'card', t0: 0, wake: 0, watched: new Map(), watchDone: 0, pairs: new Map(), pairsDone: 0, halo: 0, unearth: 0, orderN: 0, pulses: 0, look: [0, 0], zoom: 1, hold: null, watch: null, lastTap: 0, endT: 0, lost: [], regs: new Set(), yaw: 0, pitch: 0};
-  const touches = new Map(); let pinch = null;
+  const swim = ['glide', 'boost'].includes(Q.get('swim')) ? Q.get('swim') : 'carve';
+  const touches = new Map();
+  let pair = null, bank = 0;
+  const pairPose = () => {
+    const [a, b] = touches.values();
+    return {x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, gap: Math.hypot(a.x - b.x, a.y - b.y)};
+  };
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const cv = $('gl');
   const filmAt = (x, y) => { let best = null, bd = 1e9; const test = (p, size, o) => { _a.copy(p).project(camera); if (_a.z > 1) return; const sx = (_a.x * .5 + .5) * innerWidth, sy = (-_a.y * .5 + .5) * innerHeight, dist = camera.position.distanceTo(p), rpx = size * 1.15 / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * dist) * innerHeight, d = Math.hypot(sx - x, sy - y); if (d < Math.max(28, rpx) && d < bd) { bd = d; best = o; } };
     for (const s of SP) if ((s.slot >= 0 || (s.doodle && s.pos && !s.caught)) && !s.bad && visible(s)) test(s.pos, s.size, s); for (const b of CHAIN.beads) if (!b.taken && Math.abs(b.u - J.u) < 40) test(b.p, 1, b); return best; };
@@ -343,21 +352,52 @@ export async function play(L, ALL) {
   cv.addEventListener('pointerdown', e => { touches.set(e.pointerId, {x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY, t0: performance.now()}); try { cv.setPointerCapture(e.pointerId); } catch (x) {}
     if (G.state === 'card') { begin(); return; }
     if (G.state === 'end') { G.swipe = {x: e.clientX, y: e.clientY, t: performance.now()}; return; }
-    if (touches.size === 2) { const [a, b] = [...touches.values()]; pinch = {d: Math.hypot(a.x - b.x, a.y - b.y), z: G.zoom}; G.hold = null; endWatch(); return; }
+    if (touches.size >= 2) {
+      if (touches.size === 2) {
+        const pose = pairPose();
+        pair = {start: pose, pose, zoom: G.zoom, mode: swim === 'boost' ? 'boost' : null};
+        G.hold = null;
+        J.target = null;
+        G.lastTap = -Infinity;
+        endWatch();
+      }
+      return;
+    }
     if (e.button === 2) { G.rmb = true; }
     const f = filmAt(e.clientX, e.clientY); G.hold = {id: e.pointerId, x: e.clientX, y: e.clientY, t0: performance.now(), film: f, moved: 0}; });
   cv.addEventListener('pointermove', e => { const t = touches.get(e.pointerId); if (t) { t.x = e.clientX; t.y = e.clientY; }
-    if (pinch && touches.size >= 2) { const pts = [...touches.values()], d = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y); if (Math.abs(d - pinch.d) > 40) G.zoom = THREE.MathUtils.clamp(pinch.z * d / Math.max(20, pinch.d), .55, 1.6); return; }
+    if (pair && t && touches.size === 2) {
+      pair.pose = pairPose();
+      const travel = Math.hypot(pair.pose.x - pair.start.x, pair.pose.y - pair.start.y);
+      const spread = Math.abs(pair.pose.gap - pair.start.gap);
+      if (!pair.mode) {
+        if (spread > 14 && spread > travel * 1.5) pair.mode = 'zoom';
+        else if (travel > 12 && travel > spread) pair.mode = swim;
+      }
+      if (pair.mode === 'zoom' || (pair.mode === 'boost' && spread > 40)) {
+        G.zoom = THREE.MathUtils.clamp(pair.zoom * pair.pose.gap / Math.max(20, pair.start.gap), .55, 1.6);
+      }
+      return;
+    }
     if (G.hold && G.hold.id === e.pointerId) { G.hold.moved = Math.max(G.hold.moved, Math.hypot(e.clientX - G.hold.x, e.clientY - G.hold.y)); G.hold.cx = e.clientX; G.hold.cy = e.clientY; } });
   const up = e => { const t = touches.get(e.pointerId); touches.delete(e.pointerId);
     if (G.state === 'end' && G.swipe) { const dx = e.clientX - G.swipe.x, dy = e.clientY - G.swipe.y; G.swipe = null; if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy)) { const i = ALL.indexOf(L), hk = ARC.findIndex(a => HERO[a.id] === L.id); go(dx < 0 ? (hk >= 0 && hk < ARC.length - 1 ? HERO[ARC[hk + 1].id] : ALL[(i + 1) % ALL.length].id) : null); } else if (dy < -70 && SEA) go(SEA.id, regionOf(L)); else if (Math.hypot(dx, dy) < 20 && performance.now() - G.endT > 1500) go(L.id); return; }
-    if (e.button === 2) G.rmb = false; if (pinch) { if (touches.size < 2) pinch = null; return; }
+    if (e.button === 2) G.rmb = false; if (pair) { if (!touches.size) pair = null; return; }
     if (t && t.x0 < 24 && e.clientX - t.x0 > 90) { go(null); return; }   // swipe in from the left edge: back to all drifts
     const h = G.hold; if (!h || h.id !== e.pointerId) return; G.hold = null; const dt = performance.now() - h.t0;
     if (G.watch) { endWatch(); return; }
     if (dt < 260 && h.moved < 14) { if (h.film) { J.target = h.film; say(h.film.j !== undefined ? `slice ${h.film.j + 1} of ${FILMS[CHAIN.film].title}` : `${FILMS[h.film.film].title}`); }
       else { const now = performance.now(); if (now - G.lastTap < 320 && Math.hypot(e.clientX - G.lastX, e.clientY - G.lastY) < 40) { pulse(); G.lastTap = 0; } else { G.lastTap = now; G.lastX = e.clientX; G.lastY = e.clientY; } } } };
-  cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+  cv.addEventListener('pointerup', up);
+  const cancel = e => {
+    if (!touches.delete(e.pointerId)) return;
+    if (!touches.size) pair = null;
+    if (G.hold?.id === e.pointerId) { G.hold = null; endWatch(); }
+    G.swipe = null;
+    if (e.pointerType === 'mouse') G.rmb = false;
+  };
+  cv.addEventListener('pointercancel', cancel);
+  cv.addEventListener('lostpointercapture', cancel);
   cv.addEventListener('dblclick', e => { e.preventDefault(); });
   cv.addEventListener('wheel', e => { e.preventDefault(); G.zoom = THREE.MathUtils.clamp(G.zoom * Math.exp(-e.deltaY * .001), .55, 1.6); }, {passive: false});
   const keys = new Set(); addEventListener('keydown', e => { const k = e.key.toLowerCase(); keys.add(k); if (k === 'escape') go(null); if (G.state === 'card') begin(); if (G.state === 'end') { if (k === 'enter' || k === ' ') go(L.id); if (k === 'n' || k === 'arrowright') go(ALL[(ALL.indexOf(L) + 1) % ALL.length].id); } if (k === ' ' && G.state === 'play') { e.preventDefault(); pulse(); } if (k === 'c') { G.yaw = G.pitch = 0; G.zoom = 1; } });
@@ -398,7 +438,7 @@ export async function play(L, ALL) {
   const buzz = p => { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} };
   const say = (t, hold = 0) => { $('say').textContent = t; $('say').style.opacity = 1; G.sayT = RT + hold; };
   function begin() { G.state = 'play'; G.t0 = RT; AU.start(); $('card').style.opacity = 0; setTimeout(() => $('card').style.display = 'none', 700); $('hud').style.opacity = 1; buzz(10);
-    $('hint').innerHTML = COARSE ? 'hold the water to swim · two fingers to boost · tap a jelly-film to take a frame<br>hold on a jelly-film: the clip lasts as long as you hold · double-tap to sting (pulse) · pinch to pull back<br>red marks are hunters: outrun them, or sting the ones that feel it' : 'hold the mouse in the water to swim · shift or right button to boost · click a jelly-film to take a frame<br>hold on a jelly-film: the clip lasts as long as you hold · space to sting (pulse) · scroll to pull back · Q/E R/F turn the camera, C recentres<br>red marks are hunters: outrun them, or sting the ones that feel it · Esc for all drifts';
+    $('hint').innerHTML = COARSE ? 'hold the water to swim · two-finger drag to steer · tap a jelly-film to take a frame<br>hold on a jelly-film: the clip lasts as long as you hold · double-tap to sting (pulse) · pinch to pull back<br>red marks are hunters: outrun them, or sting the ones that feel it' : 'hold the mouse in the water to swim · shift or right button to boost · click a jelly-film to take a frame<br>hold on a jelly-film: the clip lasts as long as you hold · space to sting (pulse) · scroll to pull back · Q/E R/F turn the camera, C recentres<br>red marks are hunters: outrun them, or sting the ones that feel it · Esc for all drifts';
     $('hint').style.opacity = 1; setTimeout(() => $('hint').style.opacity = 0, 11000); }
   // ------------------------------------------------ pulse, watch, capture
   let PULSE = null; const pulseMat = new THREE.ShaderMaterial({transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: {uR: {value: 0}, uA: {value: 0}, uC: {value: new THREE.Vector3()}, uScale: {value: 1}},
@@ -457,12 +497,27 @@ export async function play(L, ALL) {
   function frame(now) { requestAnimationFrame(frame); const real = Math.max(0, Math.min(.05, (now - last) / 1000)); /* the first rAF stamp can precede setup */ last = now; RT += real; const ws = G.watch && !L.fluid ? .12 : 1, dt = real * ws; T += dt;
     const playing = G.state === 'play';
     // swimmer: hold the water and it swims toward your finger; let go and it drifts with the current
-    let tu = 0, tw = 0; const h = G.hold, two = touches.size >= 2 && pinch ? [...touches.values()] : null; let boost = (keys.has('shift') || G.rmb) && h ? 1 : 0;
-    if (playing && two) { const p = screenToPlane((two[0].x + two[1].x) / 2, (two[0].y + two[1].y) / 2); if (p) { const [pu, pw] = toUW(p); tu = pu - J.u; tw = pw - J.w; J.target = null; boost = 1; } }   /* two fingers: boost toward them */
-    if (playing && h && !h.film && !G.watch && !pinch && performance.now() - h.t0 > 120) { const p = screenToPlane(h.cx ?? h.x, h.cy ?? h.y); if (p) { const [pu, pw] = toUW(p); tu = pu - J.u; tw = pw - J.w; J.target = null; } }
+    let tu = 0, tw = 0;
+    const h = G.hold, two = touches.size === 2 ? pair : null;
+    let boost = (keys.has('shift') || G.rmb) && h ? 1 : 0;
+    const carving = playing && two?.mode === 'carve';
+    const gliding = playing && two?.mode === 'glide';
+    if (playing && two?.mode === 'boost') {
+      const p = screenToPlane(two.pose.x, two.pose.y);
+      if (p) { const [pu, pw] = toUW(p); tu = pu - J.u; tw = pw - J.w; boost = 1; }
+    }
+    if (carving || gliding) {
+      const scale = Math.max(64, Math.min(innerWidth, innerHeight) * .24);
+      const x = THREE.MathUtils.clamp((two.pose.x - two.start.x) / scale, -1, 1);
+      const y = THREE.MathUtils.clamp((two.start.y - two.pose.y) / scale, -1, 1);
+      tu = 6 * (DIR === 'right' ? x : DIR === 'up' ? y : -y);
+      tw = 6 * (DIR === 'right' ? y : x);
+      boost = (carving ? .8 : .18) * Math.min(1, Math.hypot(x, y));
+    }
+    if (playing && h && !h.film && !G.watch && !pair && performance.now() - h.t0 > 120) { const p = screenToPlane(h.cx ?? h.x, h.cy ?? h.y); if (p) { const [pu, pw] = toUW(p); tu = pu - J.u; tw = pw - J.w; J.target = null; } }
     if (playing && J.target) { const s = J.target, P = s.p || s.pos; if (!P || (s.j === undefined && s.slot < 0 && !s.doodle) || s.caught) J.target = null; else { const [pu, pw] = toUW(P); tu = pu - J.u; tw = pw - J.w; if (Math.hypot(tu, tw) < ((s.size || 1) * .5 + 2.2) * BODY.reach) { capture(s); J.target = null; } } }
     const kx = (keys.has('arrowright') || keys.has('d')) - (keys.has('arrowleft') || keys.has('a')), ky = (keys.has('arrowup') || keys.has('w')) - (keys.has('arrowdown') || keys.has('s')); if (kx || ky) { const v = W(kx, ky, 0).sub(W(0, 0, 0)); tu = (DIR === 'right' ? kx : DIR === 'up' ? ky : -ky) * 6; tw = (DIR === 'right' ? ky : kx) * 6; }
-    if (AUTO && playing && !kx && !ky && !h && !two) {   // autopilot (?auto, ?trailer): swims for a recording, takes films, holds on some to watch them, pulses now and then
+    if (AUTO && playing && !kx && !ky && !h && !pair) {   // autopilot (?auto, ?trailer): swims for a recording, takes films, holds on some to watch them, pulses now and then
       const A = AUTO; if (!A.s || RT > A.until || A.s.slot < 0 || A.s.gone || (A.s.pos && toUW(A.s.pos)[0] < J.u - 2)) { A.s = SP.filter(x => x.slot >= 0 && !x.bad && !x.gone && !x.doodle && x.pos && x.u > J.u + 2 && x.u < J.u + 30 && Math.abs(x.z || 0) < 2 && visible(x)).sort((a, b) => (a.u - J.u + Math.abs(a.w - J.w) * .6) - (b.u - J.u + Math.abs(b.w - J.w) * .6))[0] || null; A.until = RT + 6; }
       if (G.watch) { if (RT - G.watch.t0 > A.watchFor) { endWatch(); A.lastW = RT; A.s = null; } }
       else if (A.s) { const [pu, pw] = toUW(A.s.p || A.s.pos); tu = pu - J.u; tw = pw - J.w; const dd = Math.hypot(tu, tw);
@@ -479,7 +534,8 @@ export async function play(L, ALL) {
     const ph = J.ph % 1, thrust = ph < .28 ? Math.sin(ph / .28 * Math.PI) * .8 : 0;
     const ending = playing ? 1 : G.state === 'card' ? .12 : 0;
     const wantU = ending * (L.current + slip + du + thrust * (m > .3 ? 1 : .4)), wantW = ending * dw + .2 * Math.sin(T * .5);
-    J.vu += (wantU - J.vu) * Math.min(1, dt * 2.4); J.vw += (wantW - J.vw) * Math.min(1, dt * 2.4); if (J.stun > 0) { J.vu *= .9; J.vw *= .9; }
+    const response = 1 - Math.exp(-dt * (gliding ? 1.25 : carving ? 3.2 : 2.4));
+    J.vu += (wantU - J.vu) * response; J.vw += (wantW - J.vw) * response; if (J.stun > 0) { J.vu *= .9; J.vw *= .9; }
     J.u += J.vu * dt; J.w += J.vw * dt; const tongue = caveTongue(J.u);
     if (Math.abs(J.w) > BAND) { J.w = Math.sign(J.w) * BAND; J.vw = 0; } if (tongue && Math.abs(J.w) < tongue + .6) { J.w = (J.w < 0 ? -1 : 1) * (tongue + .6); J.vw *= -.2; }
     if (J.u < 2) J.u = 2;
@@ -488,13 +544,18 @@ export async function play(L, ALL) {
     const prev = J.p.clone(); W(J.u, J.w, 0, J.p); J.pv.copy(J.p).sub(prev).divideScalar(Math.max(dt, 1e-4)); jelly.position.copy(J.p);
     const head = _a.copy(J.pv).setLength(1); if (J.pv.lengthSq() > .01) { const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), head.lerp(new THREE.Vector3(0, 1, 0), .35).normalize()); jelly.quaternion.slerp(q, 1 - Math.pow(.05, dt)); }
     stepArms(Math.max(dt, 1e-4));
-    // camera: trailing from the side, small jelly, look-ahead with the current; two fingers look around
+    // camera: trailing from the side, small jelly, look-ahead with the current and a mild carve bank
     camera.fov += (50 + 12 * J.boost - camera.fov) * Math.min(1, real * 3); camera.updateProjectionMatrix(); const vis = 2 * Math.tan(THREE.MathUtils.degToRad(50 / 2)) * Math.min(1, camera.aspect), d0 = THREE.MathUtils.clamp(2 * .92 * CS / (.12 * G.zoom * vis), 6, 34) * (G.state === 'end' ? 1.25 : 1) * (1 + .15 * J.boost);
     const spd = Math.min(1, Math.hypot(J.vu, J.vw) / 9), hunter = PR ? PR.list.filter(p => p.m.visible && (p.st === 'hunt' || p.st === 'mark' || p.st === 'dive')).sort((a, b) => a.pos.distanceTo(J.p) - b.pos.distanceTo(J.p))[0] : null, hk = hunter ? Math.max(0, 1 - hunter.pos.distanceTo(J.p) / 18) : 0;
     G.hk = (G.hk ?? 0) + (hk - (G.hk ?? 0)) * Math.min(1, real * 2); G.lean = (G.lean ?? 0) + ((G.litD < 3.5 && !G.watch ? 1 : 0) - (G.lean ?? 0)) * Math.min(1, real * 1.5);
     const d = d0 * (1 + .22 * spd + .4 * G.hk - .12 * G.lean);
     if (playing) { const kx2 = (keys.has('e') ? 1 : 0) - (keys.has('q') ? 1 : 0), ky2 = (keys.has('r') ? 1 : 0) - (keys.has('f') ? 1 : 0); G.yaw = THREE.MathUtils.clamp(G.yaw + kx2 * real * 1.2, -1, 1); G.pitch = THREE.MathUtils.clamp(G.pitch + ky2 * real * .9, -.7, .7); }
-    const look = W(J.u + 3.5 + J.vu * .45 + G.look[0], J.w * .75 + J.vw * .3 + G.look[1], 0); if (G.watch && G.watch.s.pos) look.lerp((G.watch.s.p || G.watch.s.pos).clone().setZ(0), (TRAILER ? .62 : .88) * sm(0, 1, (RT - G.watch.t0) * (TRAILER ? .7 : 2))); if (hunter && G.hk > .01) look.lerp(hunter.pos.clone().setZ(0), .3 * G.hk); const lookZ = G.watch ? .75 : 1, off = new THREE.Vector3(0, DIR === 'right' ? 1.2 : 0, d * lookZ).applyAxisAngle(new THREE.Vector3(1, 0, 0), -G.pitch).applyAxisAngle(new THREE.Vector3(0, 1, 0), G.yaw), camT = look.clone().add(off); camera.position.lerp(camT, 1 - Math.pow(TRAILER ? .06 : .004, real));   /* the camera leads with your speed */ camera.lookAt(look.x, look.y, 0); camera.updateMatrixWorld();
+    const look = W(J.u + 3.5 + J.vu * .45 + G.look[0], J.w * .75 + J.vw * .3 + G.look[1], 0); if (G.watch && G.watch.s.pos) look.lerp((G.watch.s.p || G.watch.s.pos).clone().setZ(0), (TRAILER ? .62 : .88) * sm(0, 1, (RT - G.watch.t0) * (TRAILER ? .7 : 2))); if (hunter && G.hk > .01) look.lerp(hunter.pos.clone().setZ(0), .3 * G.hk); const lookZ = G.watch ? .75 : 1, off = new THREE.Vector3(0, DIR === 'right' ? 1.2 : 0, d * lookZ).applyAxisAngle(new THREE.Vector3(1, 0, 0), -G.pitch).applyAxisAngle(new THREE.Vector3(0, 1, 0), G.yaw), camT = look.clone().add(off); camera.position.lerp(camT, 1 - Math.pow(TRAILER ? .06 : .004, real));   /* the camera leads with your speed */ camera.lookAt(look.x, look.y, 0);
+    const bankTarget = carving && !G.watch && !reducedMotion.matches
+      ? THREE.MathUtils.clamp((wantW - J.vw) * .026, -.12, .12) : 0;
+    bank += (bankTarget - bank) * (1 - Math.exp(-real * 5));
+    camera.rotateZ(bank);
+    camera.updateMatrixWorld();
     uR.value.setFromMatrixColumn(camera.matrixWorld, 0); uU.value.setFromMatrixColumn(camera.matrixWorld, 1); uF.value.setFromMatrixColumn(camera.matrixWorld, 2);
     // water colour toward the surface or the void
     if (REG.length > 1) { const Rg = regionAt(J.u); Rg._fog = Rg._fog || new THREE.Color(Rg.fog || L.fog); Rg._top = Rg._top || new THREE.Color(Rg.top || Rg.fog || L.fog); FOG.lerp(Rg._fog, Math.min(1, real * .5)); TOP.lerp(Rg._top, Math.min(1, real * .5));
@@ -517,7 +578,7 @@ export async function play(L, ALL) {
       if (s.gone) { hide(r); continue; }
       const lightR = J.lightT > 0 ? 9 : 4.5, gl = s.glimpse ? Math.max(0, 1 - Math.abs(RT - s.glimpse - .8) / .8) : 0, clear = s.bad ? 0 : Math.max(gl, s.lit > RT - 6 ? Math.min(1, (6 - (RT - s.lit)) / 2) : 0, Math.max(0, 1 - dist / lightR) * .85, sm(.45, 1, res) * .6, G.watch && G.watch.s === s ? 1 : 0); s.clear = clear; if (clear > .35 && visible(s) && (!LIT || clear - dist * .02 > LIT.clear - LIT.d * .02)) { LIT = s; LIT.d = dist; }   // light shines on a cloud and it becomes readable video
       row(r, 0, s.pos.x, s.pos.y, s.pos.z, s.size * (1 + .08 * res + .28 * clear)); row(r, 1, s.bad ? -1 : SP_BLOCK.get(s), 1.35, s.sleep && !s.awake ? 0 : T * fps(FILMS[s.film]), (s.bad ? .9 : 1.15) * shown * sleepy * fade * (s.giant ? 1.2 : 1) * (1 + .5 * clear) * (1 - .85 * scrA(s)));
-      row(r, 2, 0, s.bad ? .6 : .7 * (1 - .7 * clear), s.bad ? 1 : 0, 0); row(r, 3, 0, 0, 0, s.awake ? .4 : 0); row(r, 4, s.bad ? 0 : .7 + .6 * res + (s.giant ? .5 : 0) + .7 * clear, 1.8 - .75 * clear, 0, s.bad ? 0 : (1 - res) * .9 * (1 - clear)); }
+      row(r, 2, 0, s.bad ? .6 : .7 * (1 - .7 * clear), s.bad ? 1 : 0, 0); row(r, 3, 0, 0, 0, s.awake ? .4 : 0); row(r, 4, s.bad ? 0 : .7 + .6 * res + (s.giant ? .5 : 0) + .7 * clear, 1.8 - .75 * clear, clear, s.bad ? 0 : (1 - res) * .9 * (1 - clear)); }
     if (playing && RT > (G.nextGlimpse ?? 6)) { G.nextGlimpse = RT + 7 + Math.random() * 5; const c = SP.filter(x => x.slot >= 0 && !x.bad && !x.doodle && visible(x) && x.pos && Math.abs(x.u - J.u) < 22); if (c.length) { const g = c[(Math.random() * c.length) | 0]; g.glimpse = RT; AU.tone(1760, .6, .012); } }   // a glimpse: light catches one jelly-film
     G.litD = LIT ? LIT.d : 99; AU.filmAudio(LIT || (G.watch && G.watch.s));
     stepScreens(real);
@@ -528,9 +589,9 @@ export async function play(L, ALL) {
     if (G.watch) { $('say').textContent = `● ${((performance.now() - G.watch.r0) / 1000).toFixed(1)} s  ${G.watch.title}`; $('say').style.opacity = 1; G.sayT = RT; if (MK.rec) MK.until = Math.max(MK.until, RT + .6); }
     if (G.watch) { const s = G.watch.s, u = Math.min(1, (RT - G.watch.t0) / .5), at = (s.p || s.pos).clone();   // seen clearly where it is, in the back, transparent
       const blk = G.watch.blk ?? (s.j !== undefined ? CHAIN.blocks[s.j >> 3] : SP_BLOCK.get(s)), fr = s.j !== undefined ? s.j % 8 : (RT - G.watch.t0) * fps(FILMS[s.film]) % BLOCK;
-      row(VROW, 0, at.x, at.y, at.z + .05, s.size * (1.1 + .5 * u)); row(VROW, 1, blk, 1.4, fr, (.95 * u + .2) * (1 - .88 * scrA(s))); row(VROW, 2, 0, .45, 0, 0); row(VROW, 3, 0, 0, 0, .25); row(VROW, 4, 1.6, 1.1, 0, 0); }
+      row(VROW, 0, at.x, at.y, at.z + .05, s.size * (1.1 + .5 * u)); row(VROW, 1, blk, 1.4, fr, (.95 * u + .2) * (1 - .88 * scrA(s))); row(VROW, 2, 0, .45, 0, 0); row(VROW, 3, 0, 0, 0, .25); row(VROW, 4, 1.6, 1.1, u, 0); }
     else if (G.state !== 'end' && LIT && SP_BLOCK.get(LIT) >= 0) { const s = LIT, c = s.clear;   // the lit film takes the fine cloud: 48,000 flecks, enough to read the footage
-      row(VROW, 0, s.pos.x, s.pos.y, s.pos.z + .05, s.size * (1.15 + .25 * c)); row(VROW, 1, SP_BLOCK.get(s), 1.4, T * fps(FILMS[s.film]), .85 * c * (1 - .88 * scrA(s))); row(VROW, 2, 0, .25, 0, 0); row(VROW, 3, 0, 0, 0, .15); row(VROW, 4, 1.5, 1.15, 0, 0);
+      row(VROW, 0, s.pos.x, s.pos.y, s.pos.z + .05, s.size * (1.15 + .25 * c)); row(VROW, 1, SP_BLOCK.get(s), 1.4, T * fps(FILMS[s.film]), .85 * c * (1 - .88 * scrA(s))); row(VROW, 2, 0, .25, 0, 0); row(VROW, 3, 0, 0, 0, .15); row(VROW, 4, 1.5, 1.15, c, 0);
       row(FROW + s.slot, 1, SP_BLOCK.get(s), 1.35, T * fps(FILMS[s.film]), 1.15 * (1 - .8 * c) * (1 - .85 * scrA(s))); }
     else if (G.state !== 'end') hide(VROW);
     // casting, flecks travelling into the bell, the interference burst

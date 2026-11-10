@@ -46,7 +46,7 @@ import {ARC, HERO, TAXA, MECH, mechOf, an} from './taxa.js';
 import {RIGS} from './rigs.js';
 const Q = new URLSearchParams(location.search), $ = id => document.getElementById(id);
 const C = await fetch('data/cineosis.json').then(r => r.json()).catch(() => null), ARCH = archiveLevels(C), SEAS = seaLevels(LEVELS, ARCH, C), ALL = LEVELS.concat(ARCH, SEAS);
-const keep = ['sm', 'films', 'cineo'].map(k => Q.get(k) ? `&${k}=${encodeURIComponent(Q.get(k))}` : '').join('');
+const keep = ['sm', 'films', 'cineo', 'swim'].map(k => Q.get(k) ? `&${k}=${encodeURIComponent(Q.get(k))}` : '').join('');
 const card = l => `<a class="card" href="?v=${l.id}${keep}"><div class="im" style="background-image:url(thumbs/${l.source}.jpg)"></div><div class="tx"><b>${l.title}</b><small>FROM ${l.source.replace('_', ' ').toUpperCase()} · ${l.goal.label.toUpperCase()}</small><span>${l.took}</span></div></a>`;
 const acard = l => `<a class="card ac" href="?v=${l.id}${keep}"><div class="tx"><b>${l.title}</b><small>${l.goal.label.toUpperCase()}</small><span>${l.took}</span></div></a>`;
 if (!Q.get('v')) {
@@ -91,7 +91,7 @@ if (!Q.get('v')) {
     <div class="wrap"><div class="hero"><canvas id="hc"></canvas><div class="wm">CONTAMINANT · THE CURRENT</div><h1>drifts</h1>
       <p>A jellyfish of celluloid swims the moving-image archive. Films are clouds of light; come near, light them or pulse, and they clear into what they show.</p>
       <a class="start" href="characters.html?next=${encodeURIComponent('./?v=silt' + keep)}"><span>Start swimming</span><span aria-hidden="true">→</span></a>
-      <div class="ops"><span><b>hold</b> to swim</span><span><b>two fingers</b> to boost</span><span><b>tap</b> a film to take it</span><span><b>hold on it</b> to see it clearly</span><span><b>double-tap</b> to pulse</span><span><b>H</b> hides every word</span><span><a href="?v=ascent&trailer${keep}">trailer mode</a>: it swims itself</span></div></div>
+      <div class="ops"><span><b>hold</b> to swim</span><span><b>two-finger drag</b> to carve · <b>pinch</b> to zoom</span><span><b>tap</b> a film to take it</span><span><b>hold on it</b> to see it clearly</span><span><b>double-tap</b> to pulse</span><span><b>H</b> hides every word</span><span><a href="?v=ascent&trailer${keep}">trailer mode</a>: it swims itself</span></div></div>
     <section class="sec2"><span class="kk">00 · CHOOSE YOUR JELLY</span><h2>Ten jellies, ten bodies</h2><p class="l">Every version of this project built its own jellyfish. Each is kept as it was made, and any of them can swim every level. Pick one; it stays yours until you pick another.</p>
       <div class="rigsel">${RIGS.map(r => { let mine = 'celluloid'; try { mine = localStorage.getItem('cj-rig') || 'celluloid'; } catch (e) {} return `<a href="characters.html?rig=${r.id}" class="${r.id === mine ? 'mine' : ''}"><img src="../../labels/rigs/${r.id}.jpg" alt="${r.name}" loading="lazy"><b>${r.name}</b><i>${r.from}</i></a>`; }).join('')}</div></section>
     <section class="sec2" id="chapters"><span class="kk">01 · THE LIFE OF A JELLY</span><h2>Thirteen species, thirteen verbs</h2><p class="l">Each chapter you are a different animal, with its own body (speed, reach, arms, sting) and one thing to do with the films. The chapters follow a life, from a polyp on the floor to a jelly that turns back time; what you hold in each joins <a href="reel.html" style="color:#f0a35a">one film</a>.</p>
