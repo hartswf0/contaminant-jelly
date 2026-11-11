@@ -82,3 +82,26 @@ Other changes:
 
 Not taken from paeleo: its rights ledger per fragment, and cut-outs as separate objects with pins. Here the collage
 is still made by a filter over one rendered picture, which is why film strips get a paper edge too.
+
+## 9. Third pass: the wall is worked on while the song plays
+A collage that never changes is a texture. In the paeleo threshold films (the scene that ends "come in") the pieces
+change for a reason and on a measured rhythm. What was read, and what was taken:
+
+| Source | What it does | What the wall now does |
+|---|---|---|
+| 04 Mouris, image torrent | The rate of replacement is the scene's pressure: frantic under the call, held when the dog lies down | Loud bars: the nervous sheets turn over every 2 beats. Quiet bars: sheets hold for 8 or 16 beats |
+| 51 Mouris montage | Whole-image substitution on a cutting score, each held a measured number of frames | Each sheet has its own period and phase in beats; a change is a whole new print and ink |
+| 43 Collage graph | Typed rewrites: ENTER, EXIT, REPLACE, each caused by a score event | ENTER: a sheet is pasted on, the brush crossing it. REPLACE: a new print is pasted over the old. EXIT: the sheet is torn off |
+| 52 Gilliam ephemera | Shot on twos; held frames | The wall's clock is stepped at 12 a second |
+| Décollage itself | Tearing leaves residue | A torn-off sheet leaves white scraps at its edges for as long as it is gone |
+
+- A paste or a tear takes a beat and a half, moves in the sheet's own direction, and has a ragged white front.
+- About one sheet in five is absent in any generation, so the bare wall moves around too.
+- The song's bar loudness (three levels) is the cutting score. Nothing is random per frame: the same song gives the
+  same wall.
+
+Checked: six stills each of décollage and paste-up between 13 s and 34 s of song 27. The sheets, prints and inks
+differ from still to still, and there were no page errors.
+Not checked: the motion itself. I cannot see whether a paste reads as a brush stroke, a tear as a tear, or whether
+the turnover in loud bars is exciting or just busy. Not taken: MERGE and SPLIT rules, and pieces that belong to an
+actor (in paeleo the dog is made of pieces; here the jellies are still rendered whole and cut out).
