@@ -13,6 +13,7 @@ R("new URL('../current/drift/data/crashlab/', import.meta.url)", "new URL('%scur
 R("const CROOT = new URL('cities/', ROOT),", "const CROOT = new URL('./data/', import.meta.url),")
 for a in ('jellystudio.html', 'realjelly.html', 'lab.html'): s = s.replace('href="%s' % a, 'href="%sbonus/%s' % (CJ, a)).replace("href = '%s" % a, "href = '%sbonus/%s" % (CJ, a))
 R('href="worlds.html"', 'href="../worlds/"')
+R("const WIMG = 'worlds/',", "const WIMG = '../worlds/img/',")
 R('<title>The Jelly Orchestra · jelly-films</title>', '<title>Celluloid Cities · CRASH LAB</title>')
 R('<b>THE JELLY ORCHESTRA</b>', '<b><a href="../" style="color:inherit">CRASH LAB</a> · CELLULOID CITIES</b>')
 R('<div class="k">BONUS · THE JELLY ORCHESTRA</div><h1>Every jellyfish is one sound</h1>', '<div class="k">CRASH LAB · CELLULOID CITIES</div><h1>The archive is a city. The jellies are its archivists.</h1>')
