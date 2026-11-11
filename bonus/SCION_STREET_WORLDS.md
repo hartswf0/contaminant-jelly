@@ -176,3 +176,34 @@ Checked: stills of all four; six stills of ink over 17 s (bands and blocks diffe
 Not checked: motion and sound; whether the stepping reads as hand-painted frames; phone speed in the depot.
 Not built from the other references: a walkable street, a record crate you flip through, a projector you can open,
 an underwater ruin. The depot and the jars were chosen because they hold the archive and the animals.
+
+## 13. Seventh pass: no boxes, more paint, and real films inside the rooms
+**Ink on film, redone.** The sixth pass laid coloured rectangles over the picture. That was wrong: in the reference
+the paint is the picture. Now:
+- Each animal leaves dye where it has been (the picture is kept and fades slowly).
+- The dye is pulled along the film.
+- Sixteen narrow bands of film each slip their registration every few frames, more when the song is loud. That is
+  what steps the edges; there are no rectangles.
+- Pigment settles in the grain, pools darker at the wet edge, and backruns open pale blooms in a wash.
+- A thin underpainting comes from the film the song is cut from.
+
+**Three more paint worlds**
+| World | Rule | Layers |
+|---|---|---|
+| WATERCOLOUR | Pencil first, then water; a wash is strongest at its edge | paper tooth, a first uneven wash, granulating colour, edge pooling, blooms, pencil line showing through |
+| INK WASH | One colour, three dilutions; where the brush runs dry the paper shows | fibrous paper, three greys, dry-brush skips, a pale water halo, a red seal |
+| THICK PAINT | Every mark is one dab, laid the way things are moving | dabs oriented by the picture's own edges, each broken warm or cool, a ridge that catches light |
+
+All work as lenses over a city and have builders (twenty builders now).
+
+**Real films inside the rooms**
+- THE VIDEO STORE: all 434 Bolas films are tapes on the shelves, each with a frame of itself and its title on the
+  cover. One is taken down every 24 seconds, or when you touch a tape; it lifts off the shelf and plays, as the real
+  video file, on four of the store's five televisions. The caption names it and opens the film itself.
+- THE FILM DEPOT: the screen at the end of the aisle plays a real film file; touch to change the reel.
+
+Checked: stills of all four paint worlds and both rooms; 434 tapes were on the shelves; in both rooms the video's
+clock was advancing; no page errors.
+Not checked: motion and sound; touching a tape (the pick was only run by the timer); phone speed; the live site.
+Weakest: thick paint is still mostly pale dabs on dark. In the store the covers are small from the usual camera
+distance, so titles cannot be read without a closer shot.

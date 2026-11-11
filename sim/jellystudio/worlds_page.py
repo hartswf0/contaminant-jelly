@@ -53,9 +53,9 @@ footer{{max-width:1240px;margin:auto;padding:40px 16px 60px;color:var(--dim);fon
 <img class="hero" src="{img}ref-wall.jpg" alt="A concrete wall of twelve painted panels of jellyfish under the word WORLDS">
 <p class="cap">The wall above is the reference board. Every tile below it is a still taken from the running page; touch one to go in.</p>
 <h1>{len(street) + len(exps) + len(rooms) + len(cities) + npoem} worlds.<br><u>One orchestra.</u></h1>
-<p class="lede">Each world is a different answer to the same question: what does it look like when every jellyfish is one sound? Some are places, some are ways of seeing, and five are painted.</p>
+<p class="lede">Each world is a different answer to the same question: what does it look like when every jellyfish is one sound? Some are places, some are ways of seeing, and eight are painted.</p>
 <nav><a href="#street">PAINT · {len(street)}</a><a href="#exp">EXPERIMENTS · {len(exps)}</a><a href="#rooms">ROOMS · {len(rooms)}</a><a href="#cities">CITIES · {len(cities)} + {npoem}</a><a href="#lens">BUILDERS · {len(lens)}</a><a href="#brief">THE BRIEF</a></nav></header>
-<span id="street"></span>{sec('PAINT', 'Street and film', 'Paint. On concrete: a stencil, a three-colour poster and a spray can. On film: dye in stepping bands, and ink still wet.', street)}
+<span id="street"></span>{sec('PAINT', 'Street and film', 'Paint. On concrete: a stencil, a three-colour poster and a spray can. On film: running dye, and ink still wet. On paper: watercolour and black ink wash. On canvas: thick paint.', street)}
 <span id="exp"></span>{sec('TWELVE', 'Experiments', 'Twelve ways of seeing, each with one rule and one animal that breaks it.', exps)}
 <span id="rooms"></span>{sec('FIVE', 'Rooms', 'Built places to be inside: a reading room, a cold aisle, a flooded rental store, a depot of film cans, and a store of specimens in jars.', rooms)}
 <span id="cities"></span>{sec('SEVEN', 'Celluloid cities', f'All 434 Bolas films as towers built of their own frames. In ALLWAYS · ARGON, schools of jellies rebuild the cuts shot by shot. {npoem} more cities hold the Cineosis poems; choose them from the cities menu inside.', cities)}
