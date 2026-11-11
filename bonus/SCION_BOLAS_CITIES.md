@@ -56,7 +56,7 @@ A song is one bar per shot, so a seventeen-bar song rebuilds about two cuts; the
 - **The live site.**
 
 ## 4 · What is not yet the full vision
-- **One school at a time.** "Ecologies" suggests many cuts foraging at once, crossing where they share a source. Now there is one school, which moves from cut to cut. 61 of the 283 source films are used by more than one cut would be the place they meet; I have not counted that, and it is the next thing to build.
+- **One school at a time.** "Ecologies" suggests many cuts foraging at once, crossing where they share a source. Now there is one school, which moves from cut to cut. 126 of the 283 source films are used by more than one cut (one by 7): those towers are where schools would meet. It is the next thing to build.
 - **Only Argon can be rebuilt.** Afterlight has edit lists in a different form (times within one source), and Sol, Sonnet and Opus have critic records but no shot-by-shot sources that I found. If their sources exist elsewhere, their cities can gain streets like Argon's.
 - **Each school looks the same.** A cut should be its own species and colour.
 - **The WarGames material and the poem cities are untouched.**
