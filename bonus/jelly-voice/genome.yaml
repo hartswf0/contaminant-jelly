@@ -1,0 +1,53 @@
+title: 'Jelly Cast: Voices Across Bodies'
+axis: SONIC
+seed: 'A character keeps its voice across jelly bodies; words, notes, beats, and material response travel as a replayable take.'
+ttl: 2
+ancestral_sources:
+  - id: jelly-repo
+    revision: e393e9f940e05d37a13e9af25c7178dcb1cbd817
+    status: source-inspected
+  - id: chimera
+    revision: e33221d006f44c78849210eb29dd1eb9755dc78e
+    status: compiled-unmodified-numerically-tested
+    license: MIT
+  - id: speaking-film-report
+    revision: operator-handoff-2026-11-11
+    status: reported-custom-patch-not-recovered
+origin_conditions:
+  - 'Seven existing pages; preserved HTML, simulations, cameras, and sound layers.'
+  - 'No human listening results and no trained character model in this run.'
+formation_epochs:
+  - {id: material-puppetry, weight: 90, contribution: 'Preserve playable body verbs', provenance: [jelly-repo]}
+  - {id: persistent-cast, weight: 100, contribution: 'Voice identity survives visual recasting', provenance: [operator-handoff-2026-11-11]}
+  - {id: dictionary-voice, weight: 100, contribution: 'Reuse pinned articulation and pronunciation', provenance: [chimera]}
+  - {id: musical-score, weight: 95, contribution: 'Prepare lyrics, notes, and beats on one clock', provenance: [chimera]}
+  - {id: locked-take, weight: 100, contribution: 'Playback and WAV share immutable PCM', provenance: [operator-handoff-2026-11-11]}
+  - {id: independent-falsification, weight: 100, contribution: 'Separate runtime evidence from listening quality', provenance: [operator-handoff-2026-11-11]}
+migration_map:
+  - id: speaking-film-to-cast
+    from: 'Reported single membrane with custom engine patch'
+    to: 'Shared renderer with explicit character identity'
+    optics: 'Existing jelly bodies retain their appearance'
+    formalism: 'Actor ID and voice revision are independent of page and rig'
+    concept: 'A body can change without replacing the character'
+    sound: 'Pinned unmodified Chimera baseline until custom patch is recovered'
+  - id: live-frame-to-locked-take
+    from: 'Frame-driven phrase initiation'
+    to: 'Prepared PCM scheduled by AudioContext time'
+    optics: 'Motion reads take position from the audio clock'
+    formalism: 'Score revision and renderer revision bind the take'
+    concept: 'A delayed image does not delete a syllable'
+    sound: 'Complete prepared phrase plays through a graphics stall'
+  - id: speech-to-music
+    from: 'Unmetered text'
+    to: 'Speech, pause, note, or syllable score'
+    optics: 'One performance display follows words and musical positions'
+    formalism: 'Seconds and beats are explicit; notes are not playback-rate shifts'
+    concept: 'Delivery is authored separately from identity'
+    sound: 'Pitch and duration are planned inside the voice renderer'
+signature_rules:
+  - 'Preserve the existing playable bodies.'
+  - 'Every claimed audible improvement requires listening evidence.'
+  - 'Never label planned phone times as measured alignment.'
+  - 'Never label this baseline as the recovered custom Speaking Film build.'
+tagline: 'One cast. Many bodies. Repeatable takes.'

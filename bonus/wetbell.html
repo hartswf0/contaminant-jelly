@@ -15,6 +15,9 @@ canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-acti
 <div class="ui" id="say">Drag to steer · tap to pulse · double-tap a hard pulse to shed what the bell carries</div>
 <script type="module">
 import * as THREE from 'three';
+import {mountVoicePanel} from './jelly-voice/panel.js';
+import {createVoiceMotion, unit, meanUnit} from './jelly-voice/adapters.js';
+const voiceMotion = createVoiceMotion();
 import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
@@ -98,8 +101,9 @@ function frame(now) { requestAnimationFrame(frame); const dt = Math.max(0, Math.
     for (; q < 8 * WN; q++) a.S[q] = 0; upd(wakePts); }
   // the camera: behind and a little above, looking ahead along the glide
   const back = J.axis.clone().setY(J.axis.y * .5).normalize(); camP.lerp(J.p.clone().addScaledVector(back, -7.5).add(V3(0, 2.6, 0)), 1 - Math.pow(.05, dt)); camL.lerp(J.p.clone().addScaledVector(J.axis, 2.5), 1 - Math.pow(.02, dt)); cam.position.copy(camP); cam.lookAt(camL);
+  body.scale.set(1 - .035 * voiceMotion.level, 1 + .07 * voiceMotion.level, 1 - .035 * voiceMotion.level);
   body.position.copy(J.p); body.quaternion.copy(J.q); const ps = innerHeight * R.getPixelRatio(); U.uScale.value = ps * .5 / Math.tan(THREE.MathUtils.degToRad(cam.fov / 2));
-  rig.update({t: G.T, dt, cam: cam.position, ph: G.T - J.lastP < 1 ? (G.T - J.lastP) : 0, glow: .2, hurt: 0, scale: ps * .0095 * 1.1, lit: 0});
+  rig.update({t: G.T, dt, cam: cam.position, ph: G.T - J.lastP < 1 ? (G.T - J.lastP) : 0, glow: .2 + .35 * voiceMotion.level, hurt: 0, scale: ps * .0095 * 1.1, lit: 0});
   // the bell, unrolled: a disc (crown in the middle, rim at the edge) showing what it carries and how thick the film is
   if (gd.width !== innerWidth) { gd.width = innerWidth; gd.height = innerHeight; } gx.clearRect(0, 0, gd.width, gd.height); const ox = gd.width - 80, oy = 120;
   for (let r = 0; r < RINGS; r++) for (let k = 0; k < AROUND; k++) { const n = r * AROUND + k, a = k / AROUND * Math.PI * 2, rr = 10 + r * 10, s = Math.min(1, SAT[n] * 2.5); gx.fillStyle = `rgba(${[0, 1, 2].map(ch => Math.min(255, (COL[n * 3 + ch] ** (1 / 2.2)) * 255 * s + 30) | 0)},${.25 + .75 * s})`; gx.beginPath(); gx.arc(ox + Math.cos(a) * rr, oy + Math.sin(a) * rr, 3 + 3 * THICK[n], 0, 7); gx.fill(); }
@@ -109,4 +113,11 @@ function frame(now) { requestAnimationFrame(frame); const dt = Math.max(0, Math.
   if (performance.now() > S.sayT) $('say').style.opacity = 0; comp.render(); }
 requestAnimationFrame(frame);
 window.__wb = {J, S, SAT, THICK, COL, CLOUDS, RINGS_W, pulse, get T() { return G.T; }, RINGS, AROUND};
+mountVoicePanel({
+  pageId: 'wetbell', defaultActorId: 'F1',
+  // Creative mappings: swimming speed, carried thickness, and carried saturation.
+  readFeatures: () => ({energy: unit(J.v.length() / 8), pressure: meanUnit(THICK), color: meanUnit(SAT)}),
+  applyFrame: voiceMotion.applyFrame,
+  onStop: () => { voiceMotion.onStop(); body.scale.setScalar(1); }
+});
 </script></body></html>

@@ -1,0 +1,129 @@
+{
+  "revision": "e33221d006f44c78849210eb29dd1eb9755dc78e",
+  "engineVersion": {
+    "layout": 1,
+    "crate": "0.1.0"
+  },
+  "wasmBytes": 1019065,
+  "wasmSha256": "606cfb8c02c4362c15548984a106640707208fd1518d6823c171fddd91d42f82",
+  "wasmImports": [],
+  "dictionaryLoaded": true,
+  "pronunciation": [
+    {
+      "ipa": "d\u0292",
+      "stress": 0
+    },
+    {
+      "ipa": "\u025b",
+      "stress": 1
+    },
+    {
+      "ipa": "l",
+      "stress": 0
+    },
+    {
+      "ipa": "i",
+      "stress": 0
+    }
+  ],
+  "results": [
+    {
+      "name": "speech",
+      "text": "Pat, bat, mat. The jelly has a voice.",
+      "frames": 175293,
+      "peak": 0.47583889961242676,
+      "rms": 0.07902307556152148,
+      "nonfinite": 0,
+      "samplesAtOrAboveOne": 0,
+      "pcmSha256": "5d19d60c2a8f698f92f1ffd2d6cd75c1c628b12ed202f4cd05233a1bad2b6338",
+      "sampleRate": 48000,
+      "duration": 3.6519375,
+      "renderMs": 2388.366194,
+      "gestures": 60,
+      "segments": 23,
+      "telemetryFrames": 110
+    },
+    {
+      "name": "song",
+      "text": "We are jelly, hear us sing.",
+      "frames": 223200,
+      "peak": 0.75,
+      "rms": 0.2276430530190466,
+      "nonfinite": 0,
+      "samplesAtOrAboveOne": 0,
+      "pcmSha256": "1744a544f632f49e622e10935488be7d751a00846d9bf97f663b6652d39401e2",
+      "sampleRate": 48000,
+      "duration": 4.65,
+      "renderMs": 2569.898762,
+      "gestures": 54,
+      "segments": 16,
+      "telemetryFrames": 140
+    },
+    {
+      "name": "rap",
+      "text": "We are jelly, hear us sing.",
+      "frames": 129943,
+      "peak": 0.40150538086891174,
+      "rms": 0.09447296355552372,
+      "nonfinite": 0,
+      "samplesAtOrAboveOne": 0,
+      "pcmSha256": "f0718fed3114686d014202aa3ade9bb1ade3dab7d5c5086d1b07fbd2ca6eebdc",
+      "sampleRate": 48000,
+      "duration": 2.707145833333333,
+      "renderMs": 1543.486675,
+      "gestures": 48,
+      "segments": 16,
+      "telemetryFrames": 82
+    }
+  ],
+  "blockResults": [
+    {
+      "blockSize": 128,
+      "frames": 57648,
+      "peak": 0.3977580964565277,
+      "rms": 0.060970266164834426,
+      "nonfinite": 0,
+      "samplesAtOrAboveOne": 0,
+      "pcmSha256": "ecd8107c18a27d5dc10986aea643b1d635b55d3202163d64ffe3b5f5025bded7"
+    },
+    {
+      "blockSize": 1024,
+      "frames": 57648,
+      "peak": 0.3977580964565277,
+      "rms": 0.060970266164834426,
+      "nonfinite": 0,
+      "samplesAtOrAboveOne": 0,
+      "pcmSha256": "ecd8107c18a27d5dc10986aea643b1d635b55d3202163d64ffe3b5f5025bded7"
+    },
+    {
+      "blockSize": 4096,
+      "frames": 57648,
+      "peak": 0.3977580964565277,
+      "rms": 0.060970266164834426,
+      "nonfinite": 0,
+      "samplesAtOrAboveOne": 0,
+      "pcmSha256": "ecd8107c18a27d5dc10986aea643b1d635b55d3202163d64ffe3b5f5025bded7"
+    }
+  ],
+  "telemetryLeavesPcmUnchanged": true,
+  "sourceControlChangesPcm": true,
+  "sampleRate44100": {
+    "frames": 52964,
+    "peak": 0.4021557569503784,
+    "rms": 0.06106273362735846,
+    "nonfinite": 0,
+    "samplesAtOrAboveOne": 0,
+    "pcmSha256": "68e9039b6a64ff0961fa788b85ba042835d962c1243758676e21a4a3629fef38"
+  },
+  "limits": [
+    "No human listening test",
+    "No browser playback tested by this harness",
+    "No recovered Speaking Film material dynamics or guard",
+    "Rap is beat-scheduled physical singing, not a trained rap model"
+  ],
+  "verificationHost": "Node v24.22.1, Linux x86_64",
+  "humanListening": "not performed",
+  "browserPlayback": "not performed in runtime recovery task",
+  "sourceClean": true,
+  "sourceRangesProvenance": "src/ui/components/VoiceControls.tsx; crates/chimera/src/voice/human_voice.rs at e33221d006f44c78849210eb29dd1eb9755dc78e"
+}

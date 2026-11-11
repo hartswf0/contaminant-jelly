@@ -30,6 +30,9 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:
 </div>
 <div class="ui" id="start"><div class="k">BONUS · THE JELLY STUDIO</div><h1>A jellyfish that is a sampler</h1><p>Its rim is two bars at 72 beats a minute. Its eight pacemakers are the eight beats. Every sound on it is an exact cut of a recording, placed on a beat, and can be taken off again. Choose a track, switch between versions while it plays, mute a ring, place a chop, undo it.</p><div class="go" id="go">LOADING…</div></div>
 <script type="module">
+import {mountVoicePanel} from './jelly-voice/panel.js';
+import {createVoiceMotion, unit, meanUnit} from './jelly-voice/adapters.js';
+const voiceMotion = createVoiceMotion();
 const $ = id => document.getElementById(id), TAU = Math.PI * 2, Q = new URLSearchParams(location.search), ROOT = new URL('./jellystudio/', import.meta.url), TRACKS = await (await fetch(new URL('tracks.json', ROOT))).json(), TID = TRACKS.some(t => t.id === Q.get('track')) ? Q.get('track') : TRACKS[0].id, BASE = new URL(TID + '/', ROOT);
 const G = await (await fetch(new URL('scion.json', BASE))).json(), SR = G.sample_rate, BEAT = G.beat_samples / SR, BAR = 4 * BEAT, LANES = G.lanes;
 const LCOL = {primary: '#f0a35a', support: '#e88fb4', drums: '#dfe9ee', bass: '#58b8c9', texture: '#7c8f9c'}, LNAME = G.lane_names, LR = {primary: .9, support: .76, drums: .62, bass: .46, texture: .32};
@@ -45,7 +48,9 @@ function undo() { const op = S.hist.pop(); if (!op) return say('Nothing to undo:
 function place(span, bar, beat) { const sp = G.spans[span], like = G.placements.find(p => p.span === span); commit({add: {id: 'u' + nextId++, scene: S.scene, span, source_hash: sp.source_hash, sample_in: sp.sample_in, sample_out: sp.sample_out, channel_mode: sp.channel_mode, fades: sp.fades, stretch: 1, pitch_shift: like ? like.pitch_shift : 0, gain: like ? like.gain : -6, pan: 0, lane: LANE[span], bar, beat, timing_offset: 0, intent: 'placed by hand', evidence: '', parent_revision: 'r' + S.rev}}); say(`${label(span)} placed at bar ${bar}, beat ${beat}. UNDO takes it off.`); }
 const label = span => S.names ? ((S.names.tracks[TID] || {})[span] || span) : BLIND[span] || span;
 // ================================================================ sound: every placement is one buffer, started on its beat, with its own fades, gain and pitch
-let AC, master, laneG = {}, laneA = {}, BUF = {}, OBUF = null, sched = new Set(), voices = new Set();
+let AC, master, laneG = {}, laneA = {}, BUF = {}, OBUF = null, sched = new Set(), voices = new Set(), loadingSounds = false, samplerLoaded = false;
+// Share the existing mixer with prepared voices without starting the sampler transport.
+function audio() { if (!AC) { AC = new (window.AudioContext || window.webkitAudioContext)(); const gr = graph(AC); master = gr.m; laneG = gr.lg; laneA = gr.la; } return AC; }
 async function loadClips(ctx, into) { await Promise.all(Object.entries(G.spans).map(async ([k, sp]) => { into[k] = await ctx.decodeAudioData(await (await fetch(new URL(sp.file, BASE))).arrayBuffer()); })); if (G.room) into.__room = await ctx.decodeAudioData(await (await fetch(new URL(G.room.file, BASE))).arrayBuffer()); }
 function graph(ctx, only) { const m = ctx.createGain(); m.gain.value = 10 ** (G.master_gain_dB / 20); const lg = {}, la = {};
   if (G.master) { const sh = ctx.createWaveShaper(), c = new Float32Array(65537), o = ctx.createGain(); for (let i = 0; i < c.length; i++) c[i] = Math.tanh(4 * (i / 32768 - 1)); sh.curve = c; m.gain.value = G.master.drive / 4; o.gain.value = G.master.ceiling; m.connect(sh); sh.connect(o); o.connect(ctx.destination); } else m.connect(ctx.destination);   /* the master: one gain into a soft limiter, the same curve as the reference render */
@@ -78,7 +83,7 @@ function frame(now) { requestAnimationFrame(frame); const T = now / 1000, pos = 
   g.setTransform(DPR, 0, 0, DPR, 0, 0); g.fillStyle = '#0b1413'; g.fillRect(0, 0, W, H); const cy = CY + S.weight * R * .05, Rb = R * (1.04 - .05 * S.kick);
   const halo = g.createRadialGradient(CX, cy, Rb * .2, CX, cy, Rb * 1.5); halo.addColorStop(0, `rgba(60,120,130,${.2 + .1 * S.weight})`); halo.addColorStop(1, 'rgba(11,20,19,0)'); g.fillStyle = halo; g.fillRect(0, 0, W, H);
   g.lineCap = 'round'; for (const t of TENT) { const sway = Math.sin(T * .8 + t.ph) * .05, wave = inPair ? Math.max(0, 1 - Math.abs(((t.a - (ang(cb) + Math.PI / 2)) % TAU + TAU + Math.PI) % TAU - Math.PI) / .5) : 0, a = t.a - Math.PI / 2, L = Rb * t.l * (1 + .5 * S.kick + .6 * wave), x0 = CX + Math.cos(a) * Rb, y0 = cy + Math.sin(a) * Rb; g.strokeStyle = `rgba(190,225,235,${.12 + .35 * wave})`; g.lineWidth = .8; g.beginPath(); g.moveTo(x0, y0); g.quadraticCurveTo(CX + Math.cos(a + sway) * (Rb + L * .6), cy + Math.sin(a + sway) * (Rb + L * .6) + L * .2 * S.weight, CX + Math.cos(a + sway * 2) * (Rb + L), cy + Math.sin(a + sway * 2) * (Rb + L) + L * .5 * S.weight); g.stroke(); }
-  const bell = g.createRadialGradient(CX, cy, 0, CX, cy, Rb); bell.addColorStop(0, 'rgba(120,170,185,.20)'); bell.addColorStop(.75, 'rgba(90,150,170,.10)'); bell.addColorStop(.97, 'rgba(170,215,230,.22)'); bell.addColorStop(1, 'rgba(170,215,230,0)'); g.fillStyle = bell; g.beginPath(); g.arc(CX, cy, Rb, 0, TAU); g.fill();
+  const voiceR = Rb * (1 - .035 * voiceMotion.level), bell = g.createRadialGradient(CX, cy, 0, CX, cy, voiceR); bell.addColorStop(0, `rgba(120,170,185,${.20 + .22 * voiceMotion.level})`); bell.addColorStop(.75, 'rgba(90,150,170,.10)'); bell.addColorStop(.97, 'rgba(170,215,230,.22)'); bell.addColorStop(1, 'rgba(170,215,230,0)'); g.fillStyle = bell; g.beginPath(); g.arc(CX, cy, voiceR, 0, TAU); g.fill();
   g.strokeStyle = 'rgba(200,230,240,.05)'; g.lineWidth = 1; for (let k = 0; k < 16; k++) { const a = k / 16 * TAU; g.beginPath(); g.moveTo(CX + Math.cos(a) * Rb * .2, cy + Math.sin(a) * Rb * .2); g.lineTo(CX + Math.cos(a) * Rb * .98, cy + Math.sin(a) * Rb * .98); g.stroke(); }
   ['primary', 'support', 'drums', 'bass'].forEach((l, q) => { const a = q * TAU / 4 + TAU / 8, x = CX + Math.cos(a) * Rb * .13, y = cy + Math.sin(a) * Rb * .13, e = Math.min(1, S.lvl[l] * 9); g.strokeStyle = LCOL[l]; g.globalAlpha = .14 + .7 * e; g.lineWidth = Rb * .035; g.shadowColor = LCOL[l]; g.shadowBlur = 14 * e; g.beginPath(); g.arc(x, y, Rb * .075, a - 2.2, a + 2.2); g.stroke(); }); g.globalAlpha = 1; g.shadowBlur = 0;   /* four gonads: the four loudest stems */
   for (const l of LANES) { g.strokeStyle = S.mute.has(l) ? 'rgba(120,140,150,.05)' : 'rgba(200,230,240,.09)'; g.lineWidth = 1; g.beginPath(); g.arc(CX, cy, Rb * LR[l], 0, TAU); g.stroke(); }
@@ -119,7 +124,7 @@ const SAY = Object.fromEntries(Object.entries(G.scenes).map(([k, v]) => [k, v.sa
 for (const [k, v] of Object.entries(G.scenes)) { const b = document.createElement('button'); b.dataset.s = k; b.textContent = v.label || k; $('scenes').appendChild(b); }
 for (const t of TRACKS) { const b = document.createElement('button'); b.textContent = innerWidth < 640 && t.id !== TID ? (t.group === 'album' ? t.label.split(' · ')[0] : t.label.replace('BOXES · ', '').replace('REMIX ', 'R').split(' · ')[0]) : t.label; b.title = t.title; if (t.group === 'swarm') continue; const row = t.group === 'album' ? 'tracks' : 'tracks2'; if (t.id === TID) b.className = 'on'; b.onclick = () => { if (t.id !== TID) location.search = '?track=' + t.id; }; $(row).appendChild(b); }
 for (const b of document.querySelectorAll('[data-s]')) b.onclick = () => { const was = S.scene, pos = posNow(), same = G.scenes[was].bars === G.scenes[b.dataset.s].bars; S.scene = b.dataset.s; S.sel = null; if (S.playing) { if (same) { sched.clear(); pump(); } else { stop(); S.pos = 0; play(0); } } else if (!same) { S.pos = 0; S.pair = 0; } paintPads(); say(SAY[S.scene]); };
-$('play').onclick = () => S.playing ? stop() : play(S.pair * 2 * BAR);
+$('play').onclick = () => S.playing ? stop() : samplerLoaded ? play(S.pair * 2 * BAR) : startSampler(S.pair * 2 * BAR);
 $('prev').onclick = () => { S.pair = Math.max(0, S.pair - 1); if (S.playing) { stop(); play(S.pair * 2 * BAR); } else S.pos = S.pair * 2 * BAR; }; $('next').onclick = () => { S.pair = Math.min(Math.ceil(scene().bars / 2) - 1, S.pair + 1); if (S.playing) { stop(); play(S.pair * 2 * BAR); } else S.pos = S.pair * 2 * BAR; };
 $('undo').onclick = undo; $('remove').onclick = () => S.sel ? (commit({remove: S.sel}), say('Removed. UNDO puts it back.')) : say('Touch a sound on the bell first, then REMOVE.');
 $('keep').onclick = () => { try { localStorage.setItem('jellystudio.keep.' + TID, JSON.stringify({rev: S.rev, PL})); say(`Kept revision ${S.rev} as the checkpoint.`); } catch { say('This browser would not keep it.'); } };
@@ -129,6 +134,27 @@ $('map').onclick = editMap; $('render').onclick = renderAll;
 addEventListener('keydown', e => { if (e.key === ' ') { e.preventDefault(); $('play').click(); } const k = '1234567890-='.indexOf(e.key); if (k >= 0 && PADS[k]) $('pads').children[k].click(); if (e.key === 'z') undo(); });
 { const sel = $('swarmsel'), sw = TRACKS.filter(t => t.group === 'swarm'); sel.innerHTML = '<option value="">choose…</option>' + sw.map(t => `<option value="${t.id}"${t.id === TID ? ' selected' : ''}>${t.label}</option>`).join(''); sel.onchange = () => sel.value && (location.search = '?track=' + sel.value); if (!sw.length) sel.style.display = 'none'; $('orch').href = 'jellyorchestra.html?song=' + TID; }
 $('ttl').textContent = G.title; size(); paintPads(); requestAnimationFrame(frame); $('go').textContent = 'TOUCH TO BEGIN · WITH SOUND';
-$('start').onclick = async () => { if (AC) return; AC = new (window.AudioContext || window.webkitAudioContext)(); $('go').textContent = 'LOADING THE SOUNDS…'; const gr = graph(AC); master = gr.m; laneG = gr.lg; laneA = gr.la; await loadClips(AC, BUF); setRoom(laneG, BUF); $('start').remove(); size(); say(SAY[S.scene]); play(0); };
+async function startSampler(from = 0) {
+  if (loadingSounds) return; loadingSounds = true; audio();
+  if ($('go')) $('go').textContent = 'LOADING THE SOUNDS…'; $('play').textContent = 'LOADING…';
+  try { if (!samplerLoaded) { await loadClips(AC, BUF); setRoom(laneG, BUF); samplerLoaded = true; } $('start')?.remove(); size(); say(SAY[S.scene]); play(from); }
+  catch (error) { if ($('go')) $('go').textContent = 'SOUNDS UNAVAILABLE · TOUCH TO RETRY'; $('play').textContent = 'LOAD & PLAY'; say('Sampler sounds unavailable. Choose LOAD & PLAY to retry.'); console.error(error); }
+  finally { loadingSounds = false; }
+}
+$('start').onclick = () => startSampler(0);
 window.__js = {HAND, handDown, handMove, handUp, replay, G, S, get PL() { return PL; }, live, play, stop, place, undo, commit, renderScene, wav, posNow, hit, get AC() { return AC; }, voices, sched, geo: () => ({CX, CY, R})};
+mountVoicePanel({
+  pageId: 'jellystudio', defaultActorId: 'G',
+  getAudioContext: async () => {
+    const ctx = audio();
+    if ($('start')) { $('start').remove(); size(); if (!samplerLoaded) { $('play').textContent = loadingSounds ? 'LOADING…' : 'LOAD & PLAY'; say('Voice mode. LOAD & PLAY loads the sampler sounds; your vocal uses the Voice panel.'); } }
+    return ctx;
+  },
+  getDestination: ctx => master || ctx.destination,
+  // Voice output bypasses the lane analysers; this read cannot feed its own playback back in.
+  // These creative features describe existing lanes, bass weight, and the current hand position.
+  readFeatures: () => ({energy: meanUnit(Object.values(S.lvl).map(v => v * 8)), pressure: unit(S.weight), color: unit(HAND.pos)}),
+  applyFrame: voiceMotion.applyFrame,
+  onStop: voiceMotion.onStop
+});
 </script></body></html>
