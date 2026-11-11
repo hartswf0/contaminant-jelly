@@ -6,7 +6,7 @@ def page(orch, img, fonts, home, homename):
         q = ('?city=' + l['city']) if l['city'] else ('?look=' + l['id']); sub = l['own'] or ('after ' + l['after'].split(':')[0]); rot = [-1.2, .8, -.5, 1.4, -.9, .4][k % 6]
         return f'<a class="p t{k % 5}" style="--r:{rot}deg" href="{orch}{q}"><img src="{img}{l["id"]}.jpg" alt="" loading="lazy"><b>{E(l["name"])}</b><i>{E(sub)}</i><span>{E(l["rule"])}</span></a>'
     def sec(tag, title, say, ls): return f'<section><h2><em>{tag}</em>{title}</h2><p class="say">{say}</p><div class="wall">' + ''.join(tile(l, k) for k, l in enumerate(ls)) + '</div></section>'
-    street = [l for l in L if l['street']]; rooms = [l for l in L if l['id'] in ('library', 'datacenter', 'store', 'depot', 'wet', 'orbit')]; cities = [l for l in L if str(l['city']).startswith('b')]; exps = [l for l in L if not l['city'] and not l['street'] and l not in rooms]
+    street = [l for l in L if l['street']]; rooms = [l for l in L if l['id'] in ('library', 'datacenter', 'store', 'depot', 'wet', 'orbit', 'chorus')]; cities = [l for l in L if str(l['city']).startswith('b')]; exps = [l for l in L if not l['city'] and not l['street'] and l not in rooms]
     npoem = len([l for l in L if l['city'] and not str(l['city']).startswith('b')]); lens = W['lenses']; names = {l['id']: l['name'] for l in L}
     lensrow = ''.join(f'<a href="{orch}?city=b5&lens={x}"><b>{E(names.get(x, "BY HAND"))}</b>{E(W["build"][x])}</a>' for x in lens)
     return f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Worlds · the Jelly Orchestra</title><link rel="stylesheet" href="{fonts}">
@@ -57,7 +57,7 @@ footer{{max-width:1240px;margin:auto;padding:40px 16px 60px;color:var(--dim);fon
 <nav><a href="#street">PAINT · {len(street)}</a><a href="#exp">EXPERIMENTS · {len(exps)}</a><a href="#rooms">ROOMS · {len(rooms)}</a><a href="#cities">CITIES · {len(cities)} + {npoem}</a><a href="#lens">BUILDERS · {len(lens)}</a><a href="#brief">THE BRIEF</a><a href="#find">WHERE THINGS ARE</a><a href="#objects">OBJECTS</a><a href="#evolve">NEXT</a></nav></header>
 <span id="street"></span>{sec('PAINT', 'Paint and print', 'Paint. On concrete: a stencil, a three-colour poster and a spray can. On film: running dye, and ink still wet. On paper: watercolour and black ink wash. On canvas: thick paint. And four prints: woodblock, cyanotype, risograph, glass.', street)}
 <span id="exp"></span>{sec('TWELVE', 'Experiments', 'Twelve ways of seeing, each with one rule and one animal that breaks it.', exps)}
-<span id="rooms"></span>{sec('SIX', 'Places', 'Built places to be inside. Press WALK in any of them and the camera is yours. Any place can be seen through any paint: open SETTINGS.', rooms)}
+<span id="rooms"></span>{sec('SEVEN', 'Places', 'Built places to be inside. Press WALK in any of them and the camera is yours. Any place can be seen through any paint: open SETTINGS.', rooms)}
 <span id="cities"></span>{sec('SEVEN', 'Celluloid cities', f'All 434 Bolas films as towers built of their own frames. In ALLWAYS · ARGON, schools of jellies rebuild the cuts shot by shot. {npoem} more cities hold the Cineosis poems; choose them from the cities menu inside.', cities)}
 <section id="lens"><h2><em>{len(lens)}</em>Builders</h2><p class="say">Any city can be seen through any lens, and each lens rebuilds a cut in its own way. Each link opens ALLWAYS · ARGON through that lens.</p><div class="lens">{lensrow}</div></section>
 
@@ -67,6 +67,8 @@ footer{{max-width:1240px;margin:auto;padding:40px 16px 60px;color:var(--dim);fon
 <a href="{orch}?city=b5&lens=watercolour"><b>A CITY THROUGH A LENS</b>?city=b5&amp;lens= and a paint or experiment name. Or press LENS on the card inside a city</a>
 <a href="{orch}?city=b5&arch=reef"><b>A CITY IN ANOTHER SHAPE</b>&amp;arch= grid, shell, reef, amph, kelp, helix, wheel, comb, table</a>
 <a href="{orch}?look=depot&lens=woodblock&walk=1"><b>ANY PLACE, ANY PAINT, ON FOOT</b>?look=depot&amp;lens=woodblock&amp;walk=1. Or press SETTINGS inside: place, paint, song and camera are four dials, and the panel gives you the address to share</a>
+<a href="{orch}?book=1"><b>THE CHORUS AND SONGBOOK</b>?book=1. All 50 songs with their words. Write a bar for one of the cast to rap, or take the last line yourself</a>
+<a href="{orch}?theatre=1"><b>THEATRE</b>?theatre=1. The controls go away and the orchestra moves through every place and paint, sixteen bars each</a>
 <a href="{orch}?look=orbit"><b>THE SPEAKING CAST</b>Four jellyfish sing the title of every song, in every world: BRUTE, HOLLOW, LAVENDER and TICK. SING in the bar turns them off</a>
 <a href="{orch}?look=store"><b>THE ARCHIVE AS OBJECTS</b>The video store. Film tapes play; red tapes are doors to other worlds; yellow tapes are powers</a>
 <a href="{orch}?look=ink&song=s27-two-rooms"><b>A SONG</b>&amp;song= and its id, or the songs menu</a></div></section>
