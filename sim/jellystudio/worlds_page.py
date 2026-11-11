@@ -54,13 +54,39 @@ footer{{max-width:1240px;margin:auto;padding:40px 16px 60px;color:var(--dim);fon
 <p class="cap">The wall above is the reference board. Every tile below it is a still taken from the running page; touch one to go in.</p>
 <h1>{len(street) + len(exps) + len(rooms) + len(cities) + npoem} worlds.<br><u>One orchestra.</u></h1>
 <p class="lede">Each world is a different answer to the same question: what does it look like when every jellyfish is one sound? Some are places, some are ways of seeing, and eight are painted.</p>
-<nav><a href="#street">PAINT · {len(street)}</a><a href="#exp">EXPERIMENTS · {len(exps)}</a><a href="#rooms">ROOMS · {len(rooms)}</a><a href="#cities">CITIES · {len(cities)} + {npoem}</a><a href="#lens">BUILDERS · {len(lens)}</a><a href="#brief">THE BRIEF</a></nav></header>
+<nav><a href="#street">PAINT · {len(street)}</a><a href="#exp">EXPERIMENTS · {len(exps)}</a><a href="#rooms">ROOMS · {len(rooms)}</a><a href="#cities">CITIES · {len(cities)} + {npoem}</a><a href="#lens">BUILDERS · {len(lens)}</a><a href="#brief">THE BRIEF</a><a href="#find">WHERE THINGS ARE</a><a href="#objects">OBJECTS</a><a href="#evolve">NEXT</a></nav></header>
 <span id="street"></span>{sec('PAINT', 'Street and film', 'Paint. On concrete: a stencil, a three-colour poster and a spray can. On film: running dye, and ink still wet. On paper: watercolour and black ink wash. On canvas: thick paint.', street)}
 <span id="exp"></span>{sec('TWELVE', 'Experiments', 'Twelve ways of seeing, each with one rule and one animal that breaks it.', exps)}
 <span id="rooms"></span>{sec('FIVE', 'Rooms', 'Built places to be inside: a reading room, a cold aisle, a flooded rental store, a depot of film cans, and a store of specimens in jars.', rooms)}
 <span id="cities"></span>{sec('SEVEN', 'Celluloid cities', f'All 434 Bolas films as towers built of their own frames. In ALLWAYS · ARGON, schools of jellies rebuild the cuts shot by shot. {npoem} more cities hold the Cineosis poems; choose them from the cities menu inside.', cities)}
 <section id="lens"><h2><em>{len(lens)}</em>Builders</h2><p class="say">Any city can be seen through any lens, and each lens rebuilds a cut in its own way. Each link opens ALLWAYS · ARGON through that lens.</p><div class="lens">{lensrow}</div></section>
-<section id="brief"><h2><em>REF</em>The brief</h2><p class="say">The reference boards the street worlds were made from. They are pictures; the worlds above are the running thing, and they do not match these yet.</p><div class="refs"><img src="{img}ref-city.jpg" alt="Film-strip towers with jellyfish between them, painted and torn" loading="lazy"><img src="{img}ref-cut.jpg" alt="A red, teal and cream poster of jellyfish and a film strip, the word CUT" loading="lazy"><img src="{img}ref-moon.jpg" alt="A moon jelly sprayed over a strip of film frames" loading="lazy"></div></section>
+
+<section id="find"><h2><em>MAP</em>Where everything is</h2><p class="say">Every world has an address. Add it to the page address, or use the two menus at the bottom of the orchestra (worlds… and cities…).</p><div class="lens">
+<a href="{orch}?look=ink"><b>A WORLD</b>?look= and its name: ink, wash, watercolour, sumi, impasto, stencil, poster, spray, store, depot, wet, library, datacenter, and the twelve experiments</a>
+<a href="{orch}?city=b5"><b>A CITY</b>?city=b1 to b7 for the Bolas cities; ?city=1 to 14 for the poem cities</a>
+<a href="{orch}?city=b5&lens=watercolour"><b>A CITY THROUGH A LENS</b>?city=b5&amp;lens= and a paint or experiment name. Or press LENS on the card inside a city</a>
+<a href="{orch}?city=b5&arch=reef"><b>A CITY IN ANOTHER SHAPE</b>&amp;arch= grid, shell, reef, amph, kelp, helix, wheel, comb, table</a>
+<a href="{orch}?look=store"><b>THE ARCHIVE AS OBJECTS</b>The video store. Film tapes play; red tapes are doors to other worlds; yellow tapes are powers</a>
+<a href="{orch}?look=ink&song=s27-two-rooms"><b>A SONG</b>&amp;song= and its id, or the songs menu</a></div></section>
+<section id="objects"><h2><em>IDEA</em>The archive as things you use</h2><p class="say">The store is the first room where objects do something. Three kinds of tape are on its shelves now. The list after them is not built; it is where this could go.</p><div class="lens">
+<a><b>BUILT · FILM TAPE</b>434 of them. Touch one and the televisions play that film; the caption opens it</a>
+<a><b>BUILT · DOOR TAPE (RED)</b>31 of them. Touch one and you are in that world or city</a>
+<a><b>BUILT · POWER TAPE (YELLOW)</b>7 of them: swerve, next and previous song, follow the odd one, video mode, record, pause</a>
+<a><b>NOT BUILT · A CAN IN THE DEPOT</b>Take a can down and the orchestra plays over that film; put two on the bench and they are cut together</a>
+<a><b>NOT BUILT · A JAR</b>Open a jar and that species joins the orchestra; close it and it leaves</a>
+<a><b>NOT BUILT · A BOOK IN THE LIBRARY</b>Each book is a SCION swarm prompt; opening one changes how the room is built</a>
+<a><b>NOT BUILT · A RACK IN THE DATA CENTER</b>Each rack is a setting: pull a drive to mute a lane, swap two to swap their sounds</a>
+<a><b>NOT BUILT · A LATE FEE</b>Powers wear off. A lens you rented goes back on the shelf after sixteen bars</a>
+<a><b>NOT BUILT · WALKING</b>You move down the aisle yourself and the orchestra follows you</a></div></section>
+<section id="evolve"><h2><em>NEXT</em>How these evolve</h2><p class="say">Each world is one rule with one test. A world changes when its test fails, not when a new filter is available. What was tried and withdrawn is part of the record.</p><div class="lens">
+<a><b>WITHDRAWN</b>Décollage and paste-up: five passes of cut-out collage as a filter over a moving picture. Unwatchable. Removed</a>
+<a><b>WITHDRAWN</b>Ink as coloured boxes laid on top. Replaced by dye the animals leave behind, pulled along the film</a>
+<a><b>WEAK NOW</b>Thick paint (pale), spray wall (pale), covers too small to read in the store</a>
+<a><b>TO TRY · PAINT</b>Gouache cut shapes; oil pastel resist; monotype with ghost prints; cyanotype; marbling pulled by the bass; scratch-on-film (black leader, white line)</a>
+<a><b>TO TRY · TIME</b>Paint that dries: bright when wet on the beat, dull four bars later. A page that is turned every section</a>
+<a><b>TO TRY · PLACE</b>A projection booth; a record crate to flip through; a street to walk; an underwater ruin</a>
+<a><b>HOW TO ASK</b>Send a picture and say which part is right: the colour, the edge, the motion or the place. One of those per world</a></div></section>
+<section id="brief"><h2><em>REF</em>The brief</h2><p class="say">The first reference boards. They are pictures; the worlds above are the running thing, and they do not match these. Later references (ink on Super 8, an archive depot, specimen jars) are described in the worlds they led to.</p><div class="refs"><img src="{img}ref-city.jpg" alt="Film-strip towers with jellyfish between them, painted and torn" loading="lazy"><img src="{img}ref-cut.jpg" alt="A red, teal and cream poster of jellyfish and a film strip, the word CUT" loading="lazy"><img src="{img}ref-moon.jpg" alt="A moon jelly sprayed over a strip of film frames" loading="lazy"></div></section>
 <footer>Stills were captured in a slow test renderer with the sound off. Motion and sound were not judged by the machine that made this page.</footer></body></html>'''
 open(SRC + 'worlds.html', 'w').write(page('jellyorchestra.html', 'worlds/', '../fonts/fonts.css', '../', 'CONTAMINANT'))
 B = (sys.argv[1] if len(sys.argv) > 1 else '/home/user/bolas') + '/worlds/'; os.makedirs(B + 'img', exist_ok=True)

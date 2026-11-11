@@ -207,3 +207,17 @@ clock was advancing; no page errors.
 Not checked: motion and sound; touching a tape (the pick was only run by the timer); phone speed; the live site.
 Weakest: thick paint is still mostly pale dabs on dark. In the store the covers are small from the usual camera
 distance, so titles cannot be read without a closer shot.
+
+## 14. The archive as things you use
+The video store's shelves now hold three kinds of tape.
+- **Film tape** (434): plays that film on the televisions; the caption opens it.
+- **Door tape, red** (31): takes you to that world or city.
+- **Power tape, yellow** (7): swerve, next song, previous song, follow the odd one, video mode, record, pause.
+The timer only ever takes down film tapes.
+
+The worlds page has three new sections: where everything is (addresses), the archive as objects (what is built
+and what is only an idea: cans, jars, books, racks, late fees, walking), and how the worlds evolve (what was
+withdrawn, what is weak, what to try).
+
+Checked by script: 472 tapes on the shelves; a power tape toggled the swerve; a door tape went to the depot.
+Not checked: touching a tape with a finger, since door and power tapes sit on the last shelf and may be hard to hit.
