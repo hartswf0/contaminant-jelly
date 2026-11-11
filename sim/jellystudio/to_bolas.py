@@ -18,5 +18,5 @@ R('<div class="k">BONUS · THE JELLY ORCHESTRA</div><h1>Every jellyfish is one s
 i = s.index('<p>Each soloist is one sampled sound'); j = s.index('</p>', i) + 4
 s = s[:i] + '<p>Fourteen cities built of film hold the whole Cineosis archive: a city for each poem, a street for each scene, a tower for each film, a floor for each shot. While a song plays, the jellies go into the towers looking for their material. On every street one of them comes back carrying a frame, the shot the poem’s cut chose, and splices it into a reel in the avenue. Touch any floor to read its address.</p>' + s[j:]
 open(DST + 'index.html', 'w').write(s)
-for f in glob.glob(SRC + 'bonus/jellystudio/cities/*.json'): shutil.copy(f, DST + 'data/')
+for f in glob.glob(SRC + 'bonus/jellystudio/cities/*.json') + glob.glob(SRC + 'bonus/jellystudio/cities/*.jpg'): shutil.copy(f, DST + 'data/')
 print('wrote', DST + 'index.html', len(s) // 1024, 'KB;', len(os.listdir(DST + 'data')), 'data files')
