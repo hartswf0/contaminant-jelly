@@ -1,0 +1,179 @@
+{
+ "source": "hartswf0/cineosis-lab lab/lab-data.json",
+ "excluded": "the WarGames collection (a feature film, not archive footage): 302 shots",
+ "cities": [
+  {
+   "n": "01",
+   "title": "OUT OF LIFE",
+   "setting": "sea",
+   "shots": 1546,
+   "films": 115,
+   "streets": 15,
+   "towers": 127
+  },
+  {
+   "n": "02",
+   "title": "FLASHING LIGHTS",
+   "setting": "moon",
+   "shots": 1282,
+   "films": 62,
+   "streets": 9,
+   "towers": 77
+  },
+  {
+   "n": "03",
+   "title": "HOW TO BREAK OFF AN ENGAGEMENT",
+   "setting": "stacks",
+   "shots": 1000,
+   "films": 55,
+   "streets": 7,
+   "towers": 65
+  },
+  {
+   "n": "04",
+   "title": "NEVERMORE",
+   "setting": "store",
+   "shots": 1684,
+   "films": 77,
+   "streets": 8,
+   "towers": 98
+  },
+  {
+   "n": "05",
+   "title": "BLOODLINES",
+   "setting": "orbit",
+   "shots": 950,
+   "films": 91,
+   "streets": 4,
+   "towers": 105
+  },
+  {
+   "n": "06",
+   "title": "RESURRECTING ATLANTIS",
+   "setting": "sea",
+   "shots": 950,
+   "films": 112,
+   "streets": 3,
+   "towers": 120
+  },
+  {
+   "n": "07",
+   "title": "DJ TURN ME UP",
+   "setting": "moon",
+   "shots": 950,
+   "films": 124,
+   "streets": 3,
+   "towers": 130
+  },
+  {
+   "n": "08",
+   "title": "NEWLY SINGLE",
+   "setting": "stacks",
+   "shots": 950,
+   "films": 127,
+   "streets": 5,
+   "towers": 130
+  },
+  {
+   "n": "09",
+   "title": "YET, HEARD",
+   "setting": "store",
+   "shots": 950,
+   "films": 102,
+   "streets": 8,
+   "towers": 111
+  },
+  {
+   "n": "10",
+   "title": "MAGIC RIDE",
+   "setting": "orbit",
+   "shots": 950,
+   "films": 142,
+   "streets": 6,
+   "towers": 145
+  },
+  {
+   "n": "11",
+   "title": "NEW DAY",
+   "setting": "sea",
+   "shots": 949,
+   "films": 121,
+   "streets": 5,
+   "towers": 127
+  },
+  {
+   "n": "12",
+   "title": "REUNION",
+   "setting": "moon",
+   "shots": 949,
+   "films": 104,
+   "streets": 2,
+   "towers": 115
+  },
+  {
+   "n": "13",
+   "title": "HOW TO WIN MY HEART",
+   "setting": "stacks",
+   "shots": 1090,
+   "films": 46,
+   "streets": 7,
+   "towers": 61
+  },
+  {
+   "n": "14",
+   "title": "HOT MINUTE",
+   "setting": "store",
+   "shots": 949,
+   "films": 127,
+   "streets": 6,
+   "towers": 130
+  }
+ ],
+ "signs": {
+  "1": "Solid perception",
+  "2": "Liquid perception",
+  "3": "Gaseous perception",
+  "4": "Icon",
+  "5": "Dividual",
+  "6": "Any-space-whatever",
+  "7": "Symptom",
+  "8": "Fetish",
+  "9": "Originary world",
+  "10": "Index of lack",
+  "11": "Index of equivocity",
+  "12": "Vector",
+  "13": "Milieu",
+  "14": "Binomial",
+  "15": "Imprint",
+  "16": "Plastic figure",
+  "17": "Theatrical figure",
+  "18": "Mise en abyme",
+  "19": "Figure of the sublime",
+  "20": "Figure of enfeeblement",
+  "21": "Quotidian",
+  "22": "Limit of the large form action-image",
+  "23": "Limit of the small form action-image",
+  "24": "Limit of the action-image (extreme limit)",
+  "25": "Rich dream",
+  "26": "Restrained dream",
+  "27": "Movement of world",
+  "28": "Strong destiny",
+  "29": "Weak destiny",
+  "30": "Forking paths",
+  "31": "Mark",
+  "32": "Demark",
+  "33": "Symbol",
+  "34a": "Opsign",
+  "34b": "Sonsign",
+  "35": "Mirrors face to face",
+  "36": "Limpid and opaque",
+  "37": "Seed and environment",
+  "38": "Peaks of the present",
+  "39": "Sheets of the past",
+  "40": "Powers of the false",
+  "41": "Bodies of attitude",
+  "42": "Bodies of gest",
+  "43": "Cinema of the brain",
+  "44": "Lectosigns"
+ }
+}
