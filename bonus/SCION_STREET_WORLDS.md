@@ -153,3 +153,26 @@ ALLWAYS · ARGON and CRASH LAB the video element was playing (its clock advanced
 towers; no page errors.
 Not checked: motion, sound, phone speed with a video decoding behind the scene, the live site. The city video is
 muted; the song is the sound.
+
+## 12. Sixth pass: the collage is withdrawn; paint and places instead
+Décollage and paste-up are removed. Five passes did not make cut-out collage work as a filter over a moving picture,
+and the verdict was that it was totally off. Sections 8 to 11 are kept as a record of what was tried.
+
+**Two paint worlds, after ink animation drawn straight onto Super 8 film (reference frames supplied)**
+| World | Rule | How it is made | Test | Failure |
+|---|---|---|---|---|
+| INK ON FILM | Whatever is lit stains the film; the stain runs along the strip in bands, and each band holds a few frames and then steps | White clear film. A few broad bands of unequal width. Seven dyes (pink, orange, yellow, blue, green, lilac, sky). Blocks five to a height, stepping on twos. The song decides how many bands are wet. Lit things stain their band with their own colour, and are themselves blots with a dried rim. Dye is subtractive, so two dyes make a third. Specks, a scratch now and then, a little gate weave | Can you tell which band belongs to which animal? | It is weather, not a score |
+| WET INK | Nothing has an edge; every animal is a bloom of its own colour | Soft focus and a pull along the film; dashed lines of dye at the strip's edge | With no edges, do you still hear who is who? | Mush |
+
+The film strips are hidden in both. Both work as lenses over a city (`&lens=ink`, `&lens=wash`) and have builders.
+
+**Two places, after real ones (reference pictures supplied: an archive depot, a museum wet collection)**
+| World | What is in it | Rule |
+|---|---|---|
+| THE FILM DEPOT | A long aisle of steel shelving; about 2,900 film cans stacked in columns, mostly bare steel, some with a band of coloured tape; tube lights; at the far end, the film the song is cut from is running on a screen | Every can is a film nobody is watching. One is running |
+| THE WET COLLECTION | The same aisle; about 430 amber jars with lids, each with a pale specimen in it | Every jar holds one that stayed. The orchestra is the ones still moving |
+
+Checked: stills of all four; six stills of ink over 17 s (bands and blocks differ from still to still); no page errors.
+Not checked: motion and sound; whether the stepping reads as hand-painted frames; phone speed in the depot.
+Not built from the other references: a walkable street, a record crate you flip through, a projector you can open,
+an underwater ruin. The depot and the jars were chosen because they hold the archive and the animals.
