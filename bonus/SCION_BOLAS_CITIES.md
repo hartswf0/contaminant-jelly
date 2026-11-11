@@ -60,3 +60,26 @@ A song is one bar per shot, so a seventeen-bar song rebuilds about two cuts; the
 - **Only Argon can be rebuilt.** Afterlight has edit lists in a different form (times within one source), and Sol, Sonnet and Opus have critic records but no shot-by-shot sources that I found. If their sources exist elsewhere, their cities can gain streets like Argon's.
 - **Each school looks the same.** A cut should be its own species and colour.
 - **The WarGames material and the poem cities are untouched.**
+
+## 5 · Lenses over the cities, and where the experiment worlds are
+**The direction:** "And all the other filter and lens worlds", then, with three stills of the experiment worlds: "Where are all of these?"
+
+**Where they are.** The fifteen experiment worlds (Deep Water, Warm Phosphor, The Set, Silhouette Theatre, Warm Cave, Light Alone, Magic Circle, Sun in Your Eyes, The Card, The Measured Bay, Cut Paper, Spacetime Worms, The Library, The Data Center, The Video Store) were always in the page, but could only be reached by pressing NEXT EXPERIMENT many times, and the Bolas page opens in a city. They were as good as hidden.
+
+| now | |
+|---|---|
+| **a "worlds…" menu** in the bar, beside "cities…" | lists all fifteen and opens one directly |
+| **a direct address** for each | add `?look=circle` (or `phosphor`, `set`, `silhouette`, `cave`, `embers`, `sun`, `card`, `bay`, `paper`, `worms`, `library`, `datacenter`, `store`, `deep`) to the page's address |
+| on the two sites | `hartswf0.github.io/contaminant-jelly/bonus/jellyorchestra.html?look=circle` and `hartswf0.github.io/bolas/cities/?look=circle` |
+
+**Lenses over the cities.** A city could only be seen plainly, because the filters and the cities were separate entries. Now **any city can be seen through any of the eleven filters**:
+- **LENS ▸** on the card steps through them: none, Warm Phosphor, The Set, Silhouette Theatre, Warm Cave, Light Alone, Magic Circle, Sun in Your Eyes, The Card, The Measured Bay, Cut Paper, Spacetime Worms.
+- **Each song brings the next lens**, so a tour of the cities also tours the lenses. Pressing LENS fixes your choice.
+- `?lens=cave` opens a city through one.
+- A lens changes the picture only: the city, its architecture, the archivists and the sound stay as they are.
+
+**Checked:** one Bolas city through all twelve with no errors, and each is distinct in the stills. The worlds menu opened a world directly, switched to another, and switched back to a city.
+
+**Reads weakly in the stills:**
+- **The Set and The Card** make the film frames in the windows unreadable, which is most of what a city has to show.
+- **Magic Circle and The Measured Bay** change little over a city, because their own worlds (the record, the grid room) are not brought along. Only the filter is.
