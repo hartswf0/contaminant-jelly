@@ -18,7 +18,7 @@ behaviour: a heavy mark runs downward.
 |---|---|---|---|---|
 | STENCIL | Two sheets: black for what is lit, red for what is brightest, on a rolled cream ground | Speckled sprayed edges, runs | With two colours, can you still tell who is playing? | Too coarse for music |
 | CUT POSTER | Three flat colours, red on top; nothing is shaded | Edges break into blocks; the wall shows through in patches | Does a poster that moves stay a poster? | Becomes a cartoon |
-| DÉCOLLAGE | Twelve scraps, each printed its own way (six inks, halftone or flat); some torn back to the wall | White torn rims; an animal changes ink when it crosses a tear | Do you follow animals across the tears? | The scraps win and the orchestra becomes a wall |
+| DÉCOLLAGE | Overlapping sheets, each printed its own way (six inks, halftone or flat); some torn back to the wall | White torn rims; an animal changes ink when it crosses a tear | Do you follow animals across the tears? | The scraps win and the orchestra becomes a wall |
 | SPRAY WALL | A dark wall; each mark in its own colour with a pale outline and mist of the same colour | Mist, speckle, runs, a short trail | Is the still animal the tag you remember? | White mush |
 | PASTE-UP | Prints from the film pasted on the wall; the orchestra cut out and pasted over them | White paper core at every cut edge, a small cast shadow, three stops of dye, one hatch over every cut-out | Can you tell cut-outs from prints at a glance? | The white edge does nothing |
 
@@ -73,7 +73,9 @@ What `paeleo/handmade` does (Ernst 03, Gilliam ephemera 52) and what was taken f
 Other changes:
 - The film specks are hidden on the street. Each one was being stencilled and outlined, and the wall turned to confetti.
 - Poster: cream stock, teal, red, and a black keyline round every shape.
-- Scraps now come in two sizes.
+- Scraps are no longer a grid. The first version cut the wall into a checkerboard, which was wrong: a wall of posters
+  has no rows. Now there are seven layers of sheets, each layer at its own angle and scale, each sheet its own size and
+  tilt; upper sheets cover the lower ones and cast a shadow on them, and the wall shows where no sheet landed.
 - On pale worlds the title and the marker label sit on a dark plate.
 - Fixed: switching from one city to another could throw an error for a moment (moon jellies kept a floor number
   from the old city).
