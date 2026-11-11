@@ -105,3 +105,24 @@ differ from still to still, and there were no page errors.
 Not checked: the motion itself. I cannot see whether a paste reads as a brush stroke, a tear as a tear, or whether
 the turnover in loud bars is exciting or just busy. Not taken: MERGE and SPLIT rules, and pieces that belong to an
 actor (in paeleo the dog is made of pieces; here the jellies are still rendered whole and cut out).
+
+## 10. Fourth pass: captured, not stuck on
+The earlier passes laid the live jellies over the paper as cut-outs with a white edge. That is a sticker: the paper
+and the picture have nothing to do with each other. Now the paper is made from the picture.
+
+- **Capture.** Once a beat the live camera picture is kept: 16 frames at half size, four bars of memory.
+- **Print.** A sheet shows the frame taken at the beat it was pasted, at the sheet's own place in the view (with a
+  small shift and enlargement, as a hand-placed print would have). Décollage prints it in the sheet's two inks,
+  halftone or flat. Paste-up exposes it in its own colours onto a toned frame of the film.
+- **Live, then set.** A sheet is live for its first beat, like a viewfinder. Then it sets and never moves again.
+- **Collage.** The wall is therefore one view at many moments: the same animal appears on several sheets, where it
+  was at each of their beats.
+- **Décollage.** Tearing a sheet off uncovers an older moment underneath, or bare wall.
+- **Nothing is laid on top.** The cut-out layer, the white core and the cast shadow are gone from these two worlds.
+  The bare wall shows no animals at all.
+- Sheet periods are now 2, 4 or 8 beats, so no sheet outlives the memory.
+
+Checked: six stills of each world between 13 s and 33 s; about 49 captures had been taken by then; prints of jellies
+and film strips are recognisable inside the sheets and differ from sheet to sheet; no page errors.
+Not checked: the motion, and the moment a live sheet sets. On a phone the capture buffer is at most 4096 px wide;
+its cost there was not measured.
