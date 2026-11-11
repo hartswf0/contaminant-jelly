@@ -32,11 +32,17 @@ for ci, p in enumerate(poems):
             fl = [[s['id'], 1 if str(s.get('thumb', '')).startswith('thumbs/') else 0, (s.get('palette') or ['#3a2a18'])[min(2, len(s.get('palette') or [1]) - 1)], (s.get('signs') or [{}])[0].get('n', '') if s.get('signs') else ''] for s in sh[part:part + 36]]
             towers.append({'t': t, 'y': yr, 'b': blk, 'p': pg if pg.startswith('http') else '', 'part': part // 36 + 1 if len(sh) > 36 else 0, 's': fl}); nshots += len(fl); nthumb += sum(f[1] for f in fl)
         if yr: years.append(yr)
+    have = {f[0] for t in towers for f in t['s']}; byid = {s['id']: s for s in S}; loans = 0
+    for k, b in enumerate(bl):   # a shot the cut chose that lives in another city is here on loan, as a one-floor tower on its street
+        pid = b['a']['id']
+        if pid not in have and pid in byid: s_ = byid[pid]; towers.append({'t': s_['title'], 'y': int(s_['year']) if str(s_.get('year') or '').isdigit() else 0, 'b': k, 'p': '', 'part': 0, 'loan': 1, 's': [[pid, 1 if str(s_.get('thumb', '')).startswith('thumbs/') else 0, (s_.get('palette') or ['#3a2a18'])[0], '']]}); have.add(pid); loans += 1
+    for t in towers:
+        if t['b'] < 0: continue
     tall = max(towers, key=lambda t: len(t['s'])); setting = SET[ci % 5]; nf = len({t['t'] for t in towers}); signs = collections.Counter(f[3] for t in towers for f in t['s'] if f[3]); top = signs.most_common(1)
     lines = ['%s is %s.' % (p['title'].capitalize(), SETNAME[setting]), 'It keeps %s shots from %d films. Every film is a tower, every shot a floor, every frame a window.' % (f'{nshots:,}', nf), 'Its %d streets are the scenes of the poem, in order: the first is “%s”.' % (len(bl), bl[0]['title'].split(';')[0]),
              'The tallest tower is %s%s: %d floors.' % (tall['t'], ' (%d)' % tall['y'] if tall['y'] else '', len(tall['s'])), 'Nothing in it is older than %d or newer than %d.' % (min(years), max(years)) if years else '', ('The sign most often read here is %s.' % SIGN[top[0][0]]['name'].lower()) if top else 'No one has read a sign here yet.']
-    city = {'n': p['n'], 'title': p['title'], 'setting': setting, 'lines': [l for l in lines if l], 'beats': [{'t': b['title'], 'codes': b['codes'], 'pick': b['a']['id'], 'pt': b['a']['title'], 'py': b['a'].get('year') or 0} for b in bl], 'towers': towers, 'shots': nshots, 'thumbs': nthumb, 'films': nf}
-    json.dump(city, open(OUT + 'c%s.json' % p['n'], 'w'), separators=(',', ':'), ensure_ascii=False); index.append({'n': p['n'], 'title': p['title'], 'setting': setting, 'shots': nshots, 'films': nf, 'streets': len(bl), 'towers': len(towers)})
+    city = {'n': p['n'], 'title': p['title'], 'setting': setting, 'lines': [l for l in lines if l], 'beats': [{'t': b['title'], 'codes': b['codes'], 'pick': b['a']['id'], 'pt': b['a']['title'], 'py': b['a'].get('year') or 0} for b in bl], 'towers': towers, 'shots': nshots, 'thumbs': nthumb, 'films': nf, 'loans': loans}
+    json.dump(city, open(OUT + 'c%s.json' % p['n'], 'w'), separators=(',', ':'), ensure_ascii=False); index.append({'n': p['n'], 'title': p['title'], 'setting': setting, 'shots': nshots, 'films': nf, 'streets': len(bl), 'towers': len(towers), 'loans': loans})
 json.dump({'source': 'hartswf0/cineosis-lab lab/lab-data.json', 'excluded': 'the WarGames collection (a feature film, not archive footage): 302 shots', 'cities': index, 'signs': {k: v['name'] for k, v in SIGN.items()}}, open(OUT + 'index.json', 'w'), indent=1, ensure_ascii=False)
 for c in index: print(c)
 print('total shots', sum(c['shots'] for c in index), 'of', len(S)); print(sum(os.path.getsize(OUT + f) for f in os.listdir(OUT)) // 1024, 'KB')

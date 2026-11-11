@@ -7,36 +7,40 @@
    "title": "OUT OF LIFE",
    "setting": "sea",
    "shots": 1546,
-   "films": 115,
+   "films": 121,
    "streets": 15,
-   "towers": 127
+   "towers": 134,
+   "loans": 7
   },
   {
    "n": "02",
    "title": "FLASHING LIGHTS",
    "setting": "moon",
    "shots": 1282,
-   "films": 62,
+   "films": 64,
    "streets": 9,
-   "towers": 77
+   "towers": 79,
+   "loans": 2
   },
   {
    "n": "03",
    "title": "HOW TO BREAK OFF AN ENGAGEMENT",
    "setting": "stacks",
    "shots": 1000,
-   "films": 55,
+   "films": 57,
    "streets": 7,
-   "towers": 65
+   "towers": 67,
+   "loans": 2
   },
   {
    "n": "04",
    "title": "NEVERMORE",
    "setting": "store",
    "shots": 1684,
-   "films": 77,
+   "films": 80,
    "streets": 8,
-   "towers": 98
+   "towers": 101,
+   "loans": 3
   },
   {
    "n": "05",
@@ -45,88 +49,98 @@
    "shots": 950,
    "films": 91,
    "streets": 4,
-   "towers": 105
+   "towers": 105,
+   "loans": 0
   },
   {
    "n": "06",
    "title": "RESURRECTING ATLANTIS",
    "setting": "sea",
    "shots": 950,
-   "films": 112,
+   "films": 113,
    "streets": 3,
-   "towers": 120
+   "towers": 121,
+   "loans": 1
   },
   {
    "n": "07",
    "title": "DJ TURN ME UP",
    "setting": "moon",
    "shots": 950,
-   "films": 124,
+   "films": 126,
    "streets": 3,
-   "towers": 130
+   "towers": 132,
+   "loans": 2
   },
   {
    "n": "08",
    "title": "NEWLY SINGLE",
    "setting": "stacks",
    "shots": 950,
-   "films": 127,
+   "films": 129,
    "streets": 5,
-   "towers": 130
+   "towers": 132,
+   "loans": 2
   },
   {
    "n": "09",
    "title": "YET, HEARD",
    "setting": "store",
    "shots": 950,
-   "films": 102,
+   "films": 105,
    "streets": 8,
-   "towers": 111
+   "towers": 114,
+   "loans": 3
   },
   {
    "n": "10",
    "title": "MAGIC RIDE",
    "setting": "orbit",
    "shots": 950,
-   "films": 142,
+   "films": 144,
    "streets": 6,
-   "towers": 145
+   "towers": 147,
+   "loans": 2
   },
   {
    "n": "11",
    "title": "NEW DAY",
    "setting": "sea",
    "shots": 949,
-   "films": 121,
+   "films": 124,
    "streets": 5,
-   "towers": 127
+   "towers": 130,
+   "loans": 3
   },
   {
    "n": "12",
    "title": "REUNION",
    "setting": "moon",
    "shots": 949,
-   "films": 104,
+   "films": 105,
    "streets": 2,
-   "towers": 115
+   "towers": 116,
+   "loans": 1
   },
   {
    "n": "13",
    "title": "HOW TO WIN MY HEART",
    "setting": "stacks",
    "shots": 1090,
-   "films": 46,
+   "films": 50,
    "streets": 7,
-   "towers": 61
+   "towers": 65,
+   "loans": 4
   },
   {
    "n": "14",
    "title": "HOT MINUTE",
    "setting": "store",
    "shots": 949,
-   "films": 127,
+   "films": 129,
    "streets": 6,
-   "towers": 130
+   "towers": 132,
+   "loans": 2
   }
  ],
  "signs": {
