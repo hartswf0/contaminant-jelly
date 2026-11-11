@@ -126,3 +126,30 @@ Checked: six stills of each world between 13 s and 33 s; about 49 captures had b
 and film strips are recognisable inside the sheets and differ from sheet to sheet; no page errors.
 Not checked: the motion, and the moment a live sheet sets. On a phone the capture buffer is at most 4096 px wide;
 its cost there was not measured.
+
+## 11. Fifth pass: watchable, with footage behind
+The fourth pass was unwatchable: seven layers of small sheets, changing every beat, with nothing whole to look at.
+The bar in every paeleo swarm prompt is "a finished, watchable work", and the ARAP swarm's theorem is to change a
+thing while keeping it recognisable. Measured against that, the wall failed. What changed:
+
+**Collage (décollage and paste-up)**
+- The live picture is whole and readable underneath. Décollage prints it in one ink on cream; paste-up plays it in
+  its own colours.
+- Over it, a few large sheets (three layers, not seven; under half of the places filled), each still a frame the
+  camera took at the beat it was pasted, live for one beat and then set.
+- Slow: a sheet lasts 8 or 12 beats, 4 only for a few sheets in the loudest bars; a paste or a tear takes two beats.
+- Décollage uses three ink pairs, not six. No residue scraps.
+- Paste-up prints are photographs with a white border on the wall's own ground, and they yellow as they age.
+
+**Footage behind**
+- Street worlds: the song's film now plays on the wall itself as a faded mural, under the paint.
+- Bolas cities: the city now plays over the actual film file. The film of the cut the first school is rebuilding
+  (or, in a city without cut lists, a film on the current street) plays as video behind the city, and a caption
+  names it. All seven Bolas cities have local files for their films.
+- The fourteen poem cities do not: their sources are pages on an outside archive, not files this site holds.
+
+Checked: stills of décollage, paste-up and stencil over 20 s (the picture is readable, the mural shows); in
+ALLWAYS · ARGON and CRASH LAB the video element was playing (its clock advanced) and the film is visible behind the
+towers; no page errors.
+Not checked: motion, sound, phone speed with a video decoding behind the scene, the live site. The city video is
+muted; the song is the sound.
