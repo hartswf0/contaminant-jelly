@@ -56,3 +56,27 @@ The songbook has a language choice next to the singer. Type in any of the five a
 ## 9. Next
 - Sing Mandarin tones as small bends inside each note, and test whether words become clearer.
 - Ask a native speaker of each language for five corrections and add them to the test words.
+
+## 10. Jelly translation
+`?voice=all`, or TRANSLATE in the songbook, or SUNG IN → TRANSLATION in the menu.
+
+One line is handed from singer to singer, each in another language, a new one every three bars:
+| Bar | Who | Language |
+|---|---|---|
+| 1 | LAVENDER | English |
+| 4 | HOLLOW | Mandarin |
+| 7 | TICK | Spanish |
+| 10 | all four | Amharic |
+| 13 | LAVENDER | Portuguese |
+
+- Under the singer a card shows the line in all five languages, with the one being sung lit.
+- The songbook now lists every song in all five languages: 50 songs, four translations each.
+- **This is not a translator.** It cannot translate a sentence you type. Every line it knows was translated by
+  hand in advance. Typing a bar still works in any one language, but it is sung as written, not translated.
+  A real translator would need a translation service or model, which this page does not have.
+
+Checked: on a phone-sized screen, all five languages took their turn in order with the right singer and script,
+the card showed five lines, and the songbook showed four translations for each of 50 songs. No page errors.
+
+**A fault I shipped and fixed:** the version pushed just before this one failed to start unless the address
+contained `?voice=`. It was live on main for a short time. The plain address was re-tested and loads.
