@@ -60,3 +60,24 @@ person, each of you has one jelly and the two of you hold a conversation neither
 - A room for more than two, and a way to see who is there.
 - Let a line be sung to the current song instead of spoken.
 - Carry talk into the game: the other person is in the same place.
+
+## 10. A room for up to eight
+The room is no longer for two.
+- **One link is the room.** Everyone opens the same address. The first to arrive holds the room and passes every
+  line on to the others; everyone after joins it. There is no separate host link and guest link.
+- **A room can have a name:** `?talk=1&room=NAME` (letters, digits, hyphens). MAKE A ROOM invents a random name.
+- **One jelly each**, in the order people arrive, up to eight on stage. Each keeps its own species, dance, language
+  and voice register.
+- **When you speak:** your jelly says the line, then one jelly for each other language in the room says it in that
+  language (up to three languages).
+- **When someone else speaks:** their jelly says it, then yours says it in your language. Each device translates
+  for itself, so each person's own ONLINE TRANSLATION setting applies to what they hear.
+- The panel shows how many are here and in which languages. When someone leaves, their jelly goes.
+- If the person holding the room leaves, the room ends; reopening the link starts it again.
+
+Checked: four tabs on one machine in English, Mandarin, Spanish and Amharic. All four saw four people. "thank
+you" from the English tab was spoken on that tab in three more languages, and each listener got it in their own
+(谢谢, gracias, አመሰግናለሁ). Closing one tab left three. A still with five jellies on stage. No errors.
+Also fixed: the language chip was covering the panel's close button.
+
+Still not checked: any of this over the real meeting point between separate devices.
