@@ -15,9 +15,14 @@ export function makeTractJelly(THREE, hue = .09) {
   const tent = new THREE.LineSegments(tg, new THREE.LineBasicMaterial({color: col, transparent: true, opacity: .55, blending: THREE.AdditiveBlending, depthWrite: false})); tent.frustumCulled = false; group.add(tent); let tinit = false;
   const R = new Float32Array(NS).fill(1), Rv = new Float32Array(NS), tgt = new Float32Array(NS).fill(1); let track = null, hop = 882, env = null, t0 = 0, bob = 0, bobV = 0, lastLip = 1, ph = 0, amp = 0, idle = Math.random() * 6;
   const prof = s => { const u = s / (NS - 1); return Math.sin(Math.min(1, u * 1.08) * Math.PI * .5) * (1 - .1 * u * u); }, hgt = s => { const u = s / (NS - 1); return 1 - u * u * 1.15; };   /* the resting bell: a dome */
-  return {group, speaking: false,
-    say(d) { track = d.tract; hop = d.hop || 882; const n = Math.floor(d.pcm.length / hop); env = new Float32Array(n); for (let f = 0; f < n; f++) { let e = 0; for (let i = 0; i < hop; i += 4) { const v = d.pcm[f * hop + i]; e += v * v; } env[f] = Math.min(1, Math.sqrt(e / (hop / 4)) * 3.2); } t0 = -1; this.speaking = true; this.dur = d.pcm.length / 44100; },
-    update(dt, now) { idle += dt; let f = -1; if (this.speaking) { if (t0 < 0) t0 = now; const t = now - t0; f = Math.floor(t * 44100 / hop); if (!track || f >= track.length / NS) { this.speaking = false; f = -1; } }
+  const ray = new THREE.Raycaster(); let rate = 1;
+  return {group, speaking: false, bell,
+    /* where a pointer touches the bell: which ring, 0 at the crown to 43 at the rim, or -1 */
+    hit(ndc, cam) { ray.setFromCamera(ndc, cam); const h = ray.intersectObject(bell)[0]; return h && h.uv ? Math.round(h.uv.y * (NS - 1)) : -1; },
+    /* a finger pushes the jelly in at that ring; the springs carry the dent outward and it wobbles back */
+    poke(ring, force = 1) { for (let s = 0; s < NS; s++) Rv[s] -= force * 9 * Math.exp(-((s - ring) ** 2) / 30); bobV -= force * .6; },
+    say(d, r = 1) { rate = r; track = d.tract; hop = d.hop || 882; const n = Math.floor(d.pcm.length / hop); env = new Float32Array(n); for (let f = 0; f < n; f++) { let e = 0; for (let i = 0; i < hop; i += 4) { const v = d.pcm[f * hop + i]; e += v * v; } env[f] = Math.min(1, Math.sqrt(e / (hop / 4)) * 3.2); } t0 = -1; this.speaking = true; this.dur = d.pcm.length / 44100; },
+    update(dt, now) { idle += dt; let f = -1; if (this.speaking) { if (t0 < 0) t0 = now; const t = (now - t0) * rate; f = Math.floor(t * 44100 / hop); if (!track || f >= track.length / NS) { this.speaking = false; f = -1; } }
       let a = 0; if (f >= 0) { a = env[Math.min(env.length - 1, f)] || 0; for (let s = 0; s < NS; s++) { const ar = track[f * NS + s], rr = Math.sqrt(Math.max(0, ar) / 3.1416); tgt[s] = s > NS - 9 ? Math.min(1.25, .12 + rr * 1.15) : .62 + Math.min(1, rr) * .5; } }   /* the last rings are the lips: they may close almost completely */
       else { const br = .5 + .5 * Math.sin(idle * 1.1); for (let s = 0; s < NS; s++) tgt[s] = 1 - (s > NS - 12 ? .22 * br * (s - (NS - 12)) / 12 : 0); }   /* at rest it breathes */
       amp += (a - amp) * Math.min(1, dt * 18); ph += dt * (6 + amp * 26); const k = 260, c = 15; for (let s = 0; s < NS; s++) { Rv[s] += (k * (tgt[s] - R[s]) - c * Rv[s]) * dt; R[s] += Rv[s] * dt; }

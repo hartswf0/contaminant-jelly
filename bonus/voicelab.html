@@ -20,7 +20,7 @@ textarea{width:100%;height:70px;font:13px ui-monospace,monospace;color:#fff;back
 #st{min-height:1.4em;color:var(--gold);font-size:13px}
 @media (max-width:520px){.ab{grid-template-columns:1fr}.verdict{grid-template-columns:1fr}}
 </style></head><body><main>
-<canvas id="jc" aria-label="A jellyfish whose bell is the shape of the voice's vocal tract; its rim closes when the lips close"></canvas><p class="dim" id="jcap">The bell is the voice's throat and mouth: crown is the throat, rim is the lips. Press play and watch the rim.</p>
+<canvas id="jc" aria-label="A jellyfish whose bell is the shape of the voice's vocal tract; its rim closes when the lips close"></canvas><p class="dim" id="jcap">The bell is the voice's throat and mouth: crown is the throat, rim is the lips. Press play and watch the rim. <b>Touch the jelly</b>: it gives where you press, and sings. Near the rim it says “ma”, near the crown “mu”.</p>
 <h1>Voice Lab</h1>
 <p>The jellyfish voices are not good enough yet. I cannot hear them, so this page is how you tell me what is wrong. You listen to two versions, say which is better and why, and the lab changes one thing at a time. When you are done, it gives you a recipe that the orchestra uses straight away.</p>
 
@@ -44,7 +44,12 @@ textarea{width:100%;height:70px;font:13px ui-monospace,monospace;color:#fff;back
 <div class="row"><button id="fresh">▶ TRY A ON A NEW LINE</button><button id="fy" disabled>YES, THAT IS WHAT I MEANT</button><button id="fn" disabled>NO</button></div>
 <p class="dim" id="freshline"></p>
 
-<h2>5 · USE IT</h2>
+<h2>5 · CAN YOU UNDERSTAND IT?</h2>
+<p class="dim">The real test of Chinese and Amharic (or any of them) is whether a speaker can tell the words apart. The jelly says one of four; you press the one you heard. Twelve rounds. The result is a line you can send me, and it tells me exactly which sounds fail.</p>
+<div class="row"><select id="ltlang"><option value="zh">中文</option><option value="am">አማርኛ</option><option value="es">Español</option><option value="pt">Português</option><option value="en">English</option></select><button class="go" id="ltgo">▶ START · SAY ONE</button><button id="ltagain" disabled>SAY IT AGAIN</button></div>
+<div class="chips" id="ltopts" style="margin-top:10px"></div><p id="ltst" class="dim"></p><textarea id="ltres" readonly style="height:54px"></textarea>
+
+<h2>6 · USE IT</h2>
 <div class="row"><button class="go" id="save">USE A IN THE ORCHESTRA</button><button id="reset">START OVER</button></div>
 <p class="dim">Saved on this device. Live voices (a bar you write, talk mode) change at once, and so do warmth, room and doubling on every song. The pre-made songs keep their old throat settings until they are made again: copy the recipe below and send it to me, and I will remake them.</p>
 <textarea id="recipe" readonly></textarea>
@@ -94,12 +99,23 @@ $('fresh').onclick = () => { const L = FRESH[$('lang').value], cur = $('txt').va
 $('fy').onclick = () => { log(`Checked on a new line (“${freshText}”): yes, it still holds.`); $('fy').disabled = $('fn').disabled = true; }; $('fn').onclick = () => { log(`Checked on a new line (“${freshText}”): NO. The recipe does not carry over. Say what is wrong with it now.`); $('txt').value = freshText; $('fy').disabled = $('fn').disabled = true; };
 $('save').onclick = () => { try { localStorage.setItem('jo.recipe', JSON.stringify(A)); } catch {} log('Saved for the orchestra on this device: ' + fmt(A)); $('recipe').select(); };
 $('reset').onclick = () => { A = {...SOFT}; try { localStorage.removeItem('jo.recipe'); } catch {} log('Started over from the soft default.'); done(); };
+// ---- touching the jelly: five syllables made once, then played the moment you press. Where you press picks the vowel; each press in a row steps up a five-note scale.
+const BANK = {list: ['ma', 'me', 'mi', 'mo', 'mu'], clips: null, busy: false, step: 0};
+async function bank() { if (BANK.clips || BANK.busy) return; BANK.busy = true; $('st').textContent = 'waking the jelly…'; const keepL = $('lang').value, keepM = $('mode').value; $('lang').value = 'es'; $('mode').value = 'sing'; try { BANK.clips = []; for (const w of BANK.list) BANK.clips.push(await voice(w, A)); $('st').textContent = ''; } catch (e) { BANK.clips = null; $('st').textContent = 'The jelly would not wake: ' + e.message; } $('lang').value = keepL; $('mode').value = keepM; BANK.busy = false; }
+window.touchJelly = async ring => { if (!ac) { ac = new (window.AudioContext || window.webkitAudioContext)(); chain = makeChain(); } await ac.resume(); window.__ac = ac; window.JELLY.poke(ring, 1); if (!BANK.clips) { await bank(); if (!BANK.clips) return; } const i = Math.max(0, Math.min(4, Math.floor((43 - ring) / 9))), d = BANK.clips[i], rate = 2 ** ([0, 3, 5, 7, 10][BANK.step++ % 5] / 12); chain.set(A); const b = ac.createBuffer(1, d.pcm.length, 44100); b.copyToChannel(d.pcm, 0); const s2 = ac.createBufferSource(); s2.buffer = b; s2.playbackRate.value = rate; s2.connect(chain.inp); s2.start(); window.JELLY.say(d, rate); window.__touched = (window.__touched || 0) + 1; window.__lastTouch = BANK.list[i]; };
+// ---- the listening test: sets of words that differ by one thing (a tone, a consonant), so a wrong answer says which thing failed
+const LT = {zh: [['妈', '麻', '马', '骂'], ['四', '十', '西', '七'], ['八', '怕', '大', '他'], ['你好', '谢谢', '再见', '早上好'], ['鸡', '七', '西', '知'], ['水母', '音乐', '城市', '朋友']], am: [['ሰላም', 'ደህና', 'አዎ', 'አይ'], ['ጠላ', 'ተላ', 'ደላ', 'ሰላ'], ['ቀን', 'ከን', 'ገን', 'ነን'], ['ቤት', 'ሰው', 'ውሃ', 'ልጅ'], ['አንድ', 'ሁለት', 'ሦስት', 'አራት'], ['በላ', 'ፐላ', 'መላ', 'ወላ']], es: [['pero', 'perro', 'pelo', 'peso'], ['casa', 'caza', 'cara', 'cama'], ['hola', 'gracias', 'adiós', 'mañana'], ['año', 'ano', 'amo', 'ajo']], pt: [['pão', 'pau', 'pá', 'pé'], ['avó', 'avô', 'ave', 'aqui'], ['olá', 'obrigado', 'tchau', 'amanhã'], ['caro', 'carro', 'calo', 'caso']], en: [['ship', 'sheep', 'chip', 'cheap'], ['bat', 'pat', 'mat', 'vat'], ['hello', 'thank you', 'goodbye', 'good morning'], ['light', 'right', 'night', 'white']]};
+const lt = {n: 0, right: 0, miss: [], cur: null};
+async function ltSay() { const keepL = $('lang').value, keepM = $('mode').value; $('lang').value = $('ltlang').value; $('mode').value = 'rap'; await play(A, lt.cur.word); $('lang').value = keepL; $('mode').value = keepM; }
+function ltNext() { const sets = LT[$('ltlang').value], set = sets[lt.n % sets.length], word = set[Math.floor(Math.random() * set.length)]; lt.cur = {set, word}; $('ltopts').innerHTML = set.map(w => `<button data-w="${w}" style="font-size:20px;padding:12px 18px">${w}</button>`).join(''); $('ltagain').disabled = false; $('ltst').textContent = `Round ${lt.n + 1} of 12. Which one did it say?`; ltSay(); }
+$('ltgo').onclick = () => { lt.n = 0; lt.right = 0; lt.miss = []; $('ltres').value = ''; ltNext(); }; $('ltagain').onclick = () => lt.cur && ltSay();
+$('ltopts').onclick = e => { const b = e.target.closest('button'); if (!b || !lt.cur) return; const ok = b.dataset.w === lt.cur.word; if (ok) lt.right++; else lt.miss.push(lt.cur.word + '→' + b.dataset.w); lt.n++; if (lt.n >= 12) { lt.cur = null; $('ltopts').innerHTML = ''; $('ltagain').disabled = true; $('ltst').textContent = `Done: ${lt.right} of 12 understood. Chance would be 3.`; $('ltres').value = `LISTEN ${$('ltlang').value} ${lt.right}/12 said→heard: ${lt.miss.join(', ') || 'none wrong'} | ${fmt(A)}`; log(`Listening test, ${$('ltlang').value}: ${lt.right} of 12.`); } else ltNext(); };
 show(); window.__lab = {get A() { return A; }, get B() { return B; }, RAW, SOFT};
 </script>
 <script type="importmap">{"imports":{"three":"../paeleo/scion/videotext/vendor/three.module.min.js"}}</script>
 <script type="module">
 import * as THREE from 'three'; import {makeTractJelly} from './tractjelly.js';
 const cv = document.getElementById('jc'), R = new THREE.WebGLRenderer({canvas: cv, antialias: true, alpha: true}), scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(36, 1, .1, 50), J = makeTractJelly(THREE, .09); scene.add(J.group); J.group.rotation.x = .5; cam.position.set(0, .1, 5.2); cam.lookAt(0, .05, 0);
-const size = () => { const w = cv.clientWidth, h = cv.clientHeight; R.setPixelRatio(Math.min(2, devicePixelRatio)); R.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }; size(); addEventListener('resize', size); window.JELLY = J; let last = performance.now(), T = 0;
+const size = () => { const w = cv.clientWidth, h = cv.clientHeight; R.setPixelRatio(Math.min(2, devicePixelRatio)); R.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }; size(); addEventListener('resize', size); window.JELLY = J; let last = performance.now(), T = 0; cv.style.touchAction = 'none'; cv.addEventListener('pointerdown', e => { const b = cv.getBoundingClientRect(), ring = J.hit(new THREE.Vector2((e.clientX - b.left) / b.width * 2 - 1, -(e.clientY - b.top) / b.height * 2 + 1), cam); if (ring >= 0) window.touchJelly(ring); });
 (function frame(now) { const dt = Math.min(.05, (now - last) / 1000); last = now; T += dt; const st = J.update(dt, window.__ac ? window.__ac.currentTime : T); window.__jst = st; J.group.rotation.y = Math.sin(T * .3) * .25; J.group.position.y = -.15 + Math.sin(T * .6) * .05; R.render(scene, cam); requestAnimationFrame(frame); })(last);
 </script></body></html>
