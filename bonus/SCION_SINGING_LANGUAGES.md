@@ -44,7 +44,7 @@ The songbook has a language choice next to the singer. Type in any of the five a
 
 ## 7. What was checked
 - Test words: Spanish 14/14, Portuguese 14/14, Amharic 12/12, Mandarin 12/12.
-- One song rendered in each language, with healthy level and 70 to 74 % of samples above the floor.
+- All 50 songs rendered in each of the four languages. Every file was measured when made; the figures are in each language's `index.json`.
 - In a browser, each language: the right words lit in the right script, with the English subtitle. No errors.
 - Typed bars: 水母在唱歌 gave five syllables; "las medusas cantan en la ciudad" gave ten.
 
