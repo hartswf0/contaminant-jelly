@@ -1,0 +1,97 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Voice Lab · the Jelly Orchestra</title>
+<style>
+:root{--bg:#0b1011;--panel:#121a1b;--line:#2a3a39;--ink:#e8ece8;--dim:#8fa29c;--gold:#f0a35a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,'Segoe UI',sans-serif}
+main{max-width:760px;margin:auto;padding:18px 14px 80px}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:12px;letter-spacing:.16em;color:var(--gold);margin:22px 0 8px;font-weight:600}
+p{margin:6px 0;color:#cfd8d4}small,.dim{color:var(--dim);font-size:13px}
+input[type=text],select{width:100%;font:inherit;color:#fff;background:#0d1415;border:1px solid var(--line);padding:11px;border-radius:6px}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1;min-width:140px}
+button{font:600 14px system-ui,sans-serif;color:var(--ink);background:var(--panel);border:1px solid var(--line);padding:12px 14px;border-radius:8px;cursor:pointer}
+button.go{background:var(--gold);color:#0b1413;border-color:var(--gold)}button:disabled{opacity:.45}
+.ab{display:grid;grid-template-columns:1fr 1fr;gap:10px}.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
+.card h3{margin:0 0 6px;font-size:13px;letter-spacing:.14em;color:var(--gold)}.card .what{min-height:3.2em;font-size:13px;color:#cfd8d4}
+.card button{width:100%;margin-top:8px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}.chips button{padding:9px 12px;border-radius:18px;font-weight:500}
+.verdict{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
+#log div{border-left:2px solid var(--gold);padding:4px 10px;margin:6px 0;font-size:13px;color:#cfd8d4}
+details{margin-top:8px}summary{cursor:pointer;color:var(--dim)}label.s{display:grid;grid-template-columns:110px 1fr 44px;gap:8px;align-items:center;font-size:13px;margin:6px 0}
+textarea{width:100%;height:70px;font:13px ui-monospace,monospace;color:#fff;background:#0d1415;border:1px solid var(--line);border-radius:6px;padding:8px}
+#st{min-height:1.4em;color:var(--gold);font-size:13px}
+@media (max-width:520px){.ab{grid-template-columns:1fr}.verdict{grid-template-columns:1fr}}
+</style></head><body><main>
+<h1>Voice Lab</h1>
+<p>The jellyfish voices are not good enough yet. I cannot hear them, so this page is how you tell me what is wrong. You listen to two versions, say which is better and why, and the lab changes one thing at a time. When you are done, it gives you a recipe that the orchestra uses straight away.</p>
+
+<h2>1 · THE LINE</h2>
+<div class="row"><input type="text" id="txt" value="two rooms, one city" maxlength="100"><select id="lang" style="flex:0 0 150px"><option value="en">English</option><option value="zh">中文</option><option value="es">Español</option><option value="pt">Português</option><option value="am">አማርኛ</option></select></div>
+<div class="row" style="margin-top:8px"><select id="who"><option value="2">LAVENDER · lead</option><option value="1">HOLLOW · tenor</option><option value="3">TICK · small</option><option value="0">BRUTE · low</option></select><select id="mode"><option value="sing">sung</option><option value="rap">spoken on the beat</option></select></div>
+
+<h2>2 · LISTEN TO BOTH</h2>
+<div class="ab">
+<div class="card"><h3>A · THE ONE WE KEEP</h3><div class="what" id="wa"></div><button class="go" id="pa">▶ PLAY A</button></div>
+<div class="card"><h3>B · THE PROPOSAL</h3><div class="what" id="wb">Say what is wrong with A below, and B will try to fix that one thing.</div><button class="go" id="pb" disabled>▶ PLAY B</button></div>
+</div>
+<p id="st"></p>
+
+<h2>3 · WHAT IS WRONG WITH A?</h2>
+<div class="chips" id="why"></div>
+<div class="verdict"><button id="vb" disabled>B IS BETTER</button><button id="va" disabled>A IS BETTER</button><button id="vn" disabled>NO DIFFERENCE</button></div>
+
+<h2>4 · CHECK I UNDERSTOOD</h2>
+<p class="dim">A recipe that only works on one sentence is no use. This plays A on a line you have not heard, so you can tell whether what you chose still holds.</p>
+<div class="row"><button id="fresh">▶ TRY A ON A NEW LINE</button><button id="fy" disabled>YES, THAT IS WHAT I MEANT</button><button id="fn" disabled>NO</button></div>
+<p class="dim" id="freshline"></p>
+
+<h2>5 · USE IT</h2>
+<div class="row"><button class="go" id="save">USE A IN THE ORCHESTRA</button><button id="reset">START OVER</button></div>
+<p class="dim">Saved on this device. Live voices (a bar you write, talk mode) change at once, and so do warmth, room and doubling on every song. The pre-made songs keep their old throat settings until they are made again: copy the recipe below and send it to me, and I will remake them.</p>
+<textarea id="recipe" readonly></textarea>
+
+<details><summary>All the dials (if you would rather turn them yourself)</summary><div id="dials"></div><button id="pd" style="margin-top:8px">▶ PLAY A WITH THESE</button></details>
+
+<h2>WHAT YOU DECIDED</h2><div id="log"></div>
+<p class="dim" style="margin-top:26px">Voice: CHIMERA by Jameson Hodge (MIT), running in this page. Nothing you type or choose leaves your device.</p>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+// A recipe is every setting that changes how the voice sounds. The first six are the throat (they need the voice made again); the last three are the mix (they can be changed on a sound that already exists).
+const DIAL = {breath: ['Breath', 0, .7, .01, 'air in the voice'], tension: ['Tension', .1, .9, .01, 'how pressed the throat is; high is buzzy'], bright: ['Brightness', 0, 1, .01, 'edge in the tone'], vib: ['Vibrato', 0, .8, .01, 'wobble in pitch on long notes'], drift: ['Drift', 0, 1, .01, 'small human unsteadiness'], speed: ['Speed', .6, 1.4, .01, 'how fast the line goes'], pitch: ['Pitch', -7, 7, 1, 'semitones up or down'], warm: ['Warmth', 2500, 12000, 100, 'treble cut: lower is warmer'], space: ['Room', 0, 1, .01, 'how much room is around the voice'], dbl: ['Doubling', 0, 1, .01, 'a second and third voice, slightly apart']};
+const RAW = {breath: .1, tension: .5, bright: .5, vib: .35, drift: .1, speed: 1, pitch: 0, warm: 12000, space: 0, dbl: 0}, SOFT = {breath: .22, tension: .36, bright: .3, vib: .28, drift: .35, speed: .92, pitch: 0, warm: 5600, space: .28, dbl: .5};
+// Each complaint is a reason, and each reason moves particular dials. The lab says which, so the rule and its rationale are both on the table.
+const WHY = [['too harsh', {tension: -.1, bright: -.12, warm: -900}, 'less throat tension, less edge, a little treble cut'], ['too robotic', {drift: .2, vib: .1, dbl: .2, breath: .05}, 'more unsteadiness and vibrato, more doubling, a little air'], ['too thin', {dbl: .25, pitch: -2, warm: -500}, 'more doubling, two semitones lower, a little warmer'], ['too fast', {speed: -.12}, 'slower'], ['too slow', {speed: .1}, 'faster'], ['hard to understand', {speed: -.08, space: -.12, dbl: -.2, bright: .08, breath: -.06}, 'slower, drier, less doubling, a little more edge, less air'], ['too wobbly', {vib: -.15, drift: -.2}, 'less vibrato and drift'], ['too dry', {space: .15}, 'more room'], ['too echoey', {space: -.15}, 'less room'], ['too breathy', {breath: -.1}, 'less air'], ['too dull', {bright: .12, warm: 1200}, 'more edge, more treble'], ['too high', {pitch: -2}, 'two semitones lower'], ['too low', {pitch: 2}, 'two semitones higher'], ['surprise me', null, 'two dials moved at random']];
+const FRESH = {en: ['the seam sings', 'a break has grammar', 'the bass leaves room for the voice', 'good morning, how are you'], zh: ['接缝在唱歌', '风景加入了乐队', '早上好'], es: ['la costura canta', 'buenos días, cómo estás'], pt: ['a costura canta', 'bom dia, como vai você'], am: ['ስፌቱ ይዘምራል', 'ሰላም እንዴት ነህ']};
+const CAST = [{body: [0, 0], low: 40}, {body: [0, 0], low: 50}, {body: [1, 0], low: 60}, {body: [0, 1], low: 67}];
+let A = load() || {...SOFT}, B = null, bWhy = '', ac = null, chain = null, worker = null, req = 0, wait = {}, cache = new Map(), freshText = '';
+function load() { try { const r = JSON.parse(localStorage.getItem('jo.recipe') || 'null'); return r && typeof r.tension === 'number' ? {...SOFT, ...r} : null; } catch { return null; } }
+const clamp = R => { for (const k in DIAL) R[k] = Math.max(DIAL[k][1], Math.min(DIAL[k][2], R[k])); return R; };
+const fmt = R => Object.keys(DIAL).map(k => `${k}=${+R[k].toFixed(2)}`).join(' ');
+function describe(R, base) { if (!base) return Object.keys(DIAL).filter(k => Math.abs(R[k] - RAW[k]) > 1e-6).map(k => `${DIAL[k][0].toLowerCase()} ${+R[k].toFixed(2)}`).join(' · ') || 'the raw voice, nothing added'; return Object.keys(DIAL).filter(k => Math.abs(R[k] - base[k]) > 1e-6).map(k => `${DIAL[k][0]} ${+base[k].toFixed(2)} → ${+R[k].toFixed(2)}`).join(' · '); }
+// ---- the mix: treble cut, doubling, room, gentle levelling
+function makeChain() { const inp = ac.createGain(), hp = ac.createBiquadFilter(), lp = ac.createBiquadFilter(), dry = ac.createGain(), wet = ac.createGain(), conv = ac.createConvolver(), comp = ac.createDynamicsCompressor(), out = ac.createGain(); hp.type = 'highpass'; hp.frequency.value = 110; lp.type = 'lowpass'; lp.Q.value = .5;
+  const n = Math.floor(ac.sampleRate * 2.2), ir = ac.createBuffer(2, n, ac.sampleRate); for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); let y = 0; for (let i = 0; i < n; i++) { y += ((Math.random() * 2 - 1) - y) * .35; d[i] = y * Math.exp(-i / n * 5.5) * (i < 400 ? i / 400 : 1); } } conv.buffer = ir;
+  inp.connect(hp); hp.connect(lp); lp.connect(dry); dry.connect(comp); lp.connect(conv); conv.connect(wet); wet.connect(comp); const dg = [];
+  [[.017, .31, -.6], [.027, .47, .6]].forEach(([t, f, pan]) => { const d = ac.createDelay(.1), g = ac.createGain(), p = ac.createStereoPanner(), o = ac.createOscillator(), og = ac.createGain(); d.delayTime.value = t; o.frequency.value = f; og.gain.value = .0018; o.connect(og); og.connect(d.delayTime); o.start(); p.pan.value = pan; lp.connect(d); d.connect(g); g.connect(p); p.connect(comp); dg.push(g); });
+  comp.threshold.value = -20; comp.ratio.value = 3; comp.attack.value = .01; comp.release.value = .2; comp.connect(out); out.gain.value = .9; out.connect(ac.destination);
+  return {inp, set(R) { lp.frequency.value = R.warm; wet.gain.value = R.space * .55; dg.forEach(g => { g.gain.value = R.dbl * .5; }); dry.gain.value = 1 - R.dbl * .15; }}; }
+// ---- the voice, in a worker beside the page
+function voice(text, R) { const lang = $('lang').value, who = +$('who').value, rap = $('mode').value === 'rap', key = [text, lang, who, rap, R.breath, R.tension, R.bright, R.vib, R.drift, R.speed, R.pitch].join('|'); if (cache.has(key)) return Promise.resolve(cache.get(key));
+  if (!worker) { worker = new Worker('jellystudio/voice/singer.js'); worker.onmessage = e => { const d = e.data, w = wait[d.id]; if (d.status) { $('st').textContent = d.status + '…'; return; } if (!w) return; delete wait[d.id]; d.error ? w.rej(new Error(d.error)) : w.res(d); }; }
+  const id = ++req, c = CAST[who]; return new Promise((res, rej) => { wait[id] = {res: d => { cache.set(key, d); res(d); }, rej}; worker.postMessage({text, id, lang, body: c.body, low: c.low + R.pitch, root: 2, bpm: Math.round((rap ? 108 : 84) * R.speed), rap, vib: rap ? 0 : R.vib, src: {breathiness: R.breath, tension: R.tension, brightness: R.bright, roughness: 0, fry: 0, drift: R.drift}}); }); }
+let playing = null;
+async function play(R, text) { if (!ac) { ac = new (window.AudioContext || window.webkitAudioContext)(); chain = makeChain(); } await ac.resume(); try { const d = await voice(text || $('txt').value, R); chain.set(R); if (playing) try { playing.stop(); } catch {} const b = ac.createBuffer(1, d.pcm.length, 44100); b.copyToChannel(d.pcm, 0); const s = ac.createBufferSource(); s.buffer = b; s.connect(chain.inp); s.start(); playing = s; $('st').textContent = ''; window.__played = (window.__played || 0) + 1; } catch (e) { $('st').textContent = 'Could not say that: ' + e.message; } }
+// ---- the conversation: a reason, a proposal, a verdict
+function show() { $('wa').textContent = describe(A); $('recipe').value = 'RECIPE ' + fmt(A); $('dials').innerHTML = Object.entries(DIAL).map(([k, d]) => `<label class="s" title="${d[4]}">${d[0]}<input type="range" data-k="${k}" min="${d[1]}" max="${d[2]}" step="${d[3]}" value="${A[k]}"><span>${+A[k].toFixed(2)}</span></label>`).join(''); document.querySelectorAll('#dials input').forEach(i => { i.oninput = () => { A[i.dataset.k] = +i.value; i.nextElementSibling.textContent = i.value; $('wa').textContent = describe(A); $('recipe').value = 'RECIPE ' + fmt(A); }; }); }
+function log(s) { const d = document.createElement('div'); d.textContent = s; $('log').prepend(d); }
+function propose(i) { const [name, delta, how] = WHY[i]; B = {...A}; if (delta) for (const k in delta) B[k] += delta[k]; else { const ks = Object.keys(DIAL).sort(() => Math.random() - .5).slice(0, 2); ks.forEach(k => { B[k] += (Math.random() - .5) * (DIAL[k][2] - DIAL[k][1]) * .4; }); } clamp(B); bWhy = name; const ch = describe(B, A);
+  $('wb').innerHTML = ch ? `You said A is <b>${name}</b>. So B is: ${how}.<br><small>${ch}</small>` : `You said A is <b>${name}</b>, but that dial is already as far as it goes.`; for (const id of ['pb', 'vb', 'va', 'vn']) $(id).disabled = !ch; if (ch) play(B); }
+$('why').innerHTML = WHY.map((w, i) => `<button data-i="${i}">${w[0]}</button>`).join(''); $('why').onclick = e => { const b = e.target.closest('button'); if (b) propose(+b.dataset.i); };
+$('pa').onclick = () => play(A); $('pb').onclick = () => B && play(B); $('pd').onclick = () => play(A);
+const done = () => { B = null; $('wb').textContent = 'Say what is wrong with A, and B will try to fix that one thing.'; for (const id of ['pb', 'vb', 'va', 'vn']) $(id).disabled = true; show(); };
+$('vb').onclick = () => { log(`“${bWhy}”: B was better. Kept: ${describe(B, A)}`); A = B; done(); }; $('va').onclick = () => { log(`“${bWhy}”: A was better. The change (${describe(B, A)}) was thrown away.`); done(); }; $('vn').onclick = () => { log(`“${bWhy}”: no difference heard (${describe(B, A)}). That dial may not be the cause.`); done(); };
+$('fresh').onclick = () => { const L = FRESH[$('lang').value], cur = $('txt').value; freshText = L.filter(x => x !== cur && x !== freshText)[Math.floor(Math.random() * (L.length - 1))] || L[0]; $('freshline').textContent = 'New line: “' + freshText + '”'; play(A, freshText); $('fy').disabled = $('fn').disabled = false; };
+$('fy').onclick = () => { log(`Checked on a new line (“${freshText}”): yes, it still holds.`); $('fy').disabled = $('fn').disabled = true; }; $('fn').onclick = () => { log(`Checked on a new line (“${freshText}”): NO. The recipe does not carry over. Say what is wrong with it now.`); $('txt').value = freshText; $('fy').disabled = $('fn').disabled = true; };
+$('save').onclick = () => { try { localStorage.setItem('jo.recipe', JSON.stringify(A)); } catch {} log('Saved for the orchestra on this device: ' + fmt(A)); $('recipe').select(); };
+$('reset').onclick = () => { A = {...SOFT}; try { localStorage.removeItem('jo.recipe'); } catch {} log('Started over from the soft default.'); done(); };
+show(); window.__lab = {get A() { return A; }, get B() { return B; }, RAW, SOFT};
+</script></body></html>

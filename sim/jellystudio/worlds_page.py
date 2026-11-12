@@ -1,7 +1,7 @@
 # Writes the worlds wall: bonus/worlds.html and the Bolas edition bolas/worlds/index.html. Every tile is a still captured from the running orchestra (bonus/worlds/<id>.jpg).
 import json, os, sys, shutil, glob, html
 SRC = '/home/user/contaminant-jelly/bonus/'; W = json.load(open(SRC + 'worlds/worlds.json')); L = W['looks']; E = html.escape
-def page(orch, img, fonts, home, homename):
+def page(orch, img, fonts, home, homename, lab='voicelab.html'):
     def tile(l, k):
         q = ('?city=' + l['city']) if l['city'] else ('?look=' + l['id']); sub = l['own'] or ('after ' + l['after'].split(':')[0]); rot = [-1.2, .8, -.5, 1.4, -.9, .4][k % 6]
         return f'<a class="p t{k % 5}" style="--r:{rot}deg" href="{orch}{q}"><img src="{img}{l["id"]}.jpg" alt="" loading="lazy"><b>{E(l["name"])}</b><i>{E(sub)}</i><span>{E(l["rule"])}</span></a>'
@@ -67,6 +67,7 @@ footer{{max-width:1240px;margin:auto;padding:40px 16px 60px;color:var(--dim);fon
 <a href="{orch}?city=b5&lens=watercolour"><b>A CITY THROUGH A LENS</b>?city=b5&amp;lens= and a paint or experiment name. Or press LENS on the card inside a city</a>
 <a href="{orch}?city=b5&arch=reef"><b>A CITY IN ANOTHER SHAPE</b>&amp;arch= grid, shell, reef, amph, kelp, helix, wheel, comb, table</a>
 <a href="{orch}?look=depot&lens=woodblock&walk=1"><b>ANY PLACE, ANY PAINT, ON FOOT</b>?look=depot&amp;lens=woodblock&amp;walk=1. Or press SETTINGS inside: place, paint, song and camera are four dials, and the panel gives you the address to share</a>
+<a href="{lab}"><b>VOICE LAB</b>One plain page for making the voices better by ear: listen to A and B, say what is wrong, and it changes one thing</a>
 <a href="{orch}?game=1"><b>THE GAME</b>?game=1. On foot from the Chorus through six doors. Take a reel from each place; each one gives you a paint and brings a singer back</a>
 <a href="{orch}?book=1"><b>THE CHORUS AND SONGBOOK</b>?book=1. All 50 songs with their words. Write a bar for one of the cast to rap, or take the last line yourself</a>
 <a href="{orch}?theatre=1"><b>THEATRE</b>?theatre=1. The controls go away and the orchestra moves through every place and paint, sixteen bars each</a>
@@ -96,6 +97,6 @@ footer{{max-width:1240px;margin:auto;padding:40px 16px 60px;color:var(--dim);fon
 <footer>Stills were captured in a slow test renderer with the sound off. Motion and sound were not judged by the machine that made this page.</footer></body></html>'''
 open(SRC + 'worlds.html', 'w').write(page('jellyorchestra.html', 'worlds/', '../fonts/fonts.css', '../', 'CONTAMINANT'))
 B = (sys.argv[1] if len(sys.argv) > 1 else '/home/user/bolas') + '/worlds/'; os.makedirs(B + 'img', exist_ok=True)
-open(B + 'index.html', 'w').write(page('../cities/', 'img/', '/contaminant-jelly/fonts/fonts.css', '../', 'CRASH LAB'))
+open(B + 'index.html', 'w').write(page('../cities/', 'img/', '/contaminant-jelly/fonts/fonts.css', '../', 'CRASH LAB', '/contaminant-jelly/bonus/voicelab.html'))
 for f in glob.glob(SRC + 'worlds/*.jpg'): shutil.copy(f, B + 'img/')
 print('wrote worlds.html and', B + 'index.html', len(glob.glob(SRC + 'worlds/*.jpg')), 'images')
