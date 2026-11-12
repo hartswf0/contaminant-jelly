@@ -24,6 +24,9 @@ canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-acti
 <div class="ui" id="start"><div class="k">BONUS · THE THINKING JELLY</div><h1>How a jelly decides to pulse</h1><p>Eight pacemakers on the rim race to fire. The winner's signal runs both ways round a nerve ring, and the muscle follows it. All of it is running here, and you can see it, hear it, and interfere.</p><div class="go">TOUCH TO BEGIN · WITH SOUND</div></div>
 <script type="module">
 import * as THREE from 'three';
+import {mountVoicePanel} from './jelly-voice/panel.js';
+import {createVoiceMotion, unit, meanUnit} from './jelly-voice/adapters.js';
+const voiceMotion = createVoiceMotion();
 import {makeGel} from './jellyjar-sim.js';
 import {makeNerve} from './thinkjelly-sim.js';
 const $ = id => document.getElementById(id), V3 = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z), TAU = Math.PI * 2;
@@ -93,7 +96,8 @@ $('bar').addEventListener('click', e => { const b = e.target.closest('button'); 
   if (b.dataset.p) PRESET[b.dataset.p](); if (b.id === 'undo') { const u = S.undo.pop(); if (u) { u(); say('Undone.', 1.5); } else say('Nothing to undo.', 1.5); }
   if (b.id === 'snd') { sndOn = !sndOn; b.classList.toggle('on', sndOn); if (watG) watG.gain.value = sndOn ? .12 : 0; } });
 $('warm').addEventListener('input', e => { NV.warm = e.target.value / 100; }); $('firm').addEventListener('input', e => { G.firm = e.target.value / 100; });
-$('start').addEventListener('pointerdown', () => { $('start').style.display = 'none'; S.started = true; audio(); say('The gold tick in the score is the pacemaker that led each beat. Touch a pacemaker to fire it; try SILENCE on the leader.', 7); });
+function startBody() { if (S.started) return; $('start').style.display = 'none'; S.started = true; audio(); say('The gold tick in the score is the pacemaker that led each beat. Touch a pacemaker to fire it; try SILENCE on the leader.', 7); }
+$('start').addEventListener('pointerdown', startBody);
 const cv = $('gl'), scr = v => { const p = v.clone().project(cam); return p.z < 1 ? [(p.x * .5 + .5) * innerWidth, (-p.y * .5 + .5) * innerHeight] : null; };
 cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); S.ptrs.set(e.pointerId, [e.clientX, e.clientY]); if (S.ptrs.size === 2) { const [a, b] = [...S.ptrs.values()]; S.pinch = {d: Math.hypot(a[0] - b[0], a[1] - b[1]), dist: S.dist}; S.drag = null; return; } S.drag = {id: e.pointerId, x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY, t: performance.now()}; });
 cv.addEventListener('pointermove', e => { if (S.ptrs.has(e.pointerId)) S.ptrs.set(e.pointerId, [e.clientX, e.clientY]); if (S.pinch && S.ptrs.size === 2) { const [a, b] = [...S.ptrs.values()]; S.dist = Math.max(2.4, Math.min(16, S.pinch.dist * S.pinch.d / Math.max(20, Math.hypot(a[0] - b[0], a[1] - b[1])))); return; } const d = S.drag; if (!d || d.id !== e.pointerId) return; S.yaw -= (e.clientX - d.x) * .006; S.pitch = Math.max(-1.2, Math.min(1.3, S.pitch + (e.clientY - d.y) * .004)); d.x = e.clientX; d.y = e.clientY; });
@@ -116,6 +120,8 @@ function frame(now) { requestAnimationFrame(frame); const dt = Math.max(0, Math.
   trailT += dt; if (trailT > .15) { trailT = 0; TRAIL.push(COM.clone()); if (TRAIL.length > 400) TRAIL.shift(); const a = trailL.geometry.attributes.position.array; TRAIL.forEach((p, i) => a.set([p.x, p.y, p.z], i * 3)); trailL.geometry.setDrawRange(0, TRAIL.length); trailL.geometry.attributes.position.needsUpdate = true; } trailL.visible = S.dist > 8;
   { const a = motes.geometry.attributes.position.array; for (let i = 0; i < a.length; i += 3) for (let c = 0; c < 3; c++) { const d = a[i + c] - COM.getComponent(c); if (d > 8) a[i + c] -= 16; if (d < -8) a[i + c] += 16; } motes.geometry.attributes.position.needsUpdate = true; }
   camT.lerp(COM, 1 - Math.pow(.02, dt)); cam.position.set(camT.x + Math.sin(S.yaw) * Math.cos(S.pitch) * S.dist, camT.y + Math.sin(S.pitch) * S.dist, camT.z + Math.cos(S.yaw) * Math.cos(S.pitch) * S.dist); cam.lookAt(camT);
+  // A bounded visual breath; no nerve or force is driven by the vocal take.
+  const voiceScale = 1 + .045 * voiceMotion.level; bell.scale.setScalar(voiceScale); bell.position.copy(COM).multiplyScalar(1 - voiceScale); ghostM.opacity = .1 + .1 * voiceMotion.level;
   overlay(); if (S.sayT && performance.now() > S.sayT) $('say').style.opacity = 0; R.render(scene, cam); }
 // the overlay: what each pacemaker is about to do (zoom in for the numbers), and the score: fourteen seconds of who fired, who led, and how hard the muscle pulled
 function overlay() { const W = innerWidth, H = innerHeight; if (ov.width !== W || ov.height !== H) { ov.width = W; ov.height = H; } g2.clearRect(0, 0, W, H); const near = S.dist < 4.2, far = S.dist > 8; g2.font = "300 10px 'JetBrains Mono', monospace"; g2.textAlign = 'center';
@@ -130,4 +136,13 @@ function overlay() { const W = innerWidth, H = innerHeight; if (ov.width !== W |
   const rate = NV.rate(), lastLead = [...S.hist].reverse().find(h => h.lead), awake = NV.rh.filter(r => !r.silent).length; $('stat').textContent = `${rate ? rate.toFixed(0) + ' beats a minute' : Math.max(...NV.act) > .2 ? 'a wave circling, with no pacemaker' : 'no beat yet'}${lastLead ? ' · led by ' + (lastLead.r + 1) : ''} · ${awake} of 8 awake${NV.cuts.size ? ' · ' + NV.cuts.size + ' cut' + (NV.cuts.size > 1 ? 's' : '') : ''}`; $('what').textContent = far ? 'far: the path it swims' : near ? 'near: each pacemaker\'s numbers' : 'zoom in for numbers, out for its path'; }
 requestAnimationFrame(frame);
 window.__tj = {G, NV, S, MUS, COM, AX, body, tapAt, PRESET, rhoW, scr, get T() { return T; }};
+// Creative mappings sampled once for a take: nerve activity, firmness, and nerve warmth.
+mountVoicePanel({
+  pageId: 'thinkjelly', defaultActorId: 'G',
+  getAudioContext: async () => { startBody(); audio(); return AC; },
+  getDestination: ctx => bus || ctx.destination,
+  readFeatures: () => ({energy: meanUnit(NV.act), pressure: unit(G.firm), color: unit(NV.warm / 2)}),
+  applyFrame: voiceMotion.applyFrame,
+  onStop: () => { voiceMotion.onStop(); bell.scale.setScalar(1); bell.position.set(0, 0, 0); ghostM.opacity = .1; }
+});
 </script></body></html>

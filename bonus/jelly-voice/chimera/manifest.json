@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "upstream": "https://github.com/jamesondh/chimera-vocal-synth",
+  "revision": "e33221d006f44c78849210eb29dd1eb9755dc78e",
+  "engineSourceModified": false,
+  "recoveredSpeakingFilmMaterialPatch": false,
+  "build": {
+    "target": "wasm32-unknown-unknown",
+    "rustVersion": "1.99.1",
+    "rustCommit": "58cf8f9c35b355199727627d07ae34a4e2846d67",
+    "llvmVersion": "23.1.1",
+    "command": "cargo build --locked --release --target wasm32-unknown-unknown -p chimera-wasm",
+    "wireTransform": "Node v24.22.1 node:module.stripTypeScriptTypes(mode=strip)"
+  },
+  "abi": {
+    "layout": 1,
+    "gestureRecordBytes": 272,
+    "maxGestures": 4000,
+    "maxRenderBlockFrames": 4096,
+    "wasmImports": []
+  },
+  "licenses": {
+    "engine": "CHIMERA-LICENSE.txt",
+    "dictionary": "CMUDICT-LICENSE.txt"
+  },
+  "artifacts": {
+    "chimera.wasm": {
+      "bytes": 1019065,
+      "sha256": "606cfb8c02c4362c15548984a106640707208fd1518d6823c171fddd91d42f82"
+    },
+    "chimera.mjs": {
+      "bytes": 8767,
+      "sha256": "48a931624b80d8b689c56cab188934ab4dfa89f9d926e5e97b543c558a2a6dee"
+    },
+    "wire.mjs": {
+      "bytes": 4235,
+      "sha256": "a03fe1822991d831351008f63a4b119d399677b81c6e670749c2206cbc591de1"
+    },
+    "cmudict.txt.gz": {
+      "bytes": 868793,
+      "sha256": "336293a10a93c3ba183483308a22eab8e2b6a5e1ac91262dd0d3d4b85da285b5"
+    },
+    "CHIMERA-LICENSE.txt": {
+      "bytes": 1070,
+      "sha256": "0b8d6e0649e7b2068a8300cafb9ebded80d9a0fe99e699b96538ba0a8c5236b1"
+    },
+    "CMUDICT-LICENSE.txt": {
+      "bytes": 1754,
+      "sha256": "bd4ce8e44170a5f9f481310ca85c51de3c4f851a65e679b40e603b143bd3542a"
+    },
+    "README.md": {
+      "bytes": 4999,
+      "sha256": "37af365861a2b80961cdd73ba97b88849830e3b0ed9b595ffb71743493c3ada2"
+    },
+    "build-runtime.sh": {
+      "bytes": 1947,
+      "sha256": "3c838a279a136cf8894c8531ab98322ce428a4d1c0d15b8fc2031597a7625a00"
+    },
+    "verification-summary.json": {
+      "bytes": 3665,
+      "sha256": "774b4d884beda9b297ebb0274ba6def84cd9135c88bf279dcf3cb7ee8137fac0"
+    }
+  }
+}

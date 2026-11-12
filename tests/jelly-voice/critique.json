@@ -1,0 +1,730 @@
+{
+  "generatedAt": "2026-11-11T19:03:23.628Z",
+  "baseRevision": "e393e9f940e05d37a13e9af25c7178dcb1cbd817",
+  "inspected": {
+    "cast.mjs": "5194bb7f876d9ee63ac8531af0b1e257544c65d942a46695c048875de4586ca0",
+    "score.mjs": "3460fd3c5101dbbb8016e6ecdfa5b30c487622270594ae3e5bb4ca73e8f892bb",
+    "render.mjs": "6538864c39ed9bac5b4d74144e442dbe77d38fd0c618033c092f721cf356ebfd",
+    "performance.mjs": "7a11b2f6bb8661365f6582788c9b19c29c40a69ca8d8a7f6ae4c6c542ba8496b",
+    "client.mjs": "006753f02fca195bda1c98ab2cd4d0d7121aa3c6325b9503810bca5330986eb2",
+    "worker.mjs": "0895b8e20646c305ac3a27cfa27189914d90b8125fe0bc44c2ad5a096351a376",
+    "panel.js": "257fd74cb02e76d18f51e35810b19cb3c23685550ffc90273a99db69c8d90117",
+    "adapters.js": "be83af9e3b0061392770a32a904f6e6d31c26f003344a1450d9364ccd189684b",
+    "chimera/chimera.mjs": "48a931624b80d8b689c56cab188934ab4dfa89f9d926e5e97b543c558a2a6dee",
+    "chimera/chimera.wasm": "606cfb8c02c4362c15548984a106640707208fd1518d6823c171fddd91d42f82",
+    "chimera/cmudict.txt.gz": "336293a10a93c3ba183483308a22eab8e2b6a5e1ac91262dd0d3d4b85da285b5"
+  },
+  "results": [
+    {
+      "name": "pinned engine and dictionary match independently hashed bytes",
+      "status": "PASS",
+      "elapsedMs": 8
+    },
+    {
+      "name": "invalid score fields reject with field-specific errors",
+      "status": "PASS",
+      "elapsedMs": 6,
+      "detail": {
+        "rejected": 21
+      }
+    },
+    {
+      "name": "inherited Object keys are rejected as actors",
+      "status": "PASS",
+      "elapsedMs": 0
+    },
+    {
+      "name": "actor profile identity is independent of body snapshot and page hint",
+      "status": "PASS",
+      "elapsedMs": 43
+    },
+    {
+      "name": "syllable and duration bounds reject before synthesis",
+      "status": "PASS",
+      "elapsedMs": 10
+    },
+    {
+      "name": "actual WASM render speech-48000: finite, nonzero, bounded, truthful duration",
+      "status": "PASS",
+      "elapsedMs": 996,
+      "detail": {
+        "label": "speech-48000",
+        "actorId": "G",
+        "mode": "speech",
+        "sampleRate": 48000,
+        "frames": 71812,
+        "duration": 1.4960833333333334,
+        "peak": 0.5435823202133179,
+        "rms": 0.07879659663329681,
+        "pcmHash": "90994bbc1e3c07b5408e79dd17075a78d144796958553b2ce8ec570c8a19856c",
+        "renderMs": 995
+      }
+    },
+    {
+      "name": "actual WASM render speech-44100: finite, nonzero, bounded, truthful duration",
+      "status": "PASS",
+      "elapsedMs": 731,
+      "detail": {
+        "label": "speech-44100",
+        "actorId": "G",
+        "mode": "speech",
+        "sampleRate": 44100,
+        "frames": 65977,
+        "duration": 1.496077097505669,
+        "peak": 0.5394933819770813,
+        "rms": 0.07887588889110969,
+        "pcmHash": "2a75803a030ccb25713e02dc52a23f69267efad9f66e9d674fc5562bcd220feb",
+        "renderMs": 731
+      }
+    },
+    {
+      "name": "actual WASM render joke-48000: finite, nonzero, bounded, truthful duration",
+      "status": "PASS",
+      "elapsedMs": 1737,
+      "detail": {
+        "label": "joke-48000",
+        "actorId": "G",
+        "mode": "joke",
+        "sampleRate": 48000,
+        "frames": 155131,
+        "duration": 3.231895833333333,
+        "peak": 0.5374042987823486,
+        "rms": 0.08522916558721502,
+        "pcmHash": "364f9f304747671bcf3a3077d025fd3906bf82d3f81a8523c225cc43da2899b5",
+        "renderMs": 1737
+      }
+    },
+    {
+      "name": "actual WASM render sing-48000: finite, nonzero, bounded, truthful duration",
+      "status": "PASS",
+      "elapsedMs": 993,
+      "detail": {
+        "label": "sing-48000",
+        "actorId": "G",
+        "mode": "sing",
+        "sampleRate": 48000,
+        "frames": 91200,
+        "duration": 1.9,
+        "peak": 0.3511168658733368,
+        "rms": 0.08423362848538209,
+        "pcmHash": "9e3e94b70bfdd8e7d25ae7975fc1988ab257f5514ace5c7c0e6cb844facf0982",
+        "renderMs": 993
+      }
+    },
+    {
+      "name": "actual WASM render rap-48000: finite, nonzero, bounded, truthful duration",
+      "status": "PASS",
+      "elapsedMs": 1030,
+      "detail": {
+        "label": "rap-48000",
+        "actorId": "G",
+        "mode": "rap",
+        "sampleRate": 48000,
+        "frames": 91200,
+        "duration": 1.9,
+        "peak": 0.45608463883399963,
+        "rms": 0.09743758016296511,
+        "pcmHash": "6ba6f6f4518d002f203bbb47844544c0fed6e3674a9638d05620543731a39531",
+        "renderMs": 1030
+      }
+    },
+    {
+      "name": "actual WASM render actor-J: finite, nonzero, bounded, truthful duration",
+      "status": "PASS",
+      "elapsedMs": 737,
+      "detail": {
+        "label": "actor-J",
+        "actorId": "J",
+        "mode": "speech",
+        "sampleRate": 48000,
+        "frames": 71812,
+        "duration": 1.4960833333333334,
+        "peak": 0.5605970025062561,
+        "rms": 0.08406677249041015,
+        "pcmHash": "0241b1489f1e8ef4b51e0c5a6b760469b27442291fcbc2dacc86d45edcf65148",
+        "renderMs": 737
+      }
+    },
+    {
+      "name": "actual WASM render actor-F1: finite, nonzero, bounded, truthful duration",
+      "status": "PASS",
+      "elapsedMs": 743,
+      "detail": {
+        "label": "actor-F1",
+        "actorId": "F1",
+        "mode": "speech",
+        "sampleRate": 48000,
+        "frames": 71812,
+        "duration": 1.4960833333333334,
+        "peak": 0.6104569435119629,
+        "rms": 0.08150807760834501,
+        "pcmHash": "08741fb80bf47ee94e089ab0aef6f5ade75328b199ccccc79490db23d9453a31",
+        "renderMs": 743
+      }
+    },
+    {
+      "name": "actual WASM render actor-F2: finite, nonzero, bounded, truthful duration",
+      "status": "PASS",
+      "elapsedMs": 821,
+      "detail": {
+        "label": "actor-F2",
+        "actorId": "F2",
+        "mode": "speech",
+        "sampleRate": 48000,
+        "frames": 71812,
+        "duration": 1.4960833333333334,
+        "peak": 0.33850669860839844,
+        "rms": 0.06631328100220123,
+        "pcmHash": "3c90ebe3b922d9f5f23f958a3416bc1acd5b9ea4054a36554e943334d2c671c7",
+        "renderMs": 821
+      }
+    },
+    {
+      "name": "actual WASM render actor-F3: finite, nonzero, bounded, truthful duration",
+      "status": "PASS",
+      "elapsedMs": 842,
+      "detail": {
+        "label": "actor-F3",
+        "actorId": "F3",
+        "mode": "speech",
+        "sampleRate": 48000,
+        "frames": 71812,
+        "duration": 1.4960833333333334,
+        "peak": 0.37339675426483154,
+        "rms": 0.06370122368380682,
+        "pcmHash": "b8a2d714e60c0c0dd4f7e49a488ea5fd32e0e520aa34e1d886b40338b1faf24a",
+        "renderMs": 842
+      }
+    },
+    {
+      "name": "all five character renders have different PCM hashes (not a listening test)",
+      "status": "PASS",
+      "elapsedMs": 0
+    },
+    {
+      "name": "same actor plus different body/page at material=0 reproduces exact PCM",
+      "status": "PASS",
+      "elapsedMs": 802
+    },
+    {
+      "name": "WAV decodes every actual sample within signed 16-bit quantization bound at both rates",
+      "status": "PASS",
+      "elapsedMs": 20,
+      "detail": [
+        {
+          "sampleRate": 44100,
+          "bytes": 131998,
+          "maxAbsoluteError": 0.00001525889593138874,
+          "wavSha256": "29ff237d2ff47fa336de86ddae4089bcbaf333b9ade95cc3efdb645f3f71628d"
+        },
+        {
+          "sampleRate": 48000,
+          "bytes": 143668,
+          "maxAbsoluteError": 0.0000152587890625,
+          "wavSha256": "8e2b78a52e6c5fb9ea5e0b68d8b91ea374842ff5585e1e237204d88bdbc80eff"
+        }
+      ]
+    },
+    {
+      "name": "TakePlayer uses one scheduled buffer and current audio clock after an 800 ms graphics stall (clock double)",
+      "status": "PASS",
+      "elapsedMs": 1
+    },
+    {
+      "name": "VoiceRenderer cancel/replacement rejects and ignores injected late results (Worker double)",
+      "status": "PASS",
+      "elapsedMs": 2
+    },
+    {
+      "name": "frameAt silence before and after take, no stale actor activity",
+      "status": "PASS",
+      "elapsedMs": 0
+    }
+  ],
+  "evidence": [
+    {
+      "label": "speech-48000",
+      "actorId": "G",
+      "mode": "speech",
+      "sampleRate": 48000,
+      "frames": 71812,
+      "duration": 1.4960833333333334,
+      "peak": 0.5435823202133179,
+      "rms": 0.07879659663329681,
+      "pcmHash": "90994bbc1e3c07b5408e79dd17075a78d144796958553b2ce8ec570c8a19856c",
+      "renderMs": 995
+    },
+    {
+      "label": "speech-44100",
+      "actorId": "G",
+      "mode": "speech",
+      "sampleRate": 44100,
+      "frames": 65977,
+      "duration": 1.496077097505669,
+      "peak": 0.5394933819770813,
+      "rms": 0.07887588889110969,
+      "pcmHash": "2a75803a030ccb25713e02dc52a23f69267efad9f66e9d674fc5562bcd220feb",
+      "renderMs": 731
+    },
+    {
+      "label": "joke-48000",
+      "actorId": "G",
+      "mode": "joke",
+      "sampleRate": 48000,
+      "frames": 155131,
+      "duration": 3.231895833333333,
+      "peak": 0.5374042987823486,
+      "rms": 0.08522916558721502,
+      "pcmHash": "364f9f304747671bcf3a3077d025fd3906bf82d3f81a8523c225cc43da2899b5",
+      "renderMs": 1737
+    },
+    {
+      "label": "sing-48000",
+      "actorId": "G",
+      "mode": "sing",
+      "sampleRate": 48000,
+      "frames": 91200,
+      "duration": 1.9,
+      "peak": 0.3511168658733368,
+      "rms": 0.08423362848538209,
+      "pcmHash": "9e3e94b70bfdd8e7d25ae7975fc1988ab257f5514ace5c7c0e6cb844facf0982",
+      "renderMs": 993
+    },
+    {
+      "label": "rap-48000",
+      "actorId": "G",
+      "mode": "rap",
+      "sampleRate": 48000,
+      "frames": 91200,
+      "duration": 1.9,
+      "peak": 0.45608463883399963,
+      "rms": 0.09743758016296511,
+      "pcmHash": "6ba6f6f4518d002f203bbb47844544c0fed6e3674a9638d05620543731a39531",
+      "renderMs": 1030
+    },
+    {
+      "label": "actor-J",
+      "actorId": "J",
+      "mode": "speech",
+      "sampleRate": 48000,
+      "frames": 71812,
+      "duration": 1.4960833333333334,
+      "peak": 0.5605970025062561,
+      "rms": 0.08406677249041015,
+      "pcmHash": "0241b1489f1e8ef4b51e0c5a6b760469b27442291fcbc2dacc86d45edcf65148",
+      "renderMs": 737
+    },
+    {
+      "label": "actor-F1",
+      "actorId": "F1",
+      "mode": "speech",
+      "sampleRate": 48000,
+      "frames": 71812,
+      "duration": 1.4960833333333334,
+      "peak": 0.6104569435119629,
+      "rms": 0.08150807760834501,
+      "pcmHash": "08741fb80bf47ee94e089ab0aef6f5ade75328b199ccccc79490db23d9453a31",
+      "renderMs": 743
+    },
+    {
+      "label": "actor-F2",
+      "actorId": "F2",
+      "mode": "speech",
+      "sampleRate": 48000,
+      "frames": 71812,
+      "duration": 1.4960833333333334,
+      "peak": 0.33850669860839844,
+      "rms": 0.06631328100220123,
+      "pcmHash": "3c90ebe3b922d9f5f23f958a3416bc1acd5b9ea4054a36554e943334d2c671c7",
+      "renderMs": 821
+    },
+    {
+      "label": "actor-F3",
+      "actorId": "F3",
+      "mode": "speech",
+      "sampleRate": 48000,
+      "frames": 71812,
+      "duration": 1.4960833333333334,
+      "peak": 0.37339675426483154,
+      "rms": 0.06370122368380682,
+      "pcmHash": "b8a2d714e60c0c0dd4f7e49a488ea5fd32e0e520aa34e1d886b40338b1faf24a",
+      "renderMs": 842
+    }
+  ],
+  "limits": [
+    "No ears or listening-quality certification.",
+    "Clock and Worker adversarial tests use named doubles; browser integration reported separately."
+  ],
+  "browser": {
+    "generatedAt": "2026-11-11T19:04:16.955Z",
+    "status": "BLOCKED",
+    "stage": "chromium-launch",
+    "testsExecuted": 0,
+    "error": "browserType.launch: Target page, context or browser has been closed\nBrowser logs:\n\n<launching> /usr/bin/chromium --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,BoundaryEventDispatchTracksNodeRemoval,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --no-sandbox --disable-dev-shm-usage --use-angle=swiftshader --enable-unsafe-swiftshader --user-data-dir=/tmp/playwright_chromiumdev_profile-6HjV97 --remote-debugging-pipe --no-startup-window\n<launched> pid=17\n[pid=17][err] /usr/bin/chromium: 9: [: 5225709568: unexpected operator\n[pid=17][err] [17:17:1111/190416.942167:FATAL:chrome/browser/process_singleton_posix.cc:297] Check failed: . socket() failed: Operation not permitted (1)\n[pid=17][err] [1111/190416.942508:ERROR:third_party/crashpad/crashpad/util/linux/scoped_ptrace_attach.cc:27] ptrace: Operation not permitted (1)\nCall log:\n\u001b[2m  - <launching> /usr/bin/chromium --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,BoundaryEventDispatchTracksNodeRemoval,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --no-sandbox --disable-dev-shm-usage --use-angle=swiftshader --enable-unsafe-swiftshader --user-data-dir=/tmp/playwright_chromiumdev_profile-6HjV97 --remote-debugging-pipe --no-startup-window\u001b[22m\n\u001b[2m  - <launched> pid=17\u001b[22m\n\u001b[2m  - [pid=17][err] /usr/bin/chromium: 9: [: 5225709568: unexpected operator\u001b[22m\n\u001b[2m  - [pid=17][err] [17:17:1111/190416.942167:FATAL:chrome/browser/process_singleton_posix.cc:297] Check failed: . socket() failed: Operation not permitted (1)\u001b[22m\n\u001b[2m  - [pid=17][err] [1111/190416.942508:ERROR:third_party/crashpad/crashpad/util/linux/scoped_ptrace_attach.cc:27] ptrace: Operation not permitted (1)\u001b[22m\n\u001b[2m  - [pid=17] <gracefully close start>\u001b[22m\n\u001b[2m  - [pid=17] <kill>\u001b[22m\n\u001b[2m  - [pid=17] <will force kill>\u001b[22m\n\u001b[2m  - [pid=17] <process did exit: exitCode=null, signal=SIGABRT>\u001b[22m\n\u001b[2m  - [pid=17] starting temporary directories cleanup\u001b[22m\n\u001b[2m  - [pid=17] finished temporary directories cleanup\u001b[22m\n\u001b[2m  - [pid=17] <gracefully close end>\u001b[22m\n",
+    "limits": [
+      "No browser page was opened; no real browser scheduling, controls, or adapter behavior can be certified.",
+      "Actual WASM/Node render results are separate from this environment blocker."
+    ]
+  },
+  "timing": {
+    "audit": "independent timing adversary",
+    "inspected": {
+      "score.mjs": "3460fd3c5101dbbb8016e6ecdfa5b30c487622270594ae3e5bb4ca73e8f892bb",
+      "render.mjs": "6538864c39ed9bac5b4d74144e442dbe77d38fd0c618033c092f721cf356ebfd",
+      "performance.mjs": "7a11b2f6bb8661365f6582788c9b19c29c40a69ca8d8a7f6ae4c6c542ba8496b",
+      "chimera/chimera.wasm": "606cfb8c02c4362c15548984a106640707208fd1518d6823c171fddd91d42f82"
+    },
+    "hashesUnchanged": true,
+    "results": [
+      {
+        "name": "actual rendered song note metadata is tied to actual nucleus starts",
+        "status": "PASS",
+        "evidence": {
+          "notes": [
+            {
+              "syllable": "she",
+              "midi": 48,
+              "beats": 0.25,
+              "beat": 0,
+              "targetNucleusTime": 0.3,
+              "plannedNucleusTime": 0.3,
+              "plannerErrorSeconds": 0
+            },
+            {
+              "syllable": "sings",
+              "midi": 48,
+              "beats": 0.25,
+              "beat": 0.25,
+              "targetNucleusTime": 0.3833333333333333,
+              "plannedNucleusTime": 0.3833333333333333,
+              "plannerErrorSeconds": 0
+            }
+          ],
+          "vowels": [
+            {
+              "ipa": "i",
+              "t0": 0.3,
+              "t1": 0.35,
+              "stress": 1,
+              "kind": "vowel"
+            },
+            {
+              "ipa": "ɪ",
+              "t0": 0.3833333333333333,
+              "t1": 0.4176666666666666,
+              "stress": 1,
+              "kind": "vowel"
+            }
+          ],
+          "pcmHash": "06cc452504017f93b9f390dbd5a057e686d24be6f84c64e9374adcfe704a7d5c",
+          "sampleRate": 44100,
+          "frames": 47040,
+          "signal": {
+            "peak": 0.14738017320632935,
+            "rms": 0.012761998726747034,
+            "frames": 47040,
+            "rawPeak": 0.14738017320632935,
+            "attenuation": 1
+          }
+        }
+      },
+      {
+        "name": "fast consonant-heavy timing distinguishes target from measured plan",
+        "status": "PASS",
+        "evidence": {
+          "maximumDriftSeconds": 0.041333333333333444,
+          "notes": [
+            {
+              "syllable": "strengths",
+              "midi": 48,
+              "beats": 0.25,
+              "beat": 0,
+              "targetNucleusTime": 0.3,
+              "plannedNucleusTime": 0.3,
+              "plannerErrorSeconds": 0
+            },
+            {
+              "syllable": "strengths",
+              "midi": 48,
+              "beats": 0.25,
+              "beat": 0.25,
+              "targetNucleusTime": 0.3833333333333333,
+              "plannedNucleusTime": 0.4040000000000001,
+              "plannerErrorSeconds": 0.020666666666666778
+            },
+            {
+              "syllable": "strengths",
+              "midi": 48,
+              "beats": 0.25,
+              "beat": 0.5,
+              "targetNucleusTime": 0.4666666666666667,
+              "plannedNucleusTime": 0.5080000000000001,
+              "plannerErrorSeconds": 0.041333333333333444
+            }
+          ],
+          "warnings": [
+            "Short syllable slots can compress consonants. Slow the tempo if words blur.",
+            "The plan moves a vowel up to 41 ms off its beat. Slow the tempo or simplify that syllable."
+          ]
+        }
+      },
+      {
+        "name": "triplet rap remains on its planned beat for consonant fixture",
+        "status": "PASS",
+        "evidence": {
+          "notes": [
+            {
+              "syllable": "strengths",
+              "midi": 49,
+              "beats": 0.3333333333333333,
+              "beat": 0,
+              "targetNucleusTime": 0.3,
+              "plannedNucleusTime": 0.3,
+              "plannerErrorSeconds": 0
+            },
+            {
+              "syllable": "strengths",
+              "midi": 49,
+              "beats": 0.3333333333333333,
+              "beat": 0.3333333333333333,
+              "targetNucleusTime": 0.4111111111111111,
+              "plannedNucleusTime": 0.41111111111111115,
+              "plannerErrorSeconds": 5.551115123125783e-17
+            },
+            {
+              "syllable": "strengths",
+              "midi": 49,
+              "beats": 0.3333333333333333,
+              "beat": 0.6666666666666666,
+              "targetNucleusTime": 0.5222222222222221,
+              "plannedNucleusTime": 0.5222222222222223,
+              "plannerErrorSeconds": 1.1102230246251565e-16
+            }
+          ]
+        }
+      },
+      {
+        "name": "dynamic preroll preserves unusually long first onset",
+        "status": "PASS",
+        "evidence": {
+          "preroll": 1.4980000000000004,
+          "minimumRampStart": 0.02000000000000006,
+          "note": {
+            "syllable": "ssssssssssssssssssa",
+            "midi": 48,
+            "beats": 0.25,
+            "beat": 0,
+            "targetNucleusTime": 1.7980000000000005,
+            "plannedNucleusTime": 1.7980000000000003,
+            "plannerErrorSeconds": -2.220446049250313e-16
+          }
+        }
+      },
+      {
+        "name": "sing rejects a pronounceable-looking lyric with no vowels",
+        "status": "PASS",
+        "evidence": {
+          "text": "psst"
+        }
+      },
+      {
+        "name": "rap rejects a pronounceable-looking lyric with no vowels",
+        "status": "PASS",
+        "evidence": {
+          "text": "psst"
+        }
+      },
+      {
+        "name": "over-duration song is rejected before rendering",
+        "status": "PASS",
+        "evidence": {
+          "syllables": 32,
+          "expectedBeats": 128,
+          "bpm": 50
+        }
+      },
+      {
+        "name": "accepted melisma metadata points to its nucleus, not the final nasal",
+        "status": "PASS",
+        "evidence": {
+          "notes": [
+            {
+              "syllable": "home",
+              "midi": 48,
+              "beats": 0.25,
+              "beat": 0,
+              "targetNucleusTime": 0.3,
+              "plannedNucleusTime": 0.3,
+              "plannerErrorSeconds": 0
+            },
+            {
+              "syllable": "~",
+              "midi": 48,
+              "beats": 0.25,
+              "beat": 0.25,
+              "targetNucleusTime": 0.3833333333333333,
+              "plannedNucleusTime": 0.3833333333333333,
+              "plannerErrorSeconds": 0
+            }
+          ],
+          "actualNuclei": [
+            {
+              "ipa": "o",
+              "t0": 0.3,
+              "t1": 0.3833333333333333,
+              "stress": 1,
+              "kind": "vowel"
+            },
+            {
+              "ipa": "o",
+              "t0": 0.3833333333333333,
+              "t1": 0.42039999999999994,
+              "stress": 1,
+              "kind": "vowel"
+            }
+          ]
+        }
+      },
+      {
+        "name": "accepted melisma does not corrupt the next word timing",
+        "status": "PASS",
+        "evidence": {
+          "notes": [
+            {
+              "syllable": "my",
+              "midi": 48,
+              "beats": 0.25,
+              "beat": 0,
+              "targetNucleusTime": 0.3,
+              "plannedNucleusTime": 0.3,
+              "plannerErrorSeconds": 0
+            },
+            {
+              "syllable": "~",
+              "midi": 48,
+              "beats": 0.25,
+              "beat": 0.25,
+              "targetNucleusTime": 0.3833333333333333,
+              "plannedNucleusTime": 0.3833333333333333,
+              "plannerErrorSeconds": 0
+            },
+            {
+              "syllable": "go",
+              "midi": 48,
+              "beats": 0.25,
+              "beat": 0.5,
+              "targetNucleusTime": 0.4666666666666667,
+              "plannedNucleusTime": 0.4666666666666666,
+              "plannerErrorSeconds": -5.551115123125783e-17
+            }
+          ],
+          "actualGo": {
+            "ipa": "o",
+            "t0": 0.4666666666666666,
+            "t1": 0.5133333333333332,
+            "stress": 1,
+            "kind": "vowel"
+          }
+        }
+      },
+      {
+        "name": "overlapping phrases are rejected or expose the actual active planned phone",
+        "status": "PASS",
+        "evidence": {
+          "rejected": true,
+          "reason": "This score overlaps two phonemes. Slow the tempo or give the notes more beats."
+        }
+      }
+    ],
+    "counts": {
+      "pass": 10,
+      "fail": 0
+    },
+    "listeningQuality": "UNKNOWN; no listening performed"
+  },
+  "adapterSourceInspection": [
+    {
+      "file": "bonus/realjelly.html",
+      "sha256": "cce687cf9f9c19e77b1226ed0f16ed0ca58f8c6e0772a7dab0689a27e7d4e5ad",
+      "moduleSyntax": "PASS",
+      "runtimeMount": "UNKNOWN — browser launch blocked",
+      "inspection": "Voice panel mount and presentation-only motion path present in inspected source."
+    },
+    {
+      "file": "bonus/thinkjelly.html",
+      "sha256": "c05bbbbaee1b59b36bad325ee6ff25eceb40390153f92837cacce556a446f396",
+      "moduleSyntax": "PASS",
+      "runtimeMount": "UNKNOWN — browser launch blocked",
+      "inspection": "Voice panel mount and presentation-only motion path present in inspected source."
+    },
+    {
+      "file": "bonus/jellyjar.html",
+      "sha256": "14192054ad48b1260c1f003891dda53468c7a559628ce84648dc7cc23ee607fa",
+      "moduleSyntax": "PASS",
+      "runtimeMount": "UNKNOWN — browser launch blocked",
+      "inspection": "Voice panel mount and presentation-only motion path present in inspected source."
+    },
+    {
+      "file": "bonus/jellystudio.html",
+      "sha256": "bc645dee2cb4e6b133c1bc719c3bd8b92ede2272010837d2d0cf022c2de11db0",
+      "moduleSyntax": "PASS",
+      "runtimeMount": "UNKNOWN — browser launch blocked",
+      "inspection": "Voice panel mount and presentation-only motion path present in inspected source."
+    },
+    {
+      "file": "bonus/wetbell.html",
+      "sha256": "034f3b9221e162fbff57fb9ceb8c5194b4294487e11ed77ea0f81c1030568c6c",
+      "moduleSyntax": "PASS",
+      "runtimeMount": "UNKNOWN — browser launch blocked",
+      "inspection": "Voice panel mount and presentation-only motion path present in inspected source."
+    },
+    {
+      "file": "bonus/colloquy.html",
+      "sha256": "fae97de727bb95bf4f3d67cca7203ae51203014c426590df6d62d97a346ff99c",
+      "moduleSyntax": "PASS",
+      "runtimeMount": "UNKNOWN — browser launch blocked",
+      "inspection": "Voice panel mount and presentation-only motion path present in inspected source."
+    },
+    {
+      "file": "bonus/bodies.html",
+      "sha256": "f1b86b48cbb44231694ec184dd73e34ad2fa89940577c6c7625bcbea30018956",
+      "moduleSyntax": "PASS",
+      "runtimeMount": "UNKNOWN — browser launch blocked",
+      "inspection": "Voice panel mount and presentation-only motion path present in inspected source."
+    }
+  ],
+  "adapterUtility": {
+    "status": "PASS",
+    "checks": [
+      "foreign frames rejected",
+      "playback level clamped",
+      "non-finite level neutralized",
+      "stop clears activity, identity, level"
+    ],
+    "scope": "Actual exported createVoiceMotion executed in Node; actual graphical bodies not executed."
+  },
+  "auditHistory": [
+    {
+      "defect": "Inherited object keys accepted as actor IDs",
+      "outcome": "Fixed; executable invalid-actor regression passes."
+    },
+    {
+      "defect": "Unsorted overlapping song segments caused frameAt to drop an active phone",
+      "outcome": "Fixed by explicit overlap rejection; original adversarial phrase remains in tests."
+    },
+    {
+      "defect": "Melisma nucleus metadata pointed to a coda or diphthong glide",
+      "outcome": "Fixed; original home ~ and my ~ go fixtures now map actual nuclei."
+    },
+    {
+      "defect": "New overlap rejection also blocked normal punctuation in rap",
+      "outcome": "Fixed by continuous rap breath; same original swing120 rap fixture now renders."
+    }
+  ],
+  "overall": {
+    "numericalAndPlanner": "PASS: 20 core plus 10 timing checks on final source",
+    "browser": "BLOCKED: Chromium socket operation prohibited before any page",
+    "listening": "UNKNOWN: no listener, intelligibility or musical-quality certification",
+    "acceptance": "Partial evidence only; do not claim all seven browser integrations or audible quality are accepted."
+  }
+}

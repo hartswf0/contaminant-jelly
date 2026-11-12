@@ -124,6 +124,9 @@ body.exhibit #dock .row.vis,body.exhibit #dock .row.tog{opacity:.25}
 
 <script type="module">
 import * as THREE from 'three';
+import {mountVoicePanel} from './jelly-voice/panel.js';
+import {createVoiceMotion, unit, meanUnit} from './jelly-voice/adapters.js';
+const voiceMotion = createVoiceMotion();
 import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
@@ -139,6 +142,10 @@ const cast = {...CAST}; for (const kv of (Q.get('cast') || '').split(',')) { con
 const sim = makeColloquy({seed: +(Q.get('seed') || 7), ambient: +(Q.get('ambient') || 0), tempo: +(Q.get('tempo') || 1)});
 const S = sim.S, P = sim.P;
 const stage = makeStage(THREE, {canvas: $('gl'), sim, createJelly, low: LOW, preserve: TEST, EffectComposer, RenderPass, UnrealBloomPass, OutputPass, cast});
+const voiceBodies = [
+  ...stage.males.map(v => ({id: v.m.id, group: v.J.group, scale: v.J.group.scale.clone()})),
+  ...stage.females.map(v => ({id: v.f.id, group: v.J.group, scale: v.J.group.scale.clone()}))
+];
 const size = () => { if (FILM) stage.resize(1280, 720, 1); else stage.resize(innerWidth, innerHeight); $('dock') && document.documentElement.style.setProperty('--dockH', $('dock').offsetHeight + 'px'); };
 addEventListener('resize', size); size();
 const sound = makeLiveSound();
@@ -271,7 +278,10 @@ let last = performance.now(), acc = 0, fpsS = 0, fpsN = 0, fps = 60, lowT = 0, h
 const prMax = Math.min(LOW ? 1.1 : 1.75, devicePixelRatio || 1);
 function tick(dt) {
   acc += dt; let n = 0; while (acc >= 1 / 60 && n < 6) { sim.step(1 / 60); acc -= 1 / 60; n++; } if (n === 6) acc = 0;
-  exhibitionStep(); stage.update(dt); stage.render();
+  exhibitionStep(); stage.update(dt);
+  // Bind by the machine's stable actor IDs, independent of each visual cast choice.
+  for (const target of voiceBodies) { const vl = target.id === voiceMotion.actorId ? voiceMotion.level : 0; target.group.scale.set(target.scale.x * (1 - .035 * vl), target.scale.y * (1 + .07 * vl), target.scale.z * (1 - .035 * vl)); }
+  stage.render();
   if ((narrT += dt) > .2) { narrT = 0; narrate(); }
   if ((plateT += dt) > .15 && $('state').classList.contains('open')) { plateT = 0; plate(); }
   if ((sndT += dt) > 1 / 40) { sndT = 0; sound.frame(S); }
@@ -342,6 +352,14 @@ const COLLOQUY = window.COLLOQUY = {
 if (!Q.has('ui') || FILM) { cinema(true); letter(!Q.has('noletter')); } if (EXH) exhibit(true);
 if (Q.has('plates')) for (const p of Q.get('plates').split(',')) if (plates.includes(p)) openPlate(p, true);
 size();
+mountVoicePanel({
+  pageId: 'colloquy', defaultActorId: 'G',
+  // The existing gallery sound owns a private context; the panel owns this voice context.
+  // Creative mappings: ensemble urgency, commitment, and the gallery's ambient light.
+  readFeatures: () => ({energy: meanUnit([...S.males, ...S.females].map(a => Math.max(a.O, a.P) / P.Lcap)), pressure: meanUnit(S.males.map(a => a.B ? 1 : 0)), color: unit(P.ambient)}),
+  applyFrame: voiceMotion.applyFrame,
+  onStop: () => { voiceMotion.onStop(); for (const target of voiceBodies) target.group.scale.copy(target.scale); }
+});
 </script>
 </body>
 </html>

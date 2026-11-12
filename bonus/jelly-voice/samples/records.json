@@ -1,0 +1,1130 @@
+{
+  "status": "rendered-not-human-reviewed",
+  "sampleRate": 48000,
+  "records": [
+    {
+      "id": "take-17",
+      "file": "take-17.wav",
+      "sampleRate": 48000,
+      "offset": 0,
+      "duration": 2.354,
+      "segments": [
+        {
+          "ipa": "ð",
+          "t0": 0.26,
+          "t1": 0.31,
+          "kind": "fricative"
+        },
+        {
+          "ipa": "ə",
+          "t0": 0.31,
+          "t1": 0.3778,
+          "stress": 0,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "l",
+          "t0": 0.3778,
+          "t1": 0.45780000000000004,
+          "kind": "lateral"
+        },
+        {
+          "ipa": "ɪ",
+          "t0": 0.45780000000000004,
+          "t1": 0.53656,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "ɾ",
+          "t0": 0.53656,
+          "t1": 0.55656,
+          "kind": "tap"
+        },
+        {
+          "ipa": "ə",
+          "t0": 0.55656,
+          "t1": 0.6168,
+          "stress": 0,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "ɫ",
+          "t0": 0.6168,
+          "t1": 0.6806,
+          "kind": "lateral"
+        },
+        {
+          "ipa": "dʒ",
+          "t0": 0.6806,
+          "t1": 0.7246,
+          "kind": "affricate"
+        },
+        {
+          "ipa": "ɛ",
+          "t0": 0.7246,
+          "t1": 0.82724,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "l",
+          "t0": 0.82724,
+          "t1": 0.9012399999999999,
+          "kind": "lateral"
+        },
+        {
+          "ipa": "i",
+          "t0": 0.9012399999999999,
+          "t1": 0.9715799999999999,
+          "stress": 0,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "h",
+          "t0": 0.9715799999999999,
+          "t1": 1.05158,
+          "kind": "glottal"
+        },
+        {
+          "ipa": "ə",
+          "t0": 1.05158,
+          "t1": 1.1261839999999999,
+          "stress": 0,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "z",
+          "t0": 1.1261839999999999,
+          "t1": 1.1959339999999998,
+          "kind": "fricative"
+        },
+        {
+          "ipa": "ə",
+          "t0": 1.1959339999999998,
+          "t1": 1.263734,
+          "stress": 0,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "v",
+          "t0": 1.263734,
+          "t1": 1.323734,
+          "kind": "fricative"
+        },
+        {
+          "ipa": "ɔ",
+          "t0": 1.323734,
+          "t1": 1.506334,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "ɪ",
+          "t0": 1.506334,
+          "t1": 1.655734,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "s",
+          "t0": 1.655734,
+          "t1": 1.753984,
+          "kind": "fricative"
+        }
+      ],
+      "score": {
+        "schema": "jelly-cast-score/1",
+        "renderer_revision": "chimera-e33221d-jelly-take-1",
+        "actorId": "G",
+        "voice_profile_id": "anchor-1",
+        "voice_profile_revision": 1,
+        "text": "The little jelly has a voice.",
+        "mode": "speech",
+        "feel": "straight",
+        "notes": [
+          {
+            "semitones": 0,
+            "beats": 1
+          },
+          {
+            "semitones": 2,
+            "beats": 1
+          },
+          {
+            "semitones": 4,
+            "beats": 1
+          },
+          {
+            "semitones": 7,
+            "beats": 1
+          },
+          {
+            "semitones": 4,
+            "beats": 1
+          },
+          {
+            "semitones": 2,
+            "beats": 1
+          },
+          {
+            "semitones": 0,
+            "beats": 2
+          }
+        ],
+        "bpm": 96,
+        "rate": 1,
+        "pause": 0.55,
+        "vibrato": 22,
+        "material": 0,
+        "captured_body": {
+          "energy": 0,
+          "pressure": 0,
+          "color": 0
+        }
+      },
+      "scoreHash": "07385d4819624d9d89f819fc71125b1e537ab4949f392b0298385bdb5e580b77",
+      "pcmHash": "84c89d208a639ebe81039fddfc113c6597abef17f6601a191c2a7ad3f4a1d256",
+      "renderer_revision": "chimera-e33221d-jelly-take-1",
+      "engine_revision": "e33221d006f44c78849210eb29dd1eb9755dc78e",
+      "notes": [],
+      "warnings": [],
+      "preroll": 0,
+      "signal": {
+        "peak": 0.6168188452720642,
+        "rms": 0.09356139397708552,
+        "frames": 112992,
+        "rawPeak": 0.6168188452720642,
+        "attenuation": 1
+      },
+      "alignmentKind": "engine-planned-phone-times-not-measured-alignment"
+    },
+    {
+      "id": "take-62",
+      "file": "take-62.wav",
+      "sampleRate": 48000,
+      "offset": 0,
+      "duration": 2.354,
+      "segments": [
+        {
+          "ipa": "ð",
+          "t0": 0.26,
+          "t1": 0.31,
+          "kind": "fricative"
+        },
+        {
+          "ipa": "ə",
+          "t0": 0.31,
+          "t1": 0.3778,
+          "stress": 0,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "l",
+          "t0": 0.3778,
+          "t1": 0.45780000000000004,
+          "kind": "lateral"
+        },
+        {
+          "ipa": "ɪ",
+          "t0": 0.45780000000000004,
+          "t1": 0.53656,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "ɾ",
+          "t0": 0.53656,
+          "t1": 0.55656,
+          "kind": "tap"
+        },
+        {
+          "ipa": "ə",
+          "t0": 0.55656,
+          "t1": 0.6168,
+          "stress": 0,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "ɫ",
+          "t0": 0.6168,
+          "t1": 0.6806,
+          "kind": "lateral"
+        },
+        {
+          "ipa": "dʒ",
+          "t0": 0.6806,
+          "t1": 0.7246,
+          "kind": "affricate"
+        },
+        {
+          "ipa": "ɛ",
+          "t0": 0.7246,
+          "t1": 0.82724,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "l",
+          "t0": 0.82724,
+          "t1": 0.9012399999999999,
+          "kind": "lateral"
+        },
+        {
+          "ipa": "i",
+          "t0": 0.9012399999999999,
+          "t1": 0.9715799999999999,
+          "stress": 0,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "h",
+          "t0": 0.9715799999999999,
+          "t1": 1.05158,
+          "kind": "glottal"
+        },
+        {
+          "ipa": "ə",
+          "t0": 1.05158,
+          "t1": 1.1261839999999999,
+          "stress": 0,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "z",
+          "t0": 1.1261839999999999,
+          "t1": 1.1959339999999998,
+          "kind": "fricative"
+        },
+        {
+          "ipa": "ə",
+          "t0": 1.1959339999999998,
+          "t1": 1.263734,
+          "stress": 0,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "v",
+          "t0": 1.263734,
+          "t1": 1.323734,
+          "kind": "fricative"
+        },
+        {
+          "ipa": "ɔ",
+          "t0": 1.323734,
+          "t1": 1.506334,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "ɪ",
+          "t0": 1.506334,
+          "t1": 1.655734,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "s",
+          "t0": 1.655734,
+          "t1": 1.753984,
+          "kind": "fricative"
+        }
+      ],
+      "score": {
+        "schema": "jelly-cast-score/1",
+        "renderer_revision": "chimera-e33221d-jelly-take-1",
+        "actorId": "F1",
+        "voice_profile_id": "glass-1",
+        "voice_profile_revision": 1,
+        "text": "The little jelly has a voice.",
+        "mode": "speech",
+        "feel": "straight",
+        "notes": [
+          {
+            "semitones": 0,
+            "beats": 1
+          },
+          {
+            "semitones": 2,
+            "beats": 1
+          },
+          {
+            "semitones": 4,
+            "beats": 1
+          },
+          {
+            "semitones": 7,
+            "beats": 1
+          },
+          {
+            "semitones": 4,
+            "beats": 1
+          },
+          {
+            "semitones": 2,
+            "beats": 1
+          },
+          {
+            "semitones": 0,
+            "beats": 2
+          }
+        ],
+        "bpm": 96,
+        "rate": 1,
+        "pause": 0.55,
+        "vibrato": 22,
+        "material": 0,
+        "captured_body": {
+          "energy": 0,
+          "pressure": 0,
+          "color": 0
+        }
+      },
+      "scoreHash": "8252daeaea68e8778da1d1d6cbc8680faca98997be0710c6843be70f5e509546",
+      "pcmHash": "1d8bb85c197bb2f45b3e4bc321bbafe5477818d52f363e23e41b4819cc9c9a98",
+      "renderer_revision": "chimera-e33221d-jelly-take-1",
+      "engine_revision": "e33221d006f44c78849210eb29dd1eb9755dc78e",
+      "notes": [],
+      "warnings": [],
+      "preroll": 0,
+      "signal": {
+        "peak": 0.75,
+        "rms": 0.10851761065917996,
+        "frames": 112992,
+        "rawPeak": 0.75,
+        "attenuation": 1
+      },
+      "alignmentKind": "engine-planned-phone-times-not-measured-alignment"
+    },
+    {
+      "id": "take-31",
+      "file": "take-31.wav",
+      "sampleRate": 48000,
+      "offset": 0,
+      "duration": 3.4942083333333334,
+      "segments": [
+        {
+          "ipa": "a",
+          "t0": 0.26,
+          "t1": 0.341675,
+          "stress": 0,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "ɪ",
+          "t0": 0.341675,
+          "t1": 0.4085,
+          "stress": 0,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "b",
+          "t0": 0.4085,
+          "t1": 0.4935,
+          "kind": "stop"
+        },
+        {
+          "ipa": "ɑ",
+          "t0": 0.4935,
+          "t1": 0.65062,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "ɾ",
+          "t0": 0.65062,
+          "t1": 0.67062,
+          "kind": "tap"
+        },
+        {
+          "ipa": "ə",
+          "t0": 0.67062,
+          "t1": 0.73086,
+          "stress": 0,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "ɫ",
+          "t0": 0.73086,
+          "t1": 0.7946599999999999,
+          "kind": "lateral"
+        },
+        {
+          "ipa": "d",
+          "t0": 0.7946599999999999,
+          "t1": 0.855285,
+          "kind": "stop"
+        },
+        {
+          "ipa": "m",
+          "t0": 0.855285,
+          "t1": 0.922285,
+          "kind": "nasal"
+        },
+        {
+          "ipa": "a",
+          "t0": 0.922285,
+          "t1": 1.00396,
+          "stress": 0,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "ɪ",
+          "t0": 1.00396,
+          "t1": 1.0707849999999999,
+          "stress": 0,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "θ",
+          "t0": 1.0707849999999999,
+          "t1": 1.160785,
+          "kind": "fricative"
+        },
+        {
+          "ipa": "ɔ",
+          "t0": 1.160785,
+          "t1": 1.397985,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "t",
+          "t0": 1.397985,
+          "t1": 1.46286,
+          "kind": "stop"
+        },
+        {
+          "ipa": "s",
+          "t0": 1.46286,
+          "t1": 1.549635,
+          "kind": "fricative"
+        },
+        {
+          "ipa": "ð",
+          "t0": 2.209635,
+          "t1": 2.259635,
+          "kind": "fricative"
+        },
+        {
+          "ipa": "e",
+          "t0": 2.259635,
+          "t1": 2.3218509999999997,
+          "stress": 0,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "i",
+          "t0": 2.3218509999999997,
+          "t1": 2.3727549999999997,
+          "stress": 0,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "ɪ",
+          "t0": 2.3727549999999997,
+          "t1": 2.4157458,
+          "stress": 0,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "s",
+          "t0": 2.4157458,
+          "t1": 2.5025207999999997,
+          "kind": "fricative"
+        },
+        {
+          "ipa": "k",
+          "t0": 2.5025207999999997,
+          "t1": 2.5744207999999995,
+          "kind": "stop"
+        },
+        {
+          "ipa": "e",
+          "t0": 2.5744207999999995,
+          "t1": 2.6756647999999994,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "i",
+          "t0": 2.6756647999999994,
+          "t1": 2.7585007999999993,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "p",
+          "t0": 2.7585007999999993,
+          "t1": 2.8293257999999994,
+          "kind": "stop"
+        },
+        {
+          "ipa": "t",
+          "t0": 2.8293257999999994,
+          "t1": 2.8942007999999992,
+          "kind": "stop"
+        }
+      ],
+      "score": {
+        "schema": "jelly-cast-score/1",
+        "renderer_revision": "chimera-e33221d-jelly-take-1",
+        "actorId": "G",
+        "voice_profile_id": "anchor-1",
+        "voice_profile_revision": 1,
+        "text": "I bottled my thoughts. | They escaped.",
+        "mode": "joke",
+        "feel": "straight",
+        "notes": [
+          {
+            "semitones": 0,
+            "beats": 1
+          },
+          {
+            "semitones": 2,
+            "beats": 1
+          },
+          {
+            "semitones": 4,
+            "beats": 1
+          },
+          {
+            "semitones": 7,
+            "beats": 1
+          },
+          {
+            "semitones": 4,
+            "beats": 1
+          },
+          {
+            "semitones": 2,
+            "beats": 1
+          },
+          {
+            "semitones": 0,
+            "beats": 2
+          }
+        ],
+        "bpm": 96,
+        "rate": 1,
+        "pause": 0.6,
+        "vibrato": 22,
+        "material": 0,
+        "captured_body": {
+          "energy": 0,
+          "pressure": 0,
+          "color": 0
+        }
+      },
+      "scoreHash": "7d06b94219077dcfcd39bfafdfac14586aedd59bb2d242ce9254f8612fcd08b0",
+      "pcmHash": "4ea9298bbfdf5ce29c30661732a3698f35918b6e51da3bd2b65038ab57ae330b",
+      "renderer_revision": "chimera-e33221d-jelly-take-1",
+      "engine_revision": "e33221d006f44c78849210eb29dd1eb9755dc78e",
+      "notes": [],
+      "warnings": [],
+      "preroll": 0,
+      "signal": {
+        "peak": 0.5311294794082642,
+        "rms": 0.08423651059166491,
+        "frames": 167722,
+        "rawPeak": 0.5311294794082642,
+        "attenuation": 1
+      },
+      "alignmentKind": "engine-planned-phone-times-not-measured-alignment"
+    },
+    {
+      "id": "take-84",
+      "file": "take-84.wav",
+      "sampleRate": 48000,
+      "offset": 0,
+      "duration": 3.627291666666667,
+      "segments": [
+        {
+          "ipa": "k",
+          "t0": 0.236,
+          "t1": 0.3,
+          "kind": "stop"
+        },
+        {
+          "ipa": "æ",
+          "t0": 0.3,
+          "t1": 0.7934545454545454,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "ɹ",
+          "t0": 0.7934545454545454,
+          "t1": 0.8454545454545455,
+          "kind": "approximant"
+        },
+        {
+          "ipa": "i",
+          "t0": 0.8454545454545455,
+          "t1": 1.3309090909090908,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "m",
+          "t0": 1.3309090909090908,
+          "t1": 1.3909090909090909,
+          "kind": "nasal"
+        },
+        {
+          "ipa": "i",
+          "t0": 1.3909090909090909,
+          "t1": 1.8643636363636362,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "h",
+          "t0": 1.8643636363636362,
+          "t1": 1.9363636363636363,
+          "kind": "glottal"
+        },
+        {
+          "ipa": "o",
+          "t0": 1.9363636363636363,
+          "t1": 2.7210909090909094,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "u",
+          "t0": 2.7210909090909094,
+          "t1": 2.917272727272728,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "m",
+          "t0": 2.917272727272728,
+          "t1": 2.977272727272728,
+          "kind": "nasal"
+        }
+      ],
+      "score": {
+        "schema": "jelly-cast-score/1",
+        "renderer_revision": "chimera-e33221d-jelly-take-1",
+        "actorId": "G",
+        "voice_profile_id": "anchor-1",
+        "voice_profile_revision": 1,
+        "text": "Carry me home.",
+        "mode": "sing",
+        "feel": "straight",
+        "notes": [
+          {
+            "semitones": 0,
+            "beats": 1
+          },
+          {
+            "semitones": 4,
+            "beats": 1
+          },
+          {
+            "semitones": 7,
+            "beats": 1
+          },
+          {
+            "semitones": 0,
+            "beats": 2
+          }
+        ],
+        "bpm": 110,
+        "rate": 1,
+        "pause": 0.55,
+        "vibrato": 22,
+        "material": 0,
+        "captured_body": {
+          "energy": 0,
+          "pressure": 0,
+          "color": 0
+        }
+      },
+      "scoreHash": "e0a0be705c7ef524b59329ce696f8d6c369ad3c1205a8ea1e133cd9b57790f0d",
+      "pcmHash": "4e547e1de33890d52810c18acf73b653bd36881f5ea5a903973048b19d226e29",
+      "renderer_revision": "chimera-e33221d-jelly-take-1",
+      "engine_revision": "e33221d006f44c78849210eb29dd1eb9755dc78e",
+      "notes": [
+        {
+          "syllable": "Car",
+          "midi": 48,
+          "beats": 1,
+          "beat": 0,
+          "targetNucleusTime": 0.3,
+          "plannedNucleusTime": 0.3,
+          "plannerErrorSeconds": 0
+        },
+        {
+          "syllable": "ry",
+          "midi": 52,
+          "beats": 1,
+          "beat": 1,
+          "targetNucleusTime": 0.8454545454545455,
+          "plannedNucleusTime": 0.8454545454545455,
+          "plannerErrorSeconds": 0
+        },
+        {
+          "syllable": "me",
+          "midi": 55,
+          "beats": 1,
+          "beat": 2,
+          "targetNucleusTime": 1.3909090909090909,
+          "plannedNucleusTime": 1.3909090909090909,
+          "plannerErrorSeconds": 0
+        },
+        {
+          "syllable": "home",
+          "midi": 48,
+          "beats": 2,
+          "beat": 3,
+          "targetNucleusTime": 1.9363636363636365,
+          "plannedNucleusTime": 1.9363636363636363,
+          "plannerErrorSeconds": -2.220446049250313e-16
+        }
+      ],
+      "warnings": [],
+      "preroll": 0,
+      "signal": {
+        "peak": 0.43027976155281067,
+        "rms": 0.13443541781633814,
+        "frames": 174110,
+        "rawPeak": 0.43027976155281067,
+        "attenuation": 1
+      },
+      "alignmentKind": "engine-planned-phone-times-not-measured-alignment"
+    },
+    {
+      "id": "take-45",
+      "file": "take-45.wav",
+      "sampleRate": 48000,
+      "offset": 0,
+      "duration": 3.7125,
+      "segments": [
+        {
+          "ipa": "w",
+          "t0": 0.252,
+          "t1": 0.3,
+          "kind": "approximant"
+        },
+        {
+          "ipa": "ɛ",
+          "t0": 0.3,
+          "t1": 0.4965,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "t",
+          "t0": 0.4965,
+          "t1": 0.5565,
+          "kind": "stop"
+        },
+        {
+          "ipa": "b",
+          "t0": 0.5565,
+          "t1": 0.6125,
+          "kind": "stop"
+        },
+        {
+          "ipa": "ɛ",
+          "t0": 0.6125,
+          "t1": 0.725,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "l",
+          "t0": 0.725,
+          "t1": 0.777,
+          "kind": "lateral"
+        },
+        {
+          "ipa": "s",
+          "t0": 0.777,
+          "t1": 0.873,
+          "kind": "fricative"
+        },
+        {
+          "ipa": "l",
+          "t0": 0.873,
+          "t1": 0.925,
+          "kind": "lateral"
+        },
+        {
+          "ipa": "o",
+          "t0": 0.925,
+          "t1": 1.0886,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "u",
+          "t0": 1.0886,
+          "t1": 1.1295,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "g",
+          "t0": 1.1295,
+          "t1": 1.1855,
+          "kind": "stop"
+        },
+        {
+          "ipa": "l",
+          "t0": 1.1855,
+          "t1": 1.2375,
+          "kind": "lateral"
+        },
+        {
+          "ipa": "o",
+          "t0": 1.2375,
+          "t1": 1.4459,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "u",
+          "t0": 1.4459,
+          "t1": 1.498,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "l",
+          "t0": 1.498,
+          "t1": 1.55,
+          "kind": "lateral"
+        },
+        {
+          "ipa": "ɛ",
+          "t0": 1.55,
+          "t1": 1.7465,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "t",
+          "t0": 1.7465,
+          "t1": 1.8065,
+          "kind": "stop"
+        },
+        {
+          "ipa": "ð",
+          "t0": 1.8065,
+          "t1": 1.8625,
+          "kind": "fricative"
+        },
+        {
+          "ipa": "ə",
+          "t0": 1.8625,
+          "t1": 2.1229999999999998,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "ɹ",
+          "t0": 2.1229999999999998,
+          "t1": 2.175,
+          "kind": "approximant"
+        },
+        {
+          "ipa": "ɪ",
+          "t0": 2.175,
+          "t1": 2.4234999999999998,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "v",
+          "t0": 2.4234999999999998,
+          "t1": 2.4875,
+          "kind": "fricative"
+        },
+        {
+          "ipa": "ɝ",
+          "t0": 2.4875,
+          "t1": 2.6599999999999997,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "f",
+          "t0": 2.6599999999999997,
+          "t1": 2.7479999999999998,
+          "kind": "fricative"
+        },
+        {
+          "ipa": "l",
+          "t0": 2.7479999999999998,
+          "t1": 2.8,
+          "kind": "lateral"
+        },
+        {
+          "ipa": "o",
+          "t0": 2.8,
+          "t1": 3.01,
+          "stress": 1,
+          "kind": "vowel"
+        },
+        {
+          "ipa": "u",
+          "t0": 3.01,
+          "t1": 3.0625,
+          "stress": 1,
+          "kind": "vowel"
+        }
+      ],
+      "score": {
+        "schema": "jelly-cast-score/1",
+        "renderer_revision": "chimera-e33221d-jelly-take-1",
+        "actorId": "G",
+        "voice_profile_id": "anchor-1",
+        "voice_profile_revision": 1,
+        "text": "Wet bell, slow glow. Let the river flow.",
+        "mode": "rap",
+        "feel": "straight",
+        "notes": [
+          {
+            "semitones": 0,
+            "beats": 1
+          },
+          {
+            "semitones": 2,
+            "beats": 1
+          },
+          {
+            "semitones": 4,
+            "beats": 1
+          },
+          {
+            "semitones": 7,
+            "beats": 1
+          },
+          {
+            "semitones": 4,
+            "beats": 1
+          },
+          {
+            "semitones": 2,
+            "beats": 1
+          },
+          {
+            "semitones": 0,
+            "beats": 2
+          }
+        ],
+        "bpm": 96,
+        "rate": 1,
+        "pause": 0.55,
+        "vibrato": 22,
+        "material": 0,
+        "captured_body": {
+          "energy": 0,
+          "pressure": 0,
+          "color": 0
+        }
+      },
+      "scoreHash": "0d50e453c6a62f8029e0f14139ba2026f4715e9973c4a6abb4bf898489ec41e7",
+      "pcmHash": "92509caa8660ec6871cbed27a66f22eb76692e1fd80ebcdd38db874517f39efa",
+      "renderer_revision": "chimera-e33221d-jelly-take-1",
+      "engine_revision": "e33221d006f44c78849210eb29dd1eb9755dc78e",
+      "notes": [
+        {
+          "syllable": "Wet",
+          "midi": 49,
+          "beats": 0.5,
+          "beat": 0,
+          "targetNucleusTime": 0.3,
+          "plannedNucleusTime": 0.3,
+          "plannerErrorSeconds": 0
+        },
+        {
+          "syllable": "bell",
+          "midi": 49,
+          "beats": 0.5,
+          "beat": 0.5,
+          "targetNucleusTime": 0.6125,
+          "plannedNucleusTime": 0.6125,
+          "plannerErrorSeconds": 0
+        },
+        {
+          "syllable": "slow",
+          "midi": 49,
+          "beats": 0.5,
+          "beat": 1,
+          "targetNucleusTime": 0.925,
+          "plannedNucleusTime": 0.925,
+          "plannerErrorSeconds": 0
+        },
+        {
+          "syllable": "glow",
+          "midi": 49,
+          "beats": 0.5,
+          "beat": 1.5,
+          "targetNucleusTime": 1.2375,
+          "plannedNucleusTime": 1.2375,
+          "plannerErrorSeconds": 0
+        },
+        {
+          "syllable": "Let",
+          "midi": 49,
+          "beats": 0.5,
+          "beat": 2,
+          "targetNucleusTime": 1.55,
+          "plannedNucleusTime": 1.55,
+          "plannerErrorSeconds": 0
+        },
+        {
+          "syllable": "the",
+          "midi": 47,
+          "beats": 0.5,
+          "beat": 2.5,
+          "targetNucleusTime": 1.8625,
+          "plannedNucleusTime": 1.8625,
+          "plannerErrorSeconds": 0
+        },
+        {
+          "syllable": "ri",
+          "midi": 49,
+          "beats": 0.5,
+          "beat": 3,
+          "targetNucleusTime": 2.175,
+          "plannedNucleusTime": 2.175,
+          "plannerErrorSeconds": 0
+        },
+        {
+          "syllable": "ver",
+          "midi": 47,
+          "beats": 0.5,
+          "beat": 3.5,
+          "targetNucleusTime": 2.4875,
+          "plannedNucleusTime": 2.4875,
+          "plannerErrorSeconds": 0
+        },
+        {
+          "syllable": "flow",
+          "midi": 49,
+          "beats": 0.5,
+          "beat": 4,
+          "targetNucleusTime": 2.8,
+          "plannedNucleusTime": 2.8,
+          "plannerErrorSeconds": 0
+        }
+      ],
+      "warnings": [],
+      "preroll": 0,
+      "signal": {
+        "peak": 0.4970329999923706,
+        "rms": 0.12102074294518797,
+        "frames": 178200,
+        "rawPeak": 0.4970329999923706,
+        "attenuation": 1
+      },
+      "alignmentKind": "engine-planned-phone-times-not-measured-alignment"
+    }
+  ]
+}
