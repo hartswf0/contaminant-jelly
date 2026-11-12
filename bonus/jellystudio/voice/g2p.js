@@ -40,7 +40,7 @@
   // ---- entry: a line of text to engine syllables. Commas and full stops end a phrase.
   function line(lang, text, table) { const S = []; if (lang === 'zh') { text.split(/[,。,、.!?;:\s·]+/).filter(Boolean).forEach(ph => { const s = zh(ph, table); if (s.length) { s[s.length - 1].phraseEnd = true; S.push(...s); } }); }
     else { const f = {es, pt, am}[lang]; text.split(/[,.;:!?፣።·]+/).forEach(ph => { const ws = ph.trim().split(/\s+/).filter(Boolean), s = []; ws.forEach(w => s.push(...f(w.replace(/[^\p{L}]/gu, '')))); if (s.length) { s[s.length - 1].phraseEnd = true; S.push(...s); } }); }
-    return S.map(s => ({text: s.text, onset: s.onset.map(ipa => ({ipa, stress: 0})), nucleus: {ipa: s.nucleus, stress: s.stress}, coda: s.coda.map(ipa => ({ipa, stress: 0})), wordEnd: !!s.wordEnd, phraseEnd: !!s.phraseEnd})); }
+    return S.map(s => { const o = {text: s.text, onset: s.onset.map(ipa => ({ipa, stress: 0})), nucleus: {ipa: s.nucleus, stress: s.stress}, coda: s.coda.map(ipa => ({ipa, stress: 0})), wordEnd: !!s.wordEnd, phraseEnd: !!s.phraseEnd}; if (s.tone) Object.defineProperty(o, 'tone', {value: s.tone, enumerable: false}); return o; });   /* the tone rides along unseen, so the engine is not sent a field it does not know */ }
   const show = (lang, text, table) => line(lang, text, table).map(s => s.onset.map(o => o.ipa).join('') + s.nucleus.ipa + s.coda.map(o => o.ipa).join('')).join('.');
   const G = {line, show, es, pt, am, zh, pinyin}; if (typeof module !== 'undefined' && module.exports) module.exports = G; else root.G2P = G;
 })(typeof self !== 'undefined' ? self : this);

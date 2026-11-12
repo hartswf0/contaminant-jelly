@@ -2,7 +2,7 @@
 <style>
 :root{--bg:#0b1011;--panel:#121a1b;--line:#2a3a39;--ink:#e8ece8;--dim:#8fa29c;--gold:#f0a35a}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,'Segoe UI',sans-serif}
-main{max-width:760px;margin:auto;padding:18px 14px 80px}
+main{max-width:760px;margin:auto;padding:0 14px 80px}#jc{display:block;width:100%;height:44vh;min-height:260px;position:sticky;top:0;z-index:3;background:radial-gradient(ellipse at 50% 30%,#12303a 0,#0b1011 70%)}#jcap{text-align:center;margin:4px 0 14px}
 h1{font-size:22px;margin:0 0 4px}h2{font-size:12px;letter-spacing:.16em;color:var(--gold);margin:22px 0 8px;font-weight:600}
 p{margin:6px 0;color:#cfd8d4}small,.dim{color:var(--dim);font-size:13px}
 input[type=text],select{width:100%;font:inherit;color:#fff;background:#0d1415;border:1px solid var(--line);padding:11px;border-radius:6px}
@@ -20,6 +20,7 @@ textarea{width:100%;height:70px;font:13px ui-monospace,monospace;color:#fff;back
 #st{min-height:1.4em;color:var(--gold);font-size:13px}
 @media (max-width:520px){.ab{grid-template-columns:1fr}.verdict{grid-template-columns:1fr}}
 </style></head><body><main>
+<canvas id="jc" aria-label="A jellyfish whose bell is the shape of the voice's vocal tract; its rim closes when the lips close"></canvas><p class="dim" id="jcap">The bell is the voice's throat and mouth: crown is the throat, rim is the lips. Press play and watch the rim.</p>
 <h1>Voice Lab</h1>
 <p>The jellyfish voices are not good enough yet. I cannot hear them, so this page is how you tell me what is wrong. You listen to two versions, say which is better and why, and the lab changes one thing at a time. When you are done, it gives you a recipe that the orchestra uses straight away.</p>
 
@@ -79,7 +80,7 @@ function voice(text, R) { const lang = $('lang').value, who = +$('who').value, r
   if (!worker) { worker = new Worker('jellystudio/voice/singer.js'); worker.onmessage = e => { const d = e.data, w = wait[d.id]; if (d.status) { $('st').textContent = d.status + '…'; return; } if (!w) return; delete wait[d.id]; d.error ? w.rej(new Error(d.error)) : w.res(d); }; }
   const id = ++req, c = CAST[who]; return new Promise((res, rej) => { wait[id] = {res: d => { cache.set(key, d); res(d); }, rej}; worker.postMessage({text, id, lang, body: c.body, low: c.low + R.pitch, root: 2, bpm: Math.round((rap ? 108 : 84) * R.speed), rap, vib: rap ? 0 : R.vib, src: {breathiness: R.breath, tension: R.tension, brightness: R.bright, roughness: 0, fry: 0, drift: R.drift}}); }); }
 let playing = null;
-async function play(R, text) { if (!ac) { ac = new (window.AudioContext || window.webkitAudioContext)(); chain = makeChain(); } await ac.resume(); try { const d = await voice(text || $('txt').value, R); chain.set(R); if (playing) try { playing.stop(); } catch {} const b = ac.createBuffer(1, d.pcm.length, 44100); b.copyToChannel(d.pcm, 0); const s = ac.createBufferSource(); s.buffer = b; s.connect(chain.inp); s.start(); playing = s; $('st').textContent = ''; window.__played = (window.__played || 0) + 1; } catch (e) { $('st').textContent = 'Could not say that: ' + e.message; } }
+async function play(R, text) { if (!ac) { ac = new (window.AudioContext || window.webkitAudioContext)(); chain = makeChain(); } await ac.resume(); try { const d = await voice(text || $('txt').value, R); chain.set(R); if (playing) try { playing.stop(); } catch {} const b = ac.createBuffer(1, d.pcm.length, 44100); b.copyToChannel(d.pcm, 0); const s = ac.createBufferSource(); s.buffer = b; s.connect(chain.inp); s.start(); playing = s; if (window.JELLY) { window.JELLY.say(d); window.__ac = ac; } $('st').textContent = ''; window.__played = (window.__played || 0) + 1; } catch (e) { $('st').textContent = 'Could not say that: ' + e.message; } }
 // ---- the conversation: a reason, a proposal, a verdict
 function show() { $('wa').textContent = describe(A); $('recipe').value = 'RECIPE ' + fmt(A); $('dials').innerHTML = Object.entries(DIAL).map(([k, d]) => `<label class="s" title="${d[4]}">${d[0]}<input type="range" data-k="${k}" min="${d[1]}" max="${d[2]}" step="${d[3]}" value="${A[k]}"><span>${+A[k].toFixed(2)}</span></label>`).join(''); document.querySelectorAll('#dials input').forEach(i => { i.oninput = () => { A[i.dataset.k] = +i.value; i.nextElementSibling.textContent = i.value; $('wa').textContent = describe(A); $('recipe').value = 'RECIPE ' + fmt(A); }; }); }
 function log(s) { const d = document.createElement('div'); d.textContent = s; $('log').prepend(d); }
@@ -94,4 +95,11 @@ $('fy').onclick = () => { log(`Checked on a new line (“${freshText}”): yes, 
 $('save').onclick = () => { try { localStorage.setItem('jo.recipe', JSON.stringify(A)); } catch {} log('Saved for the orchestra on this device: ' + fmt(A)); $('recipe').select(); };
 $('reset').onclick = () => { A = {...SOFT}; try { localStorage.removeItem('jo.recipe'); } catch {} log('Started over from the soft default.'); done(); };
 show(); window.__lab = {get A() { return A; }, get B() { return B; }, RAW, SOFT};
+</script>
+<script type="importmap">{"imports":{"three":"../paeleo/scion/videotext/vendor/three.module.min.js"}}</script>
+<script type="module">
+import * as THREE from 'three'; import {makeTractJelly} from './tractjelly.js';
+const cv = document.getElementById('jc'), R = new THREE.WebGLRenderer({canvas: cv, antialias: true, alpha: true}), scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(36, 1, .1, 50), J = makeTractJelly(THREE, .09); scene.add(J.group); J.group.rotation.x = .5; cam.position.set(0, .1, 5.2); cam.lookAt(0, .05, 0);
+const size = () => { const w = cv.clientWidth, h = cv.clientHeight; R.setPixelRatio(Math.min(2, devicePixelRatio)); R.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }; size(); addEventListener('resize', size); window.JELLY = J; let last = performance.now(), T = 0;
+(function frame(now) { const dt = Math.min(.05, (now - last) / 1000); last = now; T += dt; const st = J.update(dt, window.__ac ? window.__ac.currentTime : T); window.__jst = st; J.group.rotation.y = Math.sin(T * .3) * .25; J.group.position.y = -.15 + Math.sin(T * .6) * .05; R.render(scene, cam); requestAnimationFrame(frame); })(last);
 </script></body></html>
