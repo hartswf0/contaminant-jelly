@@ -53,8 +53,8 @@ const rnd = (a, b) => a + Math.random() * (b - a), hex = (h, s, l) => '#' + new 
 $('lids').onclick = e => { const b = e.target.closest('button'); if (!b) return; const a = b.dataset.a;
   if (a === 'random') { const h0 = Math.random(); Object.assign(P, {w: rnd(.8, 1.8), h: rnd(.5, 1.5), shape: rnd(.5, 1.4), flare: rnd(0, .5), ribs: Math.round(rnd(0, 24)), ribAmp: rnd(0, .12), top: hex(h0, rnd(.3, .8), rnd(.5, .75)), rim: hex((h0 + rnd(.08, .5)) % 1, rnd(.5, .9), rnd(.5, .7)), glow: rnd(.7, 1.5), clear: rnd(.2, .7), edge: rnd(.4, 2), shimmer: rnd(0, 1), pat: OWN_PATS[Math.floor(rnd(0, OWN_PATS.length))], patN: Math.round(rnd(4, 36)), patAmt: rnd(.2, .8), pulse: rnd(.6, 2), wobble: rnd(0, .15), arms: Math.round(rnd(4, 30)), armLen: rnd(1.5, 6), curl: rnd(.1, 1.4), rule: OWN_RULES[Math.floor(rnd(0, OWN_RULES.length))][1]}); apply(); jelly.check(R); jelly.poke(); draw(); note('Left to chance.'); }
   else if (a === 'reset') { Object.assign(P, OWN_DEFAULT); apply(); jelly.check(R); draw(); note('Back to the first jelly.'); }
-  else if (a === 'keep') { ownSave(P); if (window.JF) JF.tell({jelly: 'own'}); note('Kept. It is your jelly on this device now.'); }
-  else if (a === 'use') { ownSave(P); if (window.JF) JF.tell({jelly: 'own'}); location.href = 'jellyorchestra.html?pup=own&alone=1&look=blank'; }
+  else if (a === 'keep') { if (jelly.error) P.rule = ''; ownSave(P); if (window.JF) JF.tell({jelly: 'own'}); note('Kept. It is your jelly on this device now.'); }
+  else if (a === 'use') { if (jelly.error) P.rule = ''; ownSave(P); if (window.JF) JF.tell({jelly: 'own'}); location.href = 'jellyorchestra.html?pup=own&alone=1&look=blank'; }
   else if (a === 'send') { const url = location.origin + location.pathname + '?j=' + ownEncode(P); (async () => { try { if (navigator.share) { await navigator.share({title: 'A jelly I made', url}); return; } } catch {} try { await navigator.clipboard.writeText(url); note('The link to this jelly is copied.'); } catch { note(url); } })(); } };
 // ---- turn it, touch it
 let yaw = .5, pit = .12, dist = 9, down = null; const pts = new Map(); let pd = 0;

@@ -36,7 +36,7 @@ import {RIGS, makeRig} from '../current/drift/rigs.js';
 import {makeArms3D} from './tentacles3d.js';
 import {makeCam, MODES} from './cam3d.js';
 const $ = id => document.getElementById(id), Q = new URLSearchParams(location.search), CL = '../current/drift/data/crashlab/', GEST = 'cineosis-hand-butter', NG = 64;
-let RID = Q.get('rig'); if (!RID) try { RID = localStorage.getItem('cj-rig'); } catch (e) {} if (!RIGS.some(r => r.id === RID)) RID = 'celluloid';
+let RID = Q.get('rig'); if (!RID) try { RID = localStorage.getItem('cj-rig'); } catch (e) {} if (!RIGS.some(r => r.id === RID) && !(RID === 'own' && (() => { try { return localStorage.getItem('cj-own'); } catch (e) {} })())) RID = 'celluloid';
 const V3 = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z), UP = V3(0, 1, 0);
 // ---------------------------------------------------------------- the rooms: space, and time as a fourth way to move
 const ROOMS = {

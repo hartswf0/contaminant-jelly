@@ -36,7 +36,7 @@ import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RIGS, makeRig} from '../current/drift/rigs.js';
 import {makeArms, drawPosture} from './tentacles.js';
 const $ = id => document.getElementById(id), Q = new URLSearchParams(location.search), CL = '../current/drift/data/crashlab/';
-let RID = Q.get('rig'); if (!RID) try { RID = localStorage.getItem('cj-rig'); } catch (e) {} if (!RIGS.some(r => r.id === RID)) RID = 'celluloid';
+let RID = Q.get('rig'); if (!RID) try { RID = localStorage.getItem('cj-rig'); } catch (e) {} if (!RIGS.some(r => r.id === RID) && !(RID === 'own' && (() => { try { return localStorage.getItem('cj-own'); } catch (e) {} })())) RID = 'celluloid';
 const GEST = 'cineosis-hand-butter', FILL = ['ep3-the-raft', 'crash-lab-film', 'ep6-the-knot'], NG = 64;
 // ---------------------------------------------------------------- the rooms: each built around one thing a body of arms can do
 const ROOMS = {

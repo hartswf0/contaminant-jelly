@@ -67,3 +67,37 @@ touch it and it strokes.
 1. Draw the made jelly in the open water, steer labs and four space.
 2. More than one open line: a rule for shape as well as skin.
 3. Keep several made jellies, not one.
+
+## The made jelly everywhere, and building that works
+
+**The made jelly is now a body like the ten species.** It lives in the shared body factory (`current/drift/rigs.js`,
+id `own`), so any page that takes a species takes it:
+- the open water (it is first in YOUR JELLY there), the three steer labs, four space, the loadout's JELLY jar;
+- the links under OTHER WATERS at the entrance carry it;
+- in the labs its own arms are hidden, because there your fingers are the arms, as with every species;
+- it strokes when the page says stroke, not on its own beat;
+- it is drawn after the water, so murk does not bury it.
+
+**Why building failed on a phone.** Two faults.
+1. A tap was called "held" if more than 450 ms passed between finger down and finger up as the page saw them. On a
+   slow frame that is an ordinary tap. A held finger that touched nothing did nothing, so most taps were lost. In
+   the headless test, two of four taps placed nothing for this reason.
+2. Outside the blank room, things were still set down at the old depth, far below the jelly.
+
+**What changed.**
+- A tap that is not on a thing always sets one down. Only a finger held 600 ms on a thing takes it away.
+- Outside the blank room, things are set just below your jelly, where you can see them, and keep that height.
+- Each placing and each removal is said in a line ("Set down: PLINTH", "Taken away.").
+- Entering the blank room always puts you low, by the floor, however walking was switched on.
+
+**Checked (headless, real touch events).**
+- Open water, steer lab, steer lab 3D, steer lab 4D and four space each loaded with the made jelly and no page
+  errors from it. It is visible in the stills of the open water, the 3D lab, the 4D lab and four space.
+- Blank room: four taps, four things. Deep water: taps set plinths at 2.6 below the jelly; a quick tap on a thing
+  added another; a held finger removed one.
+
+**Not checked.**
+- The 2D steer lab loaded and ran, but the jelly was out of frame in the still for the made jelly and for a species
+  alike, so I have not seen it there.
+- In the 3D lab a bright made jelly bloomed to white; its light was cut afterwards and not re-shot.
+- Real fingers, motion, sound. The open water's films come from an outside host that cannot be reached from here.

@@ -57,7 +57,13 @@ function threads(THREE, group, parts, n, color, opacity, len, r, y0, strands, ma
 }
 const lathe = (THREE, R, H, n = 40) => Array.from({length: n + 1}, (_, i) => { const t = i / n, a = t * Math.PI / 2 * 1.04; return new THREE.Vector2(Math.max(.001, R * Math.sin(a) * (1 + .06 * Math.sin(t * Math.PI))), H * Math.cos(a)); });
 
+import {makeOwnJelly, ownLoad} from '../../bonus/ownjelly.js';
+// 'own' is the jelly made in bonus/jellymaker.html. It answers to the same hands as the ten species, so any page that takes a rig takes it.
+function ownRig(THREE, p) { const j = makeOwnJelly(THREE, p); j.driven = true; j.group.traverse(o => { o.renderOrder = 20; });   /* drawn after the water, so murk does not bury it */ let lastT = null, checked = false; return {group: j.group, norm: .62, k: 1, own: j, get tentacles() { return j.arms; },
+    update(s) { const dt = Math.min(.05, Math.max(0, s.dt ?? (s.t - (lastT ?? s.t)))); lastT = s.t; j.ph = Math.max(0, Math.min(1, s.ph ?? 1)) - dt / .55; j.update(dt || 1 / 60, s.t); j.bell.material.uniforms.uGlow.value = j.P.glow * .85 * (1 + .4 * (s.glow || 0)); },
+    setFilm() {}, dispose() { j.group.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); }); }}; }
 export function makeRig(THREE, id) {
+  if (id === 'own') { const p = ownLoad(); if (p) return ownRig(THREE, p); id = 'glass'; }
   const group = new THREE.Group(), mats = [], parts = [], filmMats = [], inv = new THREE.Matrix4(); let norm = 1, k = 1, lastT = null;
   const pts = (geo, mat) => { const p = new THREE.Points(geo, mat); p.frustumCulled = false; group.add(p); mats.push(mat); return p; };
   const attrs = (n, fill) => { const g = new THREE.BufferGeometry(), P = new Float32Array(n * 3), T = new Float32Array(n), S = new Float32Array(n), L = new Float32Array(n); let m = 0; for (let i = 0; i < n * 4 && m < n; i++) if (fill(m, P, T, S, L) !== false) m++;

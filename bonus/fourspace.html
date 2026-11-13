@@ -43,7 +43,7 @@ import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RIGS, makeRig} from '../current/drift/rigs.js';
 import {makeCam} from './cam3d.js';
 const $ = id => document.getElementById(id), Q = new URLSearchParams(location.search), V3 = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z), UP = V3(0, 1, 0), clamp = THREE.MathUtils.clamp, TAU = Math.PI * 2, CL = '../current/drift/data/crashlab/';
-let RID = Q.get('rig'); if (!RID) try { RID = localStorage.getItem('cj-rig'); } catch (e) {} if (!RIGS.some(r => r.id === RID)) RID = 'golden';
+let RID = Q.get('rig'); if (!RID) try { RID = localStorage.getItem('cj-rig'); } catch (e) {} if (!RIGS.some(r => r.id === RID) && !(RID === 'own' && (() => { try { return localStorage.getItem('cj-own'); } catch (e) {} })())) RID = 'golden';
 // ================================================================ FOUR-SPACE: the world is R^4; you see the 3D slice through the jelly.
 // The slice has an orthonormal frame: b0 = x, b1 = y (up never tilts), b2 = the slice's depth, n = its normal. Tilting turns (b2, n) in the z-w plane.
 // A world point q appears at slice position (b0.(q-x), q.y, b2.(q-x)) with signed distance s = n.(q-x): s > 0 is ana, s < 0 is kata.

@@ -45,7 +45,7 @@ import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RIGS, makeRig} from '../current/drift/rigs.js';
 import {makeArms, drawPosture} from './tentacles.js';
 const $ = id => document.getElementById(id), Q = new URLSearchParams(location.search), COARSE = matchMedia('(pointer: coarse)').matches, LO = COARSE || Q.has('lo');
-let RID = Q.get('rig'); if (!RID) try { RID = localStorage.getItem('cj-rig'); } catch (e) {} if (!RIGS.some(r => r.id === RID)) RID = 'reel';
+let RID = Q.get('rig'); if (!RID) try { RID = localStorage.getItem('cj-rig'); } catch (e) {} if (!RIGS.some(r => r.id === RID) && !(RID === 'own' && (() => { try { return localStorage.getItem('cj-own'); } catch (e) {} })())) RID = 'reel';
 // ---------------------------------------------------------------- the lie of the floor, baked once into a heightmap that both the splats and the swimmer read
 const Hs = (x, z) => { const s = Math.sin(x * 127.1 + z * 311.7) * 43758.5453; return s - Math.floor(s); };
 const vn = (x, z) => { const xi = Math.floor(x), zi = Math.floor(z), xf = x - xi, zf = z - zi, u = xf * xf * (3 - 2 * xf), v = zf * zf * (3 - 2 * zf); return (Hs(xi, zi) * (1 - u) + Hs(xi + 1, zi) * u) * (1 - v) + (Hs(xi, zi + 1) * (1 - u) + Hs(xi + 1, zi + 1) * u) * v; };
@@ -182,7 +182,7 @@ const MKN = 48 + 16 + 30, markPts = pts(geoOf({position: [new Float32Array(MKN *
 let rig = null; const body = new THREE.Group(); scene.add(body);
 const setRig = id => { if (rig) { body.remove(rig.group); rig.dispose(); } RID = id; rig = makeRig(THREE, id); rig.group.scale.setScalar(rig.norm * 1.5); body.add(rig.group); try { localStorage.setItem('cj-rig', id); } catch (e) {} };
 setRig(RID);
-$('rigs').innerHTML = `YOUR JELLY · ${RIGS.map(r => `<button data-rig="${r.id}" class="${r.id === RID ? 'on' : ''}">${r.name.replace(/^The /, '')}</button>`).join('')} · <a href="../current/drift/characters.html?rig=${RID}&next=${encodeURIComponent('../../bonus/sea.html')}">try them in the tank →</a> · <a href="lab.html?score=scores/open-water.peo">open in the Lab →</a>`;
+$('rigs').innerHTML = `YOUR JELLY · ${(() => { try { return localStorage.getItem('cj-own'); } catch (e) {} })() ? `<button data-rig="own" class="${RID === 'own' ? 'on' : ''}">Your Own</button>` : ''}${RIGS.map(r => `<button data-rig="${r.id}" class="${r.id === RID ? 'on' : ''}">${r.name.replace(/^The /, '')}</button>`).join('')} · <a href="../current/drift/characters.html?rig=${RID}&next=${encodeURIComponent('../../bonus/sea.html')}">try them in the tank →</a> · <a href="lab.html?score=scores/open-water.peo">open in the Lab →</a>`;
 $('rigs').querySelectorAll('button').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); setRig(b.dataset.rig); $('rigs').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); }));
 const UP = new THREE.Vector3(0, 1, 0);
 const J = {p: new THREE.Vector3(SITES[4].x + 22, 0, SITES[4].z + 36), v: new THREE.Vector3(), dir: new THREE.Vector3(0, 0, -1), ph: .9, lastStroke: -9, interval: .84, kick: 0, boost: 0, got: 0, seen: new Set(), alt: 10, goal: null, trail: []};

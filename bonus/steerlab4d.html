@@ -32,7 +32,7 @@ import {RIGS, makeRig} from '../current/drift/rigs.js';
 import {makeArms3D} from './tentacles3d.js';
 import {makeCam} from './cam3d.js';
 const $ = id => document.getElementById(id), Q = new URLSearchParams(location.search), V3 = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z), UP = V3(0, 1, 0), clamp = THREE.MathUtils.clamp;
-let RID = Q.get('rig'); if (!RID) try { RID = localStorage.getItem('cj-rig'); } catch (e) {} if (!RIGS.some(r => r.id === RID)) RID = 'golden';
+let RID = Q.get('rig'); if (!RID) try { RID = localStorage.getItem('cj-rig'); } catch (e) {} if (!RIGS.some(r => r.id === RID) && !(RID === 'own' && (() => { try { return localStorage.getItem('cj-own'); } catch (e) {} })())) RID = 'golden';
 // ---------------------------------------------------------------- three stages, one idea each. A stone is [x, y, z, w, r]: a hypersphere, seen as the sphere where it crosses your w.
 const wall = []; for (let x = -27; x <= 27; x += 6) for (let y = -10; y <= 20; y += 6) wall.push([x, y, 0, 0, 4]);
 const STAGES = [
