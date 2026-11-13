@@ -141,3 +141,32 @@ open water; keeping, leaving, returning and bringing back restored jelly, game, 
 
 **Not checked.** I cannot watch motion, so the steering movements and the lid lift are unseen. Under a strong
 look (woodblock) the plinth text is lost. Two long names can still touch in the back row on a narrow phone.
+
+## The live pane
+
+**Why.** The loadout showed pictures of decisions. Nothing in it could be steered, touched or heard, and a place
+was a picture on a wall, not the place.
+
+**What changed.**
+- On a phone the top of the loadout is now the real thing, running: the room, the open water, a steer lab,
+  whichever GAME is chosen. Touch it to begin, then steer it, touch the jelly, hear it. The jars sit beneath it.
+- For the room, the orchestra and the reel game, a jar changes the running pane in place. No reload: the jelly
+  becomes the new jelly where it is swimming, the place loads around it, the steering changes under your thumb, the
+  look repaints, the words are spoken.
+- Those three arrive without their own menus (`stage=1`); the jars are the menu. The stick, SING, RISE and SINK stay.
+- Any other game is reloaded with the new sentence when a jar changes, and has to be touched again to begin.
+- FILL THE SCREEN (and TEST) make the pane the whole screen; BACK TO THE JARS returns.
+- On a wide screen the pane is the panel on the right, as before, with the same in-place changes.
+
+**Checked (headless, phone size; positions and names read from the running page, plus stills).**
+- The room began in the pane; pushing the stick moved the jelly from (-0.4, 2.0) to (2.1, -3.3).
+- Choosing the medusa, the video store, glide and ink wash from the jars changed all four in the running room; the
+  pane's address did not change, so it was not reloaded.
+- Changing GAME to the open water loaded `sea.html?rig=medusa&mode=glide&place=store&lens=sumi` in the pane.
+- No page errors.
+
+**Not checked, and limits.**
+- I cannot watch motion or hear sound; that the voice is audible in the pane is unverified.
+- Two 3D pictures run at once on a phone. Speed on a real phone is untested.
+- The pane is small. Under ink wash the video store reads as a grey smear at that size.
+- Games other than the three above lose their place when a jar changes, because they are reloaded.
