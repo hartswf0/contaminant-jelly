@@ -47,3 +47,35 @@ control like any other, and a place can hold company: jellies that swim with you
 1. Pinch to zoom, and a saved shot per place.
 2. A friend's name over their jelly.
 3. Company that answers what you say instead of mouthing along.
+
+## The entrance, names, pinch
+
+**Why.** The page opened on a paragraph about sampling and "touch to begin". It did not ask who you are or what
+you came to do, friends in a room were unnamed bodies, and the camera's distance was two buttons.
+
+**The entrance.** One screen, in this order:
+1. YOUR NAME: up to 16 letters. There is no account and no password. The name is kept on this device and is shown
+   only to friends in a room with you.
+2. YOUR JELLY: the eleven bodies as pictures in a row.
+3. WHAT TO DO: The Room, The Orchestra, Bring the Reels Home, Talk, Theatre, Demo, each with one line.
+4. OTHER WATERS: the open water, steer lab, four space, real jelly, voice lab and the loadout, as links that carry
+   your jelly with them.
+5. ENTER, a lid fixed at the bottom right. Nothing else on the screen begins the page.
+- It opens on what you chose last time. A link that names a game or a room opens on that; an invitation says a
+  friend is waiting.
+- Inside the loadout's live pane the entrance is skipped, because the jars have already chosen.
+
+**Names.** A friend's name floats over their jelly; yours floats over your own while you are in a room. A friend
+with no name is "a friend". The arrival line uses the name.
+
+**Pinch.** Two fingers on the picture change the camera's distance (3 to 40): together sends it back, apart brings
+it closer. Steering pauses while two fingers are down. TWIN keeps its two thumbs for steering, so it has no pinch.
+
+**Checked (headless, emulated touch).** A tap on the title began nothing. Name "Mulu", the medusa and The Room,
+then ENTER: alone, as the medusa, walking, name stored in the shared sentence. Pinch took the distance from 9.5 to
+28.5 and a spread to 7.1. A second page opened by the invitation said a friend was waiting and preselected The
+Room; entered as "Hart"; the first page showed the labels MULU and HART. Choosing Bring the Reels Home started the
+reel game. No page errors.
+
+**Not checked.** Real fingers on a real phone; two phones over the internet; the on-screen keyboard covering the
+name field. I cannot watch motion or hear sound.
