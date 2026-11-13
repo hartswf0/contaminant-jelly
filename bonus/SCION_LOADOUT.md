@@ -76,3 +76,38 @@ same reel lids.
 - The jars only choose and launch. You cannot yet bring an object, a film or a room you built into the base and
   see it there.
 - The other pages keep their own menus. The next step is for each to show this same shelf in place of its own.
+
+## The door, the round trip, the preview
+
+**Why.** The loadout chose things but did not hand them over, could only be reached from the orchestra, and
+could not be tried before leaving. Changing jelly or look on any other page meant editing the address by hand.
+
+**What changed.**
+- `bonus/loadout-button.js` is one shared script. Every page that carries it shows a reel-lid door on its left
+  edge. Pages: the open water, the three steer labs, four space, real jelly, the voice lab. The orchestra opens
+  the same thing from MORE.
+- The door opens the loadout over the page you are on. The jars start on what that page is already using
+  (its game, jelly, steer, world, look), read from its address.
+- ENTER goes back to the same page with only the changed choices replaced; everything else in the address is kept.
+  Choosing a different game goes to that game instead.
+- LOOK now applies everywhere. A page with `lens=` in its address has that look laid over its canvases.
+- PREVIEW: on a screen 900 wide or more, a panel in the loadout runs the real page with the current choices and
+  reloads when a jar changes. TEST (the small lid beside ENTER, and the button on the panel) fills the screen with
+  it; BACK TO THE JARS returns with nothing lost.
+
+**Limits, stated plainly.**
+- Outside the orchestra the looks are colour filters over the finished picture (seven as SVG filters, five as CSS
+  filters). They approximate the orchestra's paints; they do not redraw edges or grain the way its shader does.
+- A phone has no live panel beside the jars; it has TEST only.
+- Real Jelly has one body, so JELLY is ignored there. The voice lab ignores STEER and WORLD.
+- Long names can touch each other under the jars on a narrow phone.
+
+**Checked (headless, stills and addresses only).**
+- The door is present on all seven pages; `?lens=cyanotype` put a filter on every canvas; no page errors.
+- Opened over `sea.html?rig=glass&mode=glide`: jars showed open water / glass moon / glide. Chose medusa and ink
+  wash, ENTER returned `sea.html?rig=medusa&mode=glide&lens=sumi` with the jelly and the look changed.
+- Desktop preview ran `fourspace.html?g=swing&rig=golden&lens=woodblock`; TEST filled the screen with
+  `steerlab.html?room=kelp&rig=golden&lens=woodblock`; BACK TO THE JARS worked.
+
+**Not checked.** I cannot watch motion or hear sound. Real phones, the live site, and whether a filtered page stays
+fast on a phone are untested.

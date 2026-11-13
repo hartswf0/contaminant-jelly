@@ -365,4 +365,5 @@ requestAnimationFrame(frame);
     setInterval(() => { const t = aud.currentTime; if (i > 0 && ev[i - 1].t > t + .5) i = 0; while (i < ev.length && ev[i].t <= t + .03) { if (!aud.paused && ev[i].kick) NV.stimulate((n++ * 3) % NV.NR); i++; } }, 15); window.__solo = {aud, ev, SG};
     const tag = document.createElement('div'); tag.style.cssText = "position:fixed;left:14px;bottom:max(120px,calc(env(safe-area-inset-bottom) + 110px));font:300 11px 'JetBrains Mono',monospace;color:#f0a35a;text-shadow:0 0 6px #000;pointer-events:none;letter-spacing:.12em"; tag.textContent = 'SOLO · ' + SG.title + ' · touch to start the music'; document.body.appendChild(tag); addEventListener('pointerdown', () => { tag.textContent = 'SOLO · ' + SG.title; }, {once: true}); } catch (e) { console.warn('solo song unavailable', e); } })(); }
 window.__rj = {CK, TARGET, TCLIP, get THRUST() { return THRUST; }, set THRUST(v) { THRUST = v; }, LOW, get PR() { return PR; }, get ft() { return S.ft; }, HULL, FAB, PUB, SED, RIB, puff, WU, cam, GAIN, LIGHT, LEARN, FEED, VR, CH, SHOTS, startFilm, stopFilm, onTap, RADM, get RECOIL() { return RECOIL; }, G, NV, S, MUS, COM, AX, body, tapAt, PRESET, rhoW, scr, get T() { return T; }};
-</script></body></html>
+</script><script src="loadout-button.js"></script>
+</body></html>

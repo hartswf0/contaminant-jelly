@@ -7,6 +7,7 @@ def R(a, b, n=1):
     global s; assert s.count(a) == n, (a[:70], s.count(a)); s = s.replace(a, b)
 R('href="../fonts/fonts.css"', 'href="%sfonts/fonts.css"' % CJ)
 R('"three":"../paeleo/scion/videotext/vendor/three.module.min.js","three/addons/":"../paeleo/scion/videotext/vendor/addons/"', '"three":"%spaeleo/scion/videotext/vendor/three.module.min.js","three/addons/":"%spaeleo/scion/videotext/vendor/addons/"' % (CJ, CJ))
+R('<script src="loadout-button.js"></script>', '<script src="%sbonus/loadout-button.js"></script>' % CJ)
 R("from './tractjelly.js'", "from '%sbonus/tractjelly.js'" % CJ)
 R("from '../current/drift/rigs.js'", "from '%scurrent/drift/rigs.js'" % CJ)
 R("new URL('./jellystudio/', import.meta.url)", "new URL('%sbonus/jellystudio/', location.origin)" % CJ)
