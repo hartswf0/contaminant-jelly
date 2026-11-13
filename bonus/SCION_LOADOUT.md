@@ -111,3 +111,33 @@ could not be tried before leaving. Changing jelly or look on any other page mean
 
 **Not checked.** I cannot watch motion or hear sound. Real phones, the live site, and whether a filtered page stays
 fast on a phone are untested.
+
+## Consequence and memory
+
+**Why.** Choosing something in a jar changed a word under the jar and nothing else. With Theatre chosen, every
+other jar was struck through, so no choice did anything and the page did not say why.
+
+**What a choice does now, in the loadout itself.**
+| Jar | What you see change |
+|---|---|
+| JELLY | the body over the plinth, and its picture inside the jar |
+| WORLD | the place is thrown on the far wall |
+| LOOK | the whole room is seen through that look |
+| STEER | the jelly moves the way that steering moves it; the jar holds its sign |
+| GAME | its name and one line are on the plinth; jars it sets aside go dark |
+| WORDS | the line is on the plinth and in the jar |
+| KEPT | new jar: KEEP THIS ONE stores the whole loadout; touch one to bring it back; FORGET ONE removes it |
+
+- Every choice is said in a sentence under the title, and the jar's lid lifts and its lamp flares.
+- A choice is never ignored. If the current game cannot use it, the game changes to one that can, and the
+  sentence says so: "Theatre does not use JELLY, so GAME is now The Room." A way of steering the room does not
+  have (reins, arms) moves you to the open water.
+- Choosing a game says what it sets aside.
+- Coming back, the page says "As you left it" and the jars hold what they held. Stored on the device only.
+
+**Checked (headless stills and text, phone size).** Starting from Theatre: choosing the medusa changed the body and
+moved GAME to The Room; the video store appeared on the wall; woodblock repainted the room; reins moved GAME to the
+open water; keeping, leaving, returning and bringing back restored jelly, game, steer and look. No page errors.
+
+**Not checked.** I cannot watch motion, so the steering movements and the lid lift are unseen. Under a strong
+look (woodblock) the plinth text is lost. Two long names can still touch in the back row on a narrow phone.
