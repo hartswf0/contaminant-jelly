@@ -215,5 +215,5 @@ function drawGuide() { const W = innerWidth, H = innerHeight; if (gd.width !== W
     AR.arms.forEach(a => { if (a.mode === 'latch' && a.anc && a.anc.type === 'frame') { gx.fillStyle = `rgb(${a.col.map(v => v * 255 | 0)})`; gx.beginPath(); gx.arc(X(a.anc.t), y, 6, 0, 7); gx.fill(); const e = IMG[Math.round(a.anc.t)]; if (e.ok) gx.drawImage(e.im, X(a.anc.t) - 30, y - 72, 60, 45); } }); gx.fillStyle = 'rgba(207,221,232,.6)'; gx.textAlign = 'left'; gx.fillText(`time · frame ${Math.round(WORM.live) + 1} of ${NG} playing`, x0, y + 18); } }
 requestAnimationFrame(frame);
 window.__lab3 = {CAM, B, AR, env, down, up, mv, rayAt, cam, start, S, REELS, KELP, TILES, WORM, EXIT, wormPos, screen, get T() { return T; }};
-</script><script src="loadout-button.js"></script>
+</script><script src="jellyfilm.js"></script>
 </body></html>
