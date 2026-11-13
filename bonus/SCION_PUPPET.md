@@ -64,3 +64,38 @@ The Real Jelly is one animal with a nervous system, muscle and water. These elev
 The voice body is the closest: its shape comes from a physical model and it has springs. Giving the puppet the
 Real Jelly's nerves (so steering is a stimulus and the stroke is its own) is the step that would make it
 believable, and it is not done.
+
+## Controls that stopped controlling
+
+**What was measured first.** With a mouse, in a headless browser: the stick, RISE and SINK in all 40 places, with
+the orchestra on and alone; and seven steering schemes (glide, tap, drag, twin, paddle, draw, wheel) in four places.
+All of them moved the jelly. So the code that steers was not the fault.
+
+**What was actually wrong.**
+1. The orchestra's picture did not claim finger gestures (`touch-action` was missing; every other page had it).
+   On a phone the browser takes a drag back after a few pixels for its own scrolling. The stick and the wheel had
+   their own claim, so they worked; glide, drag, twin, paddle, draw and drag-to-look could die mid-gesture. A mouse
+   never shows this, which is why earlier tests passed.
+2. In every scheme but the stick, the stick circle stayed on screen, dimmed, and swallowed any touch that began on
+   it while doing nothing.
+3. The camera sat so close that the jelly filled the screen and hid the place being steered through.
+4. Lids that did nothing in some states: LOOK on a painted place; SONG while ALONE (the music is muted); the ALONE
+   lid lost its light whenever another lid was opened.
+5. The water had limits (a ceiling, a floor) that stopped you silently, and no sideways limit at all.
+
+**What changed.**
+- The picture claims its gestures. The stick circle is on screen only when the stick steers.
+- The camera stands back (9.5 instead of 6.5).
+- LOOK always changes what is seen: on a painted place the new paint becomes the place.
+- SONG while ALONE offers MUSIC, which lets the music back in.
+- ALONE stays lit while it is on.
+- The ceiling and floor say so in a line and the bell flinches. Past 46 from the centre a current carries you back.
+
+**Checked (emulated touch, headless).** A touch glide begun where the stick circle used to sit moved the jelly 5.0
+with no gesture taken back; two thumbs in TWIN moved it 6.4 and raised it 5.2. The ceiling line appeared. Placed
+at 52 from the centre, the jelly was back at 46 after three seconds. ALONE stayed lit with LOOK open. MUSIC
+unmuted the song. No page errors.
+
+**Not checked.** Emulated touch is not a phone: whether the browser really stops taking gestures back has to be
+confirmed on yours. I cannot watch motion or hear sound. TILT cannot be tested here. Five cities (b3, b6, 03, 06,
+13) open as the city after them when asked for by name.
