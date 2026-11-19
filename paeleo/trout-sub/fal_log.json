@@ -1225,5 +1225,125 @@
   "files": [
    "films/p49-v2.mp4"
   ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "p52-v2",
+  "take": 1,
+  "seconds": 10.5,
+  "arguments": {
+   "duration": 8,
+   "resolution": "480P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 1357258104,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p52.jpg",
+   "atlas/a19.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images.\n\nShot 1 (0-5.5s), Turkey's seat, locked-off camera, the camera never moves: exactly the cockpit reference throughout in the house watercolour: steel tin, brass six-bolt porthole chipped at two o'clock, ballast slot, chalk chart, lamp toggle. From frame one the porthole reference is in the glass as deep blue-green murk full of slowly drifting pale specks: one thick twisted rope, the only fully painted thing, dull red inside a small pool of pale greenish-white light, taut from lower left up to a knot on an iron ring. The stone wall and the boulder pile beyond are only traced in hair-thin wavering pale cyan threads and dots. Past the pool the rope thins to a single thread running on into the dark. At 1s only a wing tip enters lower left, drops a grey weight into the slot and leaves. The rope does one thing, slowly: it slackens and sways in a soft S like a limb, then draws straight and hard again,.\n\nShot 2 (5.5-8s), Trout's side, hard cut, locked-off camera, the camera never moves: exactly the outside reference, held still, the port clear, Turkey small behind the amber port. The same rope seen from the river: knotted to the handle on top of the tin, crossing the left foreground, and running on as a thread across a low arched doorway traced in cyan dots. One speckled trout waits inside the doorway, behind the rope. The rope tightens and one thread boulder slides a hand's width, half clear of the doorway, half across it, and settles.\n\nThe small haloed pool of light and the single line leaving it as in the last reference only. No text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab3133d/wDQYcbSm0cIvPV_O0XcDl_minimax-h3.mp4",
+  "files": [
+   "films/p52-v2.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "p53-v2",
+  "take": 1,
+  "seconds": 15.0,
+  "arguments": {
+   "duration": 8,
+   "resolution": "480P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 719371876,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p53.jpg",
+   "atlas/a15.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images.\n\nShot 1 (0-5.5s), Turkey's seat, locked-off camera, the camera never moves: exactly the cockpit reference throughout in the house watercolour: steel tin, brass six-bolt porthole chipped at two o'clock, ballast slot, chalk chart, lamp toggle. From frame one the porthole reference is in the glass as a hand-made poster: flat, frontal, shadowless, on dusty pink board in speckled black, brick red, orange and cream. A mill wheel stands upright in the centre: compass circle, eight ruled black spokes, brick-red paddle blocks on the rim. Under it a cream trapdoor with one orange latch. At 1s only a wing tip enters lower left, drops a grey weight into the slot and leaves. The wheel turns forward in steps, one paddle per step; each leaves one pencil tick below, a crimped row of ticks, never letters. On the fourth step a paddle meets the latch and stops dead. The wheel steps back one paddle; the trapdoor hinges up a hand's width, holds, and drops flat.\n\nShot 2 (5.5-8s), Trout's side, hard cut, locked-off camera, the camera never moves: exactly the outside reference, held still, the port clear, Turkey small behind the amber port. In the left foreground the same poster wheel is seen end-on beside one speckled trout: a narrow upright stack of black and red blocks, its orange axle hub sticking out toward the trout like a winding key, one brown block wedged between two paddles. The hub turns one click forward, one back, one forward, and the stack rocks against the wedged block.\n\nHandled stained paper as in the last reference only. No text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab3133d/25dZRHpxwkXJ-rTOX8zR1_minimax-h3.mp4",
+  "files": [
+   "films/p53-v2.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "p51-v2",
+  "take": 1,
+  "seconds": 16.5,
+  "arguments": {
+   "duration": 8,
+   "resolution": "480P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 958878627,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p51.jpg",
+   "atlas/a36.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images.\n\nShot 1 (0-5.5s), Turkey's seat, locked-off camera, the camera never moves: exactly the cockpit reference throughout in the house watercolour: steel tin, brass six-bolt porthole chipped at two o'clock, ballast slot, chalk chart, lamp toggle. From frame one the porthole reference is in the glass as a photographed tabletop miniature: a giant clam carved from wood and painted matte, grain and cut grooves instead of ink lines, blue-black and slate on a dusty tan floor. Its shells are shut to a thin gap; a bone-pale glow leaks out and lies as a patch on the floor. At 1s only a wing tip enters lower right, flips the toggle and leaves. The same look happens twice. The upper shell hinges up stiffly in three small steps and holds: a bone-white pearl as big as a basketball, smooth and egg-shaped, rocks once. The shell steps shut. It steps open again the same way: now the pearl sits tight like a stopper and one line of bubbles leaks past its edge.\n\nShot 2 (5.5-8s), Trout's side, hard cut, locked-off camera, the camera never moves: exactly the outside reference, held still, the port clear, Turkey small behind the amber port. In the left foreground the same carved clam stands open, the pearl the one warm thing, glinting dull brass. One speckled trout has its nose on the pearl. The pearl rolls a finger's width toward the trout and rolls back; the trout holds still. The upper shell drops one step and stops.\n\nMatte carved wood, seams, raking side light and tan floor as in the last reference only. No text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab3133e/-eUwN8plOVz6RbtVK-Qx4_minimax-h3.mp4",
+  "files": [
+   "films/p51-v2.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "p50-v2",
+  "take": 1,
+  "seconds": 16.5,
+  "arguments": {
+   "duration": 8,
+   "resolution": "480P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 1932827399,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p50.jpg",
+   "atlas/a45.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images.\n\nShot 1 (0-5.5s), Turkey's seat, locked-off camera, the camera never moves: exactly the cockpit reference throughout, in the house watercolour: steel tin, six-bolt brass porthole, ballast slot lower left, lamp toggle lower right. The porthole reference is in the glass from the first frame, looking like a small built model filmed under water: rounded forms, no outline, glossy skin, fine sand. A rusty orange diamond road sign stands planted in river gravel, the only crisp surface, lettered DAM in plain dark capitals. In front of it hovers one three-inch tan darter. Four large trout wait in a line behind the sign in green haze. At 1s only a feathered wing tip enters lower right, flips the toggle and leaves. Daylight slides in slow rippled bands across the sand, and the tiny darter's single long shadow stretches away over the sand until it is wider than the sign and lies across all four trout, who step forward, meet it and stop.\n\nShot 2 (5.5-8s), Trout's side, hard cut, locked-off camera, the camera never moves: exactly the outside reference, held still: the tin on the riverbed, Turkey small behind the amber port. Scale reversed: the darter is nearest and sharp, left foreground, larger in frame than the tin, beside one small speckled trout. Head down, it shoves a low ridge of pebbles forward with its snout like a blade; a fresh groove runs back from it to the foot of the DAM sign, now small in the far haze.\n\nLight bands on sand and the long shadow as in the last reference, none of its figures. The only lettering is the word DAM on the sign; no other text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab3133d/v-ynevs8IbUXapjt1nfv9_minimax-h3.mp4",
+  "files": [
+   "films/p50-v2.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "p54-v2",
+  "take": 1,
+  "seconds": 10.6,
+  "arguments": {
+   "duration": 8,
+   "resolution": "480P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 251170439,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p54.jpg",
+   "atlas/a26.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images.\n\nShot 1 (0-5.5s), Turkey's seat, locked-off camera, the camera never moves: exactly the cockpit reference throughout in the house watercolour: steel tin, brass six-bolt porthole chipped at two o'clock, ballast slot, chalk chart, lamp toggle. From frame one the porthole reference is in the glass: under a heavy rock slab on a steep diagonal lies a wrinkled brown shape, a grainy soft photographed cutout with a thin dark outline traced loosely round it. Still, it reads as a ruffled gravy boat: curled tail for a handle, blunt end for a spout, a frilly rim. At 1s only a wing tip enters lower right, flips the toggle and leaves. In a single frame, a cut, never a fade, the same body snaps into a flat drawing of angular facets, pale ice blue where lit, cobalt in shadow, the water behind it straight horizontal white-blue streaks: an eye open on the spout, a webbed foot on the gravel, frilly folds flared like a dragon's ruff. It holds a second and snaps back to the still cutout, eye shut.\n\nShot 2 (5.5-8s), Trout's side, hard cut, locked-off camera, the camera never moves: exactly the outside reference, held still, the port clear, Turkey small behind the amber port. In the left foreground the same grainy cutout salamander lies beside one speckled trout, both facing the tin, its loose throat folds hanging like the red wattle of the turkey in the port. It snaps once to blue facets over white streaks, folds flared, then snaps back and draws its head under its own folds like a shell.\n\nSteep diagonal of a heavy mass as in the last reference only. No text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab3133f/SCWjIkMfH6PvHYscLG6rz_minimax-h3.mp4",
+  "files": [
+   "films/p54-v2.mp4"
+  ]
  }
 ]
