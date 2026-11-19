@@ -238,31 +238,82 @@ def stamp(s):
     return "%d:%02d" % (int(s) // 60, int(s) % 60)
 
 
-def slips(times, dive_of):
-    """One printed slip per pilot. The slip carries the words; the film carries the picture."""
-    pages = []
-    for name, a, b, _, _, _ in DIVES:
-        cells = "".join(
-            '<div class="slip"><div class="n">%02d</div><div class="t"><div class="h"><b>%s</b><span>%s · %s</span></div>'
-            '<p><u>Rim Clue</u> %s</p><p><u>River Rule</u> %s</p>'
-            '<p class="q"><u>Crewmate B · bolts 1 2 3 · Turkey looks out</u> %s</p>'
-            '<p class="q"><u>Crewmate C · bolts 4 5 6 · Trout look in</u> %s</p></div></div>'
-            % (n, seeds[n - 1][0].split("·")[1].strip(), name, stamp(times[n]), seeds[n - 1][1], seeds[n - 1][5], seeds[n - 1][3], seeds[n - 1][4])
-            for n in range(a, b + 1))
-        pages.append('<section><h1>TOURKEY TROUTTOWN · %s · slips %02d to %02d</h1><div class="grid">%s</div></section>' % (name, a, b, cells))
+def die(n):
+    """A die face drawn as SVG, in the worksheet's gold-edged square."""
+    pips = {1: [(12, 12)], 2: [(7, 7), (17, 17)], 3: [(7, 7), (12, 12), (17, 17)], 4: [(7, 7), (17, 7), (7, 17), (17, 17)],
+            5: [(7, 7), (17, 7), (12, 12), (7, 17), (17, 17)], 6: [(7, 6), (17, 6), (7, 12), (17, 12), (7, 18), (17, 18)]}[n]
+    return ('<svg class="die" viewBox="0 0 24 24"><rect x="1.5" y="1.5" width="21" height="21" rx="4" fill="#fbf6e9" stroke="#8a5a12" stroke-width="1.6"/>%s</svg>'
+            % "".join('<circle cx="%d" cy="%d" r="2" fill="#16293a"/>' % p for p in pips))
+
+
+SNAIL = ('<svg class="snail" viewBox="0 0 28 20"><path d="M3 16h20c2 0 3-2 3-4" fill="none" stroke="#8a5a12" stroke-width="1.6" stroke-linecap="round"/>'
+         '<circle cx="12" cy="9" r="6.2" fill="#f3e3bf" stroke="#8a5a12" stroke-width="1.6"/><circle cx="12" cy="9" r="2.6" fill="none" stroke="#8a5a12" stroke-width="1.4"/></svg>')
+
+
+def slips(times, dive_of=None):
+    """One strip per pilot, built like the original worksheets so it stands on its own:
+    the porthole drawing, the worksheet's header already filled in, a box for each
+    River Witness with their bolts and question, and where the porthole plays in the film."""
+    os.makedirs("youtube/thumbs", exist_ok=True)
+    for n in range(1, 56):
+        t = "youtube/thumbs/p%02d.jpg" % n
+        if not os.path.exists(t):
+            Image.open("stills/p%02d.jpg" % n).convert("RGB").resize((380, 380), Image.LANCZOS).save(t, quality=82)
+    pages, strips = [], []
+    for name, a, b, _, song, _ in DIVES:
+        for n in range(a, b + 1):
+            r = seeds[n - 1]; station = r[0].split("·")[1].strip()
+            strips.append("""<article class="strip">
+<img src="thumbs/p%02d.jpg" alt="Porthole %02d drawing">
+<div class="body">
+ <header><div><div class="kick">PAE-09 · TROUT TOWN · TOUR-KEY SUBMARINE</div><h2>Porthole Slip <b>%02d</b> · %s</h2></div>
+  <div class="chip">%s<div><b>%s · AT %s</b><span>IN THE FILM · TOURKEY TROUTTOWN</span></div></div></header>
+ <div class="fields"><span><i>Porthole #:</i> <b>%02d</b></span><span><i>Sub Station:</i> <b>%s</b></span></div>
+ <div class="fields"><span><i>Rim Clue &amp; River Rule:</i> <b>%s</b> <em>· %s</em></span></div>
+ <div class="two">
+  <div class="box"><div class="who"><b>Crewmate B</b> “River Witness #1” <span class="dice">%s%s%s</span></div><div class="look">TURKEY LOOKS OUT</div><p>%s</p></div>
+  <div class="box"><div class="who"><b>Crewmate C</b> “River Witness #2” <span class="dice">%s%s%s</span></div><div class="look">TROUT LOOK IN</div><p>%s</p></div>
+ </div>
+ <div class="bar"><span>&rarr; COPY THE TOP TWO LINES ONTO YOUR SUBMARINE PORTHOLE LOG</span><span>○ PROBABLE &nbsp; △ PLAUSIBLE &nbsp; ✹ PREPOSTEROUS</span></div>
+</div></article>""" % (n, n, n, station, SNAIL, name.upper(), stamp(times[n]), n, station, r[1], r[5],
+                       die(1), die(2), die(3), r[3], die(4), die(5), die(6), r[4]))
+    for i in range(0, len(strips), 4):
+        pages.append("<section>%s</section>" % "".join(strips[i:i + 4]))
     open("youtube/slips.html", "w").write("""<!doctype html><html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1"><title>Tourkey Trouttown · Slips</title><style>
-@page{size:letter;margin:9mm}*{box-sizing:border-box}body{margin:0;font:11px/1.3 Inter,Arial,sans-serif;color:#162b34;background:#fff}
-section{break-after:page}h1{font-size:13px;margin:0 0 2mm}
-.grid{display:grid;grid-template-columns:1fr 1fr}
-.slip{display:flex;gap:3mm;border:1px dashed #9aa8ad;padding:2.5mm 3mm;min-height:30mm;break-inside:avoid}
-.n{font-size:36px;font-weight:800;line-height:1;min-width:15mm}.h{display:flex;justify-content:space-between;gap:2mm;margin-bottom:1mm}
-.h b{font-size:14px}.h span{color:#b07a28;font-weight:600}p{margin:0 0 .6mm}u{text-decoration:none;color:#5f6c70;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.03em;margin-right:1mm}
-.q u{display:block}@media(max-width:700px){.grid{grid-template-columns:1fr}}</style></head><body>%s</body></html>""" % "".join(pages))
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>Tourkey Trouttown · Porthole Slips</title><style>
+@page{size:letter;margin:9mm 10mm}*{box-sizing:border-box}
+body{margin:0;font:10.5px/1.3 Inter,"Helvetica Neue",Arial,sans-serif;color:#16293a;background:#fff}
+section{break-after:page;display:flex;flex-direction:column;gap:0}
+.strip{display:flex;gap:4.5mm;align-items:stretch;height:64.5mm;padding:3.5mm 0;border-bottom:1.2px dashed #8fa0ab;break-inside:avoid}
+section .strip:last-child{border-bottom:0}
+.strip img{width:51mm;height:51mm;align-self:center;border-radius:50%%;object-fit:cover}
+.body{flex:1;display:flex;flex-direction:column;gap:1.6mm;min-width:0}
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:3mm}
+.kick{font-size:7.5px;font-weight:800;letter-spacing:.08em;color:#8a5a12}
+h2{margin:.3mm 0 0;font-size:17px;line-height:1.1;font-weight:800}h2 b{font-size:22px}
+.chip{display:flex;gap:1.8mm;align-items:center;border:1.2px solid #c99a4a;background:#fbf3df;border-radius:2.2mm;padding:1.2mm 2.4mm;white-space:nowrap}
+.chip b{display:block;font-size:9px;letter-spacing:.03em}.chip span{font-size:7px;font-weight:700;color:#8a5a12;letter-spacing:.03em}
+.snail{width:7mm;height:5mm}
+.fields{display:flex;gap:6mm;border-bottom:1.1px solid #16293a;padding-bottom:.7mm}
+.fields i{font-style:normal;font-weight:700}.fields b{font-size:12px}.fields em{font-style:normal;font-weight:600;color:#8a5a12}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:3mm;flex:1}
+.box{border:1.1px solid #9fb0bf;border-top:2.2px solid #16293a;background:#f1f5f8;border-radius:1.6mm;padding:1.6mm 2.2mm}
+.who{display:flex;align-items:center;gap:1.2mm;font-size:9px}.who b{font-size:10.5px}.dice{margin-left:auto;display:flex;gap:.8mm}.die{width:4.6mm;height:4.6mm}
+.look{font-size:7.5px;font-weight:800;letter-spacing:.07em;color:#8a5a12;margin-top:.6mm}
+.box p{margin:.5mm 0 0;font-size:13px;line-height:1.22;font-weight:700}
+.bar{display:flex;justify-content:space-between;background:#16344a;color:#fff;border-radius:1.4mm;padding:1.3mm 2.6mm;font-size:7.6px;font-weight:800;letter-spacing:.05em}
+@media screen{body{max-width:216mm;margin:0 auto;padding:16px}}
+@media screen and (max-width:700px){.strip{height:auto;flex-direction:column}.two{grid-template-columns:1fr}.strip img{width:40vw;height:40vw}header{flex-direction:column}}
+</style></head><body>%s</body></html>""" % "".join(pages))
 
 
 if __name__ == "__main__":
     os.makedirs("youtube", exist_ok=True)
+    if "--slips" in sys.argv:                                   # reprint the slips from the last build's timings
+        tt = json.load(open("youtube/timing.json"))["portholes"]
+        stamp = lambda v: v
+        slips({int(k): v for k, v in tt.items()})
+        sys.exit(print("youtube/slips.html"))
     out, times, chapters = Out(), {}, [(0, "How to play")]
     shots(out, HOWTO, HOWTO_SONG)
     for spec in DIVES:
