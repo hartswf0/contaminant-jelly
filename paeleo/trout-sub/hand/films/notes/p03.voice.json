@@ -4,18 +4,20 @@
  "lines": [
   {
    "at": 19.7,
-   "voice": "bm_fable",
+   "voice": "am_santa",
    "speaker": "turkey",
-   "text": "Mister Hook, the famous guest speaker? Or the Monster, most wanted?",
-   "seconds": 4.46,
+   "text": "Hoo-wee. Mister Hook, the famous guest speaker? Or... the Monster. Most wanted.",
+   "caption": "Mister Hook, the famous guest speaker? Or the Monster, most wanted?",
+   "seconds": 5.53,
    "caption_held": 4.6
   },
   {
    "at": 28.9,
-   "voice": "bf_emma",
+   "voice": "af_bella",
    "speaker": "trout",
-   "text": "OK, mister: are you our new class pet? Or the Hook Monster?",
-   "seconds": 3.33,
+   "text": "Okay, mister. Are you our new class pet? Or are you the Hook Monster?",
+   "caption": "OK, mister: are you our new class pet? Or the Hook Monster?",
+   "seconds": 4.09,
    "caption_held": 4.8
   }
  ]

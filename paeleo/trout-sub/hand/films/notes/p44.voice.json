@@ -4,34 +4,38 @@
  "lines": [
   {
    "at": 17.0,
-   "voice": "bm_fable",
+   "voice": "am_santa",
    "speaker": "turkey",
-   "text": "A turbine, drinking the river down a whirlpool?",
-   "seconds": 3.16,
+   "text": "Is that a turbine, drinkin' the whole river down a whirlpool?",
+   "caption": "A turbine, drinking the river down a whirlpool?",
+   "seconds": 3.95,
    "caption_held": 3.8
   },
   {
    "at": 21.3,
-   "voice": "bm_fable",
+   "voice": "am_santa",
    "speaker": "turkey",
-   "text": "Or a trap that hypnotises, and I am staring?",
-   "seconds": 3.54,
+   "text": "Or a trap that hypnotizes. And I am a-starin' right at it?",
+   "caption": "Or a trap that hypnotises, and I am staring?",
+   "seconds": 3.95,
    "caption_held": 3.1
   },
   {
    "at": 25.6,
-   "voice": "bf_emma",
+   "voice": "af_bella",
    "speaker": "trout",
-   "text": "The pie-prize wheel from the diner: who wins the slice?",
-   "seconds": 3.16,
+   "text": "That's the pie-prize wheel from the diner! Who wins the slice?",
+   "caption": "The pie-prize wheel from the diner: who wins the slice?",
+   "seconds": 3.49,
    "caption_held": 3.6
   },
   {
    "at": 29.7,
-   "voice": "bf_emma",
+   "voice": "af_bella",
    "speaker": "trout",
-   "text": "Or a washing machine, and whose sock?",
-   "seconds": 2.04,
+   "text": "Or a washin' machine. And whose sock is that?",
+   "caption": "Or a washing machine, and whose sock?",
+   "seconds": 2.63,
    "caption_held": 3.9
   }
  ]

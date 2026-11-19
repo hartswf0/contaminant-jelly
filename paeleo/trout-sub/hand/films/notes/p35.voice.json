@@ -4,42 +4,47 @@
  "lines": [
   {
    "at": 0.9,
-   "voice": "bm_george",
+   "voice": "am_michael",
    "speaker": "narrator",
-   "text": "Prints from the Farm Security file: Rothstein, Vachon, Delano, Lee. 1940 and 1941.",
-   "seconds": 9.83,
+   "text": "Prints from the Farm Security file.",
+   "caption": "Prints from the Farm Security file: Rothstein, Vachon, Delano, Lee. 1940 and 1941.",
+   "seconds": 2.37,
    "caption_held": 3.3
   },
   {
    "at": 5.0,
-   "voice": "bm_george",
+   "voice": "am_michael",
    "speaker": "narrator",
-   "text": "Box 44: blue paper, cut along a pencil line, numbered with a brush.",
-   "seconds": 5.26,
+   "text": "Box forty-four. Blue paper, cut on a pencil line.",
+   "caption": "Box 44: blue paper, cut along a pencil line, numbered with a brush.",
+   "seconds": 3.74,
    "caption_held": 4.4
   },
   {
    "at": 10.5,
-   "voice": "bm_george",
+   "voice": "am_michael",
    "speaker": "narrator",
-   "text": "The river is one sheet of green gel. Lee's mail bag, cut from its print, goes in last.",
-   "seconds": 6.44,
+   "text": "The river is green gel. The mail bag goes in last.",
+   "caption": "The river is one sheet of green gel. Lee's mail bag, cut from its print, goes in last.",
+   "seconds": 3.81,
    "caption_held": 3.2
   },
   {
    "at": 15.6,
-   "voice": "bm_fable",
+   "voice": "am_santa",
    "speaker": "turkey",
-   "text": "Are those my lost mission orders? Or is that only a sack of laundry?",
-   "seconds": 4.75,
+   "text": "Are those my lost mission orders? Or is that just a sack of dirty laundry?",
+   "caption": "Are those my lost mission orders? Or is that only a sack of laundry?",
+   "seconds": 6.03,
    "caption_held": 7.9
   },
   {
    "at": 26.6,
-   "voice": "bf_emma",
+   "voice": "af_bella",
    "speaker": "trout",
-   "text": "A porch pirate with a vacuum? Or the mailman's truck, here at last?",
-   "seconds": 3.73,
+   "text": "Well, shoot! A porch pirate with a vacuum? Or the mailman's truck, here at long last?",
+   "caption": "A porch pirate with a vacuum? Or the mailman's truck, here at last?",
+   "seconds": 5.11,
    "caption_held": 6.9
   }
  ]

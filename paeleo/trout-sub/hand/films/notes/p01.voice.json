@@ -4,26 +4,29 @@
  "lines": [
   {
    "at": 1.2,
-   "voice": "bm_george",
+   "voice": "am_michael",
    "speaker": "narrator",
-   "text": "A rubber boot, cut out of an old Boston Rubber Shoe Co. poster.",
-   "seconds": 4.5,
+   "text": "Now, this here is a rubber boot, cut clean out of an old poster.",
+   "caption": "A rubber boot, cut out of an old Boston Rubber Shoe Co. poster.",
+   "seconds": 3.99,
    "caption_held": 3.4
   },
   {
    "at": 14.6,
-   "voice": "bm_fable",
+   "voice": "am_santa",
    "speaker": "turkey",
-   "text": "Shipwreck? Giant's foot? Or a tunnel?",
-   "seconds": 2.99,
+   "text": "Well, I'll be. Is that a shipwreck? A giant's foot? Or some kinda tunnel?",
+   "caption": "Turkey: Shipwreck? Giant's foot? Or a tunnel?",
+   "seconds": 5.67,
    "caption_held": 5.0
   },
   {
    "at": 23.2,
-   "voice": "bf_emma",
+   "voice": "af_bella",
    "speaker": "trout",
-   "text": "Is its sole a torch, or is a crab biting its toe?",
-   "seconds": 2.79,
+   "text": "Lord have mercy! Is that boot sole a flashlight? Or is a crab a-bitin' its toe?",
+   "caption": "Trout: Is its sole a torch, or is a crab biting its toe?",
+   "seconds": 5.25,
    "caption_held": 5.4
   }
  ]
