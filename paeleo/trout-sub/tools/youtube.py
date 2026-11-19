@@ -140,7 +140,8 @@ def ff(*a):
 
 def porthole(n):
     row, pid = seeds[n - 1], "p%02d" % n
-    cut = (units.get(pid) or {}).get("cut") or 6.0
+    u = units.get(pid) or {}
+    cut = u.get("cut") if u.get("lock_end") and u.get("cut") else UNIT - 0.9   # units that close on the master switch there
     out = "%s/seg_%02d.mp4" % (TMP, n)
     fc = ("[0:v]fps=24,scale=%d:%d:flags=lanczos,setsar=1,tpad=stop_mode=clone:stop_duration=%f[v0];"
           "[v0][1:v]overlay=enable='lt(t,%f)'[v1];[v1][2:v]overlay=enable='between(t,%f,%f)'[v2];"
