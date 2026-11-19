@@ -75,7 +75,8 @@ def match(gray, r, pad, box=None):
 # as fractions of frame width. Every film is generated from the same two masters, so
 # the port opens near (0.50, 0.26) r 0.145 and closes near (0.50, 0.285) r 0.20.
 SEARCH = {"start": ((0.12, 0.20), (0.40, 0.16, 0.60, 0.36)),
-          "end": ((0.15, 0.32), (0.30, 0.14, 0.70, 0.44))}
+          "end": ((0.15, 0.32), (0.30, 0.14, 0.70, 0.44)),
+          "any": ((0.12, 0.50), (0.15, 0.05, 0.85, 0.52))}
 
 
 def fit(img, key):
@@ -101,6 +102,26 @@ def fit(img, key):
         s_, x, y = match(roi, r, 0)
         if s_ > best[0]:
             best = (s_, x + x0 - pad, y + y0 - pad, float(r))
+    return best[1], best[2], best[3], best[0]
+
+
+def fit_near(img, prev):
+    """Follow the rim from where it was in the previous frame: (cx, cy, r, score) in 480-wide pixels."""
+    g = cv2.createCLAHE(2.0, (8, 8)).apply(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY))
+    pcx, pcy, pr = prev
+    pad = 160
+    gp = cv2.copyMakeBorder(g, pad, pad, pad, pad, cv2.BORDER_CONSTANT, value=int(g.mean()))
+    f = 1.0 if pr < 90 else 0.5                   # big rims are matched at half size for speed
+    if f != 1.0:
+        gp = cv2.resize(gp, None, fx=f, fy=f, interpolation=cv2.INTER_AREA)
+    m = pr * 1.35 + 24
+    x0, y0 = max(0, int((pcx + pad - m) * f)), max(0, int((pcy + pad - m) * f))
+    roi = gp[y0:int((pcy + pad + m) * f), x0:int((pcx + pad + m) * f)]
+    best = (-1.0, pcx, pcy, pr)
+    for q in (0.92, 0.96, 0.985, 1.0, 1.015, 1.04, 1.08):
+        s_, x, y = match(roi, pr * q * f, 0)
+        if s_ > best[0]:
+            best = (s_, (x + x0) / f - pad, (y + y0) / f - pad, pr * q)
     return best[1], best[2], best[3], best[0]
 
 

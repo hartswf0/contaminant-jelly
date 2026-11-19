@@ -1,181 +1,233 @@
 #!/usr/bin/env python3
 """units: one standard unit per porthole, so the deck plays as one seamless chain.
 
-    python3 tools/units.py            # build every missing unit
+    python3 tools/units.py            # build every unit
     python3 tools/units.py p07 p49    # rebuild these
 
-A unit is exactly 8.000 s, 960x540, 24 fps, with sound. Its first and last
-frames show the brass porthole at the same centre and size (found per film by
-tools/porttrack.py), so the outside shot that ends any unit registers rim on
-rim with the inside shot that opens any other: a unit loops on itself and joins
-any unit in any order. The first frame carries the deck drawing in the glass.
+A unit is exactly 8.000 s, 960x540, 24 fps, with sound, and has no camera
+move. The brass porthole is tracked on every frame of the film and held at one
+place and size (frame centre, outer rim radius CANON_R of frame width) from
+the first frame to the last:
 
-Source is films/<id>.mp4 (time-fitted to 8 s). Where no film exists, a
-keyframe unit is built in code from masters/cockpit.jpg, the deck still and
-masters/outside.jpg: lamp on, push in to the port, cut across the glass.
-No fal call is made here.
+- Turkey's side. The room is the film's own opening framing, held still. While
+  the film's camera stays there the frame is shown live (so the wing on the
+  control is kept). When the film pushes in on the glass, only the porthole is
+  taken from the film, resized to the lock and set into the held room. If the
+  film goes right through the rim, its picture fills the glass.
+- Trout's side. From the film's cut across the glass, the outside shot is held
+  at one framing with the port on the lock. If that shot has no port that can
+  be brought to the lock, the unit dissolves to masters/outside.jpg on the lock.
+- Frame one carries the deck drawing in the glass, dissolving into the film.
+
+So the shot that ends any unit registers rim on rim with the shot that opens
+any other, and a unit loops on itself. A porthole with no generated film gets a
+keyframe unit built from the two masters and its deck still. No fal call here.
 """
-import os, subprocess, sys, tempfile
-from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
+import json, os, subprocess, sys
+import cv2, numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(ROOT)
-RIVER = "0x10201f"
-PORT = (672, 335, 166)      # centre x, centre y, outer rim radius in masters/cockpit.jpg (1344x768)
-STILL_RIM = 300             # outer rim radius in a 640x640 deck still
-LEN, IRIS = 8.0, 0.4
+sys.path.insert(0, os.path.join(ROOT, "tools"))
+import porttrack as pt
 
-
-def run(*a):
-    subprocess.run(["ffmpeg", "-v", "error", "-y"] + list(a), check=True)
-
-
-def keyframe_source(pid, out):
-    """8 s film from stills only."""
-    cx, cy, r = PORT
-    room = Image.open("masters/cockpit.jpg").convert("RGB")
-    d = int(640 * r / STILL_RIM)
-    still = Image.open("stills/%s.jpg" % pid).convert("RGB").resize((d, d), Image.LANCZOS)
-    mask = Image.new("L", (d, d), 0)
-    ImageDraw.Draw(mask).ellipse((d // 2 - r + 5, d // 2 - r + 5, d // 2 + r - 5, d // 2 + r - 5), fill=255)
-    mask = mask.filter(ImageFilter.GaussianBlur(1.5))
-    tmp = tempfile.mkdtemp()
-    for name, bright in (("dim", 0.45), ("lit", 1.0)):
-        im = room.copy()
-        s = ImageEnhance.Brightness(still).enhance(bright)
-        if name == "dim":
-            s = s.filter(ImageFilter.GaussianBlur(3))
-        im.paste(s, (cx - d // 2, cy - d // 2), mask)
-        im.resize((2688, 1536), Image.LANCZOS).save("%s/%s.png" % (tmp, name))
-    zx, zy = cx / 1344.0, cy / 768.0
-    fc = (
-        "[0]scale=1344:768,setsar=1[a0];[1]scale=1344:768,setsar=1[a1];"
-        "[a0][a1]xfade=transition=fade:duration=0.6:offset=1.2,trim=0:2.5,setpts=PTS-STARTPTS[s1];"
-        "[2]zoompan=z='1+2.3*pow(on/72,1.6)':x='iw*%f-iw/zoom*%f':y='ih*%f-ih/zoom*%f':d=72:s=1344x768:fps=24,setsar=1[s2];"
-        "[3]scale=2688:-2,zoompan=z='1+0.08*on/60':x='iw/2-iw/zoom/2':y='ih/2-ih/zoom/2':d=60:s=1344x768:fps=24,setsar=1[s3];"
-        "[s1][s2][s3]concat=n=3:v=1:a=0,format=yuv420p[v]" % (zx, zx, zy, zy)
-    )
-    run("-loop", "1", "-framerate", "24", "-t", "2.5", "-i", tmp + "/dim.png",
-        "-loop", "1", "-framerate", "24", "-t", "2.5", "-i", tmp + "/lit.png",
-        "-i", tmp + "/lit.png", "-i", "masters/outside.jpg",
-        "-f", "lavfi", "-t", "8", "-i", "anullsrc=r=44100:cl=stereo",
-        "-filter_complex", fc, "-map", "[v]", "-map", "4:a", "-t", "8",
-        "-c:v", "libx264", "-crf", "18", "-c:a", "aac", out)
-
-
-CANON_R = 0.215        # outer rim radius every unit opens and closes on, as a fraction of frame width
+LEN, FPS = 8.0, 24
+OW, OH = 960, 540
+CANON_R = 0.215        # outer rim radius on the lock, as a fraction of frame width
 GLASS = 0.77           # glass radius / outer rim radius
-STILL_GLASS = 0.715    # glass radius / outer rim radius in the deck stills
-OPEN, CLOSE, HOLD = 1.3, 0.9, 0.25   # seconds: pull-back from the lock, push into the lock, held lock at the tail
-MIN_SCORE, MAX_DRIFT = 0.33, 0.05
-
-
-def good(p):
-    return bool(p) and p["score"] >= MIN_SCORE and p["drift"] <= MAX_DRIFT
-
-
-def reachable(p):
-    """Can a zoom of at least 1 put this port at frame centre at CANON_R without showing an edge?"""
-    if not good(p) or p["r"] > CANON_R:
-        return False
-    slack = 0.5 * (1 - p["r"] / CANON_R)
-    return abs(p["cx"] - 0.5) <= slack and abs(p["cy"] * 16 / 9 - 0.5) <= slack
-
-
-MASTER_IN = (670, 356, 195)     # port in masters/cockpit.jpg: centre x, centre y, outer rim radius (1344x768)
+STILL_RIM, STILL_GLASS = 300, 0.715   # deck stills: outer rim radius in a 640 px still; glass / rim
+MASTER_IN = (670, 356, 195)     # port in masters/cockpit.jpg (1344x768): centre x, centre y, outer rim radius
 MASTER_OUT = (675, 387, 268)    # port in masters/outside.jpg
+KF_CUT = 5.5           # keyframe units: seconds on Turkey's side
+MIN_SCORE, PUSH_SCORE = 0.33, 0.5
+N = int(LEN * FPS)
+C = (OW / 2.0, OH / 2.0, CANON_R * OW)     # the lock, in output pixels
 
 
-def still_disc(pid, diameter, out):
-    """The deck drawing's glass, cut to a soft-edged disc of the given pixel diameter."""
-    im = Image.open("stills/%s.jpg" % pid).convert("RGB")
-    r = int(STILL_RIM * STILL_GLASS)
-    im = im.crop((320 - r, 320 - r, 320 + r, 320 + r)).resize((diameter, diameter), Image.LANCZOS)
-    mask = Image.new("L", (diameter * 2, diameter * 2), 0)
-    ImageDraw.Draw(mask).ellipse((6, 6, diameter * 2 - 6, diameter * 2 - 6), fill=255)
-    im.putalpha(mask.resize((diameter, diameter), Image.LANCZOS).filter(ImageFilter.GaussianBlur(2)))
-    im.save(out)
+def frames(src, n, w=1280, h=720):
+    """n frames spread evenly over the whole film (this is the time fit to 8 s)."""
+    dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", src],
+                               capture_output=True, text=True, check=True).stdout)
+    raw = subprocess.run(["ffmpeg", "-v", "error", "-i", src, "-vf", "fps=%f,scale=%d:%d:flags=lanczos" % (n / dur, w, h),
+                          "-frames:v", str(n), "-f", "rawvideo", "-pix_fmt", "bgr24", "-"], capture_output=True).stdout
+    a = np.frombuffer(raw, np.uint8).reshape(-1, h, w, 3)
+    if len(a) < n:
+        a = np.concatenate([a, np.repeat(a[-1:], n - len(a), 0)])
+    return a, dur
+
+
+def place(img, port, size=(OW, OH)):
+    """Scale and shift a frame so the given port (cx, cy, r in img pixels) sits on the lock."""
+    s = C[2] / port[2]
+    M = np.float32([[s, 0, C[0] - s * port[0]], [0, s, C[1] - s * port[1]]])
+    return cv2.warpAffine(img, M, size, flags=cv2.INTER_AREA if s < 1 else cv2.INTER_CUBIC, borderMode=cv2.BORDER_REFLECT)
+
+
+def disc(radius, feather=3.0):
+    yy, xx = np.mgrid[:OH, :OW]
+    d = np.hypot(xx - C[0], yy - C[1])
+    return np.clip((radius - d) / feather + 0.5, 0, 1)[..., None].astype(np.float32)
+
+
+def covers(port, w, h):
+    """Does a frame placed on the lock by this port fill the output with no edge showing?"""
+    s = C[2] / port[2]
+    x0, y0 = C[0] - s * port[0], C[1] - s * port[1]
+    return x0 <= 0.5 and y0 <= 0.5 and x0 + s * w >= OW - 0.5 and y0 + s * h >= OH - 0.5
+
+
+def still_glass(pid):
+    """The deck drawing's glass, sized to the lock's glass, as a full output frame."""
+    im = cv2.imread("stills/%s.jpg" % pid)
+    r = STILL_RIM * STILL_GLASS
+    return place(im, (320, 320, r / GLASS * 1.0), (OW, OH)) if im is not None else None
+
+
+def cut_time(src, dur):
+    """The film's cut across the glass: its strongest scene change in the second half, in seconds."""
+    out = subprocess.run(["ffmpeg", "-v", "error", "-i", src, "-vf", "scale=320:-1,select='gte(scene,0)',metadata=print:file=-",
+                          "-an", "-f", "null", "-"], capture_output=True, text=True).stdout
+    best, t = (0.0, None), None
+    for line in out.splitlines():
+        if "pts_time:" in line:
+            t = float(line.split("pts_time:")[1].split()[0])
+        elif "scene_score=" in line and t is not None and 0.45 * dur < t < 0.97 * dur:
+            v = float(line.split("=")[1])
+            if v > best[0]:
+                best = (v, t)
+    return best[1] if best[0] >= 0.2 else None
+
+
+def follow(F, i0, i1, first):
+    """Track the rim over frames i0..i1-1. Returns per frame (cx, cy, r) in 1280-wide pixels, or
+    None once the film has gone in so close that the rim leaves the picture. Inside Turkey's
+    shot the port never gets smaller than it starts, so smaller or weak matches are refused,
+    and once the rim is lost it stays lost (no flicker between the two treatments)."""
+    k = F.shape[2] / float(pt.W)
+    out, prev, gone = [], first, False
+    for i in range(i0, i1):
+        hit = None
+        if not gone:
+            small = cv2.resize(F[i], (pt.W, pt.H), interpolation=cv2.INTER_AREA)
+            cx, cy, r, sc = pt.fit_near(small, prev)
+            if sc >= PUSH_SCORE and r >= 0.92 * first[2]:
+                hit = (cx, cy, r)
+        if hit:
+            prev = hit
+            out.append((hit[0] * k, hit[1] * k, hit[2] * k))
+        else:
+            gone = True
+            out.append(None)
+    return out
+
+
+def keyframe_film(pid):
+    """Frames for a porthole with no film: the cockpit master with the deck drawing in its port
+    (dim, then lit), a cut, and the outside master. Returns frames and the known ports."""
+    room = cv2.resize(cv2.imread("masters/cockpit.jpg"), (1280, 731))[5:725]
+    out_ = cv2.resize(cv2.imread("masters/outside.jpg"), (1280, 731))[5:725]
+    k = 1280 / 1344.0
+    pin = (MASTER_IN[0] * k, MASTER_IN[1] * k - 5, MASTER_IN[2] * k)
+    pout = (MASTER_OUT[0] * k, MASTER_OUT[1] * k - 5, MASTER_OUT[2] * k)
+    F = np.empty((N, 720, 1280, 3), np.uint8)
+    nc = int(KF_CUT * FPS)
+    F[:nc] = room
+    F[nc:] = out_
+    return F, pin, pout, nc
 
 
 def unit(pid):
-    """Time-fit to 8 s, then lock the porthole: the first and last frames show the brass
-    rim at the same centre and size (frame centre, CANON_R), so the outside shot that
-    ends one unit and the inside shot that opens the next register rim on rim. The
-    opening frame also carries the deck drawing in the glass, dissolving into the film."""
-    import json
     src = "films/%s.mp4" % pid
-    kind = "film"
-    if not os.path.exists(src):
-        os.makedirs(".raw", exist_ok=True)
-        src = ".raw/kf_%s.mp4" % pid
-        keyframe_source(pid, src)
-        kind = "keyframe"
-    ports = json.load(open("ports.json")) if os.path.exists("ports.json") else {}
-    if kind == "keyframe":      # built from the masters, so the port is where the masters have it
-        ports[pid] = {"duration": LEN, "start": dict(zip(("cx", "cy", "r"), [v / 1344.0 for v in MASTER_IN]), score=1, drift=0),
-                      "end": dict(zip(("cx", "cy", "r"), [v / 1344.0 for v in MASTER_OUT]), score=1, drift=0)}
-    elif pid not in ports:
-        import porttrack
-        ports[pid] = porttrack.track(pid, src)
-    json.dump(dict(sorted(ports.items())), open("ports.json", "w"), indent=1)
-    P = ports[pid]
-    dur = P["duration"]
-    k = LEN / dur
-    tempo = min(max(1 / k, 0.5), 2.0)
-    WW, HH = 1920, 1080                       # work size; zoompan is steadier on a large frame
-    st, en = P.get("start"), P.get("end")
-    lock_s, lock_e = good(st), reachable(en)
-    s0 = max(1.0, CANON_R / st["r"]) if lock_s else 1.0
-    s1 = max(1.0, CANON_R / en["r"]) if lock_e else 1.0
-    sx, sy = (st["cx"], st["cy"] * 16 / 9) if lock_s else (0.5, 0.5)     # as fractions of width, height
-    ex, ey = (en["cx"], en["cy"] * 16 / 9) if lock_e else (0.5, 0.5)
-    te = LEN - HOLD - CLOSE
-    n = "(in/24)"
-    ease = lambda u: "(0.5-0.5*cos(PI*clip(%s,0,1)))" % u
-    z = "(1+%f*(1-%s)+%f*%s)" % (s0 - 1, ease("%s/%f" % (n, OPEN)), s1 - 1, ease("(%s-%f)/%f" % (n, te, CLOSE)))
-    fx = "if(lt(%s,%f),%f,%f)" % (n, LEN / 2, sx, ex)
-    fy = "if(lt(%s,%f),%f,%f)" % (n, LEN / 2, sy, ey)
-    zp = "zoompan=z='%s':x='clip(iw*%s-iw/zoom/2,0,iw-iw/zoom)':y='clip(ih*%s-ih/zoom/2,0,ih-ih/zoom)':d=1:s=960x540:fps=24" % (z, fx, fy)
-    inputs = ["-i", src]
-    pre = "[0:v]setpts=%f*PTS,fps=24,scale=%d:%d:flags=lanczos,setsar=1,trim=0:%f,tpad=stop_mode=clone:stop_duration=1,trim=0:%f,setpts=PTS-STARTPTS[b];" % (k, WW, HH, LEN, LEN)
-    if lock_s and kind == "film":
-        d = int(round(2 * st["r"] * GLASS * WW)) // 2 * 2
-        disc = os.path.join(tempfile.mkdtemp(), "disc.png")
-        still_disc(pid, d, disc)
-        inputs += ["-loop", "1", "-framerate", "24", "-t", "1.4", "-i", disc]
-        pre += ("[1:v]format=rgba,fade=t=out:st=0.45:d=0.8:alpha=1[d];"
-                "[b][d]overlay=x=%d:y=%d:eof_action=pass[b2];" % (round(st["cx"] * WW - d / 2), round(st["cy"] * WW - d / 2)))
+    kind = "film" if os.path.exists(src) else "keyframe"
+    glass_r = C[2] * GLASS
+    card = still_glass(pid)
+    m_glass, m_rim = disc(glass_r - 2), disc(C[2] * 1.02)
+    out = np.empty((N, OH, OW, 3), np.uint8)
+    info = {"kind": kind}
+    if kind == "keyframe":
+        F, pin, pout, nc = keyframe_film(pid)
+        room, outside = place(F[0], pin), place(F[-1], pout)
+        for i in range(N):
+            if i < nc:
+                lit = np.clip((i / FPS - 1.2) / 0.6, 0, 1)
+                c = cv2.GaussianBlur(card, (0, 0), 3 * (1 - lit) + 0.01) * (0.45 + 0.55 * lit)
+                out[i] = room * (1 - m_glass) + c * m_glass
+            else:
+                out[i] = outside
+        info.update(lock_start=True, lock_end=True, cut=KF_CUT, pushed_in=0, lost=0)
+        audio = None
     else:
-        pre += "[b]null[b2];"
-    if lock_e:
-        tail = "[b2]%s,setsar=1,format=yuv420p[vo];" % zp
-    else:
-        # The film's last shot has no port that can be brought to the lock (hidden, off centre
-        # or too large), so the unit returns to the outside master, already at the lock.
-        cx, cy, r = MASTER_OUT
-        cw = 1344 * (r / 1344.0) / CANON_R
-        inputs += ["-loop", "1", "-framerate", "24", "-t", "0.9", "-i", "masters/outside.jpg"]
-        tail = ("[b2]%s,setsar=1[zv];[%d:v]crop=%d:%d:%d:%d,scale=960:540:flags=lanczos,setsar=1,fps=24[m];"
-                "[zv][m]xfade=transition=fade:duration=0.6:offset=%f,format=yuv420p[vo];"
-                % (zp, len(inputs) // 2 - (2 if "-loop" in inputs[:4] else 0) if False else (2 if lock_s and kind == "film" else 1),
-                   int(cw), int(cw * 9 / 16), int(cx - cw / 2), int(cy - cw * 9 / 32), LEN - 0.9))
-    fc = (pre + tail +
-          "[0:a]atempo=%f,apad,atrim=0:%f,afade=t=in:d=0.15,afade=t=out:st=%f:d=0.15[ao]" % (tempo, LEN, LEN - 0.15))
+        F, dur = frames(src, N)
+        ports = json.load(open("ports.json")) if os.path.exists("ports.json") else {}
+        if pid not in ports:
+            ports[pid] = pt.track(pid)
+            json.dump(dict(sorted(ports.items())), open("ports.json", "w"), indent=1)
+        P = ports[pid]
+        W = F.shape[2]
+        st = (P["start"]["cx"] * W, P["start"]["cy"] * W, P["start"]["r"] * W)
+        en = P.get("end")
+        tc = cut_time(src, dur)
+        nc = int(round(tc / dur * N)) if tc else None
+        end_port = (en["cx"] * W, en["cy"] * W, en["r"] * W) if en and en["score"] >= MIN_SCORE else None
+        lock_end = bool(end_port) and nc is not None and covers(end_port, W, F.shape[1])
+        n_in = nc if nc is not None else N - int(0.9 * FPS)
+        tr = follow(F, 0, n_in, (st[0] * pt.W / W, st[1] * pt.W / W, st[2] * pt.W / W))
+        room = place(F[0], st)
+        pushed = lost = 0
+        for i in range(n_in):
+            p = tr[i]
+            if p is not None and abs(p[2] / st[2] - 1) < 0.03 and np.hypot(p[0] - st[0], p[1] - st[1]) < 0.02 * W and covers(p, W, F.shape[1]):
+                frame = place(F[i], p)                    # film camera is at home: show it live, on the lock
+                room = frame
+            elif p is not None:
+                pushed += 1                               # film pushed in: keep the room, take only the port
+                live = place(F[i], p)
+                frame = room * (1 - m_rim) + live * m_rim
+            else:
+                lost += 1                                 # film is inside the rim: its picture fills the glass
+                s = glass_r / (0.5 * F.shape[1]) * 1.02    # the largest circle in the picture fills the glass
+                M = np.float32([[s, 0, C[0] - s * W / 2], [0, s, C[1] - s * F.shape[1] / 2]])
+                live = cv2.warpAffine(F[i], M, (OW, OH), flags=cv2.INTER_AREA)
+                frame = room * (1 - m_glass) + live * m_glass
+            out[i] = np.clip(frame, 0, 255)
+        if lock_end:
+            for i in range(n_in, N):
+                out[i] = place(F[i], end_port)
+        else:
+            k = 1280 / 1344.0
+            tail = place(cv2.resize(cv2.imread("masters/outside.jpg"), (1280, 731)), (MASTER_OUT[0] * k, MASTER_OUT[1] * k, MASTER_OUT[2] * k))
+            last = out[n_in - 1].astype(np.float32)
+            for i in range(n_in, N):
+                a = min(1.0, (i - n_in + 1) / (0.5 * FPS))
+                src_f = place(F[i], st) if nc is None else last
+                out[i] = src_f * (1 - a) + tail * a
+        if card is not None:                              # frame one carries the deck drawing
+            for i in range(int(1.25 * FPS)):
+                a = float(np.clip(1 - (i / FPS - 0.45) / 0.8, 0, 1))
+                out[i] = out[i] * (1 - m_glass * a) + card * (m_glass * a)
+        info.update(lock_start=True, lock_end=lock_end, cut=round(nc / FPS, 3) if nc else None, pushed_in=pushed, lost=lost)
+        audio = (src, dur)
     os.makedirs("units", exist_ok=True)
-    run(*inputs, "-filter_complex", fc, "-map", "[vo]", "-map", "[ao]", "-t", str(LEN),
-        "-c:v", "libx264", "-preset", "slow", "-crf", "26", "-g", "24", "-c:a", "aac", "-b:a", "80k",
-        "-movflags", "+faststart", "units/%s.mp4" % pid)
-    print(pid, kind, "lock start %s x%.2f, end %s x%.2f" % (lock_s, s0, lock_e, s1))
-    return {"kind": kind, "lock_start": lock_s, "lock_end": lock_e}
+    cmd = ["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "bgr24", "-s", "%dx%d" % (OW, OH), "-r", str(FPS), "-i", "-"]
+    if audio:
+        tempo = min(max(audio[1] / LEN, 0.5), 2.0)
+        cmd += ["-i", audio[0], "-filter_complex",
+                "[1:a]atempo=%f,apad,atrim=0:%f,afade=t=in:d=0.15,afade=t=out:st=%f:d=0.15[a]" % (tempo, LEN, LEN - 0.15),
+                "-map", "0:v", "-map", "[a]"]
+    else:
+        cmd += ["-f", "lavfi", "-t", str(LEN), "-i", "anullsrc=r=44100:cl=stereo", "-map", "0:v", "-map", "1:a"]
+    cmd += ["-t", str(LEN), "-c:v", "libx264", "-preset", "slow", "-crf", "25", "-pix_fmt", "yuv420p", "-g", "24",
+            "-c:a", "aac", "-b:a", "80k", "-movflags", "+faststart", "units/%s.mp4" % pid]
+    subprocess.run(cmd, input=out.tobytes(), check=True)
+    print(pid, json.dumps(info), flush=True)
+    return info
 
 
 if __name__ == "__main__":
-    import json
-    sys.path.insert(0, os.path.join(ROOT, "tools"))
     ids = sys.argv[1:] or ["p%02d" % n for n in range(1, 56)]
     state = json.load(open("units.json")) if os.path.exists("units.json") else {}
     for i in ids:
         state[i] = unit(i)
-    json.dump(dict(sorted(state.items())), open("units.json", "w"), indent=1)
-    print("%d units; keyframe: %s; end not locked: %s" % (len(ids), [i for i in ids if state[i]["kind"] == "keyframe"],
-                                                           [i for i in ids if not state[i]["lock_end"]]))
+        json.dump(dict(sorted(state.items())), open("units.json", "w"), indent=1)
+    print("%d units; keyframe: %s; closed on the master: %s" % (
+        len(ids), [i for i in ids if state[i]["kind"] == "keyframe"], [i for i in ids if not state[i]["lock_end"]]))

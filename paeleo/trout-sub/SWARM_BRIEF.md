@@ -42,3 +42,11 @@ It takes about a minute, writes `films/pNN.mp4`, and prints the path of a contac
 - **When the last shot has no usable port** (hidden, off centre, too large) the unit dissolves back to the outside master at the lock. `units.json` records which.
 - A porthole with no generated film gets a keyframe unit built in code from the cockpit master, its deck still and the outside master.
 `python3 tools/intro.py` cuts the four-step intro from footage already made. None of these tools calls fal.
+
+## Version 2: feedstock swarms and the two-shot grammar (prompts2/)
+The 19 source films in the atlas are the feedstock. Each gets a SCION card in `feedstock/<slug>.md`, written from its atlas frames, that turns the film into a reusable animation style: what the frames show (medium, line, palette, light, staging, how things move), and a LAW paragraph that carries that style into a prompt in our own words, naming no film, show, band, artist, studio or character. The style is applied to what is seen THROUGH THE GLASS. The room, the brass rim and the tin stay in the house watercolour of the masters, so the lock holds.
+
+A version 2 prompt (`prompts2/pNN.txt`) is two locked-off shots, 8 seconds, with no camera move of any kind (no push-in, no pan, no zoom, no drift):
+1. **Turkey's seat, 0-5.5 s.** Exactly the cockpit master framing for the whole shot. The thing from the deck still is already in the port on the first frame. Around 1 s a wing tip (never a body or tail fan) uses one control, lamp toggle or ballast. The thing in the glass then does one clear action that keeps both of Turkey's readings open, drawn in the feedstock LAW.
+2. **Trout's side, 5.5-8 s.** Hard cut to exactly the outside master framing, held still: the tin, the port in the same place, Turkey small behind the glass, and the thing in the foreground beside the trout, staged so both of Trout's readings are open.
+Start with the house style line, state "locked-off camera, the camera never moves" in both shots, apply the row's Ouxpo/SCION rule, and end with the no-text line (or the exact lettering allowed). 900-1700 characters. First line of the file is a comment: `# feedstock: <slug> | control: lamp|ballast | atlas: aNN[,aNN]`. These prompts are written now and run later; nobody calls fal while writing them.
