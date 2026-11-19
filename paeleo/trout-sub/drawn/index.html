@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tourkey Drawn Portholes</title>
+<style>
+:root{--bg:#10201f;--ink:#e9e4d4;--dim:#9fb0a8;--amber:#f0b25a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 Georgia,serif}
+main{max-width:1100px;margin:0 auto;padding:22px 16px 60px}h1{margin:0 0 4px;font-size:clamp(26px,4vw,38px)}
+p{color:var(--dim);margin:0 0 14px;max-width:64ch}
+.stage{display:grid;grid-template-columns:minmax(0,560px) minmax(0,1fr);gap:22px;align-items:start}
+canvas{width:100%;height:auto;aspect-ratio:1;display:block;border-radius:50%;background:#000}
+.info h2{margin:0 0 4px;font-size:24px}.mono{font:12px ui-monospace,Menlo,monospace;letter-spacing:.04em;text-transform:uppercase;color:var(--dim)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}button{font:13px ui-monospace,Menlo,monospace;background:none;color:var(--ink);border:1px solid #2c4947;border-radius:99px;padding:6px 12px;cursor:pointer}
+button[aria-pressed=true]{background:var(--amber);color:#1b1608;border-color:var(--amber)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:6px;margin-top:22px}
+.grid button{border-radius:8px;padding:8px 0;text-align:center}.grid button.none{opacity:.3}
+ul{margin:8px 0 0;padding-left:18px;color:var(--dim)}
+@media(max-width:760px){.stage{grid-template-columns:1fr}}
+</style></head><body><main>
+<div class="mono">Tourkey Trouttown · drawn portholes</div>
+<h1>Watch each porthole being drawn</h1>
+<p>Each of these is made by hand in code. For eight seconds a tool draws it in front of you, in the manner of one of the films it descends from. Then it moves.</p>
+<div class="stage"><canvas id="c" width="1000" height="1000"></canvas>
+<div class="info"><div class="mono" id="st"></div><h2 id="ti"></h2><p id="sy"></p><ul id="sc"></ul>
+<div class="bar"><button id="prev">← Prev</button><button id="play" aria-pressed="true">Playing</button><button id="next">Next →</button><button id="again">Draw again</button></div></div></div>
+<div class="grid" id="grid"></div>
+</main>
+<script src="kit.js"></script>
+<script>for (var i = 1; i <= 55; i++) document.write('<script src="p' + (i < 10 ? "0" + i : i) + '.js"><\/script>');</script>
+<script>
+(function () {
+  var c = document.getElementById("c"), ctx = c.getContext("2d"), cur = 1, t0 = performance.now(), playing = true, held = 0;
+  function pad(n) { return n < 10 ? "0" + n : "" + n; }
+  function frame(id, t) {
+    var s = DRAWN.scenes[id]; ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, 1000, 1000);
+    ctx.save(); ctx.beginPath(); ctx.arc(500, 500, 430, 0, K.TAU); ctx.clip();
+    if (s) { try { s.draw(ctx, t, K); K.tool(ctx); } catch (e) { ctx.fillStyle = "#400"; ctx.fillRect(0, 0, 1000, 1000); window.__err = String(e && e.stack || e); } }
+    else { ctx.fillStyle = "#16262b"; ctx.fillRect(0, 0, 1000, 1000); }
+    ctx.restore();
+    ctx.lineWidth = 58; ctx.strokeStyle = "#b08d3e"; ctx.beginPath(); ctx.arc(500, 500, 459, 0, K.TAU); ctx.stroke();
+    ctx.lineWidth = 4; ctx.strokeStyle = "#3b2a10"; ctx.beginPath(); ctx.arc(500, 500, 430, 0, K.TAU); ctx.stroke(); ctx.beginPath(); ctx.arc(500, 500, 488, 0, K.TAU); ctx.stroke();
+    for (var k = 0; k < 6; k++) { var a = -Math.PI / 2 + k * Math.PI / 3; ctx.fillStyle = "#e7d39a"; ctx.beginPath(); ctx.arc(500 + 459 * Math.cos(a), 500 + 459 * Math.sin(a), 13, 0, K.TAU); ctx.fill(); ctx.stroke(); }
+  }
+  window.__shot = function (id, t) { window.__frozen = true; window.__err = null; frame(id, t); return window.__err; };
+  window.__ids = function () { return Object.keys(DRAWN.scenes).map(Number); };
+  function show(id) {
+    cur = ((id - 1 + 55) % 55) + 1; t0 = performance.now(); var s = DRAWN.scenes[cur];
+    document.getElementById("st").textContent = "Porthole " + pad(cur);
+    document.getElementById("ti").textContent = s ? s.title : "Not drawn yet";
+    document.getElementById("sy").textContent = s ? (s.style || "") : "";
+    var ul = document.getElementById("sc"); ul.textContent = ""; (s && s.scions || []).forEach(function (x) { var li = document.createElement("li"); li.textContent = x; ul.appendChild(li); });
+    [].forEach.call(document.getElementById("grid").children, function (b, i) { b.setAttribute("aria-pressed", i + 1 === cur); });
+  }
+  var g = document.getElementById("grid");
+  for (var i = 1; i <= 55; i++) (function (i) { var b = document.createElement("button"); b.textContent = pad(i); if (!DRAWN.scenes[i]) b.className = "none"; b.onclick = function () { show(i); }; g.appendChild(b); })(i);
+  document.getElementById("prev").onclick = function () { show(cur - 1); };
+  document.getElementById("next").onclick = function () { show(cur + 1); };
+  document.getElementById("again").onclick = function () { t0 = performance.now(); };
+  document.getElementById("play").onclick = function () { playing = !playing; this.setAttribute("aria-pressed", playing); this.textContent = playing ? "Playing" : "Paused"; if (playing) t0 = performance.now() - held * 1000; };
+  (function loop() { if (window.__frozen) return requestAnimationFrame(loop); if (playing) held = ((performance.now() - t0) / 1000) % 12; frame(cur, held); requestAnimationFrame(loop); })();
+  var first = (location.hash.match(/\d+/) || [0])[0] | 0; show(first || (window.__ids()[0] || 1));
+})();
+</script></body></html>
