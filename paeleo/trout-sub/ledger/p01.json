@@ -1,0 +1,9 @@
+{
+ "id": "p01", "station": "#01 · Bow", "clue": "Giant Size 11 Rubber Boot blocking beam",
+ "rule": "Silhouette (SCION 02): backlit shadow", "control": "lamp",
+ "atlas": [{"id": "a01", "why": "two faces held inside a round window: the turkey's reflection on the glass"}],
+ "prompt_file": "prompts/p01.txt",
+ "takes": [{"take": 1, "by": "pilot", "verdict": "pass", "seen": "0-3 s cockpit matches the master and the boot is a dark shape in the port; 3-7 s the beam comes on, push-in, boot backlit with the trout and the turkey's reflection; 8-10 s outside view with two trout and Turkey behind the port", "changed": null}],
+ "final_take": 1, "verdict": "pass",
+ "open": ["Turkey's tail fan covers the lamp toggle, so the hand on the control is not visible", "the boot is missing from the outside view"]
+}

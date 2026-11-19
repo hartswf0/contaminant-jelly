@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trout Sub · 55 Porthole Films</title>
+<style>
+:root{--bg:#10201f;--panel:#172b2a;--line:#2c4947;--ink:#e9e4d4;--dim:#9fb0a8;--amber:#f0b25a;--rust:#d9775a;--teal:#6fc3b8;--brass:#b08d3e}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Georgia,"Times New Roman",serif}
+main{max-width:1180px;margin:0 auto;padding:28px 16px 80px}
+h1{font-size:clamp(28px,5vw,44px);line-height:1.1;margin:0 0 8px}
+h2{font-size:22px;margin:44px 0 6px}
+p.lede{color:var(--dim);max-width:62ch;margin:0 0 20px}
+.mono{font:12px/1.4 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.04em;text-transform:uppercase;color:var(--dim)}
+video{display:block;width:100%;aspect-ratio:16/9;background:#000;border-radius:6px}
+.intro{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:20px;align-items:start}
+.steps{margin:0;padding-left:20px}.steps li{margin:0 0 8px}
+.shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-top:14px}
+.shot{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:8px;cursor:pointer;color:inherit;text-align:left;font:inherit}
+.shot b{display:block;font-size:14px}.shot span{font-size:13px;color:var(--dim)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 16px}
+.bar button{font:13px ui-monospace,Menlo,monospace;background:none;color:var(--ink);border:1px solid var(--line);border-radius:99px;padding:6px 12px;cursor:pointer}
+.bar button[aria-pressed=true]{background:var(--amber);color:#1b1608;border-color:var(--amber)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden;display:flex;flex-direction:column}
+.card .body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.card h3{margin:0;font-size:17px;line-height:1.25}
+.q{margin:0;font-size:15px}.q.t{color:var(--amber)}.q.r{color:var(--teal)}
+.q small{display:block;font:11px ui-monospace,Menlo,monospace;letter-spacing:.05em;text-transform:uppercase;color:var(--dim)}
+.tag{font:11px ui-monospace,Menlo,monospace;border:1px solid var(--line);border-radius:4px;padding:1px 6px;color:var(--dim)}
+.tag.pass{color:var(--teal);border-color:var(--teal)}.tag.ref{color:var(--rust);border-color:var(--rust)}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.poster{position:relative;aspect-ratio:16/9;background:#0a1414 center/contain no-repeat;cursor:pointer;border:0;width:100%;padding:0}
+.poster::after{content:"▶ Play";position:absolute;left:10px;bottom:10px;font:13px ui-monospace,Menlo,monospace;background:var(--amber);color:#1b1608;border-radius:99px;padding:4px 12px}
+.poster.none{cursor:default}.poster.none::after{content:"no film yet";background:var(--line);color:var(--dim)}
+details{font-size:14px}summary{cursor:pointer;color:var(--dim);font:12px ui-monospace,Menlo,monospace}
+pre{white-space:pre-wrap;font:12px/1.45 ui-monospace,Menlo,monospace;color:var(--dim);margin:8px 0 0;max-height:260px;overflow:auto}
+ul.open{margin:6px 0 0;padding-left:18px;color:var(--dim)}
+a{color:var(--amber)}
+@media(max-width:760px){.intro{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+<div class="mono">Trout Sub · Double Duck/Rabbit Deck · PAE-09</div>
+<h1>55 portholes, one film each</h1>
+<p class="lede">Every film holds one room: Turkey flips the lamp or fits ballast, the thing arrives at the glass, and the cut crosses to the trout looking in. Each was written by a director, generated once, and checked by a second reader who had not seen the prompt.</p>
+
+<h2>Start here: the activity in six shots</h2>
+<div class="intro">
+  <div><video id="introV" controls playsinline preload="metadata"></video>
+    <div class="shots" id="shots"></div></div>
+  <ol class="steps">
+    <li><b>Take Turkey’s seat.</b> Oval bread-roll tin, chipped porthole, ballast slot left, chalk chart center, lamp toggle right.</li>
+    <li><b>Operate one part and watch the port.</b> Play any porthole film: the lamp or the ballast changes what is outside the glass.</li>
+    <li><b>Read both sides of the cut.</b> Turkey writes odd faces (1·3·5, looking out). Trout writes even faces (2·4·6, looking in). Probable, Plausible, Preposterous.</li>
+    <li><b>Roll 1d6 and pass the record.</b> Circle the outcome, mark the chart under glass, hand the clue to the next pilot.</li>
+  </ol>
+</div>
+
+<h2>The portholes</h2>
+<div class="bar" id="bar"></div>
+<div class="grid" id="grid"></div>
+</main>
+<script src="./data.js"></script>
+<script>
+var D = window.TROUT_SUB, $ = function (s) { return document.querySelector(s); };
+function el(t, c, txt) { var e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; }
+var iv = $("#introV");
+if (D.introFilm) iv.src = "films/intro.mp4";
+D.intro.forEach(function (s, i) {
+  var b = el("button", "shot"); b.type = "button";
+  b.appendChild(el("b", null, (i + 1) + ". " + s.title)); b.appendChild(el("span", null, s.claim));
+  b.onclick = function () { if (!s.film) return; iv.src = "films/" + s.id + ".mp4"; iv.play(); };
+  $("#shots").appendChild(b);
+  if (!D.introFilm && i === 0 && s.film) iv.src = "films/" + s.id + ".mp4";
+});
+var filt = "all", current = null;
+var FILTERS = [["all", "All 55"], ["core", "#01–#30"], ["exp", "#31–#55"], ["pass", "Pass"], ["open", "Has open notes"]];
+FILTERS.forEach(function (f) {
+  var b = el("button", null, f[1]); b.type = "button"; b.setAttribute("aria-pressed", f[0] === filt);
+  b.onclick = function () { filt = f[0]; [].forEach.call($("#bar").children, function (x) { x.setAttribute("aria-pressed", x === b); }); render(); };
+  $("#bar").appendChild(b);
+});
+function show(p, i) {
+  return filt === "all" || (filt === "core" && i < 30) || (filt === "exp" && i >= 30) || (filt === "pass" && p.verdict === "pass") || (filt === "open" && p.open.length);
+}
+function render() {
+  var g = $("#grid"); g.textContent = ""; current = null;
+  D.ports.forEach(function (p, i) {
+    if (!show(p, i)) return;
+    var c = el("article", "card");
+    var poster = el("button", "poster" + (p.film ? "" : " none")); poster.type = "button";
+    poster.style.backgroundImage = "url(stills/" + p.id + ".jpg)"; poster.setAttribute("aria-label", "Play film " + p.station);
+    poster.onclick = function () {
+      if (!p.film) return;
+      if (current) current.pause();
+      var v = el("video"); v.controls = true; v.playsInline = true; v.loop = true; v.src = "films/" + p.id + ".mp4";
+      c.replaceChild(v, poster); v.play(); current = v;
+    };
+    c.appendChild(poster);
+    var b = el("div", "body");
+    b.appendChild(el("div", "mono", p.station + " · " + p.lineage));
+    b.appendChild(el("h3", null, p.clue));
+    var t = el("p", "q t"); t.appendChild(el("small", null, "Turkey looking out")); t.appendChild(document.createTextNode(p.turkey)); b.appendChild(t);
+    var r = el("p", "q r"); r.appendChild(el("small", null, "Trout looking in")); r.appendChild(document.createTextNode(p.trout)); b.appendChild(r);
+    var row = el("div", "row");
+    if (p.verdict) row.appendChild(el("span", "tag " + (p.verdict === "pass" ? "pass" : "ref"), p.verdict));
+    if (p.control) row.appendChild(el("span", "tag", p.control));
+    if (p.takes) row.appendChild(el("span", "tag", p.takes + (p.takes === 1 ? " take" : " takes")));
+    row.appendChild(el("span", "tag", p.rule));
+    b.appendChild(row);
+    if (p.prompt) {
+      var d = el("details"); d.appendChild(el("summary", null, "Shot prompt, references, open notes"));
+      p.atlas.forEach(function (a) { d.appendChild(el("div", "mono", a.id + " · " + a.why)); });
+      if (p.open.length) { var ul = el("ul", "open"); p.open.forEach(function (o) { ul.appendChild(el("li", null, o)); }); d.appendChild(ul); }
+      d.appendChild(el("pre", null, p.prompt));
+      if (p.film) { var a = el("a", null, "MP4"); a.href = "films/" + p.id + ".mp4"; d.appendChild(a); }
+      b.appendChild(d);
+    }
+    c.appendChild(b); g.appendChild(c);
+  });
+}
+render();
+</script>
+</body>
+</html>

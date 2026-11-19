@@ -1,0 +1,75 @@
+[
+ {
+  "endpoint": "minimax/h3-max/reference-to-video",
+  "name": "p01",
+  "take": 1,
+  "seconds": 21.8,
+  "arguments": {
+   "duration": 10,
+   "resolution": "768P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 738703410,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p01.jpg",
+   "atlas/a01.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. Three beats, one continuous film.\n\nBeat 1 (0-3s), Turkey's seat: the fixed eye-level view inside the bread-roll-tin submarine exactly as in the cockpit reference: centered brass six-bolt porthole with a chip at two o'clock, empty ballast slot at lower left, chalk route chart under glass at lower center, brass lamp toggle at lower right, amber lamp overhead, dent in the right wall. Outside the glass is only murky blue-green silt and one huge dark shape. A feathered turkey wing reaches in from the lower right foreground and flips the brass lamp toggle.\n\nBeat 2 (3-7s): an amber beam switches on below the porthole and the camera pushes slowly in to the glass. The silt clears to the scene of the porthole reference: a giant size-eleven dark rubber boot standing on the riverbed, blocking the beam, backlit into a silhouette. It shifts its weight and a puff of silt rolls off the sole. A faint reflection of the turkey's face on the glass tilts, puzzled.\n\nBeat 3 (7-10s), hard cut across the glass to the outside view of the reference: the riveted metal tin on the riverbed, the turkey small behind the amber porthole, and in the foreground a speckled brook trout beside the towering boot, turning to stare in at the turkey; the amber beam lights the boot sole like a flashlight.\n\nBubbles rise throughout. No text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab3104f/Vw0cBB-_Xfz2LoW6zxRi0_minimax-h3.mp4",
+  "files": [
+   "films/p01.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max/reference-to-video",
+  "name": "p02",
+  "take": 1,
+  "seconds": 21.7,
+  "arguments": {
+   "duration": 10,
+   "resolution": "768P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 292054090,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p02.jpg",
+   "atlas/a41.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. Three beats, one continuous film.\n\nBeat 1 (0-3s), Turkey's seat: the fixed eye-level view inside the bread-roll-tin submarine exactly as in the cockpit reference: centered brass six-bolt porthole with a chip at two o'clock, empty ballast slot at lower left, chalk route chart under glass at lower center, brass lamp toggle at lower right, amber lamp overhead, dent in the right wall. Outside the glass is blue-green river and a warm orange glow low down. Only the tip of one feathered turkey wing enters at the lower left edge and drops a small iron ballast weight into the slot with a clunk; no turkey body or tail in frame. The tin sinks a little.\n\nBeat 2 (3-7s): the camera pushes slowly in to the glass as the scene of the porthole reference rises into view: a wooden diner serving window glowing amber among river weeds, a speckled trout cook in a white chef hat holding one long silver baster in both fins, two small trout customers at the counter behind. The cook squirts the baster once over a dish on the sill, then swings the very same silver tool to point straight at the porthole and squeezes: a fan of bright bubbles sprays onto the glass. A faint reflection of the turkey's face at lower right flinches, then leans closer. Light as in the last reference: one amber shade lamp pooling over a counter, green water and hanging weed behind; no papers.\n\nBeat 3 (7-10s), hard cut across the glass to the outside view of the reference: the riveted metal tin on the riverbed, lit amber like a covered roasting dish and like a landed saucer, the turkey small behind the porthole turning a little valve with one wing tip. In the foreground the trout cook dribbles the silver baster along the tin's lid, then taps a rivet with it like a plumber, head cocked.\n\nBubbles rise throughout. No text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab3105a/DHxgPtYH_Ob2aeCOnf5Qh_minimax-h3.mp4",
+  "files": [
+   "films/p02.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max/reference-to-video",
+  "name": "p03",
+  "take": 1,
+  "seconds": 24.4,
+  "arguments": {
+   "duration": 10,
+   "resolution": "768P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 205773660,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p03.jpg",
+   "atlas/a46.jpg",
+   "atlas/a38.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. Three beats, one continuous film.\n\nBeat 1 (0-3s), Turkey's seat: the fixed eye-level view inside the riveted steel bread-roll-tin submarine exactly as in the cockpit reference: centered brass six-bolt porthole with a chip at two o'clock, empty ballast slot lower left, chalk route chart under glass lower center, brass lamp toggle lower right, amber lamp overhead, dent in the right wall. Outside the glass, dim blue-green water and a dark rectangle. Only the tip of a feathered turkey wing enters at the lower right edge and flips the brass lamp toggle.\n\nBeat 2 (3-7s): an amber beam comes on and the camera pushes slowly in to the glass. The rectangle is the porthole reference: a wood-framed green chalkboard standing on the riverbed among weeds, chalked HOOK MONSTER beside a chalk sketch of a beaked, feathered bird hanging on a fish hook. Above the words one more chalk line is already a pale washed smear; a ribbon of current slides over the board and carries off chalk dust in a milky trail, so the heading can never be read. The chalk glows pale against the dark board, as the chalk-like marks do in the last reference. A faint reflection of the turkey's face on the glass looks from the sketch to itself.\n\nBeat 3 (7-10s), hard cut across the glass to the outside reference: the tin on the riverbed, the turkey small behind the amber porthole. In the foreground, low in frame as the pupils are in the fourth reference, two young trout with satchels by the chalkboard: one swims up and holds out a worm to the glass, the other ducks behind the board frame, pointing a fin from the sketch to the turkey.\n\nBubbles rise throughout. The only lettering is HOOK MONSTER on the chalkboard; no other text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab3105b/bzPfL0SLKqbYqs9jOwRSl_minimax-h3.mp4",
+  "files": [
+   "films/p03.mp4"
+  ]
+ }
+]
