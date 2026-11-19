@@ -1,0 +1,23 @@
+{
+ "id": "p39", "station": "#39 · Parlor", "clue": "Wallpapered sunken living room with lamp",
+ "rule": "Drowned Domesticity (SCION 20)", "control": "lamp",
+ "atlas": [{"id": "a20", "why": "one pool of light picking out part of a drowned room while the rest stays dark, for the moment the parlor lamp answers the toggle; nothing in it asked to appear"}],
+ "prompt_file": "prompts/p39.txt",
+ "takes": [{"take": 1, "by": "director", "verdict": "reference stronger", "seen": "0-0.4 s cockpit matches the master (chipped six-bolt port, empty slot lower left, chalk chart, brass toggle lower right, dent right, amber lamp) with plain blue-green water in the port; 0.5-3.1 s a turkey head and tail fan rise in the lower right corner beside the toggle and a round amber glow blooms on the wall right of the port (1.2-2 s); from about 2 s a tall dark tapered shape stands in the water outside; about 3.2 s the view jumps closer and the glass goes dark, showing a dim photographic room with a streak of pale light until about 4.2 s, Turkey's faint reflection lower left; 4.25-4.75 s a fringed floor lamp glows on and the still's parlor fades up: green tufted wingback armchair, floral wallpaper, patterned rug on floorboards; 4.75-7.3 s slow push-in on the lit parlor while a speckled trout swims in from the right past the lamp post, bubbles rising, Turkey's reflection held lower left; 7.4 s hard cut to Trout's side: the riveted steel tin with top handle on a pebble riverbed, Turkey whole behind the amber port with a beam at the bottom of the glass, two speckled trout at left looking in, a strip of brown fringe-like grass under the tin; held to 8 s", "changed": null}],
+ "final_take": 1, "verdict": "reference stronger",
+ "open": [
+  "beat 3 lasts only about 0.6 s (7.4-8 s) instead of 2.5 s",
+  "beat 3 has no parlor: no rug, armchair, floor lamp or wallpaper on Trout's side; the tin sits on plain river pebbles as in the outside master, so the same thing is not seen from the river",
+  "Trout's readings are not staged: 'goldfish bowl on the rug' rests only on Turkey behind round glass (no rug), and nothing supports 'vacuum cleaner' (no silt or fringe drawn toward the tin; the brown grass strip under the tin does not move)",
+  "atlas leak: from about 3.2 to 4.2 s the port shows the a20 reference almost as a dim live-action photograph, including what looks like a human figure in the light, breaking the watercolor look",
+  "the push-in is not continuous: the view jumps closer at about 3.2 s, then pushes slowly",
+  "beat 1: a turkey head and tail fan, not a wing tip, fill the lower right corner from about 0.5 to 3.1 s; the toggle stays visible but no wing is seen flipping it, and the lever looks the same before and after",
+  "the lamp effect in the cockpit is a round glow on the wall beside the port, not a beam into the water",
+  "Turkey's readings: the dry-parlor reading holds (tidy lit room); the mirage reading is weak, no heat-haze waver or swaying fringe can be pointed to in the frames, only the fade-up from dark and small bubbles; the single bubble from the shade is not identifiable",
+  "the still already shows everything beat 2 shows (parlor, lamp, trout, Turkey's reflection); the film adds only the lamp coming on",
+  "two trout outside rather than one; neither hovers over a chair",
+  "no stray text seen; tin stays riveted steel, not bread",
+  "prompt ran 1709 characters, just over the brief's 1700 limit",
+  "sound not checked"
+ ]
+}

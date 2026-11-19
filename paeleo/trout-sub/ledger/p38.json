@@ -1,0 +1,23 @@
+{
+ "id": "p38", "station": "#38 · Visor", "clue": "1978 posterboard UFO chart with fin notes",
+ "rule": "Annotated Schematic (SCION 25)", "control": "lamp",
+ "atlas": [{"id": "a15", "why": "rubbed, brown, handled paper for the posterboard's material; nothing in it asked to appear. a33 (the lineage frame) and a46 were looked at and left out because both carry lettering that would leak"}],
+ "prompt_file": "prompts/p38.txt",
+ "takes": [{"take": 1, "by": "director", "verdict": "inconclusive", "seen": "0-0.5 s cockpit matches the master (chipped six-bolt port, empty slot lower left, chalk chart, toggle lower right, dent right, amber lamp) with one pale blank square in the port; about 1 s a wing tip rests on the brass toggle while a turkey tail fan sits in the lower right corner; about 2.3-3 s the overhead lamp throws a wide amber cone down the wall and the port washes pale; 3-3.7 s push-in, the square resolves into a cream chart in a wooden frame with rusty corner plates, a saucer with a round blue port at its centre, compass marks in the corners; about 4.3 s the frame fills the port, a few arrows and a dashed ring around the saucer, Turkey's faint reflection lower left; 5-5.2 s the chart is full of red, blue, green and black arrows pointing in at a golden domed saucer as in the still; about 6 s a few short black strokes and panel lines cross the saucer's hull; about 6.3 s the image mixes to Trout's side: the riveted steel tin with top handle on the riverbed, the framed chart standing on two posts in front of it, saucer glowing gold with rays, a blank paper tag on a string at the frame's right corner; 7-7.7 s two speckled trout lower left facing the chart, a third small trout at right with its nose at the tag, which now shows a drawn hourglass with the sand run to the bottom", "changed": null}],
+ "final_take": 1, "verdict": "inconclusive",
+ "open": [
+  "beat 3: Turkey is never visible from the river side; the framed chart stands directly in front of the porthole and covers it from about 6.3 s to the end, so the shot has the tin and the chart but not Turkey behind the amber port",
+  "the change to Trout's side at about 6.3 s is a dissolve (the chart is ghosted over the tin in the sheet frame), not a hard cut",
+  "Turkey's butcher's-diagram reading is weak: the dashed section lines asked for arrive only as a few short black strokes on the hull at about 6 s, just before the mix; they do not read as cuts",
+  "Turkey's blueprint reading: the saucer has a round blue port like the sub's only from about 3.7 to 4.5 s; by 5 s the port is gone and it is the plain domed saucer of the still. Arrows fill in and point inward but none singles out a port or hinge",
+  "Trout's wish-machine reading rests on the gold glow and the two trout facing it; the pebble laid at its foot and the bow are not visible",
+  "Trout's overdue-rental reading rests on the hourglass tag, which is blank until about 7.5 s and small; a trout's nose, not a fin, is at it",
+  "beat 1: a turkey tail fan occupies the lower right corner throughout (porthole, slot, chart and toggle stay visible); the wing tip is on the toggle at about 1 s but the flip itself is not clearly seen",
+  "the lamp effect is a cone from the overhead lamp that washes the port pale at about 2.3 s, not a beam into the water; the chart's first appearance at about 3 s differs in design (blue-port saucer, few marks) from what it becomes",
+  "stray text: no words seen; the chart's marks are arrows and compass symbols. Small squiggles under the upper left compass mark were not checked beyond 480P",
+  "tin is riveted steel, not bread, in both views; the outside chart's posterboard is not noticeably rubbed or brown (the a15 material did not carry over)",
+  "the still's own trout at the right edge of the port does not appear in beat 2",
+  "prompt ran 1950 characters, over the brief's 1700 limit",
+  "sound not checked"
+ ]
+}
