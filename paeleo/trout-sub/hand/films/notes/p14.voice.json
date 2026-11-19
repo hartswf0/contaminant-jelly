@@ -1,0 +1,38 @@
+{
+ "song": "the-selkies-cradle",
+ "song_from_seconds": 30,
+ "lines": [
+  {
+   "at": 16.9,
+   "voice": "bm_fable",
+   "speaker": "turkey",
+   "text": "A spark, gone under the water?",
+   "seconds": 2.32,
+   "caption_held": 3.1
+  },
+  {
+   "at": 20.3,
+   "voice": "bm_fable",
+   "speaker": "turkey",
+   "text": "Or the calendar, ticking down to Thanksgiving?",
+   "seconds": 3.15,
+   "caption_held": 3.4
+  },
+  {
+   "at": 26.6,
+   "voice": "bf_emma",
+   "speaker": "trout",
+   "text": "A feather, fallen out of the sky?",
+   "seconds": 1.92,
+   "caption_held": 3.1
+  },
+  {
+   "at": 30.0,
+   "voice": "bf_emma",
+   "speaker": "trout",
+   "text": "Or a flare: is somebody up there in trouble?",
+   "seconds": 2.36,
+   "caption_held": 3.5
+  }
+ ]
+}

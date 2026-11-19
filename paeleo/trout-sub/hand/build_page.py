@@ -16,13 +16,22 @@ for pid in sorted(f[:-4] for f in os.listdir("assets/films") if f.endswith(".mp4
     n = int(pid[1:]); r = seeds[n - 1]; p = prov.get(pid, {}); mk, cr = p.get("maker", {}), p.get("critic", {})
     note = open("films/notes/%s.txt" % pid).read().strip() if os.path.exists("films/notes/%s.txt" % pid) else ""
     cred = json.load(open("films/credits/%s.json" % pid)) if os.path.exists("films/credits/%s.json" % pid) else []
+    vj = "films/notes/%s.voice.json" % pid
+    voice = json.load(open(vj)) if os.path.exists(vj) else None
+    film_src = ("assets/voiced/%s.mp4" % pid) if os.path.exists("assets/voiced/%s.mp4" % pid) else ("assets/films/%s.mp4" % pid)
+    voice_html = ""
+    if voice:
+        voice_html = ('<details><summary>Voices and music (%d spoken lines)</summary><p>Music: a passage of "%s" from DEEP SEA VOYAGE, from %d s in, ducked under the voices. '
+                      'Voices are stock Kokoro voices run locally; the lines are the film\'s own captions.</p><table><tr><th>At</th><th>Speaker</th><th>Voice</th><th>Line</th></tr>%s</table></details>'
+                      % (len(voice["lines"]), E_(voice["song"].replace("-", " ").title()), voice["song_from_seconds"],
+                         "".join("<tr><td>%ss</td><td>%s</td><td>%s</td><td>%s</td></tr>" % (l["at"], l["speaker"], l["voice"], E_(l["text"])) for l in voice["lines"])))
     li = lambda xs: "".join("<li>%s</li>" % E_(x) for x in xs)
     rows = "".join('<tr><td><a href="%s">%s</a></td><td>%s</td><td>%s</td><td>%s</td></tr>' % (
         E_(c.get("source_url", "")), E_(c.get("title", "")), E_(c.get("author", "")),
         ('<a href="%s">%s</a>' % (E_(c["license_url"]), E_(c.get("license", "")))) if c.get("license_url") else E_(c.get("license", "")), E_(c.get("used_as", ""))) for c in cred)
     verdict = {"pass": "Passed review", "nearly": "Nearly passed", "not yet": "Not yet passed"}.get(cr.get("verdict"), "Not reviewed")
     cards.append('''<article id="%s">
-<video controls playsinline preload="metadata" poster="assets/films/%s.webp" src="assets/films/%s.mp4"></video>
+<video controls playsinline preload="metadata" poster="assets/films/%s.webp" src="%s"></video>
 <div class="body"><div class="mono">Porthole %02d · %s · %d s</div><h2>%s</h2>
 <span class="tag %s">%s</span>
 <p><b>Turkey looking out:</b> %s<br><b>Trout looking in:</b> %s<br><b>Rule:</b> %s<br><b>Descends from:</b> %s</p>
@@ -31,13 +40,14 @@ for pid in sorted(f[:-4] for f in os.listdir("assets/films") if f.endswith(".mp4
 <details><summary>What the maker reported</summary><p><b>Method.</b> %s</p><p><b>Animation SCIONs used.</b></p><ul>%s</ul><p><b>Weakest part, in the maker's words.</b> %s</p></details>
 <details><summary>What the critic repaired (%d) and still lists as open (%d)</summary><p><b>Repaired</b></p><ul>%s</ul><p><b>Open</b></p><ul>%s</ul></details>
 <details><summary>Foraged sources and licences (%d)</summary>%s</details>
-<p class="links"><a href="films/%s.py.txt">The script that draws it</a> · <a href="assets/films/%s.mp4" download>Download</a></p>
-</div></article>''' % (pid, pid, pid, n, E_(r[0].split("·")[1].strip()), round(dur("assets/films/%s.mp4" % pid)), E_(r[1]),
+%s
+<p class="links"><a href="films/%s.py.txt">The script that draws it</a> · <a href="%s" download>Download</a> · <a href="assets/films/%s.mp4">Without voices or music</a></p>
+</div></article>''' % (pid, pid, film_src, n, E_(r[0].split("·")[1].strip()), round(dur("assets/films/%s.mp4" % pid)), E_(r[1]),
                        cr.get("verdict", "none").replace(" ", "-"), verdict, E_(r[3]), E_(r[4]), E_(r[5]), E_(r[2]), E_(note),
                        E_(direction.get(pid, "")), E_(mk.get("method", "")), li(mk.get("scions", [])), E_(mk.get("weak", "")),
                        len(cr.get("repaired", [])), len(cr.get("open", [])), li(cr.get("repaired", [])), li(cr.get("open", [])),
                        len(cred), ("<table><tr><th>Item</th><th>Author</th><th>Licence</th><th>Used as</th></tr>%s</table>" % rows) if cred else "<p>Nothing foraged; everything is handmade.</p>",
-                       pid, pid))
+                       voice_html, pid, film_src, pid))
     open("films/%s.py.txt" % pid, "w").write(open("films/%s.py" % pid).read())
 for f in ("films/kit.py", "films/kit_anim.py"):
     open(f + ".txt", "w").write(open(f).read())
@@ -51,7 +61,7 @@ article{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:22px;
 video{width:100%;aspect-ratio:16/9;background:#000;display:block}h2{font:800 28px/1.1 "Arial Narrow",Arial,sans-serif;text-transform:uppercase;margin:2px 0 8px}
 .tag{display:inline-block;font:12px ui-monospace,Menlo,monospace;letter-spacing:.06em;text-transform:uppercase;border:1px solid;padding:2px 7px;margin-bottom:8px}
 .tag.pass{color:var(--teal)}.tag.nearly{color:#9a6a12}.tag.not-yet,.tag.none{color:var(--accent)}
-article>*{min-width:0}body{overflow-wrap:break-word}td:nth-child(3){white-space:nowrap}td:first-child{word-break:break-all;max-width:220px}details{overflow-x:auto}p{margin:0 0 10px}.note{color:var(--mute)}details{border-top:1px solid var(--rule);padding:7px 0}summary{cursor:pointer;font:13px ui-monospace,Menlo,monospace;letter-spacing:.04em;text-transform:uppercase}
+article>*{min-width:0}body{overflow-wrap:break-word}td:first-child{word-break:break-all;max-width:220px}details{overflow-x:auto}p{margin:0 0 10px}.note{color:var(--mute)}details{border-top:1px solid var(--rule);padding:7px 0}summary{cursor:pointer;font:13px ui-monospace,Menlo,monospace;letter-spacing:.04em;text-transform:uppercase}
 details p,details ul{font-size:15px}ul{margin:4px 0 8px;padding-left:20px}table{width:100%;border-collapse:collapse;font-size:13.5px}td,th{text-align:left;vertical-align:top;border-top:1px solid var(--rule);padding:5px 8px 5px 0}
 a{color:var(--accent)}.links{font:13px ui-monospace,Menlo,monospace;margin-top:8px}.shared{border-top:2px solid var(--ink);padding-top:18px}
 @media(max-width:760px){article{grid-template-columns:1fr}}

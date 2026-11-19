@@ -1,0 +1,22 @@
+{
+ "song": "the-prophet",
+ "song_from_seconds": 18,
+ "lines": [
+  {
+   "at": 19.7,
+   "voice": "bm_fable",
+   "speaker": "turkey",
+   "text": "Mister Hook, the famous guest speaker? Or the Monster, most wanted?",
+   "seconds": 4.46,
+   "caption_held": 4.6
+  },
+  {
+   "at": 28.9,
+   "voice": "bf_emma",
+   "speaker": "trout",
+   "text": "OK, mister: are you our new class pet? Or the Hook Monster?",
+   "seconds": 3.33,
+   "caption_held": 4.8
+  }
+ ]
+}

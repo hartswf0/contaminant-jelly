@@ -1,0 +1,30 @@
+{
+ "song": "lake-merritt-clave",
+ "song_from_seconds": 22,
+ "lines": [
+  {
+   "at": 1.2,
+   "voice": "bm_george",
+   "speaker": "narrator",
+   "text": "A rubber boot, cut out of an old Boston Rubber Shoe Co. poster.",
+   "seconds": 4.5,
+   "caption_held": 3.4
+  },
+  {
+   "at": 14.6,
+   "voice": "bm_fable",
+   "speaker": "turkey",
+   "text": "Shipwreck? Giant's foot? Or a tunnel?",
+   "seconds": 2.99,
+   "caption_held": 5.0
+  },
+  {
+   "at": 23.2,
+   "voice": "bf_emma",
+   "speaker": "trout",
+   "text": "Is its sole a torch, or is a crab biting its toe?",
+   "seconds": 2.79,
+   "caption_held": 5.4
+  }
+ ]
+}
