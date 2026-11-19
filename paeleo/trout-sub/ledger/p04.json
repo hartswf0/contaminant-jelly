@@ -1,0 +1,29 @@
+{
+ "id": "p04", "station": "#04 · Belly", "clue": "Old Bridge: Snapping Turtle on brass key",
+ "rule": "Threshold (SCION 48): shell retreat", "control": "lamp",
+ "atlas": [
+  {"id": "a09", "why": "sent as the fourth and last reference (after cockpit, outside and the p04 still): an oval hull and a pale beam sitting under a rock arch, for how the withdrawn shell and the lamp beam sit under the bridge arch so that it can read as a vessel"}
+ ],
+ "prompt_file": "prompts/p04.txt",
+ "takes": [{
+  "take": 1, "by": "critic", "verdict": "pass",
+  "seen": "0-1 s cockpit matches the master (riveted steel tin, six-bolt brass port with chip at two o'clock, hinge and latch, empty slot lower left, chalk chart under glass, brass toggle lower right, caged amber lamp, dent on the right wall), only murky blue-green water in the port; from about 1 s a turkey tail fan and then a blue head rise in the lower right corner while a low dark dome under a faint arch forms in the port; about 1.6-2 s the turkey's beak is on the toggle knob, which sits low and then stands up; by 2 s the port already shows the stone bridge and a turtle with a key; about 2.5 s a warm diagonal beam crosses the wall and the port and the push-in starts; 2.8-5.5 s the port holds the scene of the still: mossy stone bridge arch, moss-backed snapping turtle with one clawed forefoot on a large brass key, a faint turkey face reflected low left on the glass; about 5.7-5.9 s the turtle pulls its head and forelegs into the shell; 6-8 s a smooth mossy dome sits under the arch with a small amber glow at its lower rim and a string of bubbles rising at its right, the key lying in front; from about 6.3 s the push has gone past the brass rim; 8.0 s hard cut to the outside: riveted steel tin with handle on a pebble riverbed, whole turkey small behind the amber port, a speckled trout hovering at the right by the latch looking toward the turtle, and in the foreground a dark green snapping turtle with head and foreleg out, the ring of the brass key in its mouth and a claw on the shaft; 8-10 s its jaw opens and closes on the ring, bubbles rise. No lettering anywhere.",
+  "changed": null
+ }],
+ "final_take": 1, "verdict": "pass",
+ "open": [
+  "a turkey tail fan and head, not a wing tip, fill the lower right corner from about 1 s to 3.5 s; the toggle is worked with the beak, and the knob movement is small and half hidden behind the fan",
+  "the turtle, bridge and key are plainly readable in the port by 2 s, before the beam arrives, so Turkey's boulder-or-submarine doubt has no dark-dome moment of its own; the dim dome lasts well under a second (about 1.2 s)",
+  "the beam is a diagonal band across the wall and port, not a beam switching on below the porthole, and its source is not shown",
+  "after the retreat the shell is not a clean dome: front claws and tail tip stay out, and the whole oversized brass key lies in full view in front instead of a single brass glint, which weakens the boulder reading; the rival submarine reading rests on the lamp-like glow at the rim and the bubble string",
+  "the retreat itself is quick (about 0.2 s, 5.7-5.9 s) and partly a morph; the shell changes shape and gets flatter and wider as the head goes in",
+  "from about 6.3 s to 8 s the push is past the brass rim, so only the turkey reflection in the corner says there is glass; the reflection drifts into the lower left corner and a tilt of the head cannot be made out",
+  "beat 3 has no bridge arch: the turtle sits directly against the tin, covering the lower left of the port and hinge, where in beat 2 it sat at a distance under the bridge; the two sides of the glass do not agree on where it is",
+  "Trout's back-scratcher reading is not supported: the key is held by the ring in the turtle's mouth with a claw on the shaft and is never rubbed along the shell; only the thief reading (clutching and biting the key) is visible",
+  "the trout is small and in the background at the right, not in the foreground beside the turtle, and it does not react",
+  "the turtle changes between beats: tan-olive with a pale shell in beat 2, dark green and larger in beat 3; the head-and-foreleg emergence is not shown, it is already out at the cut",
+  "beat 3 lasts about 2.1 s (8.0-10.1 s), not 3 s, and the cut comes about a second late; the push-in starts about half a second early",
+  "the dent on the tin in the outside view is mostly hidden behind the trout and the turtle; only crack lines show to the right of the port",
+  "the still has the trout watching from the right inside the same port frame together with turtle, key and turkey reflection; the film never puts the trout and the reflection in one frame"
+ ]
+}

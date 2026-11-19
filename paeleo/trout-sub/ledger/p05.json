@@ -1,0 +1,39 @@
+{
+ "id": "p05",
+ "station": "#05 · Scope",
+ "clue": "Waterline: Raccoon hands washing tin plate",
+ "rule": "Split Plane (SCION 44): air / creek",
+ "control": "ballast",
+ "atlas": [
+  {
+   "id": "a40",
+   "why": "sun cutting down through the water seen from below, asked for as the light of the outside beat (per fal_log.json, sent after cockpit, outside and stills/p05)"
+  }
+ ],
+ "prompt_file": "prompts/p05.txt",
+ "takes": [
+  {
+   "take": 1,
+   "by": "critic",
+   "verdict": "pass",
+   "seen": "0-1.5 s cockpit matches the master (six-bolt brass port with chip at two o'clock, hinge left, latch right, empty slot, chalk chart, toggle, amber lamp, dent right, riveted steel); a pale hand at lower left lowers a round iron weight on a ring into the ballast slot at about 1.2 s and the ring stays visible in the slot. 2-4.5 s the water in the port slides down until a waterline sits across the glass with orange leaves and bank above it. 4.5-5 s a ribbed silver disc and a paw come down from the top of the port. 5.0 s cut to a close view of the port: split plane almost exactly as the still, two gray raccoon forearms holding the shiny ribbed disc half in air and half in teal water, sun rays under it, Turkey's faint puzzled reflection lower left; camera creeps in until 8.6 s. 8.6 s hard cut across the glass: riveted tin with the dent on the right, Turkey behind the amber-lit port, two speckled trout at left, a silver pan with a stream of bubbles under its rim rising to the surface, two dark paws above it at 8.6-9.0 s; by 9.4 s the pan sits flat on the rippled surface. No lettering anywhere; the tin is metal throughout.",
+   "changed": null
+  }
+ ],
+ "final_take": 1,
+ "verdict": "pass",
+ "open": [
+  "Turkey's whole tail fan stands in the left edge of frame from about 1 s to 5 s; it covers the left wall but not the port, chart or controls",
+  "the ballast weight is dropped by a pale glove-like hand, not a feathered wing tip",
+  "the move to the glass at 5.0 s is a cut, not a push-in; only a slow creep follows",
+  "the disc is never visibly turned like a wheel or rubbed; paws and disc are nearly static 5-8.6 s, so 'rescue mechanic or hubcap thief' rests on the hubcap look alone, as in the still, and nothing separates mechanic from thief",
+  "the underwater half of the disc is hardly bent or shifted against the half in air; the split-plane offset is weaker than asked",
+  "the cut across the glass comes at 8.6 s, not 7 s, so Trout's side lasts about 1.5 s and the floating pan with bubbles is easy to miss",
+  "in the first outside frames (8.6-9.0 s) the pan hangs in mid-water in front of the top of the port and is deep-sided, unlike the flat disc of beat 2; it only reads as a floating pie tin from about 9.4 s",
+  "the tin sits on the riverbed with the surface directly over its top, not hanging under the surface; the handle on top of the tin in the master is hidden or replaced by the pan",
+  "two trout instead of one, and both look at the port, not up at the pan, so nobody on Trout's side is seen reading the disc",
+  "raccoon paws are in the outside view for under half a second and are gone by 9.4 s",
+  "the trout that is inside the port in the still is absent from beat 2 (the prompt did not ask for it)",
+  "the film runs 10 s where the brief says 8 s"
+ ]
+}
