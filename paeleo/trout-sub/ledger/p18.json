@@ -1,0 +1,21 @@
+{
+ "id": "p18", "station": "#18 · Vent", "clue": "Steamer trunk with star cutout peephole",
+ "rule": "Reverse Peephole (SCION 17)", "control": "lamp",
+ "atlas": [{"id": "a34", "why": "light leaking through star shapes cut in a dark hinged lid: the cut-out light of the trunk; nothing in it was asked to appear (its stars and crescent moon appeared anyway, see open)"}],
+ "prompt_file": "prompts/p18.txt",
+ "takes": [{"take": 1, "by": "director", "verdict": "pass", "seen": "0-3.4 s cockpit matches the master (riveted steel tin, six-bolt brass port with chip at two o'clock, hinge and latch, empty ballast slot, chalk chart under glass, brass lamp toggle, amber lamp, dent at right), a boxy domed trunk shape in the murk in the port from about 1 s; at 0.3 s a pink five-fingered hand in front of a tail fan reaches the lamp toggle, and the tail fan stays in the lower right corner until about 3.4 s; by 2.8 s the amber beam is on below the port; about 3.4-5.6 s push-in to the glass and the still's scene: domed wooden trunk with brass bands, straps, moss, one star-shaped hole glowing on its front, rocks and weed, beam from the lamp at the bottom of the port, Turkey's faint reflection low left; about 4.6-5.6 s a trout's face and eye sit in the star hole looking out at the glass; about 6.0-6.2 s the lid lifts and a red scarf and a fish back show in the gap, the star now dark; first hard cut at about 6.2-6.3 s to a close view of the open trunk in open water with no tin and no port rim: blank paper luggage tag on a red string swaying on the latch, star and crescent-moon cut-outs on the front panel and pale stars inside the lid; about 6.8-7.2 s a speckled trout rises out of the trunk with the red scarf in its mouth and amber light fans out through the crescent; second hard cut at about 7.2-7.3 s to the river side as the outside master (riveted tin with top handle and dent, brass port with chip, hinge and latch, light shafts, bubbles), Turkey whole and small behind the amber port, two trout in the left foreground facing the port, held to 8 s", "changed": null}],
+ "final_take": 1, "verdict": "pass",
+ "open": [
+  "the trunk and the tin never share a frame on Trout's side: Trout's two readings (trout rising with a red scarf = magician's assistant, blank luggage tag = lost luggage) are both in the 6.3-7.2 s close insert, and the outside-master shot at 7.3-8 s shows only Turkey and two trout, with no trunk, tag, scarf or star of light on the pebbles",
+  "the cut across the glass comes in two steps and late: insert at about 6.2-6.3 s, tin at about 7.2-7.3 s instead of 5.5 s; the outside beat lasts about 0.7 s",
+  "the trunk changes between beats: one star hole on the front in beat 2, then a front panel with three or four stars and a large crescent moon and a star-painted lid in the insert; the crescent moon and extra stars come from the atlas frame a34 and were not asked for",
+  "the insert shows the trunk from the front, not from behind as asked, and the trout does not bow toward the tin",
+  "Turkey's 'pirate chest' reading has only the barnacled banded chest and the lifting lid, as in the still; the gold glint asked for is not visible; 'magic box' has the star, the eye in it and the red scarf in the gap at about 6.1 s (small and brief)",
+  "the rule is carried by the trout's eye in the star looking back at about 4.6-5.6 s (the blink is not readable in stills); Turkey's eye pressed to the port in beat 3 is not there, he stands whole in the port",
+  "beat 1 shows a turkey tail fan in the lower right corner for about 3 s and a pink human-like hand at the toggle, not only a wing tip; it covers the right end of the bench but not the port, slot, chart or toggle",
+  "small scribbled letter-like marks on the brass band of the lid at about 6.3-6.6 s (left and right of the buckles) and a mark on the latch plate; not readable words, but stray lettering",
+  "the prompt is 1816 characters, over the brief's 1700 limit",
+  "sound was not checked",
+  "the tin is steel throughout, never bread; no captions or labels otherwise"
+ ]
+}

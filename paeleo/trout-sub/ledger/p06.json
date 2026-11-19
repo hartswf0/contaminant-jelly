@@ -1,0 +1,37 @@
+{
+ "id": "p06",
+ "station": "#06 · Stern",
+ "clue": "Sheriff Carp measuring tail against a lure",
+ "rule": "Detective (Oulipopo): wrong suspect",
+ "control": "lamp",
+ "atlas": [
+  {
+   "id": "a17",
+   "why": "one thin pale search cone cutting through dim grainy water, asked for as the light of the outside beat (the amber beam as an interrogation lamp); nothing in it was asked to appear"
+  }
+ ],
+ "prompt_file": "prompts/p06.txt",
+ "takes": [
+  {
+   "take": 1,
+   "by": "director",
+   "verdict": "pass",
+   "seen": "0-1 s cockpit matches the master: riveted steel tin, centered six-bolt brass port with the chip at two o'clock, hinge left, latch right, empty ballast slot, chalk chart, brass toggle, amber lamp, dent on the right wall, empty blue-green water in the port. About 1.2 s Turkey's head and tail fan come in at lower right over the toggle; by 2.8 s a broad amber beam is on and the carp with a yellow ruler slides into the port from the right. 3.5-5 s push in to the glass: the scene of the still, olive moustached frowning carp with a silver star badge holding the ruler upright beside the orange-and-teal feathered lure with its hook, wooden post, reeds, Turkey's faint reflection lower left. 5.6-6.2 s the carp swings the ruler flat and lays it along the lure, just above Turkey's reflection. About 6.5 s hard cut across the glass: riveted metal tin on the riverbed with its handle, Turkey small behind the amber-lit port, two speckled trout watching at left, the carp with badge at the port holding the feathered lure up right beside Turkey's body and tail; by 7.4 s the carp has a fin raised and its head turned in toward Turkey. The tin is metal throughout; no captions or labels.",
+   "changed": null
+  }
+ ],
+ "final_take": 1,
+ "verdict": "pass",
+ "open": [
+  "Turkey's head and whole tail fan stand in the lower right corner from about 1.2 s to 4.3 s and cover the lamp toggle, so no wing tip is seen flipping the control; the port, chart and slot stay clear",
+  "the beam falls from the overhead lamp down through the port and onto the chart, not from a lamp below the porthole as asked; the small lamp at the bottom of the port only appears from the push-in on",
+  "the wrong-suspect turn is weak: the ruler goes flat along the lure and ends near Turkey's reflection but is never clearly laid on the reflection, and the carp does not visibly shake his head; 'roasting-pan fitting or ID check' rests on the ruler being held toward the glass next to Turkey's face, much as in the still",
+  "the cut across the glass comes at about 6.5 s, not 5.5 s, so Trout's side lasts about 1.5 s",
+  "outside view: the carp overlaps the right half of the port and partly covers Turkey, and hides the dent on the tin's right wall",
+  "the salute is a small raised fin at about 7.4 s that is easy to miss, so 'undercover deputy' is thinly supported; the lure beside Turkey's feathers (suspect reading) is clear",
+  "two trout instead of one in the outside view",
+  "the amber beam in the outside view is a small glow inside the port, not one thin cone through dim water; the a17 light was not taken up",
+  "the star badge carries a blurred illegible mark rather than a readable SHERIFF; the ruler has tick marks and smudged numeral-like marks",
+  "the prompt is 1756 characters, slightly over the brief's 1700"
+ ]
+}

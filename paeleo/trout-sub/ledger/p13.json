@@ -1,0 +1,19 @@
+{
+ "id": "p13", "station": "#13 · Arch", "clue": "Bell Boulder arch with brass twig-bell",
+ "rule": "Clockwise Etiquette (SCION 48)", "control": "lamp",
+ "atlas": [{"id": "a50", "why": "a fish close to camera beside a small brass bell above a stony bottom: the staging for the trout in the foreground of beat 3"}],
+ "prompt_file": "prompts/p13.txt",
+ "takes": [{"take": 1, "by": "director", "verdict": "reference stronger", "seen": "0-1 s cockpit matches the master (six-bolt port with chip at two o'clock, hinge and latch, empty ballast slot, chalk chart, lamp toggle, amber lamp, dent at right) with a dark arch shape in the port; about 0.7-2.5 s a turkey tail fan and blue head come in at lower right, the head at the toggle at about 1 s, and an amber beam comes on through the port by about 2 s; 2.5-5.6 s push-in to the glass, the mossy boulder arch with the brass bell on a twig and a knotted cord, a speckled trout under the bell facing right at about 4-5 s and then to the right of the bell facing left with its mouth open at about 5.6 s, Turkey's faint reflection lower left, beam from below as in the still; about 6.0 s a transition frame shows the tin, Turkey, the bell and the trout together inside a porthole rim; 6.6-8 s river side as the outside master: riveted tin with dent on the pebble bed, Turkey small behind the amber port, a knot of cord tied on the tin's top handle, two speckled trout at the left foreground facing the port", "changed": null}],
+ "final_take": 1, "verdict": "reference stronger",
+ "open": [
+  "beat 3 loses the thing: from about 6.6 s there is no arch and no bell on Trout's side, only a knot of cord on the tin's handle, so 'polite ferry customer or bell-ringer prank' has nothing to point to except that knot; the bell over the tin is seen only in the transition frame at about 6.0 s",
+  "the cut is not hard: at about 6.0 s a morph frame shows the tin and Turkey inside a porthole rim with the bell and trout in front, and Turkey's reflection still at lower left",
+  "a turkey tail fan and head, not a wing tip, fill the lower right corner in beat 1 (about 0.7-3.5 s); the head or beak, not a wing, is at the lamp toggle",
+  "the clockwise circle (the row's rule) cannot be confirmed: the trout is seen below the bell facing right and then right of it facing left, with no full loop visible in the frames",
+  "the bell swinging and the cord being pulled are not readable in stills; the bell hangs nearly plumb in every frame, so 'tripwire alarm or dinner bell' rests on the trout stopping open-mouthed beside the cord at about 5.6 s; nothing arrives to eat and nothing reacts as to an alarm",
+  "two trout in beat 3 where one was asked for; neither is seen circling",
+  "the tin is not shown rocking and the cord is not seen running from the handle up to anything",
+  "sound was not checked (whether a bell is heard)",
+  "beat 2 adds little over the still: same composition, bell, cord, trout, reflection and beam, with a small move of the trout"
+ ]
+}

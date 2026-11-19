@@ -1,0 +1,29 @@
+{
+ "id": "p10", "station": "#10 · PA", "clue": "Elementary brick: flapping Clam-Shell PA",
+ "rule": "Single Hinge (SCION 13): jaw pivot", "control": "lamp",
+ "atlas": [
+  {"id": "a34", "why": "sent as the fourth and last reference (after cockpit, outside and the p10 still): a dark lid standing open on one back hinge, asked for only as the way the top shell stands up and drops in beat 3"}
+ ],
+ "prompt_file": "prompts/p10.txt",
+ "takes": [{
+  "take": 1, "by": "director", "verdict": "reference stronger",
+  "seen": "0-0.3 s cockpit matches the master (riveted steel tin, centered six-bolt brass port with chip at two o'clock, hinge and latch, empty slot lower left, chalk chart under glass, brass toggle lower right, caged amber lamp, dent with cracks on the right wall); in the port a faint ghost of a ribbed clam in blue-green murk, no wall; from 0.3 s a turkey head and striped tail fan rise in the lower right corner; by about 0.5-1 s the clam is pale and solid on a red brick wall with a brass pin at its left end; about 1.75 s an amber cone switches on from the bottom of the port and falls on the chart; 2-5.5 s one continuous push-in to the glass, no cut; the clam opens and shuts three times (open about 3.2 s, 4.2 s, 5.2 s; shut between), its two halves spreading from the brass pin and rod at the wall as in the still; from about 4.2 s concentric ripple arcs stand in the water to the right of the clam; from about 4.5 s three speckled trout come up from the lower right under it; turkey face reflected low left on the glass from about 4 s; mossy brick, a book and a slate at the bottom as in the still; about 6.2 s a dissolve to the outside: riveted steel tin with handle on a pebble riverbed, whole turkey small behind the amber port, dent on the right of the tin, two speckled trout at the left; about 7 s the lower trout tilts up and noses toward the top of the port; from about 7.3 s a pale ribbed half shell hangs like a lid inside the top of the porthole above the turkey's head and stays there to 8 s. Sound was not listened to.",
+  "changed": null
+ }],
+ "final_take": 1, "verdict": "reference stronger",
+ "open": [
+  "a turkey head and a whole tail fan, not a wing tip, sit in the lower right corner from about 0.3 s to about 2.5 s; the toggle stays visible beside the fan but no wing touches it and no flip is visible; the beam simply comes on at about 1.75 s",
+  "beat 1 does not show a big dark shape: the clam is a faint ghost in open water for the first frames, then a pale fully lit clam on a brick wall that fades in, so there is no reveal by the beam",
+  "the crossing of the glass at about 6.2 s is a dissolve of about a quarter second, not a hard cut, and comes about 0.7 s late; beat 3 lasts about 1.7 s",
+  "the clam on its brick wall is missing from the outside view; there is no brick wall or schoolhouse in beat 3 at all, so the two sides of the glass do not share the thing in its place",
+  "instead a half shell appears from about 7.3 s inside the top of the tin's own porthole over the turkey's head, attached to nothing; it reads as an error, not as the PA",
+  "Trout's hall-monitor reading is not supported: two trout, not a file, and they do not pass beneath anything; they approach the porthole",
+  "Trout's lunchbox reading is only weakly supported: a trout noses up toward the port and a shell lid is then seen raised there, but the trout does not visibly lift it, nothing is seen inside, and the lid never drops shut",
+  "the Single Hinge rule is only partly kept: the brass pin stays fixed and all motion pivots from it, but both halves of the shell spread and close, not the top half alone; in beat 3 no hinge is visible",
+  "Turkey's snapping-jaw reading leans on the three claps alone; the trout do not jump back at any clap, they swim up toward the clam while it is flapping, and the reflected turkey does not visibly flinch",
+  "Turkey's intercom reading is carried by the ripple arcs, but they stand as a fixed pattern from about 4.2 s and are not seen leaving the shell one ring per clap",
+  "stray lettering: the book at the lower left of the port in beat 2 (about 5-6 s) carries two lines of garbled letters, leaked from the still's FORGOTTEN TEXTBOOK, although the prompt asked for no text",
+  "the lid-on-a-back-hinge staging asked from a34 is not visible; the shell in beat 3 is a floating half with no hinge",
+  "the still holds clam, hinge pin, ripple rings, trout and turkey reflection in one frame; the film adds the three claps and matches the still closely in beat 2, but loses the clam and the wall on Trout's side, so the still does the porthole better"
+ ]
+}

@@ -1,0 +1,37 @@
+{
+ "id": "p16",
+ "station": "#16 · Aft",
+ "clue": "Identical twin Turkey Sub waving back",
+ "rule": "Temporal Double (SCION 36)",
+ "control": "lamp",
+ "atlas": [
+  {
+   "id": "a06",
+   "why": "deep cyan water with small points of lamp light marking a distant craft: the light for the twin's window seen across the river (light only, none of its craft or figures)"
+  }
+ ],
+ "prompt_file": "prompts/p16.txt",
+ "takes": [
+  {
+   "take": 1,
+   "by": "director",
+   "verdict": "reference stronger",
+   "seen": "0-0.3 s cockpit matches the master (six-bolt port with chip, ballast slot, chalk chart, toggle, dent, amber lamp, steel tin) with a dim shape and one small lit dot in the port; 0.3-2.3 s a turkey tail fan pokes into the lower right corner; about 1.0 s the shape is a dark silhouette of a small sub with a bright round window; by 1.7 s the amber beam is on below the port; 2.3 s the silhouette resolves into the still's silver pail-shaped tin sub with copper pipes and a lit brass porthole, empty; 3.0 s a tiny turkey silhouette is in that window; 3.0-5.4 s push-in to the glass, a speckled trout arrives at the right by 3.7 s and hovers under the twin, turkey reflection low left from about 4.4 s with a raised wing or fan shape beside it at 5.0-5.4 s; about 5.5 s hard cut to the outside master: steel tin on the pebble bed, Turkey behind the amber port, two trout at the left looking in; 6.2-8 s Turkey spreads and lifts his wings toward the trout",
+   "changed": null
+  }
+ ],
+ "final_take": 1,
+ "verdict": "reference stronger",
+ "open": [
+  "the twin sub is missing from the outside view (5.5-8 s): the thing is never seen from the river side, so neither of Trout's readings (two-headed tin monster, traffic jam) is supported; no overlapping tins, no two amber eyes, no queue of three trout and no trout backing away, only two trout looking in at Turkey",
+  "rule not readable: no delay between the two craft can be pointed to. The twin's window is already a lit dot at 0.3 s, before the beam comes on at about 1.7 s, so it does not light one second late; no wave-then-echo is visible",
+  "the tiny turkey in the twin's window is a small dark silhouette whose pose shifts slightly between 3.0 and 5.4 s; a wave cannot be made out, where the still shows a coloured turkey clearly waving",
+  "Turkey's readings: 'pond mirror' is partly supported (a tin with a turkey in a round brass port facing back, reflection on the glass); 'yesterday's crew' is unsupported without the visible lag",
+  "the twin is the still's pail-shaped tin with pipes, not an identical copy of the bread-roll tin; this keeps the still but weakens the 'identical twin' clue",
+  "a turkey tail fan, not a wing tip, enters at lower right at 0.3-2.3 s; the toggle stays visible but no flip of it is seen; the fan stays in the corner and does not block the port or the room",
+  "Turkey's wing spread at 6.2-8 s has no second turkey answering it",
+  "no stray text seen; tin is steel throughout; nothing from atlas frame a06 appears, and its cyan lamp-point light is not noticeable either",
+  "prompt is 1746 characters, over the brief's 1700 guide",
+  "sound not checked"
+ ]
+}

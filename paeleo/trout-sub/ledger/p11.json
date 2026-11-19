@@ -1,0 +1,18 @@
+{
+ "id": "p11", "station": "#11 · Tank", "clue": "Igloo Water Cooler trailing vinyl tubing",
+ "rule": "Bricolage (SCION 29): hose splice", "control": "lamp",
+ "atlas": [{"id": "a50", "why": "a fish close to camera beside one small object above a stony bottom: the staging for the trout at the spigot in beat 3"}],
+ "prompt_file": "prompts/p11.txt",
+ "takes": [{"take": 1, "by": "director", "verdict": "pass", "seen": "0-1 s cockpit matches the master (six-bolt port with chip, empty ballast slot, chalk chart, amber lamp, dent at right) with a tilted dark barrel shape in the port; about 1-2.5 s a turkey tail fan comes in at lower right and an amber beam switches on through the port; 2.5-5.5 s push-in to the glass, the orange white-lidded cooler tipped on mossy stones with looping clear tubing from the spigot, bubbles streaming up along the tube, a speckled trout at the right with the tube end at its mouth, Turkey's faint reflection lower left; about 5.8-6 s cut to the river side: riveted tin with handle and dent, Turkey small behind the amber port, the cooler large in the left foreground, a clear tube running from its white spigot across to the tin's hull right of the port, the trout nosing the spigot with a few bubbles", "changed": null}],
+ "final_take": 1, "verdict": "pass",
+ "open": [
+  "stray lettering: the cooler carries a label reading '3000' (faint at 4-5.5 s, clear from 6 s) although the prompt asked for a blank cooler",
+  "a turkey tail fan, not a wing tip, fills the lower right corner in beat 1 and hides the lamp toggle at about 1 s; no wing is seen touching the toggle (the toggle is visible again at 2.2 s with the beam already on)",
+  "the hose splice (the row's rule) is barely shown: no twine-and-patch join, only a small white clip on the tube at the cooler's shoulder where bubbles leak",
+  "the cut is not hard: around 5.8 s there is a frameless close view of the cooler and trout before the tin appears",
+  "in beat 3 the cooler covers the left third of the tin and the left edge of the porthole",
+  "the spigot gives no clear fizzy jet, only a few bubbles, so 'soda dispenser' rests on the trout's position at the spigot; the trout's look along the tube to the tin is not readable",
+  "the breathing rhythm of the bubbles (gill life-support) cannot be confirmed from stills; it rests on the tube end at the trout's mouth",
+  "prompt is 2057 characters, over the brief's 900-1700 range"
+ ]
+}

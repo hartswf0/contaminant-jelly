@@ -1,0 +1,38 @@
+{
+ "id": "p21",
+ "station": "#21 · Fwd",
+ "clue": "Five giant trout heads tapping bus tablets",
+ "rule": "Collage Scale (SCION 33)",
+ "control": "lamp",
+ "atlas": [
+  {
+   "id": "a00",
+   "why": "a row of trout in profile under a warm overhead wash with cyan screen glow on their faces: the light for the five heads in the bus windows; nothing in it was asked to appear"
+  }
+ ],
+ "prompt_file": "prompts/p21.txt",
+ "takes": [
+  {
+   "take": 1,
+   "by": "director",
+   "verdict": "pass",
+   "seen": "0-0.5 s cockpit matches the master (riveted steel tin, six-bolt brass port with chip at two o'clock, hinge and latch, empty ballast slot, chalk chart under glass, brass lamp toggle, amber lamp, dent at right), plain blue-green water in the port; about 0.7-3.3 s five cyan glows in a row appear in the port while a turkey tail fan rises in the lower right corner; about 2.0-3.3 s an amber beam fans out below the port and the room brightens; about 3.4 s the view is already pushed in to the glass on the still's scene: sunken yellow bus on the rocky riverbed, five trout in five windows each holding a glowing cyan tablet, lamp beam from the bottom of the port, Turkey's faint reflection low left; about 4.6-6.6 s slow push-in continues, the tablets flare brighter together and pale concentric rings spread from the row of tablets across the glass (clearest 5.5-6.6 s); 6.67 s hard cut to the river side; 6.7-8 s outside view as the master (riveted tin with top handle and dent, brass port with chip, hinge and latch, light shafts, bubbles), Turkey whole and small behind the amber port, and in the foreground a yellow bus the size of one trout with a brass wind-up key standing on its roof, two speckled trout at left drifting toward it",
+   "changed": null
+  }
+ ],
+ "final_take": 1,
+ "verdict": "pass",
+ "open": [
+  "beat 1 shows a turkey tail fan filling the lower right corner (about 0.7-3.3 s), not only a wing tip; it covers the lamp toggle, so the flip of the control is never seen; the port, slot and chart stay clear",
+  "the move to the glass is a jump, not a push: at about 3.3 s the room is wide, at 3.4 s the camera is already at the port; the slow push happens only after that",
+  "the cut across the glass comes at 6.67 s, not 5.5 s; beat 3 lasts 1.3 s, short for reading the toy bus",
+  "Trout's 'delayed city bus' reading is thin: no post, no trout waiting or tapping a fin, the wheels are not seen spinning; only the bus standing still on the riverbed carries it. 'Wind-up bath toy' is carried by the trout-sized bus and the key on its roof, but the key is not seen to turn between 6.85 and 7.95 s",
+  "the toy bus in beat 3 has empty dark windows: the five heads and tablets are gone, so the two sides are linked only by the yellow bus",
+  "Collage Scale is carried by the change of the bus from port-filling (beat 2) to trout-sized (beat 3); inside beat 2 the heads fit the windows as in the still and do not read as pasted in at the wrong scale",
+  "Turkey's 'sonar hackers' reading is supported (five glows in the dark, tablets flaring together, rings spreading to the glass); 'commuter carpool' rests only on the still's bus and seated row: the shared sway as if over a bump is not readable",
+  "the fish in beat 2 are whole small trout seated in the windows (as in the still), not five giant heads",
+  "two trout in the outside view, not one; a faint pale smudge on the toy bus's lower side panel at 7.3 s could be a trace of lettering at 480P, nothing readable; no other stray text or labels seen",
+  "the tin is steel, never bread; Setup A held on both sides",
+  "sound was not checked"
+ ]
+}

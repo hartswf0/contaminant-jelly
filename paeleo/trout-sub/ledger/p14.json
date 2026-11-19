@@ -1,0 +1,20 @@
+{
+ "id": "p14", "station": "#14 · Tower", "clue": "Sinking crimson autumn maple leaf",
+ "rule": "Seasonal Timer (SCION 11)", "control": "lamp",
+ "atlas": [{"id": "a39", "why": "layered translucent sheets of water with soft pale motes: the water the leaf falls through on Trout's side"}],
+ "prompt_file": "prompts/p14.txt",
+ "takes": [{"take": 1, "by": "director", "verdict": "pass", "seen": "0-2 s cockpit matches the master (six-bolt port with chip, ballast slot, chalk chart, toggle, dent, amber lamp, steel tin) with a dark speck sinking in the port; a turkey head and tail fan poke into the lower right corner at 0.3-1.2 s and are gone by 1.7 s; about 2.2 s the amber beam is on and a small red leaf enters the top of the port; 2.5-5.4 s push-in to the glass, the still's crimson maple leaf glows in the beam and sinks from the top of the port to below centre, trout at the right from about 4 s, turkey reflection low left throughout; 5.5 s hard cut to a pale blue paper-water view where the leaf falls trailing a thin red streak from above, small red leaves behind it, white motes; 6.3-6.8 s that view slides up and off as the outside master rises from below, the leaf vanishing at the seam; 6.9-8 s the steel tin on the pebble bed, Turkey behind the amber port, two trout swim in from the left and look in at him", "changed": null}],
+ "final_take": 1, "verdict": "pass",
+ "open": [
+  "the hard cut at 5.5 s lands on a near copy of atlas frame a39 (pale blue textured paper, white motes, its rocks and grass marks, a thin black bar along the top edge), not on Trout's side as in the outside master; the outside master only arrives by a vertical slide at about 6.3-6.8 s and holds for about 1.2 s",
+  "style break: the 5.5-6.5 s section is a different palette and paper from the rest of the film",
+  "the leaf is never in the same frame as the tin and Turkey; it disappears at the seam at about 6.5 s, so the thing is not seen from the river side in the outside view",
+  "Trout's readings are supported only in the 5.5-6.5 s insert (red streak for the flare, slow fall from above for the sky-feather); no trout is in that shot and no trout reacts to the leaf: the trout that rises to catch it and the one that darts away are missing; the two trout at 7-8 s only look at Turkey",
+  "Turkey's readings: 'underwater spark' is supported (leaf glowing in the beam, 3-5.4 s); 'Thanksgiving calendar' is weak: the reflection is present but no gulp or duck can be made out on the sheet",
+  "rule only partly applied: the leaf sinks steadily and tilts a little but the even pendulum rocking is not readable on the sheet; the further falling leaves (season arriving) appear only as a few small ones at 5.5-6.5 s",
+  "a turkey head and tail fan, not a wing tip, enter at lower right at 0.3-1.2 s; the fan covers the lamp toggle so no flip of the control is seen; it stays in the corner and does not block the port",
+  "no stray text seen; tin is steel throughout",
+  "prompt is 1706 characters, at the brief's 1700 guide",
+  "sound not checked"
+ ]
+}

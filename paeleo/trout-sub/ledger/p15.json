@@ -1,0 +1,22 @@
+{
+ "id": "p15", "station": "#15 · Lens", "clue": "Cyan bathroom-tile glass block wall",
+ "rule": "Grid Phase Shift (SCION 22)", "control": "lamp",
+ "atlas": [{"id": "a39", "why": "wide soft ribbons of blue water in a flat arrangement: the ripple inside the glass blocks; nothing in it was asked to appear"}],
+ "prompt_file": "prompts/p15.txt",
+ "takes": [{"take": 1, "by": "director", "verdict": "pass", "seen": "0-3.4 s cockpit matches the master (riveted steel tin, six-bolt brass port with chip at two o'clock, hinge and latch, empty ballast slot, chalk chart under glass, lamp toggle, amber lamp, dent at right), plain blue-green water in the port; 0-1.5 s a blue turkey head with red wattle and the edge of a tail fan come in at the lower right corner, beak at the lamp toggle, the head gone by about 2 s; about 2.5-3.4 s an amber beam comes on below the port; about 3.5-6.4 s push-in to the glass, the still's wall of nine wavy cyan glass blocks with pale grout fills the port, amber lamp glow in the bottom middle block, Turkey's faint reflection low left crossed by a grout line; about 4.2 s a speckled trout enters from the right, cut by the grout into pieces; about 4.7 s it is in two pieces that do not join (left block and middle block each hold a separate tail-less part, right block empty), then by about 5.2-5.9 s it is one whole trout facing right across the three middle blocks, as in the still; hard cut at about 6.45 s; 6.5-8 s river side as the outside master (riveted tin with top handle and dent on the pebble bed, light shafts, bubbles) with a three-by-three wall of cyan glass blocks on the tin's face, a tiny amber-lit turkey in each of the nine blocks; by about 7.8 s the amber has dimmed in all blocks and the middle block is darkest; two speckled trout at the left foreground face the wall", "changed": null}],
+ "final_take": 1, "verdict": "pass",
+ "open": [
+  "beat 1 shows a turkey head and tail-fan edge at the lower right (0-2 s), not only a wing tip; the beak, not a wing, is at the lamp toggle; it stays in the corner and does not cover the port, slot or chart",
+  "beat 1 port shows plain water; the faint straight lines of the wall asked for before the push-in are not there, so the wall appears only once the camera is at the glass",
+  "the phase shift is brief and loose: one out-of-step moment at about 4.7 s (trout in two unjoined pieces) rather than a clean one-block sideways slip of the middle row; the snap back to whole is not seen as a snap, the trout is simply whole by about 5.2 s",
+  "'scrambled Sub' is weakly supported: nothing of the sub is scrambled on Turkey's side except his reflection crossed by one grout line; 'cracked glass' rests on the grout lines and the split trout",
+  "beat 3 replaces the tin's brass six-bolt porthole with the glass-block wall: no round port, hinge, latch or chip is visible from the river side, so Setup A is not held outside; the wall is on the tin's face, not standing in front of it",
+  "the nine turkeys are full small turkeys with a lamp above each, but no tiny portholes around them as asked",
+  "'broken TV screen' rests on the middle block going darker at about 7.8 s while all blocks dim; it is not seen lighting again and no flicker is readable in stills",
+  "two trout in beat 3 where one was asked for; no head tilt is readable",
+  "the cut is hard but late, at about 6.45 s instead of 5.5 s; the outside beat lasts about 1.5 s",
+  "the prompt is 1893 characters, over the brief's 1700 limit",
+  "sound was not checked",
+  "no stray text or labels seen; the tin is steel, never bread"
+ ]
+}

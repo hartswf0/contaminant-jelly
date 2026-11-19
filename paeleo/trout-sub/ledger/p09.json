@@ -1,0 +1,19 @@
+{
+ "id": "p09", "station": "#09 · Port", "clue": "Dollar General: Trout pushing wire cart",
+ "rule": "Inversion (SCION 19): creek drag", "control": "ballast",
+ "atlas": [{"id": "a39", "why": "layered ribbons of water with small round bubbles, to make the direction of the current visible on Trout's side"}],
+ "prompt_file": "prompts/p09.txt",
+ "takes": [{"take": 1, "by": "director", "verdict": "inconclusive", "seen": "0-2.5 s cockpit matches the master (six-bolt port with the chip at two o'clock, empty slot, chalk chart, toggle, amber lamp, dent on the right) with a small dark boxy shape far off in the port; about 0.7-1.5 s a fanned turkey wing enters at the left edge holding a round iron weight and the weight is then sitting in the ballast slot; 2.5-5.9 s push-in to the glass and the far shape becomes the still's scene: speckled trout at the handle of a rusty wire cart full of dented cans on a cracked road with yellow dashes, silt plumes, weed, the cart growing until it fills the port, Turkey's pale face reflected lower right; cut between 5.9 and 6.6 s to the outside view: riveted tin on the pebble bed, Turkey small behind the amber port, two trout at the left, the nearer one turning up toward the glass by 7.8 s", "changed": null}],
+ "final_take": 1, "verdict": "inconclusive",
+ "open": [
+  "the cart, the cans and the cracked road are missing from the outside view; beat 3 is the outside master with two trout, so the thing from the still does not cross the glass",
+  "Trout's readings (rude aisle-blocker or returnable bottle) are not staged: no cart stopped against the tin, no tap on the steel, no look from the cans to the tin",
+  "two trout outside instead of the one cart trout",
+  "the Inversion rule is not readable: the trout reads as pushing the cart in the ordinary way with silt trailing behind it, not as being towed by a current running toward the glass",
+  "Turkey's readings rest only on the cart bearing down on the glass with its load (convoy or ram); nothing more separates them",
+  "more than a wing tip enters in beat 1: a fanned section like a tail fan comes in at the left edge; it does not cover the port or the controls",
+  "an amber beam is lit under the port in the outside view although the lamp toggle was never used (ballast was the control)",
+  "the prompt is 1938 characters, over the brief's 1700 limit",
+  "sound not checked; judged from frames only"
+ ]
+}

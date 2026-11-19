@@ -1,0 +1,19 @@
+{
+ "id": "p12", "station": "#12 · Keel", "clue": "Cardboard stage with green Floor Porthole",
+ "rule": "Cutout Stage (SCION 31): rib zoom", "control": "lamp",
+ "atlas": [{"id": "a34", "why": "hard-edged shapes cut out of a flat lid and lit from behind: the green cone as a cut shape of light, the stage as flat card"}],
+ "prompt_file": "prompts/p12.txt",
+ "takes": [{"take": 1, "by": "director", "verdict": "pass", "seen": "0-2.4 s cockpit matches the master (six-bolt port with chip, ballast slot, chalk chart, toggle, dent, steel tin); a green glow rises in the port at about 1 s, a turkey tail fan pokes into the lower right corner at 1-2 s and the amber beam comes on; 2.5-5 s push-in to the glass, the still's stage appears: scalloped cream curtains, plank floor, glowing green floor hole, trout at the right wing, turkey reflection low left at about 4 s; 4-5.5 s a leaf and specks circle the hole and drop into it; 5.8-6.5 s the trout swims into the green shafts and dives head first down the hole; 6.5-7 s dissolve to the outside view; 7-8 s the steel tin on the pebble bed, Turkey behind the amber port, two trout in the foreground staring in at him", "changed": null}],
+ "final_take": 1, "verdict": "pass",
+ "open": [
+  "the crossing of the glass is a cross-dissolve at about 6.5-7 s (tin ghosted over the stage), not a hard cut at 5.5 s; the outside beat lasts only about 1 s",
+  "the stage, the green hole and its light are absent from the outside view, so the thing is never seen from the river side",
+  "Trout's 'stage spotlight' reading is only supported before the cut (trout enters the green shafts at 5.8 s), not on Trout's side of the glass; the pebble and tin cup (the 1-dollar fee) never appear; only the 'sideshow freak' reading is staged outside (two trout staring at Turkey)",
+  "Turkey's 'tourist trap' reading is weak: nothing shows a fee or a lure beyond the curtained theatre; 'whirlpool drain' is strong (leaf, then the trout, go down the hole)",
+  "rule only partly applied: the stage reads as a real plank-and-cloth theatre, not flat cardboard cutouts; no visible card edges and the curtain layers do not slide apart like ribs during the push-in",
+  "a turkey tail fan, not a wing tip, enters at lower right; it stays in the corner and does not block the room, but no wing is seen flipping the toggle",
+  "after about 5 s the camera is past the brass rim, so the porthole frame is lost for the end of beat 2",
+  "prompt is 1879 characters, over the brief's 1700 guide",
+  "sound not checked"
+ ]
+}

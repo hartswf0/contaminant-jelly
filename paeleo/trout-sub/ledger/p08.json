@@ -1,0 +1,18 @@
+{
+ "id": "p08", "station": "#08 · Gauge", "clue": "Snail inside glass crawling on Creek Map",
+ "rule": "Occlusion (SCION 45): giant snail", "control": "lamp",
+ "atlas": [{"id": "a15", "why": "sepia handled-paper grain and a round rim dividing near surface from interior field: the light and material of the map stuck on the glass"}],
+ "prompt_file": "prompts/p08.txt",
+ "takes": [{"take": 1, "by": "director", "verdict": "pass", "seen": "0-1.3 s cockpit matches the master (steel tin, six-bolt port with chip, ballast slot, chalk chart, toggle, dent right) with the torn creek map and its X across the port and a small snail at the map's right edge; only a wing tip enters at lower right, at the toggle, and is gone by 1.3 s, the lamp is brighter after; 1.3-3.5 s the snail crawls toward the X; 3.5-6.5 s push-in to the port, the gold-shelled snail slides over the X until only two stroke ends stick out under its body (5.3-6 s), a wet trail behind it, a brook trout watching at upper right, Turkey's reflection lower left; about 6.7-8 s cut to the outside: steel tin on the pebbles, port glowing amber with the map seen from behind, the spiral shell a gold disc in the middle of the glass, Turkey's head small beside it, two trout in the foreground facing the port", "changed": null}],
+ "final_take": 1, "verdict": "pass",
+ "open": [
+  "the X is not completely hidden: two stroke ends remain visible under the snail at 5.3-6 s, so the occlusion is partial",
+  "the snail crosses straight over the X; it never curves around it and leaves no ring, so 'circling X' rests only on the approach and 'eating our map' only on the head at the paper; no mouth action or bite mark is visible",
+  "beat timing is off the brief: the push-in starts about 3.5 s and the cut across the glass lands about 6.7 s, leaving the outside view roughly 1.3 s",
+  "outside, the shell is a bare spiral disc with no snail body and does not visibly move between the two sheet frames, so the eye-turning then pebble-still action is not shown; the eye reading works, the pebble reading is weak, and the shell no longer reads as a snail",
+  "two trout outside instead of the one asked for",
+  "the toggle itself is not seen moving; the wing tip is at it and the lamp brightens afterwards",
+  "the prompt is 1957 characters, over the brief's 900-1700",
+  "no stray text seen; sound not reviewed"
+ ]
+}

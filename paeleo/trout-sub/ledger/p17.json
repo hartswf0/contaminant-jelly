@@ -1,0 +1,21 @@
+{
+ "id": "p17", "station": "#17 · Dorsal", "clue": "Trout Council stone table arguing budgets",
+ "rule": "Committee Clinamen (Oulipo)", "control": "lamp",
+ "atlas": [{"id": "a51", "why": "fish on different sides of a pale low table in dim water: the seating of the council; nothing in it was asked to appear"}],
+ "prompt_file": "prompts/p17.txt",
+ "takes": [{"take": 1, "by": "director", "verdict": "inconclusive", "seen": "0-3.3 s cockpit matches the master (riveted steel tin, six-bolt brass port with chip at two o'clock, hinge and latch, empty ballast slot, chalk chart under glass, brass lamp toggle, amber lamp, dent at right), plain blue-green water in the port; about 0.7-3.3 s a turkey tail fan fills the lower right corner with a small blue head at the lamp toggle; about 1.5-2 s an amber beam comes on below the port; about 3.3-5 s push-in to the glass and the still's scene appears: five stern speckled trout in round spectacles around a mossy round stone table with slate tablets and pebble stacks, lamp beam on the table's front edge, Turkey's faint reflection low left; about 5.5-6.7 s the port rim leaves frame and the middle trout, facing the glass, glows amber with both spectacle lenses lit white while the other four stay unlit and look across the table; hard cut between about 6.7 and 7.0 s; 7.0-8 s river side as the outside master (riveted tin with top handle and dent, brass port with chip, hinge and latch, light shafts, bubbles), Turkey whole and small behind the amber port, four trout in the foreground with the table top, slates and pebbles at the bottom edge; about 7.3-7.9 s one trout swims across from the left and puts its nose to the porthole glass in front of Turkey", "changed": null}],
+ "final_take": 1, "verdict": "inconclusive",
+ "open": [
+  "Trout's pair of readings is not staged: no pebble is set down under the porthole, no wing is raised, no lamp blink is readable, so 'new parking meter' has nothing to point to and 'taxpayer witness' rests only on Turkey standing in the port while the trout look at him and one noses the glass",
+  "the clinamen is carried by light, not by movement: the middle trout is the one lit member (about 5.5-6.7 s); the four fins rapping in unison are not readable in stills, the fins look still on the table, and the middle trout faces the glass from its first appearance, so no break of step or turn is seen",
+  "Turkey's pair is only as strong as the still: stern spectacled row with one staring out (jury) and untouched slates and pebble stacks (stalled board); the film adds the lit stare and nothing else",
+  "beat 1 shows a turkey tail fan and head at the lower right for about 2.5 s, not only a wing tip; the head, not a wing, is at the lamp toggle; it covers the toggle and the right end of the bench but not the port, slot or chart",
+  "beat 1 port shows plain water; the low round shape asked for before the push-in is not there",
+  "the cut is hard but late, at about 6.7-7.0 s instead of 5.5 s; the outside beat lasts about 1 s",
+  "beat 3 shows four trout, not five, and they are seen from the side and front, not from behind; the table is only a strip at the bottom edge",
+  "the trout that reaches the port partly covers Turkey at about 7.9 s",
+  "the prompt is 1816 characters, over the brief's 1700 limit",
+  "sound was not checked",
+  "no stray text or labels seen; the tin is steel, never bread"
+ ]
+}

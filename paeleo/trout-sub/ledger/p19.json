@@ -1,0 +1,39 @@
+{
+ "id": "p19",
+ "station": "#19 · Bilge",
+ "clue": "Raw potato skewered with 10 bendy straws",
+ "rule": "Hydrostatic Gauge (SCION 09)",
+ "control": "ballast",
+ "atlas": [
+  {
+   "id": "a39",
+   "why": "wide rounded ribbons of blue stacked in a flat arrangement: the water sliding past the port in darker bands as the tin sinks; nothing in it was asked to appear"
+  }
+ ],
+ "prompt_file": "prompts/p19.txt",
+ "takes": [
+  {
+   "take": 1,
+   "by": "director",
+   "verdict": "reference stronger",
+   "seen": "0-3 s cockpit matches the master (riveted steel tin, six-bolt brass port with chip at two o'clock, hinge and latch, empty ballast slot, chalk chart under glass, brass lamp toggle, amber lamp, dent at right); about 0.3 s a grey iron weight with a ring hangs over the ballast slot at lower left, held from a turkey tail fan at the left edge; about 1.0 s the weight sits in the slot; by about 1.7 s the fan is gone and the room is clear; about 1.0-3.0 s a water line climbs the port from the bottom to the top and the glass fills with stacked rounded bands of blue, darker toward the bottom; about 3.6-5.2 s pushed in to the glass, the still's scene: raw brown potato on the riverbed skewered with striped bendy straws in pink, blue, yellow, orange and green, amber lamp beam under it, a speckled trout at the right of the glass, Turkey's faint reflection low left; the straw angles differ a little between 3.6, 4.8 and 5.2 s; about 5.6 s a short dissolve (port and outside view overlaid) to the river side; 6.0-8 s outside view as the master (riveted tin with top handle and dent, brass port with chip, hinge and latch, light shafts, bubbles), Turkey whole and small behind the amber port, two speckled trout in the left foreground drifting right toward the port",
+   "changed": null
+  }
+ ],
+ "final_take": 1,
+ "verdict": "reference stronger",
+ "open": [
+  "the potato is missing from the outside view (6.0-8 s): Trout's pair, science-fair judge or potato-eating pest, has nothing to point to; no trout circles it, no open mouth at the skin, no bite mark; two trout simply swim toward the port",
+  "the gauge rule is carried only by beat 1 (weight in the slot, water line and darker bands climbing the port, about 1.0-3.0 s); the straws do not swing together to one direction and hold like a needle, they shift slightly and stay splayed; no air beads at the straw tips and no sideways step are readable",
+  "Turkey's pair is only as strong as the still: spiky ball on the riverbed reads urchin; the meter reading rests on the sinking bands before it, not on anything the potato does",
+  "the sink ends in a jump: at 3.0 s the port holds plain blue bands, at 3.6 s the camera is already at the glass with the potato scene in place; the potato never arrives through the darkening water",
+  "the change of side at about 5.6 s is a short dissolve, not a hard cut",
+  "beat 1 shows part of a turkey tail fan at the left edge (about 0.3-1.3 s), not only a wing tip; it covers the left wall edge, not the port, slot, chart or toggle; the weight hangs from the fan with a red strap rather than from a wing",
+  "the lamp beam is on in beat 2 and 3 though the lamp toggle was never used (the still's own beam carried over)",
+  "a trout is already beside the potato in beat 2 (from the still); the outside view shows two trout, not one",
+  "straw count on screen is more than ten (about fourteen, as in the still)",
+  "the prompt was sent at 1775 characters, over the brief's 1700 limit: a trim step failed before the single allowed gen ran",
+  "sound was not checked",
+  "no stray text or labels seen; the tin is steel, never bread; Setup A held"
+ ]
+}

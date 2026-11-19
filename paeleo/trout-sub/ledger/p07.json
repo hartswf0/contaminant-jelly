@@ -1,0 +1,30 @@
+{
+ "id": "p07", "station": "#07 · Hatch", "clue": "River Choir around sunken Birthday Piñata",
+ "rule": "Sound-Action (SCION 47): pitch shift", "control": "lamp",
+ "atlas": [
+  {"id": "a39", "why": "sent as the fourth and last reference (after cockpit, outside and the p07 still): wide layered ribbons of water with small round circles, asked for only as the water treatment of beat 3 so the sliding note has something flat and ringed to travel through"}
+ ],
+ "prompt_file": "prompts/p07.txt",
+ "takes": [{
+  "take": 1, "by": "director", "verdict": "pass",
+  "seen": "0-1 s cockpit matches the master (riveted steel tin, centered six-bolt brass port with chip at two o'clock, hinge and latch, empty slot lower left, chalk chart under glass, brass toggle lower right, caged amber lamp, dent with cracks on the right wall); in the port a dark spiked ball hangs from a line coming down from the top of the glass, reading as a mine; from about 0.3 s a turkey head and then a striped tail fan rise in the lower right corner; by 1.2 s the fan covers the toggle; about 2 s an amber cone switches on from the bottom of the port and lights the spiked ball; 2.9 s hard cut to a close view of the port (rim, hinge, latch, bolts): the scene of the still, a star-shaped paper piñata in rust, green, blue and violet fringe with dark spikes and ribbon tails, on a knotted rope tied to a stone, eight speckled trout in a ring facing it with mouths open, amber cone from below, turkey face reflected low left on the glass; 3-6 s slow push-in while the ring of trout closes steadily until their mouths touch the piñata (about 5.7 s) and the piñata sits slightly higher on its rope; 6.1 s hard cut to the outside: riveted steel tin with handle on a pebble riverbed, whole turkey small behind the amber port, dent on the right of the tin, two speckled trout at the left, the lower one holding a short brass tube with a flared end in its mouth, pointed at the port; about 7.3 s a burst of small bubbles leaves the tube; 7.9 s the tube is tilted up a little. No lettering anywhere. Sound was not listened to; a rough spectrum of the audio track shows a tone climbing from about 230 Hz to about 1500 Hz between 3 s and 4.5 s and falling to about 530 Hz by 5.5 s, with fainter sound around 950-1000 Hz from 6.5 s to 7.5 s.",
+  "changed": null
+ }],
+ "final_take": 1, "verdict": "pass",
+ "open": [
+  "a whole turkey tail fan and head, not a wing tip, fill the lower right corner from about 1 s to 2.9 s; the toggle is hidden behind the fan and no flip of it is visible",
+  "the move to the glass is a hard cut at 2.9 s, not a push-in from the seat; the film therefore has two cuts, and the slow push only starts after the first one",
+  "the thing changes at that cut instead of being revealed: in beat 1 it is a black spiked ball hanging from a line above, in beat 2 a striped star piñata on a rope tied to a stone below; the beam at 2-2.9 s lights the ball without showing any colour or fringe",
+  "beat 1 shows no trout at all, so the ring of eight appears from nowhere at the cut",
+  "the piñata is missing from the outside view; beat 3 has only the tin, Turkey, two trout and the brass tube, so the two sides of the glass do not share the thing",
+  "Trout's piñata-bat reading is not supported: with no piñata in beat 3 there is nothing to swing at, and the tube only tilts up slightly in the last frames; only the kazoo reading (tube in the mouth, bubbles out of the end at about 7.3 s) is visible, and the tube is aimed at the porthole",
+  "the choir is absent from beat 3: two trout, not eight, and the second one does nothing",
+  "the pitch shift rests on the soundtrack, which was measured roughly and not heard; in the picture the rise is carried by the ring tightening, the trout hardly rise as a group and the rope does not visibly pull taut; the downward slide in beat 3 is not confirmed",
+  "Turkey's trap reading leans only on the ring closing until the mouths touch the piñata; by 5.7 s the trout bodies overlap its arms and it reads as nibbling as much as closing a trap",
+  "from about 5 s to 6.1 s the push is past most of the brass rim; only the latch, hinge edge and the reflection say there is glass, and no tilt of the reflected turkey head can be made out",
+  "beat 3 lasts about 1.9 s (6.1-8.0 s), not 2.5 s, and the cut comes about 0.6 s late",
+  "the layered ribbon water of a39 is not visible in beat 3; the water there is the outside master's light shafts and bubbles",
+  "the prompt ran at 1898 characters, over the brief's 1700 limit",
+  "the still holds piñata, choir and turkey reflection in one frame and beat 2 matches it closely; the film adds the mine-like first look and the closing ring but loses the piñata on Trout's side"
+ ]
+}
