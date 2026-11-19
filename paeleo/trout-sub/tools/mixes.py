@@ -76,5 +76,7 @@ if __name__ == "__main__":
     which = [int(a) for a in sys.argv[1:] if a.isdigit()] or list(range(1, 11))
     plans = plan()
     done = [render(k, plans[k - 1], 3 if test else None) for k in which]
-    if not test and len(which) == 10:
+    if not test:
+        old = json.load(open("youtube/mixes.json")) if os.path.exists("youtube/mixes.json") else []
+        done = sorted([d for d in old if d["file"] not in [x["file"] for x in done]] + done, key=lambda d: d["file"])
         json.dump(done, open("youtube/mixes.json", "w"), indent=1, ensure_ascii=False)

@@ -244,7 +244,10 @@ class Out:
         for at, text, tempo in self.said:
             a = V.load(text)
             if tempo > 1.02:
-                a = librosa.effects.time_stretch(a, rate=tempo)
+                try:
+                    a = librosa.effects.time_stretch(a, rate=tempo, n_fft=1024)
+                except Exception:
+                    pass                                  # a clip too short to stretch plays at its own speed
             i = int(at * sr); a = a[:max(0, len(y) - i)]; y[i:i + len(a)] += a
         rng = np.random.RandomState(7)                       # a little wireless hiss and the odd crackle
         hiss = rng.randn(len(y)).astype(np.float32); hiss = np.convolve(hiss, np.ones(8) / 8.0, "same") * 0.006
