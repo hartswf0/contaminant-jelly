@@ -8,7 +8,7 @@ scions = json.load(open("scions.json"))
 def entry(i):
     led = json.load(open("ledger/%s.json" % i)) if os.path.exists("ledger/%s.json" % i) else {}
     pf = "prompts/%s.txt" % i
-    return {"id": i, "film": os.path.exists("films/%s.mp4" % i), "verdict": led.get("verdict"),
+    return {"id": i, "film": os.path.exists("films/%s.mp4" % i), "unit": os.path.exists("units/%s.mp4" % i), "verdict": led.get("verdict"),
             "takes": len(led.get("takes", [])), "open": led.get("open", []), "atlas": led.get("atlas", []),
             "control": led.get("control"), "prompt": open(pf).read().strip() if os.path.exists(pf) else ""}
 ports = []

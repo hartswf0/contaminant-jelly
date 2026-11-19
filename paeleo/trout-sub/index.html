@@ -38,16 +38,20 @@ details{font-size:14px}summary{cursor:pointer;color:var(--dim);font:12px ui-mono
 pre{white-space:pre-wrap;font:12px/1.45 ui-monospace,Menlo,monospace;color:var(--dim);margin:8px 0 0;max-height:260px;overflow:auto}
 ul.open{margin:6px 0 0;padding-left:18px;color:var(--dim)}
 a{color:var(--amber)}
-@media(max-width:760px){.intro{grid-template-columns:1fr}}
+.dive{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:20px;align-items:start}
+.stage{position:relative;aspect-ratio:16/9;background:#10201f;border-radius:6px;overflow:hidden}
+.stage video{position:absolute;inset:0;height:100%;border-radius:0;background:#10201f}
+.now h3{margin:4px 0 8px;font-size:20px}
+@media(max-width:760px){.intro,.dive{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <main>
 <div class="mono">Trout Sub · Double Duck/Rabbit Deck · PAE-09</div>
 <h1>55 portholes, one film each</h1>
-<p class="lede">Every film holds one room: Turkey flips the lamp or fits ballast, the thing arrives at the glass, and the cut crosses to the trout looking in. Each was written by a director, generated once, and checked by a second reader who had not seen the prompt.</p>
+<p class="lede">Every film holds one room: Turkey flips the lamp or fits ballast, the thing arrives at the glass, and the cut crosses to the trout looking in. 48 were written by a director, generated once and logged against the deck drawing; the last 7 are keyframe units built from the drawings.</p>
 
-<h2>Start here: the activity in six shots</h2>
+<h2>Start here: the activity</h2>
 <div class="intro">
   <div><video id="introV" controls playsinline preload="metadata"></video>
     <div class="shots" id="shots"></div></div>
@@ -57,6 +61,18 @@ a{color:var(--amber)}
     <li><b>Read both sides of the cut.</b> Turkey writes odd faces (1·3·5, looking out). Trout writes even faces (2·4·6, looking in). Probable, Plausible, Preposterous.</li>
     <li><b>Roll 1d6 and pass the record.</b> Circle the outcome, mark the chart under glass, hand the clue to the next pilot.</li>
   </ol>
+</div>
+
+<h2>The dive: all 55 as one chain</h2>
+<p class="lede">Every porthole is one standard unit: 8 seconds, opening and closing through the same iris of river water. Any unit loops on itself and joins any other, in deck order or shuffled.</p>
+<div class="dive">
+  <div class="stage"><video id="dA" playsinline preload="auto"></video><video id="dB" playsinline preload="auto"></video></div>
+  <div class="now">
+    <div class="mono" id="dS"></div><h3 id="dC"></h3>
+    <p class="q t"><small>Turkey looking out</small><span id="dT"></span></p>
+    <p class="q r"><small>Trout looking in</small><span id="dR"></span></p>
+    <div class="bar"><button type="button" id="dPlay">▶ Dive</button><button type="button" id="dPrev">← Prev</button><button type="button" id="dNext">Next →</button><button type="button" id="dLoop" aria-pressed="false">Hold this porthole</button><button type="button" id="dShuf" aria-pressed="false">Shuffle the deck</button><button type="button" id="dMute" aria-pressed="false">Sound on</button></div>
+  </div>
 </div>
 
 <h2>The portholes</h2>
@@ -72,10 +88,56 @@ if (D.introFilm) iv.src = "films/intro.mp4";
 D.intro.forEach(function (s, i) {
   var b = el("button", "shot"); b.type = "button";
   b.appendChild(el("b", null, (i + 1) + ". " + s.title)); b.appendChild(el("span", null, s.claim));
+  if (!s.film) { b.disabled = true; b.style.opacity = .55; b.appendChild(el("span", null, " · written, not yet filmed")); }
   b.onclick = function () { if (!s.film) return; iv.src = "films/" + s.id + ".mp4"; iv.play(); };
   $("#shots").appendChild(b);
   if (!D.introFilm && i === 0 && s.film) iv.src = "films/" + s.id + ".mp4";
 });
+(function () {
+  var order = D.ports.map(function (_, i) { return i; }).filter(function (i) { return D.ports[i].unit; });
+  var pos = 0, hold = false, vids = [$("#dA"), $("#dB")], front = 0, playing = false;
+  vids.forEach(function (v) { v.muted = true; });
+  function src(k) { return "units/" + D.ports[order[(k + order.length) % order.length]].id + ".mp4"; }
+  function label() {
+    var p = D.ports[order[pos]];
+    $("#dS").textContent = p.station + " · " + (pos + 1) + " of " + order.length + (p.film ? "" : " · keyframe unit");
+    $("#dC").textContent = p.clue; $("#dT").textContent = p.turkey; $("#dR").textContent = p.trout;
+  }
+  function cue() {
+    var f = vids[front], b = vids[1 - front];
+    f.style.zIndex = 2; b.style.zIndex = 1; f.loop = hold;
+    b.src = src(pos + 1); b.load(); label();
+  }
+  function go(k, play) {
+    pos = (k + order.length) % order.length;
+    var f = vids[front]; f.src = src(pos); cue();
+    if (play) f.play();
+  }
+  vids.forEach(function (v, i) {
+    v.addEventListener("ended", function () {
+      if (i !== front || hold) return;
+      pos = (pos + 1) % order.length; front = 1 - front;
+      vids[front].currentTime = 0; vids[front].play(); cue();
+    });
+  });
+  $("#dPlay").onclick = function () {
+    playing = !playing; this.textContent = playing ? "❚❚ Pause" : "▶ Dive";
+    if (playing) vids[front].play(); else vids[front].pause();
+  };
+  $("#dPrev").onclick = function () { go(pos - 1, playing); };
+  $("#dNext").onclick = function () { go(pos + 1, playing); };
+  $("#dLoop").onclick = function () { hold = !hold; this.setAttribute("aria-pressed", hold); vids[front].loop = hold; };
+  $("#dMute").onclick = function () { var on = vids[0].muted; vids.forEach(function (v) { v.muted = !on; }); this.setAttribute("aria-pressed", on); };
+  $("#dShuf").onclick = function () {
+    var on = this.getAttribute("aria-pressed") !== "true"; this.setAttribute("aria-pressed", on);
+    var cur = order[pos];
+    order = D.ports.map(function (_, i) { return i; }).filter(function (i) { return D.ports[i].unit; });
+    if (on) for (var i = order.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = order[i]; order[i] = order[j]; order[j] = t; }
+    pos = Math.max(0, order.indexOf(cur)); cue();
+  };
+  window.__dive = function () { return { pos: pos, id: D.ports[order[pos]].id, front: front, t: vids[front].currentTime, n: order.length }; };
+  if (order.length) go(0, false);
+})();
 var filt = "all", current = null;
 var FILTERS = [["all", "All 55"], ["core", "#01–#30"], ["exp", "#31–#55"], ["pass", "Pass"], ["open", "Has open notes"]];
 FILTERS.forEach(function (f) {
@@ -91,12 +153,13 @@ function render() {
   D.ports.forEach(function (p, i) {
     if (!show(p, i)) return;
     var c = el("article", "card");
-    var poster = el("button", "poster" + (p.film ? "" : " none")); poster.type = "button";
+    var clip = p.film ? "films/" + p.id + ".mp4" : (p.unit ? "units/" + p.id + ".mp4" : null);
+    var poster = el("button", "poster" + (clip ? "" : " none")); poster.type = "button";
     poster.style.backgroundImage = "url(stills/" + p.id + ".jpg)"; poster.setAttribute("aria-label", "Play film " + p.station);
     poster.onclick = function () {
-      if (!p.film) return;
+      if (!clip) return;
       if (current) current.pause();
-      var v = el("video"); v.controls = true; v.playsInline = true; v.loop = true; v.src = "films/" + p.id + ".mp4";
+      var v = el("video"); v.controls = true; v.playsInline = true; v.loop = true; v.src = clip;
       c.replaceChild(v, poster); v.play(); current = v;
     };
     c.appendChild(poster);
@@ -106,7 +169,8 @@ function render() {
     var t = el("p", "q t"); t.appendChild(el("small", null, "Turkey looking out")); t.appendChild(document.createTextNode(p.turkey)); b.appendChild(t);
     var r = el("p", "q r"); r.appendChild(el("small", null, "Trout looking in")); r.appendChild(document.createTextNode(p.trout)); b.appendChild(r);
     var row = el("div", "row");
-    if (p.verdict) row.appendChild(el("span", "tag " + (p.verdict === "pass" ? "pass" : "ref"), p.verdict));
+    if (!p.film && p.unit) row.appendChild(el("span", "tag ref", "keyframe unit, no generated film"));
+    else if (p.verdict) row.appendChild(el("span", "tag " + (p.verdict === "pass" ? "pass" : "ref"), p.verdict));
     if (p.control) row.appendChild(el("span", "tag", p.control));
     if (p.takes) row.appendChild(el("span", "tag", p.takes + (p.takes === 1 ? " take" : " takes")));
     row.appendChild(el("span", "tag", p.rule));

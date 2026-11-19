@@ -34,3 +34,6 @@ It takes about a minute, writes `films/pNN.mp4`, and prints the path of a contac
 
 ## Ledger
 `ledger/pNN.json`: `{id, station, clue, rule, control, atlas: [{id, why}], prompt_file, takes: [{take, by, verdict, seen, changed}], final_take, verdict, open}`. Verdict is `pass`, `reference stronger` (the still does it better than the film) or `inconclusive`. `seen` is what a viewer can point to, with the time. `open` lists what is still wrong. Write only what the sheet shows.
+
+## The standard unit (how the 55 become one film)
+`python3 tools/units.py` turns every porthole into one unit in `units/`: exactly 8.000 s, 960x540, 24 fps, opening with a 0.4 s iris out of the river colour (#10201f) and closing with a 0.4 s iris back into it. Because every unit starts and ends on the same frame, a unit loops on itself and joins any other unit in any order, so the deck can be played in sequence or shuffled. A porthole with no generated film gets a keyframe unit built in code from the cockpit master, its deck still and the outside master. `python3 tools/intro.py` cuts the four-step intro from footage already made. Neither tool calls fal.
