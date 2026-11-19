@@ -16,7 +16,9 @@ Rules of the cut
   the trout's about 7 seconds, words are few, large and in sentence case, nothing blinks.
 - Four dives of 16, 16, 16 and 7 portholes. Each half of a dive has its own song from
   DEEP SEA VOYAGE, and portholes change on that song's tracked beats.
-- Sound: the music leads; each film's own sound sits low under it; and a soft mallet note marks
+- A narrator reads every line aloud (tools/voice.py), through an old wireless set; the music ducks
+  under him, and each choice lights as he begins to say it.
+- Sound: the music leads between lines; each film's own sound sits low under it; and a soft mallet note marks
   every line as it lights, a different pitch for each button, so choices can be told by ear.
   Every light lands on a beat.
 - The change between portholes goes through the porthole: the next film opens from the
@@ -32,6 +34,7 @@ os.chdir(ROOT)
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import units as U
 import cards as C
+import voice as V
 
 W, H, FPS = 1280, 720, 24
 BX, BY, BW, BH = 0, 0, W, H                     # the film fills the frame
@@ -215,7 +218,7 @@ class Out:
     """Frames in. A lightly compressed master is written first, then the finished file is
     encoded in two passes to a size that stays under MAX_MB, with the music mixed in."""
     def __init__(self):
-        self.tmp = tempfile.mkdtemp(); self.path = self.tmp + "/master.mp4"; self.n = 0; self.music = []; self.cues = []
+        self.tmp = tempfile.mkdtemp(); self.path = self.tmp + "/master.mp4"; self.n = 0; self.music = []; self.cues = []; self.said = []; self.tunes = []
         self.p = subprocess.Popen(["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "bgr24", "-s", "%dx%d" % (W, H), "-r", str(FPS), "-i", "-",
                                    "-c:v", "libx264", "-preset", "veryfast", "-crf", "17", "-pix_fmt", "yuv420p", self.path], stdin=subprocess.PIPE)
     def add(self, frame):
@@ -229,6 +232,33 @@ class Out:
         """A soft mallet note when a line is lit. Each button has its own pitch, so a choice can be
         told by ear as well as by shape and colour."""
         self.cues.append((at, kind))
+    def say(self, at, text, tempo=1.0):
+        """The narrator speaks this line at this time. Returns how long it takes."""
+        self.said.append((at, text, tempo)); return V.seconds(text) / tempo
+    def tune(self, at):
+        """The wireless is tuned to a new station: a burst of static and a falling whistle."""
+        self.tunes.append(at)
+    def voice_track(self):
+        import librosa, soundfile as sf
+        sr = 44100; y = np.zeros(int((self.t + 2) * sr), np.float32)
+        for at, text, tempo in self.said:
+            a = V.load(text)
+            if tempo > 1.02:
+                a = librosa.effects.time_stretch(a, rate=tempo)
+            i = int(at * sr); a = a[:max(0, len(y) - i)]; y[i:i + len(a)] += a
+        rng = np.random.RandomState(7)                       # a little wireless hiss and the odd crackle
+        hiss = rng.randn(len(y)).astype(np.float32); hiss = np.convolve(hiss, np.ones(8) / 8.0, "same") * 0.006
+        clicks = np.zeros(len(y), np.float32); idx = rng.randint(0, len(y), int(self.t * 1.5)); clicks[idx] = rng.uniform(-0.05, 0.05, len(idx))
+        for at in self.tunes:
+            n = int(0.6 * sr); t = np.arange(n) / float(sr); env = np.sin(np.pi * t / 0.6) ** 1.5
+            f = 2600 * np.exp(-t * 3.2) + 420                         # the whistle slides down as the dial turns
+            whistle = np.sin(2 * np.pi * np.cumsum(f) / sr) * 0.05
+            static = rng.randn(n) * 0.11 * (0.6 + 0.4 * np.sin(2 * np.pi * 23 * t))
+            i = max(0, int((at - 0.2) * sr)); seg = ((whistle + static) * env).astype(np.float32)[:max(0, len(clicks) - i)]
+            clicks[i:i + len(seg)] += seg
+        path = self.tmp + "/voice.wav"; sf.write(path, y, sr)
+        path2 = self.tmp + "/air.wav"; sf.write(path2, hiss + clicks, sr)
+        return path, path2
     def cue_track(self):
         sr = 44100; y = np.zeros(int((self.t + 1) * sr), np.float32)
         note = {"triangle": 659.3, "circle": 784.0, "cross": 523.3, "square": 587.3, "hexagon": 880.0, "all": 1046.5, "line": 392.0}
@@ -236,7 +266,7 @@ class Out:
             n = int(0.5 * sr); t = np.arange(n) / float(sr); f = note[kind]
             tone = (np.sin(2 * np.pi * f * t) + 0.35 * np.sin(2 * np.pi * 2 * f * t) + 0.12 * np.sin(2 * np.pi * 4 * f * t)) * np.exp(-t * 9.0)
             tone[:int(0.004 * sr)] *= np.linspace(0, 1, int(0.004 * sr))
-            i = int(at * sr); y[i:i + n] += (0.22 if kind != "line" else 0.16) * tone[:len(y) - i].astype(np.float32)
+            i = int(at * sr); y[i:i + n] += (0.10 if kind != "line" else 0.07) * tone[:len(y) - i].astype(np.float32)
         import soundfile as sf
         path = self.tmp + "/cues.wav"; sf.write(path, np.stack([y, y], 1), sr); return path
     def close(self, dest):
@@ -247,10 +277,19 @@ class Out:
             fc.append("[%d:a]aresample=44100,aformat=channel_layouts=stereo,volume=%.3f,afade=t=in:d=0.3,afade=t=out:st=%.3f:d=%.2f,adelay=%d:all=1[m%d]"
                       % (i, gain, max(0, length - fade), fade, int(at * 1000), i))
             mix.append("[m%d]" % i)
+        fc.append("%samix=inputs=%d:normalize=0[mus]" % ("".join(mix), len(mix)))
+        last = ["[mus]"]; k = len(self.music)
+        if self.said:                                    # the narrator, through an old wireless set; music ducks under him
+            vp, ap = self.voice_track(); ins += ["-i", vp, "-i", ap]
+            fc.append("[%d:a]aformat=channel_layouts=stereo,highpass=f=170,lowpass=f=4300,acompressor=threshold=-20dB:ratio=3:attack=5:release=120:makeup=5,"
+                      "aecho=0.8:0.25:18:0.12,volume=1.7,asplit[nv][ns]" % (k + 1))
+            fc.append("[%d:a]aformat=channel_layouts=stereo,highpass=f=300,lowpass=f=5000[air]" % (k + 2))
+            fc.append("[mus][ns]sidechaincompress=threshold=0.02:ratio=8:attack=30:release=600[duck]")
+            last = ["[duck]", "[nv]", "[air]"]; k += 2
         if self.cues:
-            ins += ["-i", self.cue_track()]; k = len(self.music) + 1
-            fc.append("[%d:a]aresample=44100,aformat=channel_layouts=stereo[m%d]" % (k, k)); mix.append("[m%d]" % k)
-        fc.append("%samix=inputs=%d:normalize=0,alimiter=limit=0.9,apad[a]" % ("".join(mix), len(mix)))
+            ins += ["-i", self.cue_track()]; k += 1
+            fc.append("[%d:a]aresample=44100,aformat=channel_layouts=stereo[cu]" % k); last.append("[cu]")
+        fc.append("%samix=inputs=%d:normalize=0,alimiter=limit=0.92,apad[a]" % ("".join(last), len(last)))
         kbps = int(min(2600, MAX_MB * 8192.0 / self.t - 136))
         v = ["-c:v", "libx264", "-preset", "medium", "-b:v", "%dk" % kbps, "-pix_fmt", "yuv420p", "-g", "48"]
         log = self.tmp + "/pass"
@@ -268,17 +307,43 @@ def film_frames(src, ss, n, w=W, h=H):
     return np.concatenate([a, np.repeat(a[-1:], n - len(a), 0)]) if len(a) < n else a
 
 
+def card_say(text):
+    return re.sub(r"^(\d)\. ", lambda m: ["", "One. ", "Two. ", "Three. "][int(m.group(1))], text)
+
+
+def narrate_card(out, spec):
+    out.say(out.t + 0.35, spec["title"] + ".")
+    for q, (_, line) in enumerate(spec["lights"]):
+        at = out.t + C.CARD_LEAD + C.LINE_SECONDS * q
+        out.cue(at, "line"); out.say(at + 0.25, card_say(line))
+
+
+def all_lines():
+    """Every sentence the film speaks, so they can be made before rendering starts."""
+    out = ["Tour-key Trout Town.", "Find the number on your slip. That is your porthole.", "See four choices.", "Pick one. Draw its shape.",
+           "Triangle. Circle. Cross. Square.", "The trout think."]
+    for spec in C.CARDS:
+        out += [spec["title"] + "."] + [card_say(l) for _, l in spec["lights"]]
+    for name, a, b, _ in DIVES:
+        out.append("%s. Slips %s to %s." % (name.replace("1", "one").replace("2", "two").replace("3", "three").replace("4", "four"), V.number(a), V.number(b)))
+    for pid in range(1, 56):
+        ch = choices(pid)
+        out += spoken(pid, "turkey", [c for c in ch if c[2] == "turkey"]) + spoken(pid, "trout", [c for c in ch if c[2] == "trout"])
+    return out
+
+
 def opening(out):
     """Title, one card per command on the worksheet, then how the buttons work."""
     t0 = out.t
+    out.say(t0 + 3.2, "Tour-key Trout Town."); out.say(t0 + 7.0, "Find the number on your slip. That is your porthole.")
     for f in C.title(film_frames("films/intro-6.mp4", 2.4, int(5.6 * FPS), 1136, 639)):
         out.add(f)
     for k, spec in enumerate(C.CARDS):
         n = int(C.card_seconds(spec) * FPS)
-        for q in range(len(spec["lights"])):
-            out.cue(out.t + C.CARD_LEAD + C.LINE_SECONDS * q, "line")
+        narrate_card(out, spec)
         for f in C.card(spec, film_frames(spec["film"][0], spec["film"][1], n, 640, 360), n, first=(k == 0)):
             out.add(f)
+    out.say(out.t + 0.3, "See four choices."); out.say(out.t + 2.0, "Pick one. Draw its shape."); out.say(out.t + 5.0, "Triangle. Circle. Cross. Square.")
     for f in C.choose_card(int(9.0 * FPS)):
         out.add(f)
     bt, rms, sr, dur = beats(HOWTO_SONG[0])
@@ -290,10 +355,18 @@ def closing(out):
     t0 = out.t
     for spec in C.CARDS[6:]:
         n = int(C.card_seconds(spec) * FPS)
+        narrate_card(out, spec)
         for f in C.card(spec, film_frames(spec["film"][0], spec["film"][1], n, 640, 360), n, first=False):
             out.add(f)
     bt, rms, sr, dur = beats(CLOSE_SONG[0])
     out.song(CLOSE_SONG[0], float(bt[min(8, len(bt) - 1)]), t0, min(out.t - t0 + 0.4, dur - 1))
+
+
+SHAPE_WORD = {"triangle": "Triangle", "circle": "Circle", "cross": "Cross", "square": "Square", "hexagon": "Hexagon"}
+def spoken(pid, side, items):
+    """What the narrator says for one side of a porthole: who is thinking, then each button and its choice."""
+    first = ("%s. Turkey thinks." % V.number(pid).capitalize()) if side == "turkey" else "The trout think."
+    return [first] + ["%s. %s." % (SHAPE_WORD[k], w) for k, w, _ in items]
 
 
 def play_porthole(out, pid, frames_n, half_n, lights, prev_tail, times, first=False):
@@ -316,7 +389,21 @@ def play_porthole(out, pid, frames_n, half_n, lights, prev_tail, times, first=Fa
     panels = {(s_, k): side_panel(items, s_, k) for s_, items in sides.items() for k in list(range(len(items))) + [None]}
     regs = hud(pid); dice = {"turkey": bolt_dice("turkey"), "trout": bolt_dice("trout")}
     times[pid] = out.t
-    out.song("units/p%02d.mp4" % pid, 0.0, out.t, min(U.LEN, frames_n / float(FPS)), gain=0.22, fade=0.8)     # the film's own sound, low
+    out.tune(out.t)
+    out.song("units/p%02d.mp4" % pid, 0.0, out.t, min(U.LEN, frames_n / float(FPS)), gain=0.2, fade=0.8)     # the film's own sound, low
+    # The narrator reads every line, and each choice lights as he begins to say it.
+    lights = {}
+    for side, n_side, lead_in in (("turkey", half_n, TRANS + 0.1), ("trout", frames_n - half_n, 0.3)):
+        lines_ = spoken(pid, side, sides[side])
+        total = sum(V.seconds(x) for x in lines_) + 0.18 * (len(lines_) - 1)
+        tempo = min(1.4, max(1.0, total / max(1.0, n_side / float(FPS) - lead_in - 0.25)))
+        t = lead_in; base = out.t + (0 if side == "turkey" else half_n / float(FPS)); marks = []
+        for q, line in enumerate(lines_):
+            if q > 0:
+                marks.append(int(round(t * FPS)))
+            t += out.say(base + t, line, tempo) + 0.18 / tempo
+        marks.append(min(n_side - 2, int(round(t * FPS))))
+        lights[side] = marks
     for i in range(frames_n):
         frame = one[order[i]].astype(np.float32)
         side, local = ("turkey", i) if i < half_n else ("trout", i - half_n)
@@ -364,6 +451,7 @@ def dive(out, spec, times):
         T = lambda k: float(bt[min(i0 + k, len(bt) - 1)] - bt[i0])
         t0 = out.t
         if h == 0:
+            out.say(out.t + 0.3, "%s. Slips %s to %s." % (name.replace("1", "one").replace("2", "two").replace("3", "three").replace("4", "four"), V.number(a), V.number(b)))
             for card in C.dive_card(name, a, b, " and ".join(x[1] for x in halves), int(round(T(lead) * FPS))):
                 out.add(card)
             prev_tail = None
@@ -472,6 +560,7 @@ if __name__ == "__main__":
         stamp = lambda v: v
         slips({int(k): v for k, v in tt.items()})
         sys.exit(print("youtube/slips.html"))
+    print("narration: %d new lines made" % V.prefetch(all_lines()), flush=True)
     out, times, chapters = Out(), {}, [(0, "How to play")]
     opening(out)
     for spec in DIVES:

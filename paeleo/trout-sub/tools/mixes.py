@@ -46,6 +46,7 @@ def render(k, p, limit=None):
     slug = os.path.splitext(os.path.basename(p["path"]))[0]
     dest = "youtube/mixes/mix-%02d-%s.mp4" % (k, slug)
     out, times = Y.Out(), {}
+    Y.V.prefetch(Y.all_lines())
     bt = p["bt"]; T = lambda b: float(bt[min(b, len(bt) - 1)] - bt[0])
     count = min(p["count"], limit) if limit else p["count"]
     last = (p["first"] - 1 + count - 1) % 55 + 1

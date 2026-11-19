@@ -208,7 +208,7 @@ def load_cards():
                         lights=[(tuple(x["box"]), x["say"]) for x in mine]))
     return out
 CARDS = load_cards()
-LINE_SECONDS, CARD_LEAD = 3.6, 1.4
+LINE_SECONDS, CARD_LEAD = 3.8, 2.0
 def card_seconds(spec):
     return CARD_LEAD + LINE_SECONDS * len(spec["lights"]) + 0.6
 
