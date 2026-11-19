@@ -1,0 +1,19 @@
+{
+ "id": "p31", "station": "#31 · Galley B", "clue": "Dented bread-roll tin stamped WARM TO 375°F",
+ "rule": "Thermal Inversion (SCION 51)", "control": "lamp",
+ "atlas": [{"id": "a39", "why": "flat layered bands of water: the cold layer lying as a lid over the warm pool in the tin"}],
+ "prompt_file": "prompts/p31.txt",
+ "takes": [{"take": 1, "by": "director", "verdict": "pass", "seen": "0-2.7 s cockpit matches the master (chipped six-bolt port, empty ballast slot, chalk chart, brass toggle, overhead amber lamp, dent on the right wall) with a dim rounded tin in the port that turns to show 375°F by 2 s; a fan of turkey feathers enters at the lower right corner beside the toggle; 2.7-5.5 s push-in to the glass, the tipped steel tin stamped 375°F glows amber inside with four minnows on its floor, bubbles rising inside it, and Turkey's face reflected at the lower left of the glass; 5.5-6.6 s the push continues past the rim, a flat ripple band lies across the water above the tin, and two minnows stand straight up on their tails in the glow; about 6.7 s hard cut to the outside view: riveted steel tin on the riverbed, Turkey behind the amber port, two speckled trout at left looking in, held to 8 s", "changed": null}],
+ "final_take": 1, "verdict": "pass",
+ "open": [
+  "the 375°F tin is missing from the outside view, so neither of Trout's readings (minnow spa, floating toaster) is staged on Trout's side of the glass; both are only suggested in the port close-up (minnows basking, then two standing upright like toast at about 6.5 s)",
+  "the tin never lifts or bobs off the gravel; nothing floats",
+  "the thermal inversion is weak: one flat ripple band above the tin at 5.5-6.5 s; bubbles rise freely inside the tin and are not seen stopping and spreading under a cold layer",
+  "a feather fan (reads as tail fan rather than a wing tip) enters at lower right and sits beside the toggle; the toggle is not seen being flipped and no lamp beam switches on",
+  "Turkey's spare-hull reading is thin: the small tin is a round pail shape, not a riveted oval like the hull; roasting pan rests only on the 375°F stamp and Turkey's reflection, no gulp is readable",
+  "the cut across the glass comes at about 6.7 s instead of 5.5 s, leaving the outside view only about 1.3 s; the trout do not flinch",
+  "outside view shows two trout and Turkey's whole body with tail fan inside the port, as in the master",
+  "the stamp reads 375°F only, not WARM TO 375°F (matches the still); no other stray text",
+  "prompt is 1746 characters, slightly over the 1700 limit"
+ ]
+}

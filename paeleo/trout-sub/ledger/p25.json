@@ -1,0 +1,36 @@
+{
+ "id": "p25",
+ "station": "#25 · Lock",
+ "clue": "Diner Trout wearing inverted fishbowl",
+ "rule": "Inverted Helmet (Oubapo): the helmet is turned over, open mouth up, and holds the water inside; bubbles only inside the bowl, nothing drifting around the trout",
+ "control": "lamp",
+ "atlas": [
+  {"id": "a48", "why": "a hard round rim as the threshold between wet and dry, for the brass port on Trout's side; nothing in it asked to appear"}
+ ],
+ "prompt_file": "prompts/p25.txt",
+ "takes": [
+  {
+   "take": 1,
+   "by": "director",
+   "verdict": "pass",
+   "seen": "0-0.7 s cockpit matches the master (riveted steel tin, six-bolt brass port with chip at two o'clock, hinge and latch, empty ballast slot, chalk chart under glass, brass lamp toggle, amber lamp, dent at right) with a tiny upright figure with a blue round head far off in the port; about 0.7-2.2 s Turkey's head and tail fan enter at lower right beside the toggle; about 2.2-2.9 s an amber wash comes down over the port and the figure reads as a small trout in a bowl; about 2.9-4.4 s push-in to the glass; 4.4-5.8 s the still's scene at the glass: speckled trout walking upright on a rock ledge in a cave with stalactites, brass riveted collar with ribbed hose, round fishbowl open mouth up and full of water with a visible waterline, small bubbles inside the bowl only, none in the cave, Turkey's faint reflection lower left; the trout takes steps and the waterline shifts; about 6.2 s cut to the river side through one angled frame of the tin and port; 6.6-8 s outside view as the master (riveted steel tin with top handle and dent, brass port with chip, hinge and latch), Turkey whole and small behind the amber port, the fishbowl trout large in the left foreground in profile, facing the port at glass distance, bowl still full with waterline",
+   "changed": null
+  }
+ ],
+ "final_take": 1,
+ "verdict": "pass",
+ "open": [
+  "beat 1: Turkey's head (about 0.7 s) and then the tail fan (about 1.4-2.2 s) enter at lower right instead of a wing tip; the toggle stays visible but no wing is seen flipping it",
+  "the lamp reads as an amber wash from the overhead lamp over the port, not a beam switching on below the port",
+  "in beat 1 the port shows open blue-green water with a tiny figure, not a dark cave; the cave only appears during the push-in",
+  "the cut across the glass comes at about 6.2 s, not 5.5 s, and passes through an angled frame (about 6.2 s) where the port is empty with only Turkey's head at its right edge and the trout is at far left; beat 3 proper lasts about 1.4 s",
+  "outside is the open river of the master (light shafts, weed, pebbles, free bubbles in the water around the trout), not the cave; this settles Turkey's question toward scuba helmet and breaks the rule's 'nothing drifts around the trout' on Trout's side; the dry-air-bubble reading survives only in beat 2",
+  "bird in a bottle: no reflection of the port or Turkey on the curve of the bowl; the reading rests only on the bowl and the round port with Turkey sitting side by side at the same size",
+  "giant astronaut suit: the tin does not loom as a giant helmet; the trout is as tall as the tin and covers its left third, so the reading rests on tin handle plus round visor-like port alone",
+  "the trout in beat 3 is in profile facing the port, not seen from behind, and its legs are out of frame; it reads as swimming up rather than stopping mid-walk",
+  "the slosh in the bowl is slight (waterline shifts between 5.4 and 5.8 s); no water spills, so the inversion is carried by the open rim and waterline only",
+  "sound not checked; judged from frames only",
+  "prompt is 1917 characters, over the brief's 1700 limit",
+  "no stray text seen; tin is riveted steel throughout, never bread"
+ ]
+}

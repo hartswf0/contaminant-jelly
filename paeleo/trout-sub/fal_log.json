@@ -550,5 +550,414 @@
   "files": [
    "films/p22.mp4"
   ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "p23",
+  "take": 1,
+  "seconds": 12.1,
+  "arguments": {
+   "duration": 8,
+   "resolution": "480P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 2111749639,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p23.jpg",
+   "atlas/a39.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. Three beats, one continuous film.\n\nBeat 1 (0-2.5s), Turkey's seat: the fixed eye-level view inside the riveted steel bread-roll-tin submarine exactly as in the cockpit reference: centered brass six-bolt porthole with a chip at two o'clock, empty ballast slot at lower left, chalk route chart under glass at lower center, brass lamp toggle at lower right, amber lamp overhead, dent in the right wall. Outside the glass the river is dim dusk blue with one pale round shape. Only the tip of a feathered turkey wing enters at the lower right edge and flips the brass lamp toggle.\n\nBeat 2 (2.5-5.5s): an amber beam comes on and the camera pushes slowly in to the glass. The beam finds the scene of the porthole reference: a round cream wall clock with a dark rim on a mossy barnacled wooden post, ringed by a pink sea anemone whose long tentacles are the dial. With each tick the tentacles curl inward over the clock face like a closing mouth, then open; the minute hand jumps from twelve to quarter past three. A small speckled trout hovers at the three like an hour hand. A faint reflection of the turkey's face on the glass tilts.\n\nBeat 3 (5.5-8s), hard cut across the glass to the outside view of the reference: the steel tin on the riverbed, the turkey small behind the amber porthole. In the foreground the anemone clock swings gently from a short brass chain held in the fin of a large old trout in round spectacles, like a pocketwatch, while a line of small trout fry with satchels hurries past late. Dusk water in layered rounded blue bands as in the last reference.\n\nBubbles rise throughout. Ticking sound. The only lettering is the clock numerals 1 to 12; no other text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab310c2/q0EJtsgl4WMFwGfr7mYRk_minimax-h3.mp4",
+  "files": [
+   "films/p23.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "p24",
+  "take": 1,
+  "seconds": 10.0,
+  "arguments": {
+   "duration": 8,
+   "resolution": "480P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 1435641838,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p24.jpg",
+   "atlas/a47.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. Three beats, one continuous film.\n\nBeat 1 (0-2.5s), Turkey's seat: the fixed eye-level view inside the riveted steel bread-roll-tin submarine exactly as in the cockpit reference: centered brass six-bolt porthole with hinge, latch and a chip at two o'clock, empty ballast slot at lower left, chalk route chart under glass at lower center, brass lamp toggle at lower right, amber lamp overhead, dent in the right wall. Outside the glass a dark green mesh hangs across murky blue-green water. Only the tip of one feathered turkey wing reaches in from the lower left edge and drops a small round iron ballast weight into the ballast slot. No turkey body, no tail fan.\n\nBeat 2 (2.5-5.5s): the camera pushes slowly in to the glass. The scene of the porthole reference: a chewed green twine net draped across the whole port, frayed ends waving, one ragged hole in the middle. A speckled trout noses through the hole. One taut strand above it snaps in two; that half of the net goes slack and swings toward the glass like a closing loop while the trout slips free. A faint reflection of the turkey's face low on the glass flinches.\n\nBeat 3 (5.5-8s), hard cut across the glass to the outside view of the reference: the riveted metal tin with its top handle hanging in mid-water just above the riverbed, bobbing gently, one green twine line running from the handle straight up out of frame. The turkey is small behind the amber porthole. The cut net trails from the brass latch, its severed ends drifting loose. In the foreground the freed trout looks from the cut twine to the bobbing tin.\n\nHanging net strands as a soft boundary in blue water as in the last reference; take only that. Bubbles rise throughout. No text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab310c8/bUkU4lb8JUtLKRVVSZk3S_minimax-h3.mp4",
+  "files": [
+   "films/p24.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "p25",
+  "take": 1,
+  "seconds": 11.6,
+  "arguments": {
+   "duration": 8,
+   "resolution": "480P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 1056363005,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p25.jpg",
+   "atlas/a48.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. Three beats, one continuous film.\n\nBeat 1 (0-2.5s), Turkey's seat: the fixed eye-level view inside the riveted steel bread-roll-tin submarine exactly as in the cockpit reference: centered brass six-bolt porthole with a chip at two o'clock, empty ballast slot at lower left, chalk route chart under glass at lower center, brass lamp toggle at lower right, amber lamp overhead, dent in the right wall. Outside the glass is a dark blue-green rock cave with one small upright shape. Only the tip of a feathered turkey wing enters at the lower right edge and flips the brass lamp toggle.\n\nBeat 2 (2.5-5.5s): an amber beam comes on and the camera pushes slowly in to the glass. The beam finds the scene of the porthole reference: a speckled brook trout walking upright on two legs along a rock ledge between stalactites, wearing a brass riveted collar with a ribbed hose and, over its head, a round glass fishbowl with its open mouth turned upward, full of water. The helmet is inverted: the water is inside the bowl. As the trout steps, the water in the bowl sloshes and small bubbles rise only inside the bowl; around the trout nothing drifts, no bubbles, no silt. A faint reflection of the turkey's face on the glass at lower left tilts.\n\nBeat 3 (5.5-8s), hard cut across the glass to the outside view of the reference: the steel tin with its top handle resting on the cave floor, looming like the helmet of a giant diving suit, the turkey small behind the amber porthole as if behind a visor. In the foreground the fishbowl trout, seen from behind at the left, stops and leans toward the port; the round porthole and the tiny turkey are mirrored on the curve of its bowl, like a bird in a bottle. The brass rim is a hard threshold between wet and dry, as in the last reference.\n\nNo text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab310ca/nx7798ksaPWCKqYkHm6cT_minimax-h3.mp4",
+  "files": [
+   "films/p25.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "p26",
+  "take": 1,
+  "seconds": 15.7,
+  "arguments": {
+   "duration": 8,
+   "resolution": "480P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 1080548788,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p26.jpg",
+   "atlas/a39.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. Three beats, one continuous film.\n\nBeat 1 (0-2.5s), Turkey's seat: the fixed eye-level view inside the riveted steel bread-roll-tin submarine exactly as in the cockpit reference: centered brass six-bolt porthole with a chip at two o'clock, empty ballast slot lower left, chalk route chart under glass lower center, brass lamp toggle lower right, amber lamp overhead, dent in the right wall. Outside the glass, cool blue-green murk with one small orange glow low down. Only the tip of one turkey wing enters at the lower left corner and drops a round iron weight into the ballast slot. No turkey body. The view sinks gently.\n\nBeat 2 (2.5-5.5s): the camera pushes slowly in to the glass, to the scene of the porthole reference: a heap of glowing orange coals in a dark crack of the rocky riverbed. Nothing touches the coals; only the heat moves. One wavering column of warm shimmering water and fat bubbles rises straight up from them, rolling like a pot at the boil, in soft layered ribbons as in the last reference. A strand of river weed circles in the column like a stirred noodle. One black coal lump rolls off the heap toward the glass. A speckled brook trout hovers at the right, fins spread to the warmth. A faint turkey reflection low left on the glass leans in.\n\nBeat 3 (5.5-8s), hard cut across the glass to the outside view of the reference: the riveted metal tin on the pebble riverbed, the turkey small behind the amber porthole, feathers puffed, shivering, holding both wing tips up to the glass toward the glow. In the foreground the same coal heap in its crack, ringed by stones like a little camp stove, its plume rising past the porthole. The trout beside it warms its fins over the coals and looks at the turkey.\n\nBubbles rise throughout. No text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab310cf/cNEbJMRNYfdhWMTz5XBhm_minimax-h3.mp4",
+  "files": [
+   "films/p26.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "p27",
+  "take": 1,
+  "seconds": 11.2,
+  "arguments": {
+   "duration": 8,
+   "resolution": "480P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 488512573,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p27.jpg",
+   "atlas/a31.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. Three beats, one continuous film.\n\nBeat 1 (0-2.5s), Turkey's seat: the fixed eye-level view inside the riveted steel bread-roll-tin submarine exactly as in the cockpit reference: centered brass six-bolt porthole with a chip at two o'clock, empty ballast slot lower left, chalk route chart under glass lower center, brass lamp toggle lower right, amber lamp overhead, dent in the right wall. Outside the glass, in dark blue-green murk, one small pale rectangle of light blinks on, off, on. Only the tip of one turkey wing enters at the lower right corner and flips the brass toggle. No turkey body.\n\nBeat 2 (2.5-5.5s): an amber beam switches on and the camera pushes slowly in to the glass, to the scene of the porthole reference: an old wooden television set with two rabbit-ear antennas, standing tilted on the riverbed. Everything that moves is inside its screen: a yellow sponge with a small face waves a blue cloth over its head in wide arcs, wiping green algae off the inside of the screen glass; the picture flickers and rolls once, then steadies. Two speckled brook trout lie in front of the set, watching, lit by the screen. A faint turkey reflection low left on the porthole glass leans closer. The screen is one flat bold picture, glowing as in the last reference.\n\nBeat 3 (5.5-8s), hard cut across the glass to the outside view of the reference: the riveted metal tin with its handle parked on the pebble riverbed, the turkey small inside the round amber porthole. Beside the tin at the left stands the same television, its screen with the waving sponge glowing toward us: two lit frames side by side, each with one small figure inside. The tin's amber beam falls on the television's back like a headlamp and its picture stops flickering. The two trout turn their heads from the screen to the porthole and back.\n\nBubbles rise throughout. No text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab310d1/R9nxkWUpqT8fplGX5EiUh_minimax-h3.mp4",
+  "files": [
+   "films/p27.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "p28",
+  "take": 1,
+  "seconds": 13.4,
+  "arguments": {
+   "duration": 8,
+   "resolution": "480P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 2021164766,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p28.jpg",
+   "atlas/a39.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. Three beats, one continuous film.\n\nBeat 1 (0-2.5s), Turkey's seat: the fixed eye-level view inside the riveted steel bread-roll-tin submarine exactly as in the cockpit reference: centered brass six-bolt porthole with a chip at two o'clock, empty ballast slot lower left, chalk route chart under glass lower center, brass lamp toggle lower right, amber lamp overhead, dent in the right wall. Outside the glass, dark blue-green water and one faint pale band sliding past. Only the tip of one turkey wing enters at the lower right corner and flips the brass toggle. No turkey body.\n\nBeat 2 (2.5-5.5s): an amber beam switches on and the camera pushes slowly in to the glass, to the scene of the porthole reference: a mossy stone arch tunnel in dark teal water, and hundreds of tiny silver minnows streaming as one single ribbon in a big S-curve, every minnow following the one ahead, none leaving the band. The front of the ribbon is a sharp arrowhead of minnows that points up to the right, into the arch. The tail of the ribbon curls into a round loop around a riverbed stone and draws tight. The minnows flash silver in the beam. A faint turkey reflection low left on the glass looks from the loop to the arrowhead. The ribbon moves as flat wide bands, as in the last reference.\n\nBeat 3 (5.5-8s), hard cut across the glass to the outside view of the reference: the long oval riveted metal tin with its handle on the pebble riverbed before the mossy arch, the turkey small inside the round amber porthole. The same silver ribbon of minnows swings in one S-curve and falls into line behind the tin, so the tin sits at the head of the ribbon like the first float of a parade, glinting the same silver as the minnows. One speckled brook trout in the left foreground looks from the tin to the minnows and back.\n\nBubbles rise throughout. No text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab310d9/I7Qf5ZadskJLeegadsz96_minimax-h3.mp4",
+  "files": [
+   "films/p28.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "p29",
+  "take": 1,
+  "seconds": 13.1,
+  "arguments": {
+   "duration": 8,
+   "resolution": "480P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 815593598,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p29.jpg",
+   "atlas/a39.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. Three beats, one continuous film.\n\nBeat 1 (0-2.5s), Turkey's seat: the fixed eye-level view inside the riveted steel bread-roll-tin submarine exactly as in the cockpit reference: centered brass six-bolt porthole with a chip at two o'clock, empty ballast slot lower left, chalk route chart under glass lower center, brass lamp toggle lower right, amber lamp overhead, dent in the right wall. Outside the glass, blue-green murk; one small pale square of paper drifts slowly past. Only the tip of one turkey wing enters at the lower right corner and flips the brass toggle. No turkey body.\n\nBeat 2 (2.5-5.5s): an amber beam comes on and the camera pushes slowly in to the glass, to the scene of the porthole reference: a thick old photo album lying open on the mossy riverbed, its cover flap slack like the mouth of a sack. The album never moves. The current lifts one page and sepia snapshots of little cabins and a covered bridge slip out one after another and drift up to the right in a single slow line, like letters spilling from a bag, on wide soft ribbons of water as in the last reference. A speckled trout at the right watches them pass. A faint turkey reflection low left on the glass.\n\nBeat 3 (5.5-8s), hard cut across the glass to the outside view of the reference: the riveted metal tin with its handle on the pebble riverbed, the turkey small and perfectly still inside the round brass porthole like a portrait in a round frame. The same line of sepia snapshots drifts across from the open album at the left. The porthole lamp gives one white flash like a flashbulb; one snapshot settles against the brass rim. The speckled trout in the foreground flinches, then stares at the porthole.\n\nBubbles rise throughout. No text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab310d9/SBodo-AkxAGJ3bXCo6p5G_minimax-h3.mp4",
+  "files": [
+   "films/p29.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "p30",
+  "take": 1,
+  "seconds": 11.8,
+  "arguments": {
+   "duration": 8,
+   "resolution": "480P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 801384577,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p30.jpg",
+   "atlas/a39.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images.\n\nBeat 1 (0-2.5s), Turkey's seat: the fixed eye-level view inside the riveted steel tin submarine exactly as in the cockpit reference: centered brass six-bolt porthole chipped at two o'clock, empty ballast slot lower left, chalk chart under glass lower center, brass lamp toggle lower right, amber lamp overhead, dent in the right wall. Outside the glass, dark blue-green murk with six dim round shapes hanging in a row. Only one turkey wing tip enters at the lower right and flips the toggle. No turkey body.\n\nBeat 2 (2.5-5.5s): an amber beam comes on and the camera pushes slowly in to the glass, to the scene of the porthole reference: a mossy stone bridge arch over the riverbed and, hanging in a level row under it, six large golden glass bubbles, each holding one capital letter: A, E, I, O, U, Y. They bob like moored floats. Then they light one at a time from left to right, glowing like the pale circles in the last reference, but the second bubble, E, stays dark every time. A speckled trout waits at the right.\n\nBeat 3 (5.5-8s), hard cut across the glass to the outside view of the reference: the riveted metal tin on the pebble riverbed, the turkey small behind the amber porthole. The row of letter bubbles floats in the foreground between the trout and the tin. The turkey pecks the inside of the glass once; at that instant the dark E bubble bursts in one bright flash. The five others glow on. The trout jerks back and stares at the turkey's beak.\n\nThe only lettering is the six single letters A E I O U Y inside the bubbles; no other text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab310e1/Kok24YsSYArL_oE5QM7-7_minimax-h3.mp4",
+  "files": [
+   "films/p30.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "p31",
+  "take": 1,
+  "seconds": 15.8,
+  "arguments": {
+   "duration": 8,
+   "resolution": "480P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 2145469635,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p31.jpg",
+   "atlas/a39.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. Three beats, one continuous film.\n\nBeat 1 (0-2.5s), Turkey's seat: the fixed eye-level view inside the riveted steel bread-roll-tin submarine exactly as in the cockpit reference: centered brass six-bolt porthole with a chip at two o'clock, empty ballast slot at lower left, chalk route chart under glass at lower center, brass lamp toggle at lower right, amber lamp overhead, dent in the right wall. Outside the glass: cold blue-green river and one dim rounded metal shape. Only the tip of a feathered turkey wing reaches in from the lower right edge and flips the lamp toggle.\n\nBeat 2 (2.5-5.5s): slow push in to the glass. Outside is the scene of the porthole reference: a second dented steel tin, the same riveted metal as this hull and the size of a roasting pan, tipped on its side on the riverbed, open mouth toward us, stamped 375°F. Its inside glows warm amber. The warmth is upside down: amber water stays pooled low inside the tin under a flat lid of cold blue water; bubbles rise, hit the cold layer and spread sideways in flat bands as in the last reference. Four silver minnows drift in the warm pool. A faint reflection of the turkey's face on the glass gulps.\n\nBeat 3 (5.5-8s), hard cut across the glass to the outside view of the reference: the long riveted metal tin on the riverbed, the turkey small behind the amber porthole, and in the foreground a speckled brook trout beside the small tipped tin. The minnows bask in its glow, then the tin bobs up off the gravel and two minnows pop straight up out of it; the trout flinches back.\n\nThe only lettering is 375°F on the small tin; no other text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab310e1/lhzh9kVTXZCsP9MHFbmmS_minimax-h3.mp4",
+  "files": [
+   "films/p31.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "p33",
+  "take": 1,
+  "seconds": 11.8,
+  "arguments": {
+   "duration": 8,
+   "resolution": "480P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 681741159,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p33.jpg",
+   "atlas/a09.jpg",
+   "atlas/a10.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. Three beats, one continuous film.\n\nBeat 1 (0-2.5s), Turkey's seat: the fixed eye-level view inside the riveted steel bread-roll-tin submarine exactly as in the cockpit reference: centered brass six-bolt porthole with a chip at two o'clock, empty ballast slot at lower left, chalk route chart under glass at lower center, brass lamp toggle at lower right, amber lamp overhead, dent in the right wall. Outside the glass is dim blue-green murk crossed by dark upright stripes. Only the tip of a feathered turkey wing reaches in from the lower right corner and flips the brass lamp toggle.\n\nBeat 2 (2.5-5.5s): a pale amber beam switches on and the camera pushes slowly in to the glass. The murk resolves into the scene of the porthole reference as a flat black cut-out silhouette against glowing teal water: a round stone culvert mouth, a row of upright iron bars, and heavy velvet drapes tied back at both sides. The drapes sway apart like a stage curtain opening, and behind the bars a speckled trout drifts across the lit teal circle. A faint reflection of the turkey's face on the glass leans closer.\n\nBeat 3 (5.5-8s), hard cut across the glass to the outside view of the reference: the riveted metal tin on the riverbed, the turkey small behind the amber porthole. In the foreground the speckled trout looks out between the dark culvert bars, which stand like a row of teeth in a rivet-studded stone jaw framing the picture, while the tin's amber beam shines through them in a flickering cone full of drifting motes, like a film projector.\n\nEngraved cross-hatching on stone and the pale beam under a rock arch as in the last two references; keep full colour. Bubbles rise throughout. No text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab310e8/1YgTBmAmtI82900sZiTXs_minimax-h3.mp4",
+  "files": [
+   "films/p33.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "p32",
+  "take": 1,
+  "seconds": 10.6,
+  "arguments": {
+   "duration": 8,
+   "resolution": "480P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 1482720485,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p32.jpg",
+   "atlas/a50.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. Three beats, one continuous film.\n\nBeat 1 (0-2.5s), Turkey's seat: the fixed eye-level view inside the riveted steel bread-roll-tin submarine exactly as in the cockpit reference: centered brass six-bolt porthole with a chip at two o'clock, empty ballast slot lower left, chalk route chart under glass lower center, brass lamp toggle lower right, amber lamp overhead, dent in the right wall. Outside the glass only blue-green murk and a folded dark zigzag shape at the left edge. Only the tip of one turkey wing enters at the lower right corner and flips the brass toggle. No turkey body.\n\nBeat 2 (2.5-5.5s): an amber beam switches on below the port and the camera pushes slowly in to the glass, to the scene of the porthole reference. From a slot in the yellow hull at the left a brass scissor-jack arm unfolds, its crossed bars stretching out link by link, the only thing that moves. At its end a brass two-jaw claw pinches an old iron skeleton key. The claw snaps open and shut once like a crab's pincer without dropping the key, then twists the key a quarter turn in the empty water as if in a keyhole. A speckled brook trout below gapes up at it. A faint turkey reflection low left on the glass tilts its head.\n\nBeat 3 (5.5-8s), hard cut across the glass to the outside view of the reference: the riveted metal tin on the pebble riverbed, the turkey small behind the amber porthole. The same scissor arm reaches out of the tin's left side into the foreground. A trout holds its mouth wide open and the claw brings the key tip to its teeth, close and near the lens like the fish and brass object in the last reference. Behind it a second trout hides a small padlocked tackle box under its fin.\n\nBubbles rise throughout. No text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab310e9/3fCZL9PG4B4vX1k0yyQ2t_minimax-h3.mp4",
+  "files": [
+   "films/p32.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "p34",
+  "take": 1,
+  "seconds": 10.8,
+  "arguments": {
+   "duration": 8,
+   "resolution": "480P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 1360151835,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p34.jpg",
+   "atlas/a07.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images.\n\nBeat 1 (0-2.5s), Turkey's seat: inside the riveted steel bread-roll-tin submarine exactly as in the cockpit reference: centered brass six-bolt porthole with a chip at two o'clock, empty ballast slot at lower left, chalk route chart under glass at lower center, brass lamp toggle at lower right, amber lamp overhead, dent in the right wall. Outside the glass, murk and a dark shape of upright tubes. Only the tip of a feathered turkey wing reaches in from the lower right corner and flips the brass lamp toggle.\n\nBeat 2 (2.5-5.5s): an amber beam switches on and the camera pushes in to the glass. The murk clears to the scene of the porthole reference: a brass boiler with gears and a tall rank of copper organ pipes over pleated bellows. Its front wall is cut away like a painted cross-section, flat and side-on as in the last reference: inside, an orange firebox glows and three tiny trout in a row pump the bellows. The bellows squeeze and the pipes puff bubbles. The turkey's faint reflection on the glass leans closer.\n\nBeat 3 (5.5-8s), hard cut across the glass to the outside view of the reference: the riveted metal tin on the riverbed, the turkey small behind the amber porthole. In the foreground the same cutaway boiler organ sits on a low flat raft; its pleated bellows look like radiator fins and shake, the pipes toot bubbles in rhythm, and one speckled brook trout beside it bobs in time, looking in at the turkey.\n\nTake only the flat cutaway staging and amber tint from the last reference; no people. Bubbles rise throughout. No text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab310f0/4P32qqm6MLNl8vAL5V5mx_minimax-h3.mp4",
+  "files": [
+   "films/p34.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "p35",
+  "take": 1,
+  "seconds": 12.3,
+  "arguments": {
+   "duration": 8,
+   "resolution": "480P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 1849410902,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p35.jpg",
+   "atlas/a42.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. Three beats, one continuous film.\n\nBeat 1 (0-2.5s), Turkey's seat: the fixed eye-level view inside the riveted steel bread-roll-tin submarine exactly as in the cockpit reference: centered brass six-bolt porthole with a chip at two o'clock, empty ballast slot at lower left, chalk route chart under glass at lower center, brass lamp toggle at lower right, amber lamp overhead, dent in the right wall. Outside the glass is blue-green murk and one leaning dark post. Only the tip of a feathered turkey wing reaches in from the lower left corner and drops a small iron ballast weight into the slot, like posting a letter.\n\nBeat 2 (2.5-5.5s): the camera pushes in to the glass, then locks and does not move. The scene of the porthole reference fills the port: a dented blue tin mailbox painted \"#44\" on a leaning wooden post, its door hanging open, a bulging tan canvas sack inside spilling white envelopes with red wax seals. One envelope tumbles out; a speckled brook trout wearing a tiny grey postal cap catches it in its mouth and carries it straight toward the glass, while the sack sags and slumps like a bag of washing. A faint reflection of the turkey's face on the glass tilts.\n\nBeat 3 (5.5-8s), hard cut across the glass to the outside view of the reference, camera locked: the riveted metal tin on the riverbed with its handle on top, the turkey small behind the amber porthole, the open \"#44\" mailbox on its post at the left edge. The same trout, envelope in mouth, hovers at the tin; loose envelopes drift along the current and are drawn toward the hull, where the tin's rear flap hangs open like a delivery van door.\n\nSlanting shafts of sun through the water as in the last reference. Bubbles rise throughout. The only lettering is \"#44\" on the mailbox; no other text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab310f2/ki2eeuVUY67oQ-561dro7_minimax-h3.mp4",
+  "files": [
+   "films/p35.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "p36",
+  "take": 1,
+  "seconds": 11.3,
+  "arguments": {
+   "duration": 8,
+   "resolution": "480P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 1573031645,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p36.jpg",
+   "atlas/a28.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. Three beats, one continuous film.\n\nBeat 1 (0-2.5s), Turkey's seat: the fixed eye-level view inside the riveted steel bread-roll-tin submarine exactly as in the cockpit reference: centered brass six-bolt porthole with a chip at two o'clock, empty ballast slot lower left, chalk route chart under glass lower center, brass lamp toggle lower right, amber lamp overhead, dent in the right wall. Outside the glass, in blue-green murk, the dark shape of a sitting dog in front of a sunken bench. Only the tip of one turkey wing enters at the lower right corner and flips the brass toggle. No turkey body.\n\nBeat 2 (2.5-5.5s): an amber beam switches on and the camera pushes slowly in to the glass, to the scene of the porthole reference: a brown hound sitting upright on the riverbed before a sunken wooden park bench, a white envelope with a red wax seal held in its mouth. The hound stays in exactly the same pose, like one drawing printed again; the red seal glints in the beam. It does one thing: it lifts one front paw, held out pad up, and keeps it there. A speckled brook trout hangs at the right; a faint turkey reflection low left on the glass leans closer.\n\nBeat 3 (5.5-8s), hard cut across the glass to the outside view of the reference: the riveted metal tin on the pebble riverbed, the turkey small behind the amber porthole. In the foreground the same hound in the identical pose, paw still out, envelope held up level with the brass porthole as if to post it. A stream of bubbles chugs from the back end of the tin. A trout beside the hound looks from the envelope to the tin. Hound alone between two tall weed stalks on a flat strip of ground, staged like the single figure in the last reference.\n\nNo text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab310f8/HEOnIbeiVZ4JbHDntfS3M_minimax-h3.mp4",
+  "files": [
+   "films/p36.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "p37",
+  "take": 1,
+  "seconds": 10.9,
+  "arguments": {
+   "duration": 8,
+   "resolution": "480P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 193536818,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p37.jpg",
+   "atlas/a15.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. Three beats, one continuous film.\n\nBeat 1 (0-2.5s), Turkey's seat: the fixed eye-level view inside the riveted steel bread-roll-tin submarine exactly as in the cockpit reference: centered brass six-bolt porthole with a chip at two o'clock, empty ballast slot at lower left, chalk route chart under glass at lower center, brass lamp toggle at lower right, amber lamp overhead, dent in the right wall. Outside the glass is blue-green murk and one pale folded square of paper. Only the tip of a feathered turkey wing reaches in from the lower right corner and flips the brass lamp toggle.\n\nBeat 2 (2.5-5.5s): an amber beam lights the water and the camera pushes in to the glass. The scene of the porthole reference fills the port: a creased, silt-stained paper map, folded shut, opens along its centre crease like a book. As the two halves swing flat, a scaly turkey claw inked on the left half and a speckled trout fin inked on the right half meet exactly on the fold in a handshake. A small green olive twig slips out of the crease and drifts down; a thin loop of fishing line hangs from the map's top edge. A faint reflection of the turkey's face on the glass tilts.\n\nBeat 3 (5.5-8s), hard cut across the glass to the outside view of the reference: the riveted metal tin on the riverbed with its handle on top, the turkey small behind the amber porthole. In the foreground the same map seen from its back, hanging in the current by the fishing line; the same claw-and-fin handshake is drawn on this side too. A speckled brook trout reaches one fin to the paper fin, then leans to peek round the map's edge.\n\nThe map's paper is rubbed, brown and handled as in the last reference. Bubbles rise throughout. The map has only inked river lines, no words. No text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab310f9/BJesm4ic30JXP00XUNI7H_minimax-h3.mp4",
+  "files": [
+   "films/p37.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "p38",
+  "take": 1,
+  "seconds": 11.6,
+  "arguments": {
+   "duration": 8,
+   "resolution": "480P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 2050753443,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p38.jpg",
+   "atlas/a15.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. Three beats, one continuous film.\n\nBeat 1 (0-2.5s), Turkey's seat: the fixed eye-level view inside the riveted steel bread-roll-tin submarine exactly as in the cockpit reference: centered brass six-bolt porthole with a chip at two o'clock, empty ballast slot at lower left, chalk route chart under glass at lower center, brass lamp toggle at lower right, amber lamp overhead, dent in the right wall. Outside the glass is blue-green murk and one pale square. Only the tip of a feathered turkey wing reaches in from the lower right corner and flips the brass lamp toggle.\n\nBeat 2 (2.5-5.5s): an amber beam lights the water and the camera pushes in to the glass. The scene of the porthole reference fills the port: an old cream posterboard chart pinned in a weathered wooden frame with rusty corner plates, a golden domed saucer craft painted at its centre with a round port like this one, ringed by small red, blue and green arrows and compass marks. The arrows slide inward and point at the craft's port and hinge; then black dashed lines draw themselves across the saucer, dividing it into sections like cuts. A faint reflection of the turkey's face on the glass tilts.\n\nBeat 3 (5.5-8s), hard cut across the glass to the outside view of the reference: the riveted metal tin on the riverbed with its handle on top, the turkey small behind the amber porthole. In the foreground the same framed chart stands on two posts in the pebbles, its painted saucer glowing gold in the beam. One speckled brook trout lays a pebble at its foot and bows; a second trout taps a fin on a blank paper tag with a drawn empty hourglass that hangs on a string from the frame's corner.\n\nThe posterboard is rubbed, brown and handled as in the last reference. Bubbles rise throughout. The chart has only arrows and symbols, no words. No text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab310ff/d8M1ZmN6m0OBzMMyWp3QO_minimax-h3.mp4",
+  "files": [
+   "films/p38.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "p39",
+  "take": 1,
+  "seconds": 11.4,
+  "arguments": {
+   "duration": 8,
+   "resolution": "480P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 2002868795,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p39.jpg",
+   "atlas/a20.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. Three beats, one continuous film.\n\nBeat 1 (0-2.5s), Turkey's seat: the fixed eye-level view inside the riveted steel bread-roll-tin submarine exactly as in the cockpit reference: centered brass six-bolt porthole with a chip at two o'clock, empty ballast slot lower left, chalk route chart under glass lower center, brass lamp toggle lower right, amber lamp overhead, dent in the right wall. Outside the glass is dark blue-green water and a faint tall shape. Only the tip of one feathered turkey wing enters at the lower right edge and flips the brass lamp toggle.\n\nBeat 2 (2.5-5.5s): the camera pushes slowly in to the glass. Out in the dark a fringed floor lamp answers and glows warm, and the room of the porthole reference appears: a sunken parlor with faded floral wallpaper, a green tufted wingback armchair, the tall fringed lamp, a patterned rug on floorboards. It looks dry and tidy, but the picture wavers like heat haze, the lamp fringe sways slowly and one bubble rises from the shade. Turkey's faint puzzled reflection sits low left on the glass. Light as in the last reference: one pool of light picks out part of a drowned room, the rest stays dark.\n\nBeat 3 (5.5-8s), hard cut across the glass to the outside view of the reference: the steel tin now rests on the patterned rug between the armchair and the glowing floor lamp, Turkey small behind the round amber port like a pet in a bowl. A speckled brook trout hovers over the chair cushion staring at the tin; rug fringe and silt are drawn toward the tin's end with a low hum.\n\nBubbles rise throughout. No text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab310ff/67jtJtXv2M5SzTJhmeNqy_minimax-h3.mp4",
+  "files": [
+   "films/p39.mp4"
+  ]
  }
 ]

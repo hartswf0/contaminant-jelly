@@ -1,0 +1,29 @@
+{
+ "id": "p26", "station": "#26 · Boiler", "clue": "Glowing orange riverbed coal vent",
+ "rule": "Thermal Plume (SCION 51)", "control": "ballast",
+ "atlas": [
+  {"id": "a39", "why": "sent as the fourth and last reference (after cockpit, outside and the p26 still): wide soft layered ribbons of water, asked for only as the way the warm column rises from the coals in beat 2"}
+ ],
+ "prompt_file": "prompts/p26.txt",
+ "takes": [{
+  "take": 1, "by": "director", "verdict": "pass",
+  "seen": "0-3.2 s cockpit matches the master (riveted steel tin, centered six-bolt brass port with chip at two o'clock, hinge and latch, empty slot lower left, chalk chart under glass, brass toggle lower right, caged amber lamp, dent with cracks on the right wall); from about 0.1 s a fan of striped wing feathers enters at the lower left edge holding a round dark weight, no turkey body or head; about 0.6-1.6 s the weight is over the ballast slot; by 2 s the wing is gone and a pale round object lies in the slot; in the port a small orange glow low in blue-green water appears at about 1 s and brightens to about 3 s; about 3.3 s the view is at the glass (port fills the frame, hinge left, latch right) and then pushes slowly in to about 6 s; the scene is the still: a heap of glowing orange coals over a dark crack in the rocky riverbed, a wavering orange column of ribbons and bubbles rising straight up from it and changing shape frame to frame, weed left and right, a speckled trout at the right with its pectoral fins spread toward the glow, a faint turkey face reflected low left on the glass; from about 4.8 s one black coal lump lies off the left side of the heap and by about 5.6 s sits lower left on the ledge nearer the glass; about 6.2 s a dissolve to the outside: riveted steel tin with handle on a pebble riverbed, dent on the right, whole turkey small behind the amber port with both wings spread wide against the glass, a glowing coal heap on the riverbed in front of the tin below the port with a pale wavering column rising past the port to the handle, a trout at the right with its fins held toward the heap and facing in toward it and the port, two more speckled trout at the left looking in; held to 8 s. Sound was not listened to.",
+  "changed": null
+ }],
+ "final_take": 1, "verdict": "pass",
+ "open": [
+  "the crossing of the glass at about 6.2 s is a short dissolve (the trout and coals of beat 2 are seen ghosted over the tin), not a hard cut, and comes about 0.7 s late; beat 3 lasts about 1.7 s",
+  "beat 1 runs to about 3.2 s and the move to the glass at about 3.3 s is a jump to the close port, not one continuous push-in from the seat; the slow push only starts after it",
+  "the wing in beat 1 is a broad fan of feathers rather than a tip; it does not block the room, but the weight is not seen leaving the wing and falling: the slot is simply filled by 2 s, and the object in the slot is pale while the weight carried was dark",
+  "the tin does not visibly sink after the weight goes in; the view in the port stays level and the glow only brightens",
+  "the weed strand circling in the column like a stirred noodle is not there; weed stands still at both sides, so Turkey's soup-pot reading rests on the rolling bubbles and the column alone, and there is no pot shape",
+  "Turkey's fuel reading rests on one black lump that appears beside the heap and shifts toward the glass; a clear roll off the heap is not caught on the frames read",
+  "in beat 3 the coals sit on open pebbles in front of the tin with no crack in the rock and no ring of stones, so the heap is recognisable but its place on the riverbed has changed and the camp-stove reading is carried only by the trout warming its fins",
+  "three trout in beat 3 (the still and beat 2 have one); the two at the left do nothing with the coals",
+  "Trout's cold-tourist reading: the turkey spreads both wings against the glass toward the glow, but puffed feathers and shivering cannot be confirmed from the frames; the pose could also read as surprise",
+  "the column in beat 3 is pale and smoke-like and runs up over the porthole and the turkey, partly veiling him; the soft layered ribbons asked from a39 are thin wavy strands in both beats, closer to the still's own drawing than to the reference",
+  "the Thermal Plume rule is kept in beat 2 (nothing touches the coals, only the column and bubbles move and the trout holds off at its edge) but the plume moves no object: no weed, bubble train or lump is visibly carried by it",
+  "prompt is 1897 characters, over the brief's 900-1700 guide",
+  "no stray text, no bread, no turkey body in the cockpit"
+ ]
+}

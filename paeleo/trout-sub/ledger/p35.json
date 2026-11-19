@@ -1,0 +1,19 @@
+{
+ "id": "p35", "station": "#35 · Post #44", "clue": "1943 canvas mail sack spilling at Box #44",
+ "rule": "Fixed-Shot Handoff (Oucipo)", "control": "ballast",
+ "atlas": [{"id": "a42", "why": "slanting shafts of sun through the water for the outside view; nothing in it asked to appear"}],
+ "prompt_file": "prompts/p35.txt",
+ "takes": [{"take": 1, "by": "director", "verdict": "pass", "seen": "0-2.5 s cockpit matches the master (chipped six-bolt port, empty slot, chalk chart, toggle, dent right, amber lamp) with a small dark post-and-box shape in the port; about 0.7-1.5 s a turkey wing at the left edge lowers a dome-shaped iron weight into the ballast slot and by 2 s the weight sits in the slot; 2.5-4 s push-in to the glass, then the frame holds still; 3.5-5.5 s the blue #44 mailbox on its leaning post with the tan canvas sack spilling red-sealed white envelopes, a speckled trout in a small grey cap takes one envelope in its mouth at about 4.5 s and carries it, the sack empties and droops, Turkey's faint reflection sits lower left of the glass; about 6.5-8 s Trout's side: riveted steel tin with top handle, Turkey small behind the amber port, the #44 mailbox and limp sack at the left edge, loose envelopes drifting along the riverbed and by 7.8 s being drawn into an opening in the tin's right wall", "changed": null}],
+ "final_take": 1, "verdict": "pass",
+ "open": [
+  "beat 1: the turkey's tail fan and a feathered wing fill the left edge from about 0.7 to 2.3 s, more than a wing tip, though the porthole and all four fixtures stay visible",
+  "the ballast weight is drawn as a bell-shaped dome with a ring, larger than the slot it goes into",
+  "the change to Trout's side at about 6.5 s is a dissolve with a ghosted envelope over Turkey, not a hard cut",
+  "the capped trout that carries the envelope in beat 2 is missing from the outside view; only a tiny fish at the top right edge near 7.5 s, so the handoff is not completed across the glass",
+  "outside, the dent in the right wall opens into a hole that swallows envelopes: this supports the vacuum reading but breaks the invariant dent, and the mail-truck reading has no van door or postal trout at the tin to rest on",
+  "laundry-sack reading rests only on the sack going limp and empty; mission-orders reading rests on the wax seals",
+  "the mailbox in the first two seconds is a bare dark shape without the sack; #44 is the only lettering and appears on the box in both views, no stray text seen",
+  "prompt ran 1909 characters, over the brief's 1700 limit",
+  "sound not checked"
+ ]
+}

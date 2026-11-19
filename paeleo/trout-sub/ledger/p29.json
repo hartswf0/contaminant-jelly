@@ -1,0 +1,27 @@
+{
+ "id": "p29", "station": "#29 · Deck", "clue": "Open photo album shedding sepia snapshots",
+ "rule": "Drift Archive (SCION 39)", "control": "lamp",
+ "atlas": [
+  {"id": "a39", "why": "sent as the fourth and last reference (after cockpit, outside and the p29 still): wide soft ribbons of layered water, asked for only as the way the current carries the snapshots in one slow line; its pale circles and rocks were not asked for and do not appear"}
+ ],
+ "prompt_file": "prompts/p29.txt",
+ "takes": [{
+  "take": 1, "by": "director", "verdict": "pass",
+  "seen": "Read from the 12-frame sheet and a 4-frames-per-second grid; times are to about a quarter second. 0-0.5 s cockpit matches the master (riveted steel tin, centered six-bolt brass port with chip at two o'clock, hinge and latch, empty slot lower left, chalk chart under glass, brass toggle lower right, caged amber lamp, dent with cracks on the right wall); in the port one small pale square of paper drifts from left toward centre in clear blue-green water (0-1.25 s); from about 0.5 s a closed brown book lies on the riverbed in the port; from about 0.75 s striped tail feathers fan up in the lower right corner; about 2.25-2.5 s a broad amber beam comes on across the room from the upper left; about 2.75-3.25 s the book falls open into a pale-paged album; 3-5.75 s one continuous push-in to the glass; from about 3.25 s sepia snapshots with small cabins on them leave the open album and rise up and to the right in a loose string of five to seven; mossy stones and weed as in the still; a speckled trout enters at the right about 4.25 s and hangs beside the string to 5.75 s; turkey face reflected low left on the glass from about 4.25 s; about 6.0 s the picture crosses the glass through a short dissolve; 6.25-8 s outside view as the master: riveted steel tin with handle on the pebble riverbed, dent on its right, turkey standing still inside the round brass port with the amber beam at its feet, two speckled trout at the left looking at the port; two sepia snapshots drift in from the left across the hinge and over the glass (6.25-7 s); about 7.25 s one white flash fills the port and washes out the tin; 7.5-8 s one snapshot rests on the upper right of the brass rim over the turkey's tail. Sound was not listened to.",
+  "changed": null
+ }],
+ "final_take": 1, "verdict": "pass",
+ "open": [
+  "a striped turkey tail fan, not a wing tip, sits in the lower right corner from about 0.75 s to about 3 s; it stays in the corner, the toggle stays in view and the room stays readable, no whole turkey body; no flip of the toggle is visible, the beam simply comes on",
+  "the crossing of the glass is a short dissolve at about 6.0 s (album and tin overlap for a few frames), not a hard cut, and comes about 0.5 s late; beat 3 lasts about 1.75 s",
+  "the album is absent from the outside view: the snapshots come in from the left edge with no source, so the same thing is seen from the river only through its snapshots",
+  "Drift Archive is only partly kept: the snapshots do drift up to the right as a loose string, but the album does not stay still as written; it is a closed brown book from about 0.5 s and falls open at about 3 s",
+  "the port in beat 1 is clear water, not murk, and the beam is a broad wash across the room from the upper left, not a beam from the port; it does not reveal the album, which is already in view",
+  "Turkey's town-scrapbook reading is clear (open album, cabin pictures on pages and on the snapshots); the sunken-mailbag reading is weak: the slack sack-mouth cover is not visible, and it rests only on the loose pictures leaving one after another like letters and the single stray square of paper in beat 1",
+  "Trout's paparazzi-camera reading rests on the one white flash at about 7.25 s from the round port, which is visible; the lost-picture-frame reading rests on the still turkey inside the round brass rim with a snapshot resting on the rim, also visible; but the snapshot covers part of the turkey rather than sitting beside it, and the trout's flinch is not confirmed from the frames, the two trout only face the port",
+  "trout count: one in beat 2, two in beat 3",
+  "a covered bridge on the snapshots is not confirmed; the pictures read as small cabins or barns",
+  "no stray lettering seen; the tin is riveted steel on both sides, never bread",
+  "the prompt is 1865 characters, over the brief's 1700"
+ ]
+}

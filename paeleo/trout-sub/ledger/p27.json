@@ -1,0 +1,30 @@
+{
+ "id": "p27", "station": "#27 · Port M", "clue": "Rabbit-ear CRT playing AlgaeWipe 3000",
+ "rule": "Frame-in-Frame (SCION 27)", "control": "lamp",
+ "atlas": [
+  {"id": "a31", "why": "sent as the fourth and last reference (after cockpit, outside and the p27 still): a small CRT holding one bold flat graphic, asked for only as the way the screen glows as a flat picture inside its own frame; its house and wires were not asked for"}
+ ],
+ "prompt_file": "prompts/p27.txt",
+ "takes": [{
+  "take": 1, "by": "director", "verdict": "pass",
+  "seen": "0-0.5 s cockpit matches the master (riveted steel tin, centered six-bolt brass port with chip at two o'clock, hinge and latch, empty slot lower left, chalk chart under glass, brass toggle lower right, caged amber lamp, dent with cracks on the right wall), port shows empty blue-green water; about 0.7-1.4 s a small pale rectangle of light is lit in the middle of the port, gone again by 1.5 s; from about 1.3 s striped tail feathers fan up in the lower right corner; about 2.7-2.9 s an amber cone comes on from the foot of the port onto the chart and the television fades into the port: wooden set, two rabbit ears, yellow sponge with a face on the screen, trout below; 3-6.3 s one continuous push-in to the glass; inside the screen the sponge swings a blue cloth from low left (about 5.6 s) to over its head (about 6.0-6.3 s), green algae in the screen corners; two speckled trout lie in front of the set looking up at it; turkey face reflected low left on the glass from about 5 s; about 6.35 s hard cut to the outside: riveted steel tin with handle on the pebble riverbed at the right, dent on its right, turkey small behind the amber port, and at the left the same wooden rabbit-ear television, its screen lit; an amber beam runs from the port across to the television; two (at the end possibly three) speckled trout sit between the two, looking up at the screen; the screen now shows two upright framed panels, each with a small figure in it. Sound was not listened to.",
+  "changed": null
+ }],
+ "final_take": 1, "verdict": "pass",
+ "open": [
+  "a striped turkey tail fan, not a wing tip, fills the lower right corner from about 1.3 s to about 3 s and covers the lamp toggle at about 2.5 s; no flip of the toggle is visible, the beam simply comes on; no whole turkey body, and the room stays readable",
+  "the pale rectangle is seen lit once (about 0.7-1.4 s) and then off; an on-off-on blink is not confirmed from the frames pulled",
+  "the beam does not reveal the set out of murk: the port is clear empty water, then the television fades in fully lit at about 2.8 s",
+  "the crossing of the glass comes at about 6.35 s, about 0.85 s late; beat 3 lasts about 1.6 s",
+  "in the outside view the television screen does not show the waving sponge: it shows two door-like framed panels with a small figure in each, so the advertisement is not the same on both sides of the glass",
+  "the television in beat 3 faces the camera and the beam lands on its front and side, not on its back; whether the picture flickers in beat 2 or steadies in beat 3 cannot be told from the frames",
+  "Trout's rival-channel reading rests on the two lit frames side by side, each with a small figure, which is visible; but the trout only look up at the television, and no turn of the head toward the porthole and back was seen",
+  "Trout's repairman's-van reading is weak: the tin with its handle sits beside the set and its beam points at it like a headlamp, but nothing is done to the set and no change in its picture is visible",
+  "Turkey's distress-signal reading rests on the single lit rectangle in beat 1 and the cloth swung overhead; the sponge-advertisement reading is clear (sponge, cloth, algae); the algae on the screen is not visibly wiped away",
+  "trout count drifts: two in beat 2, two at the cut, a third head appears by about 7.8 s",
+  "at about 3 s a pale rounded shape pokes up at the bottom centre of frame over the seat for a few frames, unexplained",
+  "no stray lettering seen; the tin is riveted steel on both sides, never bread",
+  "the prompt is 1990 characters, over the brief's 1700",
+  "Frame-in-Frame is kept in beat 2 (all motion stays inside the screen inside the port) and holds by accident in beat 3 (frames inside the screen), not as written"
+ ]
+}

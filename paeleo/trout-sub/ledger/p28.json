@@ -1,0 +1,29 @@
+{
+ "id": "p28", "station": "#28 · Stbd M", "clue": "Silver minnows streaming in S-curve weave",
+ "rule": "Flock Ribbon (SCION 06)", "control": "lamp",
+ "atlas": [
+  {"id": "a39", "why": "sent as the fourth and last reference (after cockpit, outside and the p28 still): wide flat ribbons of water carrying motion, asked for only as the way the school moves as flat bands"}
+ ],
+ "prompt_file": "prompts/p28.txt",
+ "takes": [{
+  "take": 1, "by": "director", "verdict": "inconclusive",
+  "seen": "0-1.4 s cockpit matches the master (riveted steel tin, centered six-bolt brass port with chip at two o'clock, hinge and latch, empty slot lower left, chalk chart under glass, brass toggle lower right, caged amber lamp, dent with cracks on the right wall); a pale horizontal band lies across the water in the port; from about 0.25 s a turkey head and striped tail fan sit in the lower right corner; about 1.4 s an amber cone switches on from the bottom of the port and falls on the chart; about 1.75-4 s one continuous push-in to the glass; from about 2.5 s a ribbon of small silver minnows rises from the lower right inside the beam and by about 3.5 s forms an S-curve under a mossy stone arch, as in the still; from about 4 s the front of the ribbon is a clear arrowhead of minnows pointing right into the arch; 4-6 s the S holds as one band with no strays while its lower tail is drawn up and shortens; turkey face reflected low left on the glass from about 2.75 s to the cut; about 6.1 s hard cut to the outside: the riveted tin small on a pebble riverbed with the turkey behind the amber port, ringed by the minnows circling it in a closed flat oval, trout heads at the left edge; 6.1-8 s the view pushes in on the tin, two speckled trout come in at the left and face the port, the ring of minnows thins and is gone by about 7.25 s; final frames are tin with handle and dent on the right, whole turkey behind the port, two trout. Sound was not listened to.",
+  "changed": null
+ }],
+ "final_take": 1, "verdict": "inconclusive",
+ "open": [
+  "a turkey head and a whole tail fan, not a wing tip, sit in the lower right corner from about 0.25 s to about 2 s; the toggle stays visible beside the fan but no wing touches it and no flip is visible; the beam simply comes on at about 1.4 s",
+  "the crossing of the glass comes at about 6.1 s, about 0.6 s late; beat 3 lasts about 1.9 s and the minnows are in it for only about 1.1 s",
+  "Turkey's lasso reading is not staged on Turkey's side: in beat 2 the tail of the ribbon never curls into a loop around a stone, it trails off the bottom of the port and is then drawn up; only the exit-arrow reading (arrowhead into the arch) is supported there",
+  "a closed ring of minnows around the tin does appear, but on Trout's side (6.1-7 s), where it reads as the lasso around the sub rather than as either of Trout's readings",
+  "Trout's parade-float-leader reading is not supported: the minnows never fall into line behind the tin, they circle it and then vanish",
+  "Trout's shiny-tin-minnow reading is only weakly supported: the tin is a silver oval inside a ring of silver minnows for about a second, nothing more; the trout do not look from the tin to the minnows, they face the port after the minnows are gone",
+  "the mossy arch is missing from the outside view, and the S-curve and arrowhead do not carry across the glass; the school changes shape at the cut from an S to an oval ring",
+  "the Flock Ribbon rule holds in beat 2 (one band, no strays, each fish in file) but the ribbon breaks up and dissolves in beat 3 instead of leaving as a ribbon",
+  "beat 1 shows a static pale band in the port, not a band sliding past, and the first minnows appear before the push-in reaches the glass",
+  "the flat wide bands asked from a39 are not distinguishable from the still's own drawing of the school",
+  "the prompt is 1971 characters, over the brief's 900-1700",
+  "no stray text seen; the tin is steel throughout, never bread",
+  "beat 2 reproduces the still closely (arch, S-curve, arrowhead, turkey reflection) and adds the school's forward flow; the still stages neither of Trout's readings either, and the film's outside view does not settle them, so neither is clearly stronger"
+ ]
+}

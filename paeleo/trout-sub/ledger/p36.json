@@ -1,0 +1,29 @@
+{
+ "id": "p36", "station": "#36 · Bench", "clue": "Hound figure clutching wax-sealed envelope",
+ "rule": "Iconic Iteration (Oubapo)", "control": "lamp",
+ "atlas": [
+  {"id": "a28", "why": "sent as the fourth and last reference (after cockpit, outside and the p36 still): one unmoving figure held between two uprights on a flat strip of ground, asked for only as the way the hound is staged in beat 3; chosen over a29 (same stage, second figure added) to keep fewer foreign figures in the references"}
+ ],
+ "prompt_file": "prompts/p36.txt",
+ "takes": [{
+  "take": 1, "by": "director", "verdict": "reference stronger",
+  "seen": "0-0.3 s cockpit matches the master (riveted steel tin, centered six-bolt brass port with chip at two o'clock, hinge and latch, empty slot lower left, chalk chart under glass, brass toggle lower right, caged amber lamp, dent with cracks on the right wall); in the port a small dark sitting-dog shape in blue-green murk; from about 0.1 s a turkey head and banded tail fan rise in the lower right corner, biggest at about 1 s with the beak at the toggle, gone by about 1.6 s; by about 1 s the port already shows a dark hound sitting before a slatted bench with a pale envelope in its mouth; about 1.6-2.2 s the hound turns from dark to lit brown and the seal shows on the envelope; about 3 s an amber beam falls from the port down across the cabin to the lower right; 3-6 s one continuous push-in to the glass, no cut; the hound, bench, envelope with orange-red wax seal, weeds and rocks match the still closely; by about 5 s the hound's near front paw is lifted and it stays lifted to 6 s; a speckled trout enters at the right of the port from about 4.5 s and hangs level with the envelope; a turkey face is reflected low left on the glass from about 5 s; about 6.3 s a dissolve to the outside: riveted steel tin with handle on a pebble riverbed, dent on the right, whole turkey small behind the amber port, two speckled trout at the left facing the port; from about 6.3 s to about 7.3 s a white envelope with a red seal sits inside the porthole in front of the turkey's chest; by 7.9 s it is gone and only the turkey and the two trout remain. The prompt is 1847 characters, over the brief's 1700. Sound was not listened to.",
+  "changed": null
+ }],
+ "final_take": 1, "verdict": "reference stronger",
+ "open": [
+  "a turkey head and a whole tail fan, not a wing tip, sit in the lower right corner from about 0.1 s to about 1.5 s and cover the toggle at about 1 s; no flip of the toggle is visible",
+  "the beam does not reveal the hound: it is already readable as a dog with an envelope at about 1 s and fully lit by about 2.2 s, before the beam appears at about 3 s; the beam is drawn falling into the cabin toward the lower right rather than out through the glass",
+  "the crossing of the glass at about 6.3 s is a dissolve, not a hard cut, and comes about 0.8 s late; beat 3 lasts about 1.7 s",
+  "the hound and the bench are missing from the outside view, so the two sides of the glass do not share the thing; the identical-pose hound asked for in beat 3 is not there",
+  "instead the envelope appears inside the tin's porthole in front of the turkey from about 6.3 s to about 7.3 s and then vanishes; it reads as the letter having been delivered through the glass or as a dissolve leftover, and it settles Turkey's side instead of leaving it open",
+  "Iconic Iteration is only partly kept: the hound holds one pose through beats 1 and 2 (dark, then lit, then close) with only the paw changing, but the third printing of the same image on Trout's side is absent",
+  "Turkey's pardon-or-bill pair is carried only by the sealed envelope and the lifted paw; the paw is raised toward the chest rather than held out pad up, so it reads as a dog giving a paw, and nothing in frame points to either reading more than the still does",
+  "Trout's brass-mailbox reading is weakly supported and only by accident: an envelope is briefly inside the brass port, but nobody posts it and no hound holds it up to the port",
+  "Trout's getaway-vehicle reading is not supported: no stream of bubbles from the back of the tin, only scattered bubbles at the right; the tin does not move",
+  "no trout looks from the envelope to the tin; two trout hover at the left facing the port as in the outside master",
+  "the staging asked from a28 (hound alone between two weed stalks on a flat strip) is not visible because the hound is not in beat 3",
+  "no stray lettering seen; the tin stays riveted metal, not bread",
+  "the still holds hound, envelope, bench, trout and turkey reflection in one frame; beat 2 reproduces it and adds only the paw, and the film loses the hound on Trout's side, so the still does the porthole better"
+ ]
+}

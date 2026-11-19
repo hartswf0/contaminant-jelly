@@ -1,0 +1,21 @@
+{
+ "id": "p23", "station": "#23 · Scope B", "clue": "Pink anemone wall clock ticking at dusk",
+ "rule": "Organic Dial (SCION 18): the anemone's tentacles are the dial and close over the face on the tick; a trout sits at the three as the hour hand", "control": "lamp",
+ "atlas": [{"id": "a39", "why": "layered rounded blue bands for dusk water on Trout's side; nothing in it asked to appear"}],
+ "prompt_file": "prompts/p23.txt",
+ "takes": [{"take": 1, "by": "director", "verdict": "pass", "seen": "0-2.6 s cockpit matches the master (porthole with chip, ballast slot, chart, toggle, lamp, dent) and the amber beam comes on at about 1.4 s; 2.9-6.5 s push-in to the glass, the cream clock on the barnacled post ringed by the pink anemone, a speckled trout at the three, Turkey's reflection lower left; at about 5 s the anemone closes into a pink toothed ring around the face, then reopens; about 7-8 s Trout's side: riveted steel tin with handle, Turkey small behind the amber port, the anemone clock hanging from a brass chain and crown like a pocketwatch, two trout at left and two small fry with brown satchels along the bottom", "changed": null}],
+ "final_take": 1, "verdict": "pass",
+ "open": [
+  "Turkey's head (0 s) and then the whole tail fan (0.7-2.2 s) enter at lower right instead of a wing tip; the fan covers the lamp toggle, so the flip is not visible",
+  "the clock never reads 3:15: hands show about 11, then 2:00, then 3:00, and a different time again outside; the dismissal reading rests on 3:00 only",
+  "the anemone closing like a mouth is brief (around 5 s) and changes the anemone into a smooth ring rather than curling the tentacles",
+  "the cut across the glass is late (about 6.6-7 s, not 5.5 s) and passes through a morph frame where the clock gains its pocketwatch crown while still inside the port rim, not a clean hard cut",
+  "no spectacled old trout holds the chain; it hangs from the top of frame, so the Principal reading rests on chain and crown alone",
+  "tardy school bus is weak: two fry with satchels, no bus shape and nothing that reads as late",
+  "outside, the clock covers the right half of the tin including the dent and overlaps the port beside Turkey",
+  "clock numerals are garbled in places (around 6.6 s the 2, 4 and 8 are malformed); no other text seen",
+  "dusk is not evident: the water reads as ordinary daylight blue-green with light rays",
+  "sound (ticking) not checked; judged from frames only",
+  "prompt is 1809 characters, over the brief's 1700 limit"
+ ]
+}

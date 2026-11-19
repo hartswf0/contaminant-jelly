@@ -1,0 +1,27 @@
+{
+ "id": "p30", "station": "#30 · Top", "clue": "Six glowing vowel bubbles under bridge",
+ "rule": "Lipogram Password (Oulipo)", "control": "lamp",
+ "atlas": [
+  {"id": "a39", "why": "sent as the fourth and last reference (after cockpit, outside and the p30 still): pale glowing circles hanging in layered blue water, asked for only as the quality of the bubbles' glow; its rocks and reeds were not asked for and do not appear"}
+ ],
+ "prompt_file": "prompts/p30.txt",
+ "takes": [{
+  "take": 1, "by": "director", "verdict": "pass",
+  "seen": "Read from the 12-frame sheet, a 4-frames-per-second grid and twelve single frames; times are to about a quarter second. 0-2 s cockpit matches the master (riveted steel tin, centered six-bolt brass port with chip at two o'clock, hinge and latch, empty slot lower left, chalk chart under glass, brass toggle lower right, caged amber lamp, dent with cracks on the right wall); in the port a row of six small pale bubbles hangs in clear blue-green water, already faintly lettered; about 0.5-1.25 s a striped tail fan rises in the lower right corner and leaves; about 2.25 s an amber beam comes on beneath the port and falls across the chart; 2.5-5.75 s one continuous push-in to the glass; from about 3.5 s the mossy stone bridge arch of the still appears behind the row, and the bubbles read A E I O U Y in gold; a speckled trout enters at the right about 4 s and hangs under the U and Y; turkey face reflected low left on the glass from about 4.5 s; from about 5 s to 5.75 s the E bubble is visibly dark and unlit while A, I, O, U glow, and the Y brightens last; about 6.0 s the picture crosses the glass with the brass rim sweeping through frame; 6.25-6.75 s outside view as the master: riveted steel tin with handle on the pebble riverbed, dent on its right, turkey behind the amber port, the six letter bubbles large in a row across the foreground, one trout at lower left; about 6.9 s the turkey lunges beak-first toward the left and a bright starburst flash replaces the E and I bubbles, the O drops loose; about 7.2 s only U and Y are left, falling at the bottom edge; 7.4-8 s no bubbles remain, the turkey stands upright behind the port and two speckled trout at the left face it. Sound was not listened to.",
+  "changed": null
+ }],
+ "final_take": 1, "verdict": "pass",
+ "open": [
+  "a striped turkey tail fan, not a wing tip, sits in the lower right corner from about 0.5 s to about 1.25 s; it stays in the corner and the room stays readable, no whole turkey body; no flip of the toggle is visible, the beam simply comes on about a second after the fan has gone",
+  "the port in beat 1 is clear water, not murk, and the six bubbles are already faintly lettered there, so the beam reveals the bridge but not the letters",
+  "the crossing of the glass at about 6.0 s is a quick sweep of the brass rim through frame, not a clean hard cut, and comes about 0.5 s late; beat 3 lasts about 2 s",
+  "Lipogram is kept in beat 2 only: E is the one dark bubble from about 5 s to 5.75 s. The one-at-a-time lighting from left to right is not clearly visible (A, I, O, U are lit together, only Y comes on late), and in the outside view at 6.25 s all six bubbles including E are lit, so the withheld letter is not carried across the glass",
+  "the burst is not E alone: the flash at about 6.9 s takes E and I together, O, U and Y fall away, and by 7.4 s every bubble is gone; the written 'five others glow on' did not happen and the last half second has no bubbles at all",
+  "at about 6.9 s the turkey's head and neck stretch across the brass rim toward the flash, so it reads as reaching through the glass rather than pecking it from inside",
+  "the stone bridge is absent from the outside view; the same thing is seen from the river only as the row of letter bubbles",
+  "Turkey's readings: Surface Lock code is supported (lettered bubbles in a row, one kept dark under the amber beam); floating mines is weak, it rests only on the round bodies hanging in a level row, there are no tethers and the bobbing is slight",
+  "Trout's readings: bubble-popping beak is supported (beak lunge and burst at the same instant, about 6.9 s); spelling-bee buzzer rests on the one starburst flash over the letters at the same moment, which is visible, but nothing marks it as an answer being judged; the trout's jerk back is not confirmed, the trout only shift left",
+  "trout count: one in beat 2, one at the cut, two from about 7 s",
+  "lettering: only the six letters A E I O U Y inside the bubbles, no other text seen; the tin is riveted steel on both sides, never bread"
+ ]
+}

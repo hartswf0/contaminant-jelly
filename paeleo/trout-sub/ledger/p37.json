@@ -1,0 +1,21 @@
+{
+ "id": "p37", "station": "#37 · Bulkhead", "clue": "Folded silt map where claw meets fin",
+ "rule": "Folded Seam (Oubapo / V04)", "control": "lamp",
+ "atlas": [{"id": "a15", "why": "rubbed, brown, handled paper for the map's material; nothing in it asked to appear"}],
+ "prompt_file": "prompts/p37.txt",
+ "takes": [{"take": 1, "by": "director", "verdict": "pass", "seen": "0-0.4 s cockpit matches the master (chipped six-bolt port, empty slot, chalk chart, toggle, dent right, amber lamp) with a pale folded square of paper in the port; 0.4-2.5 s a turkey tail fan rises in the lower right corner over the toggle, and by 2.7 s the overhead lamp throws a brighter amber cone down the wall; about 3-4 s push-in to the glass while the folded paper turns edge-on and opens along its centre crease; 4.2 s the open map with a scaly claw on the left half and a fin-arm on the right half reaching toward each other across the fold, a green olive twig at the crease, a line with a hook at the map's top edge, Turkey's faint reflection lower left; 4.8-5.8 s claw and speckled trout fin clasped in a handshake on the fold, the twig drifting down and out of frame; about 6.2 s Trout's side: the riveted steel tin with top handle on the riverbed, the map hanging from a hooked line in front of it with the same handshake; 7.1-7.8 s the map swings left and shows a paler mirrored handshake, Turkey small behind the amber port, one then two speckled trout below it, the upper one putting its nose to the paper fin", "changed": null}],
+ "final_take": 1, "verdict": "pass",
+ "open": [
+  "stray text: the map carries the word \"Creek\" twice and other scribbled lettering from the still throughout beats 2 and 3, although the prompt asked for no words",
+  "beat 1: a turkey tail fan, not a wing tip, fills the lower right corner from about 0.4 to 2.5 s and covers the lamp toggle, so the flip itself is never seen; porthole, slot and chart stay visible",
+  "the lamp effect is a brighter cone from the overhead lamp, not a beam into the water",
+  "the trout fin on the map ends in a five-fingered human-looking hand",
+  "at about 6.2 s the map covers the porthole completely, so Turkey is not visible until about 7 s",
+  "the change to Trout's side falls between 5.8 and 6.2 s; whether it is a hard cut or a dissolve was not checked frame by frame",
+  "the map outside is first shown with the same front face, then a faint mirrored one; it does not clearly read as the back of the same sheet",
+  "Trout touches the paper with its nose, not a fin, and does not peek round the edge; the decoy reading rests on the hook and line and the drawn-on-both-sides handshake, the friendly reading on the trout coming up to it",
+  "Turkey's readings: the olive twig is on screen only from about 4.2 to 5 s; the trap reading rests on the hook at the top edge, which is small",
+  "prompt ran 1890 characters, over the brief's 1700 limit",
+  "sound not checked"
+ ]
+}

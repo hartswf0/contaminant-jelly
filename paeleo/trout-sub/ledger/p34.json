@@ -1,0 +1,38 @@
+{
+ "id": "p34",
+ "station": "#34 · Organ",
+ "clue": "Cutaway boiler room with bellows & pipes",
+ "rule": "Cutaway Section (SCION 31)",
+ "control": "lamp",
+ "atlas": [
+  {
+   "id": "a07",
+   "why": "flat side-on painted hull section with amber-tinted machinery: the staging for opening the boiler organ's front wall as a cross-section"
+  }
+ ],
+ "prompt_file": "prompts/p34.txt",
+ "takes": [
+  {
+   "take": 1,
+   "by": "director",
+   "verdict": "inconclusive",
+   "seen": "0-2 s cockpit matches the master (metal tin, chipped six-bolt port, empty slot, chalk chart, toggle, dent, amber lamp); the port is empty murk at 0.3 s and by 1 s shows a dim spiky pipe shape; a turkey tail fan with a blue head enters the lower right corner at about 1 s; about 2.3-3 s an amber cone drops from the ceiling lamp over the port and the pipe organ shows in colour; 3-3.7 s push-in, the still's machine is recognisable (copper pipe rank, pleated bellows, brass boiler with gears, bubbles, two trout, stones, weed) and a lamp beam now rises from the bottom of the port; 4.3-5.7 s the machine is shown opened: a horizontal brass boiler with a rectangular cut-out front, orange fire inside and one long trout lying above the flames, pipes on top puffing bubble columns, turkey's reflection at lower left of the glass; about 6.3 s a dissolve to the river side; 7-8 s outside view as the master, metal tin on the riverbed, Turkey behind the amber port, the bellows organ with pipes, boiler and gears standing on a wooden plank platform in the right foreground with bubbles and thin steam wisps rising from the pipes, two speckled trout at left facing it",
+   "changed": null
+  }
+ ],
+ "final_take": 1,
+ "verdict": "inconclusive",
+ "open": [
+  "Turkey's 'rescue crew' reading is not staged: no row of three trout pumping bellows; the cut-out shows a single trout lying over the fire, which reads as a fish on a grill. Only 'furnace' is supported",
+  "the cutaway rule holds only at 4.3-5.7 s; in the last shot the machine is closed and whole, so Trout sees no section",
+  "the machine changes shape between beats: bellows organ at 3-3.7 s, a horizontal boiler with no bellows in the cutaway, bellows organ again at 7 s",
+  "Trout's pair rests on static cues: plank platform and bubbling pipes for the barge, pleated bellows and steam wisps for the radiator. The sheet does not show the bellows shaking or a trout bobbing in time; the platform reads as a small crate or pallet rather than a barge",
+  "the cut across the glass is a dissolve at about 6.3 s (tin and organ double-exposed), not a hard cut",
+  "a tail fan and head, not a wing tip, enter at lower right from about 1 s and cover the lamp toggle; the flip is never seen. The fan stays in the corner and does not block the room",
+  "the lamp first appears as a cone from the ceiling lamp inside the cabin; a beam through the glass shows only from about 3.7 s",
+  "the organ in the last shot stands in front of the port and covers part of the tin's right side and dent; Turkey is still visible",
+  "two trout in the last shot instead of one, and neither is beside the organ",
+  "sound not checked; judged from the contact sheet and three pulled frames only",
+  "no stray text, no people from the atlas frame, tin stays metal throughout"
+ ]
+}

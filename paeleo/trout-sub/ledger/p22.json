@@ -1,0 +1,39 @@
+{
+ "id": "p22",
+ "station": "#22 · Trim",
+ "clue": "FinFlex Coach leading mid-water squats",
+ "rule": "Synchronized Loop (SCION 14)",
+ "control": "ballast",
+ "atlas": [
+  {
+   "id": "a39",
+   "why": "wide soft layered bands of blue water: the light for the mid-water gym outside the port; nothing in it was asked to appear"
+  }
+ ],
+ "prompt_file": "prompts/p22.txt",
+ "takes": [
+  {
+   "take": 1,
+   "by": "director",
+   "verdict": "pass",
+   "seen": "0-0.4 s cockpit matches the master (riveted steel tin, six-bolt brass port with chip at two o'clock, hinge and latch, empty ballast slot, chalk chart under glass, brass lamp toggle, amber lamp, dent at right); about 0.7-1.4 s a turkey wing with a tail fan behind it enters at the left edge holding a round iron weight with a ring handle; about 1.7 s the weight goes into the ballast slot and stays visible in it; 0.4-3.6 s a row of small pale upright shapes rises in the port and grows taller together; between about 3.6 and 4.3 s the view is at the glass on the still's scene: larger trout coach at left with a whistle on a red cord, three speckled trout upright in a tight row with fins straight out, weed and stony riverbed, Turkey's faint reflection low left; about 4.3-6.25 s the three sink and rise together several times, legs tucking and extending in step, with bubble columns above them; about 6.4 s hard cut to the river side; 6.5-8 s outside view as the master (riveted tin with top handle and dent, brass port with chip, hinge and latch, light shafts, bubbles), Turkey whole and small behind the amber port raising and lowering one wing, two speckled trout swimming at left, one trout standing upright in a bent-knee squat at the right foreground",
+   "changed": null
+  }
+ ],
+ "final_take": 1,
+ "verdict": "pass",
+ "open": [
+  "beat 1 shows a turkey tail fan along the left edge (about 0.7-3.3 s), not only a wing tip; the port, slot, chart and toggle stay clear and the weight drop is visible",
+  "the shapes in the port during beat 1 are four pale skittle-like figures, not three dim shapes; they do not match the three speckled trout that follow, and no coach is among them",
+  "the move to the glass happens between about 3.6 and 4.3 s, later than 2.5 s; whether it is a push or a jump was not resolved from the frames pulled",
+  "the cut across the glass comes at about 6.4 s, not 5.5 s; beat 3 lasts about 1.6 s",
+  "beat 3 loses the still's group: no coach with a whistle and no row of three; only one upright squatting trout at right and two ordinary swimming trout at left, so the synchronized loop is not continued on the river side",
+  "Trout's 'kettlebell' reading is thin: the tin has its top handle as in the master but nothing is staged to make it read as a weight (no squatters around it, nobody lifting); the iron ring-weight that would rhyme with it is only seen inside in beat 1",
+  "Trout's 'stopwatch whistle-coach' reading rests only on Turkey's wing going up and down behind the port; no stopwatch or whistle on Turkey's side, and steady time-keeping is not provable from 1.6 s",
+  "Turkey's 'gym warm-up' reading is well supported (coach with whistle, unison squats); 'hostile river guards' rests on the tight shoulder-to-shoulder row with fins thrust out, but the row does not span the port and nothing else is threatening",
+  "Synchronized Loop: the three move together in beat 2, but the coach's nod as the cue is not readable and exact repetition of an identical loop cannot be confirmed from stills; about three or four dips are seen, not a counted two",
+  "the prompt is 1970 characters, over the brief's 1700 limit",
+  "no stray text or labels seen; the tin is steel, never bread; Setup A held on both sides",
+  "sound was not checked"
+ ]
+}

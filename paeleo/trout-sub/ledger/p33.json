@@ -1,0 +1,23 @@
+{
+ "id": "p33", "station": "#33 · Salon", "clue": "Velvet iris frame around culvert bar shadows",
+ "rule": "Mystimation Silhouette (SCION 02)", "control": "lamp",
+ "atlas": [
+  {"id": "a09", "why": "pale beam under a rock arch: the lamp beam as a projector cone at the culvert mouth"},
+  {"id": "a10", "why": "engraved hatching on receding arches: stone texture for the culvert tunnel"}
+ ],
+ "prompt_file": "prompts/p33.txt",
+ "takes": [{"take": 1, "by": "director", "verdict": "inconclusive", "seen": "0-2.5 s cockpit matches the master (tin, chipped port, slot, chart, toggle, dent) with dark upright bars already in the port and a turkey tail fan at the lower right corner; 2.3-3.5 s an amber cone drops from the overhead lamp over the port; about 3.7 s the port goes black with a teal cut-out silhouette of bars; 4.3-5.7 s push-in to the glass, stone culvert ring, iron bars, tied-back drapes, a speckled trout crossing the teal glow, turkey's reflection lower left; about 6.3 s view from inside the culvert out through the bars and drapes to the tin with a trout and a faint turkey in the port; 7-8 s outside view as the master, tin on the riverbed, Turkey behind the amber port, two trout in the foreground, bar edges framing the shot at 7 s and gone by 7.7 s", "changed": null}],
+ "final_take": 1, "verdict": "inconclusive",
+ "open": [
+  "Trout's pair is not staged: no rivet-toothed jaw is readable (the bars are plain bars, seen from the river side for about a second) and no projector cone leaves the tin; the only beam outside is the small lamp glow inside the port",
+  "a tail fan, not a wing tip, enters at lower right and the toggle is never visibly flipped; the fan stays in the corner and does not block the room",
+  "the lamp beam appears as a cone from the ceiling lamp inside the cabin, not a beam out through the glass",
+  "the drapes do not visibly open like a curtain; curtain-or-tunnel rests on the static drapes and stone ring, as in the still",
+  "the silhouette rule holds only around 3.7 s, and that frame shows an unexplained dark blob among the bars; by 5 s the scene is fully lit and coloured, not a cut-out",
+  "the cut across the glass comes in two steps (inside the culvert at about 6.3 s, then the master outside view), and the culvert, bars and drapes are gone from the final frame",
+  "the turkey at 6.3 s is a pale ghost with no tin interior around it",
+  "two trout in the last shot instead of one",
+  "prompt ran 1826 characters, over the brief's 1700",
+  "no stray text, tin stays metal throughout"
+ ]
+}
