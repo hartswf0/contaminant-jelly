@@ -1177,5 +1177,53 @@
   "files": [
    "films/p48.mp4"
   ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "p42-v2",
+  "take": 1,
+  "seconds": 19.5,
+  "arguments": {
+   "duration": 8,
+   "resolution": "480P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 1012113601,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p42.jpg",
+   "atlas/a28.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. Two shots, one hard cut.\n\nShot 1 (0-5.5s), Turkey's seat, locked-off camera, the camera never moves: exactly the cockpit reference throughout, centered brass six-bolt porthole with a chip at two o'clock, empty ballast slot lower left, chalk chart lower center, brass lamp toggle lower right, amber lamp overhead, dent in the right wall. From the first frame the scene of the porthole reference is in the glass, as flat cut paper with clean edges and no shadows: water one smooth gradient, slate blue down to warm peach; two pale spotted trunks bracket a strip of repeated moss rosettes; on it two thin old elders in waistcoats in strict profile, rigid with round brass pins at shoulders, elbows and knees; a boundary stone lower right. At 1s only a feathered wing tip enters at the lower left corner, drops a grey weight into the slot and leaves. Each elder swings one straight arm up from its shoulder pin like a toll gate and stops dead; the left elder swivels to a paper-thin edge and back. Trunks and stone never move.\n\nShot 2 (5.5-8s), Trout's side, hard cut, locked-off camera, the camera never moves: exactly the outside reference, held still, the tin in the same place, Turkey small behind the amber port, the two trunks behind it. In the right foreground the stone sits one step nearer the tin, leaving one bare disc in the rosette row; one flat elder points at the stone, the other holds a coin out to the tin. At left one speckled trout looks from stone to tin.\n\nBracketed stage and gradient as in the last reference only; nothing in it appears. No text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab31339/Baf9GT9GyJT9q5UM_H1Y3_minimax-h3.mp4",
+  "files": [
+   "films/p42-v2.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "p49-v2",
+  "take": 1,
+  "seconds": 10.0,
+  "arguments": {
+   "duration": 8,
+   "resolution": "480P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 750001983,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p49.jpg",
+   "atlas/a13.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images.\n\nShot 1 (0-5.5s), Turkey's seat, locked-off camera, the camera never moves: exactly the cockpit reference throughout, in the house watercolour: steel tin, six-bolt brass porthole, ballast slot lower left, lamp toggle lower right. The porthole reference is in the glass from the first frame, drawn as clean cel animation: thin even dark-blue contours, flat fills, no black. A four-sided traffic signal hangs on a sagging cable over a drowned street of flat storefronts, against a smooth gradient of emerald to deep indigo water. The red lamp above and the green lamp below glow from within. A trout in a blue police cap floats beside it. At 1s only a feathered wing tip enters lower right, flips the toggle and leaves. The red and green lamps pulse outward in rings on a steady beat, like party bulbs. On the fourth beat the trout cop raises a whistle, the signal swings off plumb and stays crooked, green goes dark, and red alone keeps pulsing.\n\nShot 2 (5.5-8s), Trout's side, hard cut, locked-off camera, the camera never moves: exactly the outside reference, held still: the tin on the riverbed, Turkey small behind the amber port. Left foreground, beside the trout in the police cap: the same signal hanging crooked, red glowing. One orange-gold lamp comes on in its lowest face and throws a flat gold stripe along the bed to the tin. The cop holds one fin flat toward the tin to halt it; a small minnow at his side lifts a fin toward the gold light to hail it.\n\nFlat colour on pure gradient as in the last reference, none of its objects. No text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab3133c/0RmBMSxzg1g4nVxveLHHI_minimax-h3.mp4",
+  "files": [
+   "films/p49-v2.mp4"
+  ]
  }
 ]

@@ -1,0 +1,8 @@
+# feedstock: one-more-time | control: lamp | atlas: a13
+Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images.
+
+Shot 1 (0-5.5s), Turkey's seat, locked-off camera, the camera never moves: exactly the cockpit reference throughout, in the house watercolour: steel tin, six-bolt brass porthole, ballast slot lower left, lamp toggle lower right. The porthole reference is in the glass from the first frame, drawn as clean cel animation: thin even dark-blue contours, flat fills, no black. A four-sided traffic signal hangs on a sagging cable over a drowned street of flat storefronts, against a smooth gradient of emerald to deep indigo water. The red lamp above and the green lamp below glow from within. A trout in a blue police cap floats beside it. At 1s only a feathered wing tip enters lower right, flips the toggle and leaves. The red and green lamps pulse outward in rings on a steady beat, like party bulbs. On the fourth beat the trout cop raises a whistle, the signal swings off plumb and stays crooked, green goes dark, and red alone keeps pulsing.
+
+Shot 2 (5.5-8s), Trout's side, hard cut, locked-off camera, the camera never moves: exactly the outside reference, held still: the tin on the riverbed, Turkey small behind the amber port. Left foreground, beside the trout in the police cap: the same signal hanging crooked, red glowing. One orange-gold lamp comes on in its lowest face and throws a flat gold stripe along the bed to the tin. The cop holds one fin flat toward the tin to halt it; a small minnow at his side lifts a fin toward the gold light to hail it.
+
+Flat colour on pure gradient as in the last reference, none of its objects. No text, no labels, no captions.

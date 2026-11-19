@@ -152,6 +152,8 @@ def keyframe_film(pid):
 
 def unit(pid):
     src = "films/%s.mp4" % pid
+    if not os.path.exists(src) and os.path.exists("films/%s-v2.mp4" % pid):
+        src = "films/%s-v2.mp4" % pid           # only a version 2 film exists for this porthole
     kind = "film" if os.path.exists(src) else "keyframe"
     glass_r = C[2] * GLASS
     card = still_glass(pid)
@@ -174,7 +176,7 @@ def unit(pid):
         F, dur = frames(src, N)
         ports = json.load(open("ports.json")) if os.path.exists("ports.json") else {}
         if pid not in ports:
-            ports[pid] = pt.track(pid)
+            ports[pid] = pt.track(pid, src)
             json.dump(dict(sorted(ports.items())), open("ports.json", "w"), indent=1)
         P = ports[pid]
         W = F.shape[2]

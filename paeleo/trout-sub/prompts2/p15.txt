@@ -1,0 +1,8 @@
+# feedstock: one-more-time | control: lamp | atlas: a14
+Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images.
+
+Shot 1 (0-5.5s), Turkey's seat, locked-off camera, the camera never moves: exactly the cockpit reference throughout, in the house watercolour: steel tin, brass six-bolt porthole, ballast slot lower left, chalk chart, lamp toggle lower right. From the first frame the porthole reference fills the glass, drawn as clean cel animation, thin dark-blue contours, flat fills: a wall of nine square wavy glass blocks, three by three, pale grout between. Behind it the water grades from emerald to deep indigo, and one flat-coloured speckled trout hangs still across the middle row: tail in the left block, body in the middle, head in the right. At 1s only a wing tip enters lower right, flips the toggle and leaves. The blocks light from within, electric cyan, with one orange-gold glow in the bottom middle block. On a steady beat the middle row steps one block to the right, so the head sits at the left and the tail in the middle; hold; the gold glow jumps to the bottom left block; hold; both step back and the trout is whole.
+
+Shot 2 (5.5-8s), Trout's side, hard cut, locked-off camera, the camera never moves: exactly the outside reference, held still, Turkey small behind the round amber port. At the far left, clear of the port, the same wall of nine cyan blocks stands free on the gravel, one speckled trout beside it. Each block holds one tiny orange-gold turkey head, nine in a grid. On the beat the centre block goes dark indigo; hold; it lights again. The trout tilts its head.
+
+Glow from within as in the last reference only; no dome, no city. No text, no labels, no captions.
