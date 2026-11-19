@@ -1225,8 +1225,8 @@ def build_wipes():
     R["full"] = full
     for name, letters, (a1, b1, a2, b2), seed in (("w1", [(1, 1), (1, 2)], (17.3, 18.3, 18.5, 19.4), 5), ("w2", [(0, 0), (0, 1)], (26.3, 27.3, 27.5, 28.4), 9)):
         bx = [LETTER_BOX[k] for k in letters]
-        x0, y0 = int(min(b[0] for b in bx)) - 22, int(min(b[1] for b in bx)) - 30
-        x1, y1 = int(max(b[2] for b in bx)) + 22, int(max(b[3] for b in bx)) + 30
+        x0, y0 = int(min(b[0] for b in bx)) - 22, int(min(b[1] for b in bx)) - 46
+        x1, y1 = int(max(b[2] for b in bx)) + 22, int(max(b[3] for b in bx)) + 40
         M = 54
         C = full[y0 - M:y1 + M, x0 - M:x1 + M]
         hh, ww = C.shape
@@ -1281,7 +1281,7 @@ def cloth_world(wp, t):
     else:
         u = 1 - ramp(t, a2, b2)
     ph = (t - a1) * 2 * math.pi * 2.4
-    amp = 0.30 * (y1 - y0) * (1 if a1 <= t <= b2 else 0) * (0 if b1 < t < a2 else 1)
+    amp = 0.26 * (y1 - y0) * (1 if a1 <= t <= b2 else 0) * (0 if b1 < t < a2 else 1)
     return (lerp(x0 + 6, x1 - 6, u), (y0 + y1) / 2 + amp * math.sin(ph))
 
 
@@ -1943,11 +1943,11 @@ def sound(mix):
     # ---- the bench
     mix.room(0, T_RIVER + 0.2, gain=0.012)
     sl = mix.band(mix.noise(0.75), 120, 1500) * np.hanning(int(0.75 * RATE)) ** 0.5
-    mix.add(sl, 0.0, 0.10, -0.4)
-    mix.thud(0.70, 58, 0.40, -0.1)
+    mix.add(sl, 0.0, 0.07, -0.4)
+    mix.thud(0.70, 58, 0.30, -0.1)
     for k, (t0, _) in RAIL_T.items():
         mix.whoosh(t0, 0.4, 0.035, {"left": -0.6, "right": 0.6}.get(k, 0.0))
-        mix.thud(t0 + 0.41, 110 + 20 * rs.rand(), 0.32, {"left": -0.6, "right": 0.6}.get(k, 0.0), 0.22)
+        mix.thud(t0 + 0.41, 110 + 20 * rs.rand(), 0.24, {"left": -0.6, "right": 0.6}.get(k, 0.0), 0.22)
         mix.step(t0 + 0.42, 0.34, {"left": -0.6, "right": 0.6}.get(k, 0.0), "wood")
     mix.click(3.26, 0.22, 0.0, 8000, 0.02)
     mix.bell(3.26, 2600, 0.35, 0.035)
@@ -1962,7 +1962,7 @@ def sound(mix):
                 seg = ev[(k * 2 + j * 7) % len(ev)]
                 m = min(len(seg), int((dur * (1.0 if not j else 0.5) + 0.20) * RATE))
                 seg = seg[:m] * np.linspace(1, 0, m) ** 0.6
-                mix.add(seg, at, 0.42 * g * (0.8 if s["width"] < 12 else 1.0), pan)
+                mix.add(seg, at, 0.95 * g * (0.8 if s["width"] < 12 else 1.0), pan)
         else:
             m = int((dur + 0.05) * RATE)
             x = mix.band(mix.noise(dur + 0.05), 1800, 7000) * (0.6 + 0.4 * np.sign(np.sin(2 * np.pi * 43 * mix.t(dur + 0.05)))) * np.hanning(m) ** 0.4
@@ -1973,7 +1973,7 @@ def sound(mix):
     mix.bell(T_RIVER + 0.05, 392, 3.2, 0.13)
     n = SECONDS - T_RIVER
     bed = mix.lowpass(mix.noise(n, "brown"), 420) * mix.env(int(n * RATE), 0.5, 0.01, 1.0, 1.2)
-    mix.add(bed, T_RIVER, 0.16)
+    mix.add(bed, T_RIVER, 0.10)
     mix.water(T_TROUT, SECONDS - T_TROUT, 0.035)
     mix.drone(T_RIVER, T_TROUT - T_RIVER + 0.4, (49, 73.5, 98), 0.07, 0.0, 0.6, 0.8)
     mix.drone(T_TROUT, SECONDS - T_TROUT, (55, 82.5, 123.5), 0.045, 0.0, 0.8, 1.5)
@@ -1981,7 +1981,7 @@ def sound(mix):
     t = T_RIVER
     while t < SECONDS - 0.3:
         if t < T_TROUT:
-            g, step = 0.10, 0.105
+            g, step = 0.07, 0.105
         else:
             sp = TRK["tin"][min(NF - 1, int(t * FPS))]["speed"]
             g, step = 0.05 + 0.11 * sp, 0.20 - 0.10 * sp
@@ -2020,7 +2020,7 @@ def main():
     build_cam()
     build_river()
     film = Film(SLUG, SECONDS, boil=0, wobble=0.6, seed=3)
-    film.poster_at = 13.9
+    film.poster_at = 22.5
     film.picture(picture)
     film.sound(sound)
     KA.run(film)
