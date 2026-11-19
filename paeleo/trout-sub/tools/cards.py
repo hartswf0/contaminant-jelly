@@ -179,75 +179,96 @@ def title(film, n1=int(5.6 * FPS)):
 
 # One card per command on the worksheet. crop and lights are in PDF points (612 x 792 page).
 CARDS = [
-    dict(num="1", page=1, crop=(28, 22, 584, 132), chip="Front · Pilot · 6 minutes", title="Copy your slip",
-         say="Write your number, your station and your clue.",
-         lights=[(262, 82, 392, 101), (398, 82, 580, 101), (34, 107, 580, 127)], film=("films/intro-1.mp4", 0.0)),
-    dict(num="2", page=1, crop=(120, 130, 492, 420), chip="Front · Pilot · 6 minutes", title="Draw what Turkey sees",
-         say="Draw it inside the ring.",
-         lights=[(180, 134, 430, 157), (205, 397, 405, 419)], film=("films/intro-3.mp4", 2.0)),
-    dict(num="3", page=1, crop=(28, 424, 584, 688), chip="Front · Pilot · 6 minutes", title="Write 3 things. Pass left.",
-         say="What we see. What Turkey does. What could go wrong.",
-         lights=[(34, 428, 580, 497), (34, 503, 580, 572), (34, 578, 580, 647), (34, 653, 580, 684)], film=("films/intro-2.mp4", 1.0)),
-    dict(num="4", page=2, crop=(28, 100, 584, 462), chip="Back · Two friends · 12 minutes", title="Friends write 6 endings",
-         say="First friend: 1, 2, 3. Pass left. Next friend: 4, 5, 6.",
-         lights=[(34, 110, 260, 430), (34, 433, 260, 459), (352, 110, 580, 430), (352, 433, 580, 459)], film=("units/p07.mp4", 5.6)),
+    dict(num="1", page=1, crop=(28, 22, 584, 132), chip="Front · Pilot", title="Copy your slip",
+         lights=[((262, 82, 392, 101), "Write your number."), ((398, 82, 580, 101), "Write your station."), ((34, 107, 580, 127), "Write your clue and your rule.")],
+         film=("films/intro-1.mp4", 0.0)),
+    dict(num="2", page=1, crop=(120, 130, 492, 420), chip="Front · Pilot", title="Draw what Turkey sees",
+         lights=[((150, 160, 462, 396), "Draw inside the ring.")], film=("films/intro-3.mp4", 2.0)),
+    dict(num="3", page=1, crop=(28, 424, 584, 688), chip="Front · Pilot", title="Write 3 things",
+         lights=[((34, 428, 580, 497), "1. What do we see?"), ((34, 503, 580, 572), "2. What does Turkey do?"),
+                 ((34, 578, 580, 647), "3. What could go wrong?"), ((34, 653, 580, 684), "Pass it left.")], film=("films/intro-2.mp4", 1.0)),
+    dict(num="4", page=2, crop=(28, 100, 584, 462), chip="Back · Two friends", title="Friends write 6 endings",
+         lights=[((34, 110, 260, 430), "First friend writes 1, 2, 3."), ((34, 433, 260, 459), "Pass it left again."),
+                 ((352, 110, 580, 430), "Next friend writes 4, 5, 6."), ((352, 433, 580, 459), "Give it back to the pilot.")], film=("units/p07.mp4", 5.6)),
     dict(num="5", page=2, crop=(28, 262, 584, 508), chip="Back · Pilot", title="Roll the die one time",
-         say="Circle the number you rolled.",
-         lights=[(352, 433, 580, 459), (258, 270, 354, 380), (34, 478, 580, 502)], film=("films/intro-4.mp4", 2.4)),
+         lights=[((258, 270, 354, 380), "Roll the die."), ((34, 478, 580, 502), "Circle your number.")], film=("films/intro-4.mp4", 2.4)),
     dict(num="6", page=2, crop=(28, 474, 584, 648), chip="Back · Pilot", title="Tell what happened",
-         say="Write the trout gossip. Then write a message home.",
-         lights=[(34, 503, 580, 562), (34, 566, 580, 644)], film=("films/intro-5.mp4", 2.0)),
+         lights=[((34, 503, 580, 562), "What do the trout say?"), ((34, 566, 580, 644), "Write a message home.")], film=("films/intro-5.mp4", 2.0)),
 ]
+LINE_SECONDS, CARD_LEAD = 3.6, 1.4
+def card_seconds(spec):
+    return CARD_LEAD + LINE_SECONDS * len(spec["lights"]) + 0.6
 
 
 def card(spec, film, n, first=False):
-    """Frames for one instruction card. film: at least n square-croppable BGR frames."""
+    """One command card. One line of words at a time, and the worksheet is magnified onto the
+    field that line is about, so the eye is led: read this, write here."""
     pg = sheet(spec["page"]); k = pg.size[0] / 612.0
+    AW, AH = 700, 420; px, py = 60, 250
+    asp = AW / float(AH)
+    def view_for(box, cap=330.0):
+        """The part of the page to show for a field: never wider than cap points, so the words in
+        it are always large. A field wider or taller than the view is shown from its start."""
+        x0, y0, x1, y1 = box
+        w = min(cap, max((x1 - x0) * 1.22, (y1 - y0) * 1.5 * asp, 190.0)); h = w / asp
+        cx = (x0 + x1) / 2.0 if (x1 - x0) <= w - 20 else x0 - 12 + w / 2
+        cy = (y0 + y1) / 2.0 if (y1 - y0) <= h - 14 else y0 - 10 + h / 2
+        return (cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2)
+    def grab(v):
+        """Crop the page at view v (points); anything off the page is paper white."""
+        box = (int(v[0] * k), int(v[1] * k), int(v[2] * k), int(v[3] * k))
+        out = Image.new("RGB", (box[2] - box[0], box[3] - box[1]), (255, 255, 255))
+        out.paste(pg, (-box[0], -box[1]))
+        return out.resize((AW, AH), Image.LANCZOS)
     x0, y0, x1, y1 = spec["crop"]
-    crop = pg.crop((int(x0 * k), int(y0 * k), int(x1 * k), int(y1 * k)))
-    AW, AH = 730, 444
-    s = min(AW / float(crop.size[0]), AH / float(crop.size[1]))
-    pw, ph = int(crop.size[0] * s), int(crop.size[1] * s)
-    crop = crop.resize((pw, ph), Image.LANCZOS)
-    px, py = 60 + (AW - pw) // 2, 218 + (AH - ph) // 2
-    fcx, fcy, fr_ = 1040, 432, 190
-    per = max(1.0, (n / float(FPS) - 2.0) / len(spec["lights"]))
+    whole = view_for((x0, y0, x1, y1), cap=9999.0)
+    views = [whole] + [view_for(b) for b, _ in spec["lights"]]
+    fcx, fcy, fr_ = 1040, 452, 180
     for i in range(n):
         t = i / float(FPS)
         im = Image.new("RGBA", (W, H), PAPER + (255,)); d = ImageDraw.Draw(im)
-        # slab and numeral
         u = back(span(t, 0.25, 0.7))
         d.polygon([(0, 26), (150 * u + 20, 18), (138 * u + 14, 176), (0, 184)], fill=RUST + (255,))
         d.text((38 - 160 * (1 - u), 20), spec["num"], font=font(150, "Black"), fill=PAPER + (255,))
-        # the worksheet's own words
         u2 = ease(span(t, 0.4, 0.9))
-        tf = font(58, "Black"); size = 58
-        while d.textlength(spec["title"], font=tf) > W - 250 and size > 30:
-            size -= 2; tf = font(size, "Black")
-        d.text((196 + 60 * (1 - u2), 44), spec["title"], font=tf, fill=NAVY + (int(255 * u2),))
-        d.text((198 + 60 * (1 - u2), 44 + size + 14), spec["say"], font=font(31, "Bold"), fill=NAVY + (int(235 * u2),))
+        d.text((196 + 60 * (1 - u2), 30), spec["title"], font=font(40, "Black"), fill=NAVY + (int(170 * u2),))
         cw = d.textlength(spec["chip"], font=font(17, "Bold")) + 28
-        d.rounded_rectangle((198, 162, 198 + cw, 194), 8, fill=(251, 243, 223, int(255 * u2)), outline=GOLD + (int(255 * u2),), width=2)
-        d.text((212, 168), spec["chip"], font=font(17, "Bold"), fill=NAVY + (int(255 * u2),))
-        # the worksheet itself rises into place
+        tx = 196 + d.textlength(spec["title"], font=font(40, "Black")) + 22
+        d.rounded_rectangle((tx, 38, tx + cw, 70), 8, fill=(251, 243, 223, int(255 * u2)), outline=GOLD + (int(255 * u2),), width=2)
+        d.text((tx + 14, 44), spec["chip"], font=font(17, "Bold"), fill=NAVY + (int(255 * u2),))
+        # which line is live
+        j = int((t - CARD_LEAD) // LINE_SECONDS) if t >= CARD_LEAD else -1
+        j = min(j, len(spec["lights"]) - 1)
+        tl = t - CARD_LEAD - j * LINE_SECONDS if j >= 0 else 0
+        if j >= 0:                                                    # the one line, large
+            a = ease(span(tl, 0.0, 0.35))
+            line = spec["lights"][j][1]; size = 66
+            while d.textlength(line, font=font(size, "Black")) > W - 230 and size > 40:
+                size -= 2
+            d.text((196, 92 + 18 * (1 - a)), line, font=font(size, "Black"), fill=NAVY + (int(255 * a),))
+        # the worksheet, magnified onto the live field
+        va = views[j] if j >= 0 else whole
+        vb = views[j + 1] if j >= 0 else whole
+        m = ease(span(tl, 0.0, 0.7)) if j >= 0 else 0.0
+        v = [va[q] + (vb[q] - va[q]) * m for q in range(4)]
         u3 = back(span(t, 0.5, 1.05), 1.0); oy = int((1 - u3) * 560)
-        d.rectangle((px + 8, py + 10 + oy, px + pw + 8, py + ph + 10 + oy), fill=(22, 43, 52, 60))
-        im.paste(crop, (px, py + oy))
-        d.rectangle((px, py + oy, px + pw, py + ph + oy), outline=NAVY + (255,), width=2)
-        # each command lights in turn, and stays faintly lit
+        src = grab(v)
+        d.rectangle((px + 8, py + 10 + oy, px + AW + 8, py + AH + 10 + oy), fill=(22, 43, 52, 60))
+        im.paste(src, (px, py + oy))
         ov = Image.new("RGBA", (W, H), (0, 0, 0, 0)); od = ImageDraw.Draw(ov)
-        for j, (a0, b0, a1, b1) in enumerate(spec["lights"]):
-            ts = 1.2 + j * per
-            if t < ts:
-                continue
-            wipe = ease(span(t, ts, ts + 0.35)); live = t < ts + per
-            X0, Y0 = px + (a0 - x0) * k * s, py + (b0 - y0) * k * s
-            X1, Y1 = px + (a1 - x0) * k * s, py + (b1 - y0) * k * s
-            od.rectangle((X0, Y0, X0 + (X1 - X0) * wipe, Y1), fill=GOLD + (95 if live else 40,))
-            if live and wipe >= 1:
-                od.rectangle((X0 - 3, Y0 - 3, X1 + 3, Y1 + 3), outline=RUST + (255,), width=4)
-        im.alpha_composite(ov)
-        # the film in a porthole, bolts turning in harmonic steps
+        if j >= 0:
+            a0, b0, a1, b1 = spec["lights"][j][0]
+            sx = AW / float(v[2] - v[0]); sy = AH / float(v[3] - v[1])
+            X0, Y0, X1, Y1 = px + (a0 - v[0]) * sx, py + (b0 - v[1]) * sy, px + (a1 - v[0]) * sx, py + (b1 - v[1]) * sy
+            X0, Y0, X1, Y1 = max(px, X0), max(py, Y0), min(px + AW, X1), min(py + AH, Y1)
+            wipe = ease(span(tl, 0.5, 1.0))
+            if wipe > 0 and X1 > X0 and Y1 > Y0:
+                od.rectangle((X0, Y0, X0 + (X1 - X0) * wipe, Y1), fill=GOLD + (70,))
+                if wipe >= 1:
+                    od.rectangle((X0, Y0, X1, Y1), outline=RUST + (255,), width=5)
+        im.alpha_composite(ov); d = ImageDraw.Draw(im)
+        d.rectangle((px, py + oy, px + AW, py + AH + oy), outline=NAVY + (255,), width=3)
+        # the film in a porthole
         u4 = back(span(t, 0.6, 1.1), 1.3)
         if u4 > 0:
             r = int(fr_ * u4)
@@ -255,13 +276,11 @@ def card(spec, film, n, first=False):
                 disc = circle_film(film[min(i, len(film) - 1)], 2 * int(r * 0.8))
                 im.alpha_composite(disc, (fcx - disc.size[0] // 2, fcy - disc.size[1] // 2))
                 d = ImageDraw.Draw(im)
-                porthole(d, fcx, fcy, r, 1.0, 0)
-                harmonic(d, fcx, fcy, t, 6.0, [(r * 0.9, 6, 7, 1)], home=0.0, colour=CREAM)
-                harmonic(d, fcx, fcy, t, 6.0, [(r * 1.18, 12, 3, 1)], home=0.0, colour=TEAL)
+                porthole(d, fcx, fcy, r, 1.0, 1.0)
         if not first and t < 0.75:
-            bars(im, 0.5 + t / 1.5, direction=1 if int(spec["num"]) % 2 else -1)       # bars leaving
+            bars(im, 0.5 + t / 1.5, direction=1 if int(spec["num"]) % 2 else -1)
         if n - i <= int(0.75 * FPS):
-            bars(im, (1 - (n - i) / (0.75 * FPS)) * 0.5, direction=-1 if int(spec["num"]) % 2 else 1)   # bars arriving
+            bars(im, (1 - (n - i) / (0.75 * FPS)) * 0.5, direction=-1 if int(spec["num"]) % 2 else 1)
         yield bgr(im)
 
 

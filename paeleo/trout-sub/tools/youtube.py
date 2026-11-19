@@ -8,11 +8,12 @@ Submarine Porthole Log worksheet (sheets/tour_key_porthole_worksheet.pdf).
 Rules of the cut
 - The picture fills the screen. On it there are only three things: the slip number, a
   minimap of the river showing where this porthole is, and the choices.
-- The choices are buttons. Each porthole gives Turkey's choices (right of the glass) and
-  the trout's (left of it), each with its own shape. Students pick one and draw the
-  shape. The side whose shot is playing is lit.
-- Written for fourth graders who need more time: every porthole plays twice through
-  (about 14 seconds), words are few, large and in sentence case, and nothing blinks.
+- The choices are controller buttons: green triangle and red circle for Turkey (right of
+  the glass), blue cross and pink square for the trout (left of it). Students pick one
+  and draw the shape. Only the side whose shot is playing is shown, and its choices are
+  lit one at a time, then together, so each line is read on its own.
+- Written for fourth graders who need more time: Turkey's shot holds about 7 seconds and
+  the trout's about 7 seconds, words are few, large and in sentence case, nothing blinks.
 - Four dives of 16, 16, 16 and 7 portholes. Each half of a dive has its own song from
   DEEP SEA VOYAGE, and portholes change on that song's tracked beats.
 - The change between portholes goes through the porthole: the next film opens from the
@@ -70,32 +71,43 @@ def wrap(d, text, f, width):
 
 
 RIM = U.CANON_R * W                              # outer rim radius of the locked porthole, in pixels
-def side_panel(items, side, live):
-    """One side's buttons. side 'turkey' sits right of the glass, 'trout' left of it. Each choice is
-    a plate with its controller button on it and an edge in the button's colour."""
-    pw = int(W / 2 - RIM - 26)
+def side_panel(items, side, lit=None):
+    """One side's buttons: Turkey's sit right of the glass, the trout's left of it. Each choice is a
+    plate with its controller button and an edge in the button's colour. lit = index of the one
+    choice being read now (the others wait, dimmed); None = all lit."""
+    pw = int(W / 2 - RIM - 20)
     im = Image.new("RGBA", (pw, H), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
-    size = 29; tx = 92
-    while size > 21 and any(len(wrap(d, w, font(size, "Bold"), pw - tx - 14)) > 2 for _, w, _ in items):
+    size = 35; tx = 96
+    while size > 24 and any(len(wrap(d, w, font(size, "Bold"), pw - tx - 12)) > 3 or
+                            max(d.textlength(x, font=font(size, "Bold")) for x in w.split()) > pw - tx - 12 for _, w, _ in items):
         size -= 1
-    blocks = [wrap(d, w, font(size, "Bold"), pw - tx - 14) for _, w, _ in items]
-    heights = [max(78, len(b) * (size + 6) + 26) for b in blocks]
-    total = sum(heights) + 14 * (len(items) - 1) + 44
-    y = (H - total) // 2 - 34
+    blocks = [wrap(d, w, font(size, "Bold"), pw - tx - 12) for _, w, _ in items]
+    heights = [max(86, len(b) * (size + 7) + 28) for b in blocks]
+    total = sum(heights) + 16 * (len(items) - 1) + 50
+    y = (H - total) // 2 - 30
     tag = "Turkey thinks" if side == "turkey" else "The trout think"
-    d.text((8, y), tag, font=font(22, "Bold"), fill=(255, 255, 255, 240 if live else 120)); y += 44
-    for (kind, word, _), lines, hgt in zip(items, blocks, heights):
+    d.rounded_rectangle((0, y, d.textlength(tag, font=font(25, "Bold")) + 28, y + 40), 12, fill=(8, 10, 14, 215))
+    d.text((14, y + 4), tag, font=font(25, "Bold"), fill=(255, 255, 255, 255)); y += 50
+    for i, ((kind, word, _), lines, hgt) in enumerate(zip(items, blocks, heights)):
+        on = lit is None or lit == i
         col = C.SHAPE_COL[kind]
-        d.rounded_rectangle((0, y, pw - 2, y + hgt), 18, fill=(8, 10, 14, 215 if live else 120))
-        d.rounded_rectangle((0, y, pw - 2, y + hgt), 18, outline=col + (255 if live else 90,), width=3 if live else 2)
-        C.button(d, 44, y + hgt / 2, 30, kind, on=live)
-        ty = y + (hgt - len(lines) * (size + 6)) / 2 - 2
+        d.rounded_rectangle((0, y, pw - 2, y + hgt), 20, fill=(8, 10, 14, 225 if on else 150))
+        d.rounded_rectangle((0, y, pw - 2, y + hgt), 20, outline=col + (255 if on else 90,), width=4 if on else 2)
+        C.button(d, 48, y + hgt / 2, 32, kind, on=on)
+        ty = y + (hgt - len(lines) * (size + 7)) / 2 - 2
         for l in lines:
-            d.text((tx, ty), l, font=font(size, "Bold"), fill=(255, 255, 255, 255 if live else 150)); ty += size + 6
-        y += hgt + 14
+            d.text((tx, ty), l, font=font(size, "Bold"), fill=(255, 255, 255, 255 if on else 130)); ty += size + 7
+        y += hgt + 16
     a = np.array(im).astype(np.float32)
-    x = int(W / 2 + RIM + 12) if side == "turkey" else int(W / 2 - RIM - 12 - pw)
+    x = int(W / 2 + RIM + 10) if side == "turkey" else int(W / 2 - RIM - 10 - pw)
     return x, 0, a[:, :, 2::-1].copy(), a[:, :, 3:4] / 255.0
+
+
+def reading(m, count, i):
+    """Which choice is being read at frame i of a side's m frames: each in turn, then all together."""
+    part = 0.8 / count
+    k = int((i / float(m)) / part)
+    return k if k < count else None
 
 
 def river(n_total=55):
@@ -111,7 +123,7 @@ RIVER = river()
 
 
 def hud(n):
-    """The slip number, top right, and the minimap with the station's name, bottom left."""
+    """The slip number, top right, and the minimap, bottom left. Nothing else."""
     im = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
     s = "%02d" % n; f = font(92, "Black"); tw = d.textlength(s, font=f)
     d.rounded_rectangle((W - tw - 62, 22, W - 22, 132), 22, fill=(10, 16, 18, 200))
@@ -127,10 +139,6 @@ def hud(n):
             d.ellipse((x - 2, y - 2, x + 2, y + 2), fill=(255, 255, 255, 60))
     x, y = path[n - 1]
     d.ellipse((x - 9, y - 9, x + 9, y + 9), fill=(240, 178, 90, 255), outline=(10, 16, 18, 255), width=3)
-    station = seeds[n - 1][0].split("·")[1].strip(); f = font(24, "Bold")
-    tw = d.textlength(station, font=f)
-    d.rounded_rectangle((cx - r, cy - r - 52, cx - r + tw + 30, cy - r - 12), 10, fill=(10, 16, 18, 215))
-    d.text((cx - r + 15, cy - r - 49), station, font=f, fill=(255, 255, 255, 255))
     a = np.array(im).astype(np.float32)
     regs = []
     for (x0, y0, x1, y1) in ((W - 300, 0, W, 150), (0, H - 270, 330, H)):
@@ -216,14 +224,13 @@ def film_frames(src, ss, n, w=W, h=H):
     return np.concatenate([a, np.repeat(a[-1:], n - len(a), 0)]) if len(a) < n else a
 
 
-CARD_SECONDS = [9.0, 8.0, 11.0, 12.0, 9.0, 9.0]
 def opening(out):
     """Title, one card per command on the worksheet, then how the buttons work."""
     t0 = out.t
     for f in C.title(film_frames("films/intro-6.mp4", 2.4, int(5.6 * FPS), 1136, 639)):
         out.add(f)
-    for k, (spec, secs) in enumerate(zip(C.CARDS, CARD_SECONDS)):
-        n = int(secs * FPS)
+    for k, spec in enumerate(C.CARDS):
+        n = int(C.card_seconds(spec) * FPS)
         for f in C.card(spec, film_frames(spec["film"][0], spec["film"][1], n, 640, 360), n, first=(k == 0)):
             out.add(f)
     for f in C.choose_card(int(9.0 * FPS)):
@@ -236,7 +243,7 @@ def closing(out):
     """The last two commands again, for the moment the logs come back."""
     t0 = out.t
     for spec in C.CARDS[4:]:
-        n = int(9.0 * FPS)
+        n = int(C.card_seconds(spec) * FPS)
         for f in C.card(spec, film_frames(spec["film"][0], spec["film"][1], n, 640, 360), n, first=False):
             out.add(f)
     bt, rms, sr, dur = beats(CLOSE_SONG[0])
@@ -262,24 +269,31 @@ def dive(out, spec, times):
         for j in range(count):
             end = t0 + T(lead + step * (j + 1))
             frames_n = int(round(end * FPS)) - out.n
-            half_n = frames_n // 2
-            one, _ = U.frames("units/p%02d.mp4" % pid, half_n, W, H)            # the whole unit, played twice through
+            one, _ = U.frames("units/p%02d.mp4" % pid, 192, W, H)
             u_ = units.get("p%02d" % pid) or {}
             cut = u_.get("cut") if u_.get("lock_end") and u_.get("cut") else U.LEN - 0.9
-            cut_f = int(cut / U.LEN * half_n)
+            cut_f = min(180, max(24, int(cut / U.LEN * 192)))
+            # Turkey's shot fills the first half. The trout's shot is short, so it plays forward,
+            # back and forward again to fill the second half, ending on its locked last frame.
+            half_n = frames_n // 2
+            seq_t = np.linspace(0, cut_f - 1, half_n).round().astype(int)
+            seg = list(range(cut_f, 192)); pp = seg + seg[::-1] + seg
+            seq_r = np.array(pp)[np.linspace(0, len(pp) - 1, frames_n - half_n).round().astype(int)]
+            order = np.concatenate([seq_t, seq_r])
             ch = choices(pid)
-            tk, tr = [c for c in ch if c[2] == "turkey"], [c for c in ch if c[2] == "trout"]
-            panels = {(s_, live): side_panel(items, s_, live) for s_, items in (("turkey", tk), ("trout", tr)) for live in (True, False)}
+            sides = {"turkey": [c for c in ch if c[2] == "turkey"], "trout": [c for c in ch if c[2] == "trout"]}
+            panels = {(s_, k): side_panel(items, s_, k) for s_, items in sides.items() for k in list(range(len(items))) + [None]}
             regs = hud(pid)
             times[pid] = out.t
             for i in range(frames_n):
-                k = min(i, 2 * half_n - 1) % half_n
-                frame = one[k].astype(np.float32)
-                turkey_live = k < cut_f
-                fade = min(1.0, max(0.0, (i - nt + 4) / 8.0))
+                frame = one[order[i]].astype(np.float32)
+                if i < half_n:
+                    side, local, m = "turkey", i, half_n
+                else:
+                    side, local, m = "trout", i - half_n, frames_n - half_n
+                fade = min(1.0, max(0.0, (local - (nt if side == "turkey" else 0) + 4) / 8.0))
                 if fade > 0:
-                    stamp_on(frame, panels[("turkey", turkey_live)], fade)
-                    stamp_on(frame, panels[("trout", not turkey_live)], fade)
+                    stamp_on(frame, panels[(side, reading(m, len(sides[side]), local))], fade)
                 for reg in regs:
                     stamp_on(frame, reg)
                 if i < nt and prev_tail is None:              # out of the dive card: the bars clear to the first porthole
