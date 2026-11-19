@@ -1,0 +1,26 @@
+{
+ "id": "p02", "station": "#02 · Galley", "clue": "Diner window: Trout Cook with silver baster",
+ "rule": "Double Take (Oubapo): dual prop", "control": "ballast",
+ "atlas": [{"id": "a41", "why": "sent for its light only (amber shade lamp pooling over a counter, green water and hanging weed); it did not stay a light reference: the frame itself appears in the film as a photographic shot at 7.25-8.04 s"}],
+ "prompt_file": "prompts/p02.txt",
+ "takes": [{"take": 1, "by": "critic", "verdict": "reference stronger",
+  "seen": "0-4.1 s cockpit matches the master (six-bolt port with hinge, latch and chip at two o'clock, slot lower left, chalk chart, toggle lower right, dent on the right wall, riveted steel, no bread); at 0.25-1.0 s a round iron weight with a ring comes in at lower left and sits in the ballast slot from about 1.0 s, an amber glow comes up in the bottom of the port from about 1.0 s. 4.08 s hard cut (no push-in) to the port filling the frame: the still's diner window, trout cook in chef hat with the silver baster, two small trout customers at a counter, weeds, faint turkey reflection lower right. 4.5-5.5 s the cook squirts the baster down onto a dish on the sill; 5.75-7.2 s the same baster swings up and sprays a fan of bubbles to the upper right as in the still. 6.25-7.2 s a solid, opaque turkey head rises at lower right. 7.25-8.04 s a foreign shot: a photographic, live-action-looking room with a dark fish in an apron holding a fork at a table of pancakes and drinks, newspapers and framed clippings with lettering on the wall. 8.04-10.1 s outside view as the master: riveted tin with handle and dent, Turkey whole and small behind the amber port, two plain trout at left, a silver baster at upper left dribbling blue liquid onto the port rim.",
+  "changed": null}],
+ "final_take": 1, "verdict": "reference stronger",
+ "open": [
+  "7.25-8.04 s: the atlas frame a41 leaked in as its own shot, in a photographic style that breaks the inked watercolor look; the film has two cuts instead of one",
+  "stray text: that leaked shot is full of newspaper pages, wall clippings with headlines and a portrait photo, a sign at lower left, a logo on the apron and a small mark in the lower right corner",
+  "the leaked shot shows a different fish (dark, in an apron, with a fork and pancakes), not the trout cook, and a human-looking hand",
+  "beat 1: the turkey's tail fan and body edge sit in the left edge of frame from 0.25 s to the cut, not only a wing tip; it does not cover the slot, chart or toggle",
+  "beat 1: the weight is not seen being dropped by a wing tip; it floats in and is in the slot by 1.0 s; the tin sinking is not visible",
+  "beat 1 runs to 4.1 s and beat 2 opens on a hard cut at 4.08 s instead of a push-in to the glass",
+  "beat 2: the spray goes to the upper right inside the diner frame as in the still, not onto the porthole glass, so 'refueling my air' is only weakly supported; 'cooking me' is supported by the squirt over the dish at 4.5-5.5 s",
+  "beat 2: the turkey at lower right turns from a faint reflection into a solid head at 6.25 s and reads as standing outside the glass; no flinch is visible",
+  "beat 2: the chip in the rim at two o'clock is not visible in the close view of the port",
+  "beat 3: no trout cook; two plain trout with no chef hat, and the baster hangs at upper left with only a small fin on it, not clearly held by either trout",
+  "beat 3: the baster dribbles on the port rim (roast dinner reading faintly supported) but never taps a rivet, so the UFO plumber reading is not supported; nothing in the shot reads as saucer",
+  "beat 3: Turkey stands still and turns no valve; the diner window is absent from the outside view",
+  "sound was not checked",
+  "beats 1 and 2 on their own hold Setup A and show the dual use of the one baster; removing 7.25-8.04 s in a local edit (no paid call) would leave a single cut across the glass, but beat 3 would still not carry Trout's two readings"
+ ]
+}

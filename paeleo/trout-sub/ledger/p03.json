@@ -1,0 +1,28 @@
+{
+ "id": "p03", "station": "#03 · Starbd", "clue": "Room 4 chalkboard listing HOOK MONSTER",
+ "rule": "Lipogram (Outypopo): washed chalk", "control": "lamp",
+ "atlas": [
+  {"id": "a46", "why": "sent as the fourth reference: small pupils low in frame beside a portable chalkboard, for the staging of the two young trout in beat 3"},
+  {"id": "a38", "why": "sent as the last reference: pale chalk-like marks holding against a dark ground, for how the chalk glows on the board"}
+ ],
+ "prompt_file": "prompts/p03.txt",
+ "takes": [{
+  "take": 1, "by": "critic", "verdict": "pass",
+  "seen": "0-3 s cockpit matches the master (six-bolt port with chip at two o'clock, hinge and latch, empty slot lower left, chalk chart, brass toggle lower right, amber lamp, dent on the right wall, steel not bread) with a blank dark rectangle in the port; from about 1 s a turkey tail fan rises in the lower right corner; about 3 s a warm beam drops from the overhead lamp onto the port and the rectangle becomes a wood-framed board; 3.5 s the board reads only HOOK with the hook sketch, by 4.5 s HOOK MONSTER beside a chalk bird of prey hanging on a fish hook, weeds and mossy stones as in the still; 4.5-7 s push in to the glass, at 5.5 s a faint turkey face reflected low left in the port; 5.5-6.5 s a milky wavy band slides down the board over HOOK and then MONSTER; 7-8.3 s the board fills the frame with the turkey's face reflected large between the words and the sketch; about 8.3 s hard cut to the outside view: riveted tin with handle, dent on its right, whole turkey behind the amber port, two large trout at left, the lower one holding an orange worm up to the glass, two small fish with satchels at lower right pointing fins; 8.3-10 s slow push toward the port",
+  "changed": null
+ }],
+ "final_take": 1, "verdict": "pass",
+ "open": [
+  "a turkey tail fan, not a wing tip, fills the lower right corner from about 1 s to 5 s; no wing touches the lamp toggle and the toggle is never seen to move, so the control use is not visible",
+  "the beam comes down from the overhead lamp onto the port instead of switching on below it",
+  "the washed-chalk rule reads weakly: the milky band passes over HOOK MONSTER at 5.5-6.5 s and leaves the letters intact and brighter; there is no smeared heading line above the words and no chalk dust trailing away",
+  "the lettering is not fixed: the board shows only HOOK at 3.5 s and MONSTER appears afterwards",
+  "from 7 s the push goes past the brass rim, so for over a second the frame is a bare chalkboard and only the reflection says there is glass",
+  "the chalkboard is missing from the outside view, so in beat 3 nothing links the pointing pupils to the sketch; Trout's Hook Monster reading rests only on memory of beat 2, while the class pet reading (worm offered at the glass) is clear",
+  "nothing visible supports Turkey's famous guest speaker reading beyond the board being a school board; the stern bird on the hook next to the reflected face reads as Most Wanted only",
+  "four fish in beat 3 instead of two: the worm is held by a large adult trout without a satchel (the pair from the outside master), the two satchel pupils only point, and neither ducks behind anything",
+  "the chalk bird is an eagle-like raptor, not a turkey-like bird, so the likeness to Turkey depends on the reflection alone",
+  "beat 3 lasts about 1.7 s, not 3 s",
+  "the still keeps board, turkey reflection and the two pointing satchel pupils in one frame; the film never shows all three together"
+ ]
+}
