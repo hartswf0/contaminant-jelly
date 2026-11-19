@@ -38,7 +38,7 @@ def span(t, a, b):
 _ws = {}
 def sheet(page):
     if page not in _ws:
-        _ws[page] = Image.open(os.path.join(ROOT, "sheets/ws-%d.png" % page)).convert("RGB")
+        _ws[page] = Image.open(os.path.join(ROOT, "sheets/master-%d.png" % page)).convert("RGB")
     return _ws[page]
 
 
@@ -189,53 +189,25 @@ def title(film, n1=int(5.6 * FPS)):
 
 
 # One card per command on the worksheet. crop and lights are in PDF points (612 x 792 page).
-# Every entry line and every printed prompt on the worksheet gets its own step: one box on the
-# page (PDF points), one short line of words. Nothing on the sheet is left for the child to find alone.
-CARDS = [
-    dict(num="1", page=1, crop=(28, 22, 584, 132), chip="Front · Pilot", title="Copy your slip", film=("films/intro-1.mp4", 0.0), lights=[
-        ((34, 82, 262, 101), "Write your name."),
-        ((262, 82, 392, 101), "Write your number."),
-        ((398, 82, 580, 101), "Write your station."),
-        ((34, 107, 580, 127), "Write your clue and your rule.")]),
-    dict(num="2", page=1, crop=(120, 130, 492, 420), chip="Front · Pilot", title="Draw", film=("films/intro-3.mp4", 2.0), lights=[
-        ((180, 134, 430, 157), "Look. What does Turkey see?"),
-        ((150, 160, 462, 396), "Draw it inside the ring."),
-        ((205, 397, 405, 419), "This is Trout Town.")]),
-    dict(num="3", page=1, crop=(28, 424, 584, 688), chip="Front · Pilot", title="Write 3 things", film=("films/intro-2.mp4", 1.0), lights=[
-        ((34, 428, 580, 452), "1. Who is outside the glass?"),
-        ((34, 428, 580, 452), "What do they think our sub is?"),
-        ((34, 452, 580, 497), "Write it here."),
-        ((34, 503, 580, 527), "2. What one thing does Turkey do?"),
-        ((34, 527, 580, 572), "Write it here."),
-        ((34, 578, 580, 602), "3. How could this use up our air?"),
-        ((34, 602, 580, 647), "Write it here."),
-        ((34, 653, 580, 684), "Pass your paper left.")]),
-    dict(num="4", page=2, crop=(28, 70, 584, 110), chip="Back · Everyone", title="Three kinds of endings", film=("units/p22.mp4", 2.0), lights=[
-        ((36, 79, 226, 104), "Probable: what you expect."),
-        ((212, 79, 426, 104), "Plausible: strange, but it fits."),
-        ((420, 79, 580, 104), "Preposterous: a wild surprise!")]),
-    dict(num="5", page=2, crop=(28, 104, 300, 462), chip="Back · First friend", title="First friend", film=("units/p07.mp4", 0.5), lights=[
-        ((36, 112, 262, 180), "First friend: write your name."),
-        ((36, 184, 262, 266), "Bolt 1. What would you expect?"),
-        ((36, 268, 262, 349), "Bolt 2. Strange, but it fits."),
-        ((36, 351, 262, 431), "Bolt 3. A wild surprise!"),
-        ((34, 433, 262, 459), "Pass it left again.")]),
-    dict(num="6", page=2, crop=(312, 104, 584, 462), chip="Back · Next friend", title="Next friend", film=("units/p07.mp4", 5.6), lights=[
-        ((352, 112, 580, 180), "Next friend: write your name."),
-        ((352, 184, 580, 266), "Bolt 4. What would you expect?"),
-        ((352, 268, 580, 349), "Bolt 5. Strange, but it fits."),
-        ((352, 351, 580, 431), "Bolt 6. A wild surprise!"),
-        ((352, 433, 580, 459), "Give it back to the pilot.")]),
-    dict(num="7", page=2, crop=(28, 262, 584, 508), chip="Back · Pilot", title="Roll", film=("films/intro-4.mp4", 2.4), lights=[
-        ((258, 270, 354, 380), "Roll the die one time."),
-        ((266, 477, 342, 502), "Write the number you rolled."),
-        ((342, 477, 580, 502), "Or circle that die.")]),
-    dict(num="8", page=2, crop=(28, 474, 584, 648), chip="Back · Pilot", title="Tell what happened", film=("films/intro-5.mp4", 2.0), lights=[
-        ((34, 503, 580, 524), "What do the trout tell the newspaper?"),
-        ((34, 524, 580, 562), "Write it here."),
-        ((34, 566, 580, 601), "Why did Turkey come to Trout Town?"),
-        ((34, 601, 580, 644), "Write your message home.")]),
-]
+# Every entry line and prompt on the Porthole Log is one step. The steps, their sentences and
+# their exact places on the page come from sheets/steps.json, which tools/sheet.py measures
+# from the sheet itself, so the film and the paper cannot drift apart.
+CARD_INFO = {1: ("Your slip", "Front · Pilot", ("films/intro-1.mp4", 0.0)), 2: ("Draw what Turkey sees", "Front · Pilot", ("films/intro-3.mp4", 2.0)),
+             3: ("Write 3 things", "Front · Pilot", ("films/intro-2.mp4", 1.0)), 4: ("Three kinds of endings", "Back · Everyone", ("units/p22.mp4", 2.0)),
+             5: ("First friend", "Back · Bolts 1, 2, 3", ("units/p07.mp4", 0.5)), 6: ("Next friend", "Back · Bolts 4, 5, 6", ("units/p07.mp4", 5.6)),
+             7: ("Roll", "Back · Pilot", ("films/intro-4.mp4", 2.4)), 8: ("Tell what happened", "Back · Pilot", ("films/intro-5.mp4", 2.0))}
+def load_cards():
+    import json
+    steps = json.load(open(os.path.join(ROOT, "sheets/steps.json")))
+    out = []
+    for num in sorted(CARD_INFO):
+        mine = [x for x in steps if x["card"] == num]
+        title, chip, film = CARD_INFO[num]
+        xs0 = min(x["box"][0] for x in mine); ys0 = min(x["box"][1] for x in mine); xs1 = max(x["box"][2] for x in mine); ys1 = max(x["box"][3] for x in mine)
+        out.append(dict(num=str(num), page=mine[0]["page"], crop=(xs0 - 14, ys0 - 30, xs1 + 14, ys1 + 12), chip=chip, title=title, film=film,
+                        lights=[(tuple(x["box"]), x["say"]) for x in mine]))
+    return out
+CARDS = load_cards()
 LINE_SECONDS, CARD_LEAD = 3.6, 1.4
 def card_seconds(spec):
     return CARD_LEAD + LINE_SECONDS * len(spec["lights"]) + 0.6
@@ -304,7 +276,7 @@ def card(spec, film, n, first=False):
             X0, Y0, X1, Y1 = max(px, X0), max(py, Y0), min(px + AW, X1), min(py + AH, Y1)
             wipe = ease(span(tl, 0.5, 1.0))
             if wipe > 0 and X1 > X0 and Y1 > Y0:
-                od.rectangle((X0, Y0, X0 + (X1 - X0) * wipe, Y1), fill=GOLD + (70,))
+                od.rectangle((X0, Y0, X0 + (X1 - X0) * wipe, Y1), fill=GOLD + (38,))
                 if wipe >= 1:
                     od.rectangle((X0, Y0, X1, Y1), outline=RUST + (255,), width=5)
         im.alpha_composite(ov); d = ImageDraw.Draw(im)

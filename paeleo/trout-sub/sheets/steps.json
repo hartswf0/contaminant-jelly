@@ -1,0 +1,458 @@
+[
+ {
+  "step": "name",
+  "card": 1,
+  "say": "Write your name.",
+  "page": 1,
+  "box": [
+   46.7,
+   111,
+   237.1,
+   128.6
+  ]
+ },
+ {
+  "step": "number",
+  "card": 1,
+  "say": "This is your number.",
+  "page": 1,
+  "box": [
+   254.1,
+   112.3,
+   352.3,
+   128.6
+  ]
+ },
+ {
+  "step": "station",
+  "card": 1,
+  "say": "This is your station.",
+  "page": 1,
+  "box": [
+   369.3,
+   112.3,
+   464.3,
+   128.6
+  ]
+ },
+ {
+  "step": "clue",
+  "card": 1,
+  "say": "Read your clue and your rule.",
+  "page": 1,
+  "box": [
+   46.7,
+   132.8,
+   565.3,
+   149
+  ]
+ },
+ {
+  "step": "ring",
+  "card": 2,
+  "say": "Draw it inside the ring.",
+  "page": 1,
+  "box": [
+   46.7,
+   200.1,
+   565.3,
+   446.7
+  ]
+ },
+ {
+  "step": "q1",
+  "card": 3,
+  "say": "1. Who is outside the glass?",
+  "page": 1,
+  "box": [
+   46.7,
+   499.6,
+   565.3,
+   513.7
+  ]
+ },
+ {
+  "step": "a1",
+  "card": 3,
+  "say": "Write it here.",
+  "page": 1,
+  "box": [
+   46.7,
+   517.9,
+   565.3,
+   557.6
+  ]
+ },
+ {
+  "step": "q2",
+  "card": 3,
+  "say": "2. What one thing does Turkey do?",
+  "page": 1,
+  "box": [
+   46.7,
+   563.6,
+   565.3,
+   577.7
+  ]
+ },
+ {
+  "step": "a2",
+  "card": 3,
+  "say": "Write it here.",
+  "page": 1,
+  "box": [
+   46.7,
+   581.9,
+   565.3,
+   621.6
+  ]
+ },
+ {
+  "step": "q3",
+  "card": 3,
+  "say": "3. How could this use up our air?",
+  "page": 1,
+  "box": [
+   46.7,
+   627.6,
+   565.3,
+   641.7
+  ]
+ },
+ {
+  "step": "a3",
+  "card": 3,
+  "say": "Write it here.",
+  "page": 1,
+  "box": [
+   46.7,
+   645.9,
+   565.3,
+   685.6
+  ]
+ },
+ {
+  "step": "pass1",
+  "card": 3,
+  "say": "Pass your paper left.",
+  "page": 1,
+  "box": [
+   36.8,
+   701.1,
+   575.2,
+   723.9
+  ]
+ },
+ {
+  "step": "k1",
+  "card": 4,
+  "say": "Probable: what you expect.",
+  "page": 2,
+  "box": [
+   46.7,
+   109.6,
+   213.9,
+   141.4
+  ]
+ },
+ {
+  "step": "k2",
+  "card": 4,
+  "say": "Plausible: strange, but it fits.",
+  "page": 2,
+  "box": [
+   222.4,
+   109.6,
+   389.6,
+   141.4
+  ]
+ },
+ {
+  "step": "k3",
+  "card": 4,
+  "say": "Preposterous: a wild surprise!",
+  "page": 2,
+  "box": [
+   398.1,
+   109.6,
+   565.3,
+   141.4
+  ]
+ },
+ {
+  "step": "name1",
+  "card": 5,
+  "say": "First friend: write your name.",
+  "page": 2,
+  "box": [
+   46.7,
+   191.1,
+   290.5,
+   208.7
+  ]
+ },
+ {
+  "step": "pick1",
+  "card": 5,
+  "say": "Turkey thinks.",
+  "page": 2,
+  "box": [
+   53.1,
+   218.2,
+   284.1,
+   230.4
+  ]
+ },
+ {
+  "step": "pick1-plates",
+  "card": 5,
+  "say": "Pick one.",
+  "page": 2,
+  "box": [
+   53.1,
+   234.1,
+   284.1,
+   282.4
+  ]
+ },
+ {
+  "step": "draw1",
+  "card": 5,
+  "say": "Draw its shape.",
+  "page": 2,
+  "box": [
+   53.1,
+   286.1,
+   284.1,
+   317.2
+  ]
+ },
+ {
+  "step": "bolt1",
+  "card": 5,
+  "say": "Bolt 1. What would you expect?",
+  "page": 2,
+  "box": [
+   46.7,
+   327.9,
+   290.5,
+   376.1
+  ]
+ },
+ {
+  "step": "bolt2",
+  "card": 5,
+  "say": "Bolt 2. Strange, but it fits.",
+  "page": 2,
+  "box": [
+   46.7,
+   380.3,
+   290.5,
+   428.5
+  ]
+ },
+ {
+  "step": "bolt3",
+  "card": 5,
+  "say": "Bolt 3. A wild surprise!",
+  "page": 2,
+  "box": [
+   46.7,
+   432.7,
+   290.5,
+   480.9
+  ]
+ },
+ {
+  "step": "pass2",
+  "card": 5,
+  "say": "Pass it left again.",
+  "page": 2,
+  "box": [
+   46.7,
+   485.1,
+   290.5,
+   508
+  ]
+ },
+ {
+  "step": "name2",
+  "card": 6,
+  "say": "Next friend: write your name.",
+  "page": 2,
+  "box": [
+   321.5,
+   191.1,
+   565.3,
+   208.7
+  ]
+ },
+ {
+  "step": "pick2",
+  "card": 6,
+  "say": "The trout think.",
+  "page": 2,
+  "box": [
+   327.9,
+   218.2,
+   558.9,
+   230.4
+  ]
+ },
+ {
+  "step": "pick2-plates",
+  "card": 6,
+  "say": "Pick one.",
+  "page": 2,
+  "box": [
+   327.9,
+   234.1,
+   558.9,
+   282.4
+  ]
+ },
+ {
+  "step": "draw2",
+  "card": 6,
+  "say": "Draw its shape.",
+  "page": 2,
+  "box": [
+   327.9,
+   286.1,
+   558.9,
+   317.2
+  ]
+ },
+ {
+  "step": "bolt4",
+  "card": 6,
+  "say": "Bolt 4. What would you expect?",
+  "page": 2,
+  "box": [
+   321.5,
+   327.9,
+   565.3,
+   376.1
+  ]
+ },
+ {
+  "step": "bolt5",
+  "card": 6,
+  "say": "Bolt 5. Strange, but it fits.",
+  "page": 2,
+  "box": [
+   321.5,
+   380.3,
+   565.3,
+   428.5
+  ]
+ },
+ {
+  "step": "bolt6",
+  "card": 6,
+  "say": "Bolt 6. A wild surprise!",
+  "page": 2,
+  "box": [
+   321.5,
+   432.7,
+   565.3,
+   480.9
+  ]
+ },
+ {
+  "step": "pass3",
+  "card": 6,
+  "say": "Give it back to the pilot.",
+  "page": 2,
+  "box": [
+   321.5,
+   485.1,
+   565.3,
+   508
+  ]
+ },
+ {
+  "step": "roll",
+  "card": 7,
+  "say": "Roll the die one time.",
+  "page": 2,
+  "box": [
+   46.7,
+   561.4,
+   153.2,
+   575
+  ]
+ },
+ {
+  "step": "rolled",
+  "card": 7,
+  "say": "Write the number you rolled.",
+  "page": 2,
+  "box": [
+   173,
+   559.4,
+   258.5,
+   577
+  ]
+ },
+ {
+  "step": "circle",
+  "card": 7,
+  "say": "Or circle that die.",
+  "page": 2,
+  "box": [
+   278.3,
+   557.7,
+   476.9,
+   578.7
+  ]
+ },
+ {
+  "step": "gq",
+  "card": 8,
+  "say": "What do the trout tell the newspaper?",
+  "page": 2,
+  "box": [
+   46.7,
+   630.1,
+   565.3,
+   644.2
+  ]
+ },
+ {
+  "step": "ga",
+  "card": 8,
+  "say": "Write it here.",
+  "page": 2,
+  "box": [
+   46.7,
+   648.4,
+   565.3,
+   683.6
+  ]
+ },
+ {
+  "step": "mq",
+  "card": 8,
+  "say": "Why did Turkey come to Trout Town?",
+  "page": 2,
+  "box": [
+   46.7,
+   689.5,
+   565.3,
+   703.7
+  ]
+ },
+ {
+  "step": "ma",
+  "card": 8,
+  "say": "Write your message home.",
+  "page": 2,
+  "box": [
+   46.7,
+   707.9,
+   565.3,
+   743
+  ]
+ }
+]

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """youtube: the one film for the whole exercise, made to sit beside the
-Submarine Porthole Log worksheet (sheets/tour_key_porthole_worksheet.pdf).
+Porthole Log (tools/sheet.py), the worksheet redrawn in the film's own symbols.
 
     python3 tools/youtube.py           # youtube/tourkey-trouttown.mp4, chapters.txt, slips.html, timing.json
     python3 tools/youtube.py --slips   # reprint the slips from the last build's timings
