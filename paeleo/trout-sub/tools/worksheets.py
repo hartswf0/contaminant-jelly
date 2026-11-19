@@ -127,7 +127,8 @@ if __name__ == "__main__":
     base = PdfReader(SRC)                    # read once, so all 110 pages share the worksheet's fonts and art
     for n in range(1, 56):
         for i, over in ((0, front(n)), (1, back(n))):
-            page = w.add_page(base.pages[i]); page.merge_page(over)
+            page = w.add_page(over)          # each page starts as its own overlay ...
+            page.merge_page(base.pages[i], over=False)   # ... and the untouched worksheet is laid underneath it
     w.compress_identical_objects()
     w.write("youtube/porthole-logs.pdf")
     print("youtube/porthole-logs.pdf", len(w.pages), "pages")

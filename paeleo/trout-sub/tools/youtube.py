@@ -442,7 +442,7 @@ def slips(times, dive_of=None):
 @page{size:letter;margin:9mm 10mm}*{box-sizing:border-box}
 body{margin:0;font:10.5px/1.3 Inter,"Helvetica Neue",Arial,sans-serif;color:#16293a;background:#fff}
 section{break-after:page;display:flex;flex-direction:column;gap:0}
-.strip{display:flex;gap:4.5mm;align-items:stretch;height:64.5mm;padding:3.5mm 0;border-bottom:1.2px dashed #8fa0ab;break-inside:avoid}
+.strip{display:flex;gap:4.5mm;align-items:stretch;height:64.5mm;overflow:hidden;padding:3.5mm 0;border-bottom:1.2px dashed #8fa0ab;break-inside:avoid}
 section .strip:last-child{border-bottom:0}
 .strip img{width:51mm;height:51mm;align-self:center;border-radius:50%%;object-fit:cover}
 .body{flex:1;display:flex;flex-direction:column;gap:1.6mm;min-width:0}
@@ -458,7 +458,7 @@ h2{margin:.3mm 0 0;font-size:17px;line-height:1.1;font-weight:800}h2 b{font-size
 .box{border:1.1px solid #9fb0bf;border-top:2.2px solid #16293a;background:#f1f5f8;border-radius:1.6mm;padding:1.6mm 2.2mm}
 .who{display:flex;align-items:center;gap:1.2mm;font-size:9px}.who b{font-size:10.5px}.dice{margin-left:auto;display:flex;gap:.8mm}.die{width:4.6mm;height:4.6mm}
 .look{font-size:7.5px;font-weight:800;letter-spacing:.07em;color:#8a5a12;margin-top:.6mm}
-.box p{margin:.8mm 0 0;font-size:12.5px;line-height:1.2;font-weight:700;display:flex;flex-direction:column;gap:.9mm}.ch{display:flex;align-items:center;gap:1.4mm}.btn{width:6.2mm;height:6.2mm;flex:none}
+.box p{margin:.6mm 0 0;font-size:12px;line-height:1.15;font-weight:700;display:flex;flex-direction:column;gap:.45mm}.ch{display:flex;align-items:center;gap:1.4mm}.btn{width:5.2mm;height:5.2mm;flex:none}
 .bar{display:flex;justify-content:space-between;background:#16344a;color:#fff;border-radius:1.4mm;padding:1.3mm 2.6mm;font-size:7.6px;font-weight:800;letter-spacing:.05em}
 @media screen{body{max-width:216mm;margin:0 auto;padding:16px}}
 @media screen and (max-width:700px){.strip{height:auto;flex-direction:column}.two{grid-template-columns:1fr}.strip img{width:40vw;height:40vw}header{flex-direction:column}}
