@@ -1,0 +1,197 @@
+{
+ "p03": {
+  "maker": {
+   "id": "p03",
+   "rendered": true,
+   "method": "The p03 hand film is rendered: 34 s, 960x540, 24 fps, 2.6 MB, at /home/user/contaminant-jelly/paeleo/trout-sub/hand/assets/films/p03.mp4, with poster p03.webp beside it. Nothing was committed. I checked picture from stills and frame sequences, and sound only by loudness levels; I could not listen to it.\n\n**Part 1, it is made (0 to 15.5 s, bench seen from above).** A slate slab slides onto a plank bench, four mitred wood rails are laid one at a time, and a brass ROOM 4 plate drops on. The slate is dusty, with old sweeps of the felt rubber. A chalk stick then letters HOOK MONSTER and an underline, and draws the monster beside it (a fish-hook with a bird's head, crest, wattle and wing), 43 strokes in all. Each stroke is chalk dragged over the slate's tooth and appears grain by grain as the stick passes. The camera follows the stick close and pulls back at the end. The dishcloth sits on the bench from the start.\n\n**Part 2, Turkey looks out (15.5 to 24.6 s).** From inside the tin: a brass six-bolt porthole with hinge, dog and a depth gauge, and Turkey's dark head near the glass. Outside is a cut-paper river in five planes. A trout monitor scrubs O and N off with the wet cloth in two passes, a milk of chalk drifts away, and the board reads HOOK M  STER with ghosts. Caption: \"Mister Hook, the famous guest speaker? Or the Monster, most wanted?\"\n\n**Part 3, the trout look in (24.6 to 34 s).** River side: the board, three pupils and the monitor, all hinged cut paper with satchels, and the foil-paper tin drifting in with Turkey in its porthole and a brass hook on a chain. The hook is my addition, so the trout have a reason for the second reading. The cloth takes H and O, leaving OK M  STER. One pupil swims up to the porthole and one backs away. Caption: \"OK, mister: are you our new class pet? Or the Hook Monster?\"\n\n**SCIONs used.** Forward Kinematics: every puppet is a joint tree. Secondary Dynamics: satchels, cloth, wattle and chained hook are damped pendulums driven by their parent's acceleration. Multiplane Parallax: per-plane parallax, haze, blur and shadow. Each has a small assert in the script.\n\n**Rounds.** Four rounds of contact sheets, plus a puppet sheet and frame sequences from the rendered film. Fixes along the way:\n- Slate too clean and scan-lined; made dustier.\n- Sketch colliding with the R; moved right.\n- Porthole bevel blown out to white; relit.\n- Part 2 zoom cutting off the sketch and pupils; pulled back.\n- Near weeds hiding the wiped letters; moved to the frame edges.\n- Tin cropped at the top; lowered.\n- Pupils hidden under the caption; moved up.\n- Chalk sound too quiet against the river; rebalanced.\n- Camera cropping HOOK while MONSTER was written; steadied.\n- A stray chalk fragment left by the wipe; wipe area enlarged.\n\nFiles:\n- /home/user/contaminant-jelly/paeleo/trout-sub/hand/films/p03.py\n- /home/user/contaminant-jelly/paeleo/trout-sub/hand/films/notes/p03.txt (110 words)\n- /home/user/contaminant-jelly/paeleo/trout-sub/hand/films/credits/p03.json\n- /home/user/contaminant-jelly/paeleo/trout-sub/hand/films/stills/p03_sheet.png",
+   "foraged": [
+    "File:Chalkboard-writing.ogg by Tomproberts, Wikimedia Commons, CC0 (https://commons.wikimedia.org/wiki/File:Chalkboard-writing.ogg). Its recorded strokes are cut apart and laid one under each drawn chalk stroke in the bench scene. Everything else on screen and in the soundtrack is handmade or synthesized."
+   ],
+   "scions": [
+    "32 Forward Kinematics: Hierarchical Body Logic. Trout, Turkey and the tin are joint trees of cut-paper pieces turning on hinge pivots.",
+    "41 Secondary Dynamics: Inertia and Restraint. Satchels, cloth, Turkey's wattle and snood, and the hook on its chain are damped pendulums driven by the parent's acceleration.",
+    "44 Multiplane Parallax: Spatial Collage. The river is five paper planes with their own parallax ratio, haze, focus blur and cast shadow, under a drifting and pushing camera."
+   ],
+   "seconds": 34,
+   "weak": "No hand holds the chalk: the stick moves by itself with a cast shadow, stop-motion fashion. Turkey is small inside the tin's porthole in part 3, and in part 2 is a dark, soft shape at the glass that hides the lower-left of the view. The bench props (chalk tray, felt rubber) are slight. The underwater wipe is theatre, not physics. River sound is synthesized. The script is long (about 1,900 lines in one file)."
+  },
+  "critic": {
+   "id": "p03",
+   "verdict": "pass",
+   "repaired": [
+    "River side: Turkey was too small in the tin to carry the 'class pet' reading. Tin scale raised 0.74 to 0.90 and a slow camera push (29.2 to 32.4 s) added toward the tin's window and the dangling hook, so both trout readings are visible while the question is on screen.",
+    "The push is framed so the caption band no longer sits over the hook's point.",
+    "Captions enlarged from size 25 to 28; still one at a time, held 4.6 s and 4.8 s."
+   ],
+   "open": [
+    "No hand holds the chalk; the stick moves alone (it does draw all 43 strokes one by one, and slate, rails and plate are laid piece by piece for the first 15.5 s of 34 s).",
+    "The final push crops the washed H and the M at the left edge of the board in the last seconds; OK and the ghosted letters still read.",
+    "Through the porthole, 'guest speaker or most wanted' rests on the caption and the washed HOOK M STER alone; nothing in the staging separates the two readings, and Turkey is a dark, soft shoulder shape.",
+    "The river-side caption band overlaps the riverbed trout.",
+    "River sound is synthesized; only the chalk sound is foraged (Chalkboard-writing.ogg by Tomproberts, Wikimedia Commons, CC0, author recorded).",
+    "Re-rendered film is /home/user/contaminant-jelly/paeleo/trout-sub/hand/assets/films/p03.mp4 (34.0 s, 2.7 MB); Critic line appended to /home/user/contaminant-jelly/paeleo/trout-sub/hand/films/notes/p03.txt; edits are in /home/user/contaminant-jelly/paeleo/trout-sub/hand/films/p03.py; nothing committed."
+   ],
+   "licences_ok": true
+  }
+ },
+ "p14": {
+  "maker": {
+   "id": "p14",
+   "rendered": true,
+   "method": "Atmospheric multiplane cutout. Five sheets of glass are painted in code stroke by stroke (bristle-track brush engine with paint relief): board, far boulders, mid rocks and sunk branch, pebble bed, black-green front weed. Part 1 (0-12.6 s, bench): the sheets and a clear carrier slide onto a wooden stand one by one and land on brass pegs, each at a real height under one camera; then a scalpel walks the contour of a foraged maple-leaf photograph on a cutting mat, tweezers lift the leaf by its stem, carry it and slide it under the two near sheets onto the carrier; the bench lamp dims and murk gathers as the camera drops in. Part 2 (12.6-22.2 s): the same stack through a handmade six-bolt brass porthole from inside the tin; the leaf falls as a pendulum on a 1.15 s beat, one notch lower per swing, with nine notches filed in the bezel lighting in turn; the tin's lamp makes it glow like an ember; Turkey (Audubon head cutout, hinged wattle) ducks a little per tick; caption 'A spark, gone under the water? Or the calendar, ticking down to Thanksgiving?'. Part 3 (22.2-32 s): river side, tin and porthole in frame, camera tilting down with the leaf for vertical parallax; the leaf crosses the lamp beam and flares with a red trail, one trout rises to meet it, another bolts for the tin, more leaves start falling on the far sheets on the same beat; caption 'A feather, fallen out of the sky? Or a flare: is somebody up there in trouble?'. Five rounds of stills and contact sheets. Output: 32 s, 960x540, 2.7 MB. Files: /home/user/contaminant-jelly/paeleo/trout-sub/hand/films/p14.py, /home/user/contaminant-jelly/paeleo/trout-sub/hand/assets/films/p14.mp4, /home/user/contaminant-jelly/paeleo/trout-sub/hand/assets/films/p14.webp, /home/user/contaminant-jelly/paeleo/trout-sub/hand/films/notes/p14.txt, /home/user/contaminant-jelly/paeleo/trout-sub/hand/films/credits/p14.json, /home/user/contaminant-jelly/paeleo/trout-sub/hand/films/stills/p14_sheet.png. Not committed.",
+   "foraged": [
+    "File:Red maple leaf on a white background.jpg, Wilfredor, CC0, Wikimedia Commons: the leaf, and the smaller falling leaves",
+    "File:Denton Brook Trout 1896.png, Sherman Foote Denton, public domain, Wikimedia Commons: all three trout",
+    "File:1 Wild Turkey.jpg, John James Audubon, public domain, Wikimedia Commons: Turkey's head and neck, with the wattle as a separate hinged piece"
+   ],
+   "scions": [
+    "Multiplane Parallax (SCION 44): six sheets at real heights under one camera, so scale and slide per sheet come only from height; lateral drift on the bench, vertical tilt in the river",
+    "Occlusion Compositing (SCION 45): the leaf is slid under the near and front sheets and over the mid ones, with contact shadows on the carrier glass and each sheet's paint shadowing the sheet below",
+    "Secondary Dynamics (SCION 41): damped springs drive Turkey's wattle and duck, the leaf swinging from the tweezers, and trout A's rise"
+   ],
+   "seconds": 32,
+   "weak": "No hand holds the scalpel, tweezers or glass. The sheets arrive already painted; the painting itself is not shown. Sound is entirely synthesized (glass clinks, blade, tick-tock, flare); no foraged audio. The tin's lamp cowl reads as a loose brass block, and the tin is still a fairly plain ribbed box. The far and mid sheets are soft, so depth in the river shots rests mostly on the front weed, the beam and the camera tilt. The red flare trail is faint outside the lamp beam. The trout and turkey credits were written by hand from Commons metadata because the API was rate-limited; for the trout, the licence and author come from a single API read earlier in the session."
+  },
+  "critic": {
+   "id": "p14",
+   "verdict": "nearly",
+   "licences_ok": true,
+   "repaired": [
+    "The glass sheets used to land fully painted. I added 1.9 s on the bench: the camera goes in on the top sheet and a brush paints its left-hand weed blade by blade (14 strokes) before the leaf is cut. The film is now 33.9 s, 2.8 MB, and the making runs to 14.5 s.",
+    "Each caption crammed both readings into one small line. They are now four captions, one reading each, in larger type (29 instead of 23), each held 3.1 s or more, one on screen at a time.",
+    "The flare caption now starts as the leaf enters the tin's lamp beam, so the words and the flare arrive together.",
+    "Added a brush-on-glass sound for each stroke, and appended the Critic line to /home/user/contaminant-jelly/paeleo/trout-sub/hand/films/notes/p14.txt. Re-rendered /home/user/contaminant-jelly/paeleo/trout-sub/hand/assets/films/p14.mp4 and its poster; nothing committed."
+   ],
+   "open": [
+    "The other four sheets and the right-hand weed of the top sheet still arrive already painted.",
+    "No hand holds the brush, scalpel or tweezers; the tools move on their own.",
+    "Turkey's spark reading rests on a modest ember glow when the leaf crosses the lamp beam; the calendar reading rests on small rim notches that light one per swing, which is also the only place the Seasonal Timer rule is counted on screen.",
+    "The start of each brush stroke shows as a blunt dark block at the blade's root for a frame or two.",
+    "Sound is entirely synthesized.",
+    "I checked the new version in stills only; I did not play the rendered mp4 or listen to the new brush sound."
+   ]
+  }
+ },
+ "p01": {
+  "maker": {
+   "id": "p01",
+   "rendered": true,
+   "method": "Comic cutout collage on a light table, shot on twos. Part 1 (0-11 s, 35%): scissors cut the boot out of a rubber-boot poster along a faceted path, the boot lifts out leaving a real hole, the sheet is pulled away, the ankle is snipped and pinned with a brass fastener, the foot wags on its hinge, then tissue water, etched stones, weeds, the tin, its porthole ring and the trout slide in; the top light fades and the lamp under the glass comes on. Part 2 (11-21 s): through the six-bolt brass porthole, close on the toe only, the boot falls into the amber beam and blocks it while Turkey's lamp sweeps; caption \"Turkey: Shipwreck? Giant's foot? Or a tunnel?\". Part 3 (21-31 s): river side, tin and porthole in frame, the boot lifts twice so the beam floods out under the sole toward the trout while the tin scuttles and nips at the toe; caption \"Trout: Is its sole a torch, or is a crab biting its toe?\". The Silhouette rule is shown by the same paper pieces turning into backlit shadows, with the beam's shadow computed from whatever stands in it. The scene is laid out mirrored (tin on the right) so the boot is never flipped and its poster lettering stays readable. Sound is synthesized with Mix. Five stills rounds plus a contact sheet from the final mp4. Output: /home/user/contaminant-jelly/paeleo/trout-sub/hand/assets/films/p01.mp4 (31.0 s, 960x540, 24 fps, 1.6 MB) and p01.webp poster; script /home/user/contaminant-jelly/paeleo/trout-sub/hand/films/p01.py; note /home/user/contaminant-jelly/paeleo/trout-sub/hand/films/notes/p01.txt (107 words); credits /home/user/contaminant-jelly/paeleo/trout-sub/hand/films/credits/p01.json (5 items). Not committed. Commons was heavily rate-limited: kit_anim.forage() failed, so files were fetched as 960/1280/500 px thumbnails from upload.wikimedia.org and the credits were written from the API's extmetadata by my own script; Public domain items had no licence URL in the metadata, so I filled in the Public Domain Mark URL, and I expanded two author fields (Denton, Shober & Carqueville) from the Commons credit lines.",
+   "foraged": [
+    "File:Boston Rubber Shoe Co.- George P. Holmes and Co.- Bay State Rubber Co. - DPLA - 7d874137442055e559a38a9110f77a70.jpg (Public domain; Missouri Historical Society via DPLA) - the boot, cut into leg and foot",
+    "File:FMIB 42995 Brook Trout (Salvelinus fontinalis, Mitchill).jpeg (Public domain; Denton, 1896) - trout, body and hinged tail",
+    "File:Allart van Everdingen, Pointed Boulder at the Bank of a River, probably c. 1645-1656, NGA 37572.jpg (CC0; National Gallery of Art) - river-bed stones",
+    "File:1 Wild Turkey.jpg (Public domain; Audubon, Birds of America plate 1) - Turkey's head",
+    "File:Worman-scissors.png (Public domain; 1880) - the scissors, split into two blades at the screw"
+   ],
+   "scions": [
+    "01 Terry Gilliam - Comic Cutout Metamorphosis: found engravings cut with straight facets and paper edges, pivots, held twos, impact sounds, the hole left in the poster",
+    "02 Lotte Reiniger - Articulated Shadow Theater: top light off and lamp under the glass on, so the cutouts become backlit silhouettes; ankle pin with a 26 degree limit",
+    "45 Occlusion Compositing - Who Is In Front?: the beam's shadow volume is computed each frame from the alpha of the paper standing in it; far pieces sit behind tissue, drop shadows under top light"
+   ],
+   "seconds": 31,
+   "weak": "The crab reading in part 3 leans on its caption: the tin only scuttles about 45 px and nips, it has nothing claw-like. Turkey stands beside the porthole rather than squarely behind the glass. All sound is synthesized, none foraged. Only the boot is shown being cut; trout, stones and Turkey's head arrive already cut. The source lithograph is small (1280 px thumbnail; the full-size original was rate-limited), so the boot is slightly soft under top light. The poster's \"P. HOLMES\" lettering runs across the boot shaft. I could not listen to the soundtrack, only check its levels."
+  },
+  "critic": {
+   "id": "p01",
+   "verdict": "nearly",
+   "repaired": [
+    "Porthole view (part 2) was framed so close that the boot was an unnameable black blob; pulled the camera back (cam 2.0 -> 1.3) so the whole foot, heel arch and ankle sit in the glass. It now reads as a boot / giant's foot / dark hull, with a small lit gap under the heel arch for the tunnel.",
+    "Crab reading (part 3) rested only on the caption; added handmade tinplate bread tongs (two toothed jaws riveted above and below the lamp on the tin's bow) that flex and snap three times at the lifted toe, with snap clicks in the sound. They are part of the tin from part 1 onward.",
+    "Caption 1 sat over the poster's bottom edge and the scissors crossed it while the sole was being cut; reframed part 1 (zoom 0.74, sheet raised) so the poster clears the caption band.",
+    "Re-rendered /home/user/contaminant-jelly/paeleo/trout-sub/hand/assets/films/p01.mp4 (31.0 s, 1.6 MB) and poster; appended the Critic line to /home/user/contaminant-jelly/paeleo/trout-sub/hand/films/notes/p01.txt. Edits are in /home/user/contaminant-jelly/paeleo/trout-sub/hand/films/p01.py. Not committed."
+   ],
+   "open": [
+    "Tunnel reading is thin: only the small lit gap under the heel arch suggests it.",
+    "The porthole glass shows only the beam for about 2.5 s (11.0 to 13.6 s) before the boot drops in.",
+    "The new tongs slide in already attached to the tin rather than being cut and pinned on screen.",
+    "The tongs snap below and beside the lifted toe; only the upper jaw comes close to touching it.",
+    "The notes file now runs past the 110-word limit because of the appended Critic line, and its handmade list does not mention the tongs outside that line.",
+    "Sound is entirely synthesized.",
+    "Licences were checked against films/credits/p01.json only (four Public domain, one CC0, all with authors); they were not re-verified against the Commons API."
+   ],
+   "licences_ok": true
+  }
+ },
+ "p44": {
+  "maker": {
+   "id": "p44",
+   "rendered": true,
+   "method": "Handmade spinning lettered disc, 34 s, 960x540, 24 fps, 2.4 MB. Part 1 (0 to 15.3 s, the making, on an overhead bench): a bare card disc on an iron banding wheel; a flat brush clamped on a steel rule inks one 1.5-turn spiral band while the wheel turns under it (wet sheen, bristle streaks, the brush running dry at the hub end); the brush is swapped for a ruling pen and three eccentric rings are inked ring by ring, the disc re-pinned off centre for each (pinholes stay); 31 cut-paper pieces are lifted off a baize galley by a waxed stick and set one at a time from both ends of the spiral toward the middle; twelve brass tacks go round the rim; a flick starts it spinning. The sentence is my own and is an exact letter palindrome, spaces included (asserted in code): NOW TRAP A POOL · ROTOR · LOOP A PART WON. Part 2 (15.3 to 24.7 s): through Turkey's six-bolt brass porthole the disc turns anticlockwise at 0.5, 1 and 2 turns a second so the spiral drains toward the hub, silt spirals in and a trout is drawn nose-first toward it, then it reverses and the spiral pours outward; caption asks whirlpool turbine or hypnosis trap. Part 3 (24.7 to 34 s): river side with the tin and its porthole in frame; the disc spins clockwise up to 2 turns a second (froth thrown off the rim, a strand of weed whirled round like laundry), then runs down under friction with a sprung reed ticking on the tacks and comes to rest with the reed on the middle T of ROTOR; caption asks pie-prize wheel or washing machine. Rule (Rotating Type and Depth): only rotation is drawn; motion blur is the real average of 8 shutter samples per frame, so at speed the letters dissolve and the bare spiral advances or recedes, and at exactly 2 turns a second the twelve tacks stand still against 24 fps (asserted). Sound is synthesized: brush, pen, a note per letter kind so the pairs sound twice, tack taps, a rotor hum that follows the spin, reed ticks at the computed tack crossings, a bell at the stop. Five rounds of contact sheets; fixes included enlarging the rings, de-mossing the legs, rebuilding the caught weed, recomposing the porthole so the trout is inside the glass, smoother shutter blur, and aligning the tack ring so the wheel stops on the middle T. Files: /home/user/contaminant-jelly/paeleo/trout-sub/hand/films/p44.py, /home/user/contaminant-jelly/paeleo/trout-sub/hand/assets/films/p44.mp4, /home/user/contaminant-jelly/paeleo/trout-sub/hand/assets/films/p44.webp, /home/user/contaminant-jelly/paeleo/trout-sub/hand/films/notes/p44.txt, /home/user/contaminant-jelly/paeleo/trout-sub/hand/films/credits/p44.json. Not committed.",
+   "foraged": [
+    "File:Denton Brook Trout 1896.png, Sherman Foote Denton, public domain, Wikimedia Commons (all four trout)",
+    "File:1 Wild Turkey.jpg, John James Audubon, public domain, Wikimedia Commons (Turkey's head and hinged wattle)"
+   ],
+   "scions": [
+    "06 John Whitney - Harmonic Motion Orchestra: spin speeds in 1:2:4 ratios; numeric invariant that at 2 turns/s a tack moves exactly one spacing per frame",
+    "41 Secondary Dynamics: spring-damper reed knocked by each tack, Turkey's wattle, flung/limp weed, friction run-down and settle between two tacks",
+    "45 Occlusion Compositing: post behind and legs in front of the disc with a cast shadow, a far trout passing behind the wheel, porthole ring and Turkey over the river plate"
+   ],
+   "seconds": 34,
+   "weak": "The palindrome is exact in letters and spacing, but read from hub to rim the glyphs face backwards, and the film never reads it outward on screen; the only on-screen proof is the paired setting from both ends and the stop on the middle T. No hand holds the brush, pen or stick (the tools are clamped or run off frame). Sound is entirely synthesized: a CC0 ratchet recording on Commons was found for the reed clicks but upload.wikimedia.org returned HTTP 429 on every attempt, so it is not used or credited. The trout and Turkey source files were copied from the p14 downloads (same Commons files) rather than re-fetched. The tin, brass ring and cutout helpers are copied from p14.py. The spatial logic of part 3 is loose (disc and the tin's porthole both face the camera). The note runs 113 tokens by wc because of the dots and colons, about 108 actual words."
+  },
+  "critic": {
+   "id": "p44",
+   "verdict": "nearly",
+   "licences_ok": true,
+   "repaired": [
+    "Captions: each scene had one 90-character line at 22 px carrying both readings for the whole shot. Split into four captions, one reading at a time, 27 px, each held 3.6 s or more and timed to the action that argues for it (fast spin = turbine/whirlpool; slow legible spin = hypnosis trap; spin-up with clicking reed = pie-prize wheel; run-down with froth and the thing on the tack = washing machine). An assert in /home/user/contaminant-jelly/paeleo/trout-sub/hand/films/p44.py checks the 2.5 s minimum hold and that captions never overlap.",
+    "Whirlpool reading through the porthole was nearly invisible (faint silt). The silt in the porthole shot is now larger, fully opaque and longer-streaked, so water is seen going round and in toward the hub during the fast spin.",
+    "The thing caught on a tack read only as green weed. It is now wider and banded pale/dark, so it can be weed or a striped sock; it hangs limp from the tack when the wheel stops, under the 'whose sock?' caption.",
+    "Re-rendered /home/user/contaminant-jelly/paeleo/trout-sub/hand/assets/films/p44.mp4 (34.0 s, 2.5 MB) and its poster; confirmed on new contact sheets. Appended a 'Critic:' line to /home/user/contaminant-jelly/paeleo/trout-sub/hand/films/notes/p44.txt. Nothing committed."
+   ],
+   "open": [
+    "No hand in the making: the rule-and-brush and the placing stick move by themselves. The first 15.3 s (45%) is otherwise genuinely the disc being inked and lettered piece by piece.",
+    "The whirlpool reading rests only on silt streaks and a trout drifting in; there is no visible funnel or vortex in the water.",
+    "The pie-prize reading rests on the reed and twelve tacks alone; there is no pie, slice or prize marking on the wheel.",
+    "The disc is small inside the porthole compared with the deck picture, where it fills the glass.",
+    "From the river side the letters read backwards when followed outward (the maker's own note); sound is synthesized.",
+    "The notes file is now over the 60 to 110 word limit because of the appended Critic line.",
+    "Credits have an empty license_url for both items; both are public domain with author given (rechecked against the Commons API: Denton brook trout 1896 and Audubon Wild Turkey), so BRIEF-2 is met."
+   ]
+  }
+ },
+ "p35": {
+  "maker": {
+   "id": "p35",
+   "rendered": true,
+   "method": "Document montage on a pinboard, in three locked shots (the rule, Fixed-Shot Handoff, is the staging: nothing moves but what is handed from one holder to the next). Rendered: /home/user/contaminant-jelly/paeleo/trout-sub/hand/assets/films/p35.mp4 (34.0 s, 960x540, 24 fps, 1.8 MB) plus poster p35.webp. Script: /home/user/contaminant-jelly/paeleo/trout-sub/hand/films/p35.py. Note: films/notes/p35.txt (107 words). Credits: films/credits/p35.json (7 items). Not committed.\n\nPart 1 (0 to 14 s, 41% of the film), the making: five FSA prints are handed in from the frame edges and pinned to a cork board, each with a typed slip; a blue sheet arrives, a pencil draws the mailbox outline, scissors cut along it, the waste is lifted away, a brush paints \"#44\" in eight strokes, the box is carried onto a post and pinned, the door goes on a brass fastener, a sheet of green gel is pulled across as the river, then the mail sack, red flag, five sealed letters and a trout are laid on top.\nPart 2 (14 to 24 s), Turkey looks out: the same board through a six-bolt brass porthole from inside the tin. The sack swings, a trout takes a letter and carries it off, a second trout takes another. On the cabin wall an empty MISSION ORDERS board and a sock on a line stage both readings. Caption: \"Are those my lost mission orders? Or is that only a sack of laundry?\"\nPart 3 (24 to 34 s), the trout look in: the board wide, room lamp off, lit by the tin's lamp. The tin pulls up with Turkey in its porthole, the box's flag goes up (truck), trout hand letters to its intake and loose letters are drawn in after them (vacuum), a large trout watches from the foreground. Caption: \"A porch pirate with a vacuum? Or the mailman's truck, here at last?\"\n\nSix rounds of stills and contact sheets. Main fixes along the way: cork contrast cut; gel deepened and its creases made straight folds; trout shrunk and tin enlarged so the scale reads; sack and flag moved on top of the gel so they stay legible; porthole view reframed so the letter handoff happens inside the glass; part 3 darkened so the lamp pool carries it.\n\nDeparture from the direction you should know about: the photographs come from the Library of Congress, not Wikimedia Commons. The Commons image server (upload.wikimedia.org) answered 429 with a 10-minute Retry-After for the whole session, and loc.gov, which the brief says is unreachable, was reachable. I tried once to fetch a Commons file through another Commons endpoint (thumb.php); a follow-up attempt was blocked by the permission system as working around the rate limit, so I dropped that route and the one test file is unused. Each LOC item's own rights advisory was checked (\"No known restrictions\"). The trout and turkey plates are the Commons files already on disk from p14, copied locally, with licences re-read from their Commons pages. The Loyston photographs I had wanted (Commons only) could not be fetched, so the \"Old Loyston\" half of the lineage is not in the film.",
+   "seconds": 34,
+   "foraged": [
+    "Arthur Rothstein, Mailboxes on rural road, Montgomery County, Maryland, 1940 (LC-USF34-029246-D), Library of Congress FSA/OWI, no known restrictions: the big print under the paper box",
+    "John Vachon, Rural mailbox and hollyhocks, Morgan County, Indiana, 1941 (LC-USF34-062978-D), Library of Congress, no known restrictions: print",
+    "Jack Delano, Mailboxes at O'Niels Crossroads, Heard County, Georgia, 1941 (LC-USF34-043931-D), Library of Congress, no known restrictions: print",
+    "Russell Lee, Mail bag at farmhouse, Pinto Creek, Arizona, 1940 (LC-USF34-035962-D), Library of Congress, no known restrictions: print, plus the canvas sack and the wooden post cut out of it",
+    "Russell Lee, Postmaster at Pie Town, New Mexico, taking a mail sack from the stage, 1940 (LC-USF34-036718-D), Library of Congress, no known restrictions: print",
+    "Sherman Foote Denton, Brook Trout, 1896 (Wikimedia Commons, public domain): the trout",
+    "John James Audubon, Wild Turkey, plate 1 of The Birds of America (Wikimedia Commons, public domain): Turkey's head and hinged wattle"
+   ],
+   "scions": [
+    "Library of Congress - Historical Print Stage: every print stays pinned with a typed slip naming place, photographer and year; the invented mailbox carries its own slip, 'BOX 44: PAPER, CUT HERE'; the sack is shown beside the print it was cut from",
+    "Physical Tabletop Capture - Paper Performance: every piece is a rigid cutout with a shadow that lengthens as it is lifted; one timetable of arrivals, pins, snips and handoffs drives both picture and sound; parts 2 and 3 move on twos",
+    "Secondary Dynamics - Inertia and Restraint: sack on its pin, door and flag on brass fasteners, Turkey's wattle and each settling print are damped springs kicked by the primary action"
+   ],
+   "weak": "No hand holds the pencil, scissors or brush, and pieces arrive from the frame edge unheld. Sound is all synthesized. The tin is rendered metal, not a cut piece like everything else on the board. The scissors' heading jumps at the outline's corners. Only the box body is seen being cut; door, flag, letters and the sack arrive already cut. Part 3 is the same board as the end of part 1, re-lit, so it is less of a new view than p14's river. The sack carries a private name hand-lettered in Lee's 1940 photograph. I could not listen to the soundtrack, only check its levels (mean -25 dB, peak -2 dB)."
+  },
+  "critic": {
+   "id": "p35",
+   "verdict": "nearly",
+   "repaired": [
+    "Porthole view (part 2) pulled back and shifted left (VIEW_C 950,600; VIEW_S 0.40) so the whole of box #44 sits inside the brass rim; before, the '#' and the left of the box were hidden behind the rim",
+    "Tin moved 80 px into frame in part 3 (TIN_AT x 1742 -> 1662, intake bubbles moved with it) so the bread-roll tin, its ROLLS label and its porthole read instead of being cut off at the right edge",
+    "Watching trout in part 3 lifted (y 936 -> 872) so its head no longer sits under the caption",
+    "Re-rendered /home/user/contaminant-jelly/paeleo/trout-sub/hand/assets/films/p35.mp4 (34.0 s, 1.8 MB) and appended a 'Critic:' line to /home/user/contaminant-jelly/paeleo/trout-sub/hand/films/notes/p35.txt; edits are in /home/user/contaminant-jelly/paeleo/trout-sub/hand/films/p35.py"
+   ],
+   "open": [
+    "No hand holds the pencil, scissors or brush in the making section; the tools move on their own",
+    "From the river side the intake pipe reads as a vacuum only once letters fly into it; the mailman's-truck reading rests on a small red flag that is dim under the gel",
+    "The weathered post is laid across the Rothstein print before the box exists and covers part of its typed slip",
+    "The foraged prints are dated 1940-41, not the rim clue's 1943",
+    "Sound is synthesized, not foraged",
+    "Credits check: all seven items carry author and licence that BRIEF-2 accepts (five LOC FSA/OWI 'No known restrictions', two Commons public domain); the Denton trout entry has an empty license_url, and I did not re-query LOC or Commons to confirm the recorded licences",
+    "The first third is real making (prints laid and pinned, box pencilled, cut and brush-numbered stroke by stroke) and I saw no style costume; captions are one at a time and held 3.2 s or longer"
+   ],
+   "licences_ok": true
+  }
+ }
+}

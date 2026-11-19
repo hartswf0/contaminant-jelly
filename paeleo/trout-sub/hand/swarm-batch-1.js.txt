@@ -1,0 +1,20 @@
+export const meta = {
+  name: 'hand-films-batch',
+  description: 'A batch of five porthole films made by hand or foraged (no style costumes): a maker, then an independent critic who repairs, per porthole',
+  phases: [
+    { title: 'Make', detail: 'forage or handmake in the lineage\'s own method; show it being made; four rounds of stills' },
+    { title: 'Criticize', detail: 'fresh eyes against the brief and the deck still; repair the worst faults; re-render' },
+  ],
+}
+const ROOT = '/home/user/contaminant-jelly/paeleo/trout-sub/hand'
+const pad = n => (n < 10 ? '0' + n : '' + n)
+const batch = args.batch
+const S1 = { type: 'object', properties: { id: { type: 'string' }, rendered: { type: 'boolean' }, seconds: { type: 'number' }, method: { type: 'string' }, foraged: { type: 'array', items: { type: 'string' } }, scions: { type: 'array', items: { type: 'string' } }, weak: { type: 'string' } }, required: ['id', 'rendered', 'method'] }
+const S2 = { type: 'object', properties: { id: { type: 'string' }, verdict: { type: 'string', enum: ['pass', 'nearly', 'not yet'] }, repaired: { type: 'array', items: { type: 'string' } }, open: { type: 'array', items: { type: 'string' } }, licences_ok: { type: 'boolean' } }, required: ['id', 'verdict', 'repaired', 'open'] }
+const results = await pipeline(batch,
+  b => agent(`Work in ${ROOT} (cd there). Read BRIEF.md and films/BRIEF-2-oulipo.md, then read films/kit.py IN FULL and the function list of films/kit_anim.py, and the two example notes in films/notes/ (they show what a finished film's note says). You are the maker of the hand film for porthole p${pad(b.n)} (row index ${b.n - 1} of ../seeds.json; deck picture ../stills/p${pad(b.n)}.jpg; open it). Direction for this one: ${b.direction} Take real time over it: plan the three parts, forage or build the material, and go through at least four rounds of stills, looking at a contact sheet each time and fixing what is flat or ugly. The first third must show the thing being MADE. Render the film (python3 films/p${pad(b.n)}.py), write films/notes/p${pad(b.n)}.txt and, if you foraged, films/credits/p${pad(b.n)}.json. Do not commit. Return what you made.`, { label: 'make:p' + pad(b.n), phase: 'Make', schema: S1 }),
+  (d, b) => {
+    if (!d || !d.rendered) return { id: 'p' + pad(b.n), verdict: 'not yet', repaired: [], open: ['no film was rendered: ' + (d ? d.weak : 'maker failed')] }
+    return agent(`Work in ${ROOT} (cd there). Read BRIEF.md and films/BRIEF-2-oulipo.md and skim films/kit.py. You are the independent critic and repairer for the hand film of porthole p${pad(b.n)} (row index ${b.n - 1} of ../seeds.json; deck picture ../stills/p${pad(b.n)}.jpg). You did not make it. Pull twelve stills evenly through the film (python3 films/p${pad(b.n)}.py --stills ...), make a contact sheet and look at it beside the deck picture. Judge only what is visible: (1) Is the first third really the thing being made, piece by piece or stroke by stroke? (2) Is any of it a style costume (flat shapes with fake grain, stick figures, smiley faces, a filter)? (3) Through the porthole, can a stranger name the rim clue's subject, and are both of Turkey's readings possible? (4) From the river side, are both of the trout's readings possible? (5) Is the row's rule visible? (6) Are captions legible, one at a time, held long enough? (7) If anything is foraged, open films/credits/p${pad(b.n)}.json and check every item has a licence that BRIEF-2 accepts, with author where needed. Then repair the worst two or three faults directly in films/p${pad(b.n)}.py (keep the maker's approach), look at new stills to confirm, and re-render the film. Append a line "Critic: ..." to films/notes/p${pad(b.n)}.txt saying what you changed and what is still weak. Do not commit.`, { label: 'critic:p' + pad(b.n), phase: 'Criticize', schema: S2 })
+  })
+return { results }
