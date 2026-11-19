@@ -16,6 +16,9 @@ Rules of the cut
   the trout's about 7 seconds, words are few, large and in sentence case, nothing blinks.
 - Four dives of 16, 16, 16 and 7 portholes. Each half of a dive has its own song from
   DEEP SEA VOYAGE, and portholes change on that song's tracked beats.
+- Sound: the music leads; each film's own sound sits low under it; and a soft mallet note marks
+  every line as it lights, a different pitch for each button, so choices can be told by ear.
+  Every light lands on a beat.
 - The change between portholes goes through the porthole: the next film opens from the
   glass outward while the rim, which the units lock, holds still.
 No fal call is made here.
@@ -212,7 +215,7 @@ class Out:
     """Frames in. A lightly compressed master is written first, then the finished file is
     encoded in two passes to a size that stays under MAX_MB, with the music mixed in."""
     def __init__(self):
-        self.tmp = tempfile.mkdtemp(); self.path = self.tmp + "/master.mp4"; self.n = 0; self.music = []
+        self.tmp = tempfile.mkdtemp(); self.path = self.tmp + "/master.mp4"; self.n = 0; self.music = []; self.cues = []
         self.p = subprocess.Popen(["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "bgr24", "-s", "%dx%d" % (W, H), "-r", str(FPS), "-i", "-",
                                    "-c:v", "libx264", "-preset", "veryfast", "-crf", "17", "-pix_fmt", "yuv420p", self.path], stdin=subprocess.PIPE)
     def add(self, frame):
@@ -220,15 +223,33 @@ class Out:
     @property
     def t(self):
         return self.n / float(FPS)
-    def song(self, path, start_in_song, at, length):
-        self.music.append((path, start_in_song, at, length))
+    def song(self, path, start_in_song, at, length, gain=1.0, fade=1.2):
+        self.music.append((path, start_in_song, at, length, gain, fade))
+    def cue(self, at, kind):
+        """A soft mallet note when a line is lit. Each button has its own pitch, so a choice can be
+        told by ear as well as by shape and colour."""
+        self.cues.append((at, kind))
+    def cue_track(self):
+        sr = 44100; y = np.zeros(int((self.t + 1) * sr), np.float32)
+        note = {"triangle": 659.3, "circle": 784.0, "cross": 523.3, "square": 587.3, "hexagon": 880.0, "all": 1046.5, "line": 392.0}
+        for at, kind in self.cues:
+            n = int(0.5 * sr); t = np.arange(n) / float(sr); f = note[kind]
+            tone = (np.sin(2 * np.pi * f * t) + 0.35 * np.sin(2 * np.pi * 2 * f * t) + 0.12 * np.sin(2 * np.pi * 4 * f * t)) * np.exp(-t * 9.0)
+            tone[:int(0.004 * sr)] *= np.linspace(0, 1, int(0.004 * sr))
+            i = int(at * sr); y[i:i + n] += (0.22 if kind != "line" else 0.16) * tone[:len(y) - i].astype(np.float32)
+        import soundfile as sf
+        path = self.tmp + "/cues.wav"; sf.write(path, np.stack([y, y], 1), sr); return path
     def close(self, dest):
         self.p.stdin.close(); self.p.wait()
         ins, fc, mix = ["-i", self.path], [], []
-        for i, (path, ss, at, length) in enumerate(self.music, 1):
+        for i, (path, ss, at, length, gain, fade) in enumerate(self.music, 1):
             ins += ["-ss", "%.3f" % ss, "-t", "%.3f" % length, "-i", path]
-            fc.append("[%d:a]aresample=44100,aformat=channel_layouts=stereo,afade=t=in:d=0.3,afade=t=out:st=%.3f:d=1.2,adelay=%d:all=1[m%d]" % (i, max(0, length - 1.2), int(at * 1000), i))
+            fc.append("[%d:a]aresample=44100,aformat=channel_layouts=stereo,volume=%.3f,afade=t=in:d=0.3,afade=t=out:st=%.3f:d=%.2f,adelay=%d:all=1[m%d]"
+                      % (i, gain, max(0, length - fade), fade, int(at * 1000), i))
             mix.append("[m%d]" % i)
+        if self.cues:
+            ins += ["-i", self.cue_track()]; k = len(self.music) + 1
+            fc.append("[%d:a]aresample=44100,aformat=channel_layouts=stereo[m%d]" % (k, k)); mix.append("[m%d]" % k)
         fc.append("%samix=inputs=%d:normalize=0,alimiter=limit=0.9,apad[a]" % ("".join(mix), len(mix)))
         kbps = int(min(2600, MAX_MB * 8192.0 / self.t - 136))
         v = ["-c:v", "libx264", "-preset", "medium", "-b:v", "%dk" % kbps, "-pix_fmt", "yuv420p", "-g", "48"]
@@ -254,6 +275,8 @@ def opening(out):
         out.add(f)
     for k, spec in enumerate(C.CARDS):
         n = int(C.card_seconds(spec) * FPS)
+        for q in range(len(spec["lights"])):
+            out.cue(out.t + C.CARD_LEAD + C.LINE_SECONDS * q, "line")
         for f in C.card(spec, film_frames(spec["film"][0], spec["film"][1], n, 640, 360), n, first=(k == 0)):
             out.add(f)
     for f in C.choose_card(int(9.0 * FPS)):
@@ -273,11 +296,67 @@ def closing(out):
     out.song(CLOSE_SONG[0], float(bt[min(8, len(bt) - 1)]), t0, min(out.t - t0 + 0.4, dur - 1))
 
 
+def play_porthole(out, pid, frames_n, half_n, lights, prev_tail, times, first=False):
+    """One porthole: Turkey's shot for half_n frames, then the trout's. lights = for each side the
+    frame offsets (from that side's start) at which its choices light in turn, the last one being
+    'all together'; these are beat positions, so every light lands on the music."""
+    nt = int(TRANS * FPS)
+    one, _ = U.frames("units/p%02d.mp4" % pid, 192, W, H)
+    u_ = units.get("p%02d" % pid) or {}
+    cut = u_.get("cut") if u_.get("lock_end") and u_.get("cut") else U.LEN - 0.9
+    cut_f = min(180, max(24, int(cut / U.LEN * 192)))
+    # Turkey's shot fills the first half. The trout's shot is short, so it plays forward, back and
+    # forward again to fill the second half, ending on its locked last frame.
+    seq_t = np.linspace(0, cut_f - 1, half_n).round().astype(int)
+    seg = list(range(cut_f, 192)); pp = seg + seg[::-1] + seg
+    seq_r = np.array(pp)[np.linspace(0, len(pp) - 1, frames_n - half_n).round().astype(int)]
+    order = np.concatenate([seq_t, seq_r])
+    ch = choices(pid)
+    sides = {"turkey": [c for c in ch if c[2] == "turkey"], "trout": [c for c in ch if c[2] == "trout"]}
+    panels = {(s_, k): side_panel(items, s_, k) for s_, items in sides.items() for k in list(range(len(items))) + [None]}
+    regs = hud(pid); dice = {"turkey": bolt_dice("turkey"), "trout": bolt_dice("trout")}
+    times[pid] = out.t
+    out.song("units/p%02d.mp4" % pid, 0.0, out.t, min(U.LEN, frames_n / float(FPS)), gain=0.22, fade=0.8)     # the film's own sound, low
+    for i in range(frames_n):
+        frame = one[order[i]].astype(np.float32)
+        side, local = ("turkey", i) if i < half_n else ("trout", i - half_n)
+        marks = lights[side]; count = len(sides[side])
+        k = sum(1 for m in marks if local >= m) - 1                 # which light is on: -1 none yet
+        for q, m in enumerate(marks):
+            if local == m:
+                out.cue(out.t, sides[side][q][0] if q < count else "all")
+        stamp_on(frame, dice[side])
+        if k >= 0:
+            fade = min(1.0, (local - marks[0] + 1) / 6.0)
+            stamp_on(frame, panels[(side, k if k < count else None)], fade)
+        for reg in regs:
+            stamp_on(frame, reg)
+        if i < nt and first:                          # out of a card: the bars clear to the first porthole
+            u = (i + 1) / float(nt)
+            frame = C.bgr(C.bars(Image.fromarray(frame.astype(np.uint8)[:, :, ::-1]), 0.5 + 0.5 * u)).astype(np.float32)
+        elif i < nt and prev_tail is not None:
+            frame = through(prev_tail, frame, (i + 1) / float(nt))
+        out.add(frame)
+    return one[-1].astype(np.float32)
+
+
+def light_marks(F, b0, step, n_t, n_r):
+    """Beat-timed marks for one porthole. F(b) = frame offset of beat b from the porthole's start.
+    Each side has step/2 beats: the first choice lights on its 2nd beat, the rest are spread evenly
+    over the first two thirds, and 'all together' follows."""
+    half = step // 2
+    def side(first_beat, count):
+        span_b = max(count + 1, int(half * 0.7))
+        return [F(first_beat + 1 + int(round(q * (span_b - 1) / float(count)))) for q in range(count + 1)]
+    t = side(0, n_t); r0 = F(half)
+    r = [m - r0 for m in side(half, n_r)]
+    return {"turkey": t, "trout": r}, r0
+
+
 def dive(out, spec, times):
     name, a, b, halves = spec
     t_dive = out.t
     pid = a; prev_tail = None
-    nt = int(TRANS * FPS)
     for h, (path, title, step, count) in enumerate(halves):
         bt, rms, sr, dur = beats(path)
         lead = 8 if h == 0 else 0                           # beats under the dive card
@@ -285,49 +364,16 @@ def dive(out, spec, times):
         T = lambda k: float(bt[min(i0 + k, len(bt) - 1)] - bt[i0])
         t0 = out.t
         if h == 0:
-            card = None
             for card in C.dive_card(name, a, b, " and ".join(x[1] for x in halves), int(round(T(lead) * FPS))):
                 out.add(card)
             prev_tail = None
         for j in range(count):
-            end = t0 + T(lead + step * (j + 1))
-            frames_n = int(round(end * FPS)) - out.n
-            one, _ = U.frames("units/p%02d.mp4" % pid, 192, W, H)
-            u_ = units.get("p%02d" % pid) or {}
-            cut = u_.get("cut") if u_.get("lock_end") and u_.get("cut") else U.LEN - 0.9
-            cut_f = min(180, max(24, int(cut / U.LEN * 192)))
-            # Turkey's shot fills the first half. The trout's shot is short, so it plays forward,
-            # back and forward again to fill the second half, ending on its locked last frame.
-            half_n = frames_n // 2
-            seq_t = np.linspace(0, cut_f - 1, half_n).round().astype(int)
-            seg = list(range(cut_f, 192)); pp = seg + seg[::-1] + seg
-            seq_r = np.array(pp)[np.linspace(0, len(pp) - 1, frames_n - half_n).round().astype(int)]
-            order = np.concatenate([seq_t, seq_r])
+            start_n = out.n
+            F = lambda bb: int(round((t0 + T(lead + step * j + bb)) * FPS)) - start_n
+            frames_n = F(step)
             ch = choices(pid)
-            sides = {"turkey": [c for c in ch if c[2] == "turkey"], "trout": [c for c in ch if c[2] == "trout"]}
-            panels = {(s_, k): side_panel(items, s_, k) for s_, items in sides.items() for k in list(range(len(items))) + [None]}
-            regs = hud(pid)
-            dice = {"turkey": bolt_dice("turkey"), "trout": bolt_dice("trout")}
-            times[pid] = out.t
-            for i in range(frames_n):
-                frame = one[order[i]].astype(np.float32)
-                if i < half_n:
-                    side, local, m = "turkey", i, half_n
-                else:
-                    side, local, m = "trout", i - half_n, frames_n - half_n
-                fade = min(1.0, max(0.0, (local - (nt if side == "turkey" else 0) + 4) / 8.0))
-                stamp_on(frame, dice[side])
-                if fade > 0:
-                    stamp_on(frame, panels[(side, reading(m, len(sides[side]), local))], fade)
-                for reg in regs:
-                    stamp_on(frame, reg)
-                if i < nt and prev_tail is None:              # out of the dive card: the bars clear to the first porthole
-                    u = (i + 1) / float(nt)
-                    frame = C.bgr(C.bars(Image.fromarray(frame.astype(np.uint8)[:, :, ::-1]), 0.5 + 0.5 * u)).astype(np.float32)
-                elif i < nt:
-                    frame = through(prev_tail, frame, (i + 1) / float(nt))
-                out.add(frame)
-            prev_tail = one[-1].astype(np.float32)
+            marks, half_n = light_marks(F, 0, step, sum(1 for c in ch if c[2] == "turkey"), sum(1 for c in ch if c[2] == "trout"))
+            prev_tail = play_porthole(out, pid, frames_n, half_n, marks, prev_tail, times, first=(prev_tail is None))
             pid += 1
         out.song(path, float(bt[i0]), t0, out.t - t0 + 0.7)
     return t_dive

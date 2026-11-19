@@ -325,6 +325,30 @@ def card(spec, film, n, first=False):
         yield bgr(im)
 
 
+def mix_card(k, title, a, b, n):
+    """Title for a song mix: the song's name on a slab, the harmonic ring coming home."""
+    for i in range(n):
+        t = i / float(FPS); T = n / float(FPS)
+        im = Image.new("RGBA", (W, H), DEEP + (255,)); d = ImageDraw.Draw(im)
+        home = ease(span(t, T * 0.4, T * 0.8))
+        harmonic(d, 1010, 360, t, T * 0.8, [(230, 6, 11, 1)], home, GOLD)
+        harmonic(d, 1010, 360, t, T * 0.8, [(170, 12, 4, 2), (290, 24, 3, 1)], home, TEAL, 200)
+        porthole(d, 1010, 360, 150, sweep=ease(span(t, T * 0.45, T * 0.85)), bolts=0)
+        u = back(span(t, 0.1, 0.5)); word = "MIX %02d" % k
+        wd = d.textlength(word, font=font(120, "Black")); x = -wd - 100 + (wd + 170) * u
+        d.polygon([(x - 44, 150), (x + wd + 50, 138), (x + wd + 34, 300), (x - 56, 292)], fill=RUST + (255,))
+        d.text((x, 150), word, font=font(120, "Black"), fill=DEEP + (255,))
+        u2 = ease(span(t, 0.4, 0.9)); size = 54
+        while d.textlength(title, font=font(size, "Black")) > 720 and size > 26:
+            size -= 2
+        d.text((74, 340 + 24 * (1 - u2)), title, font=font(size, "Black"), fill=CREAM + (int(255 * u2),))
+        d.text((76, 340 + size + 22), "Portholes %02d to %02d" % (a, b), font=font(30, "Bold"), fill=TEAL + (int(255 * u2),))
+        d.text((76, 660), "TOURKEY TROUTTOWN  ·  DEEP SEA VOYAGE", font=font(16, "Bold"), fill=GOLD + (int(200 * u2),))
+        if n - i <= int(0.5 * FPS):
+            bars(im, (1 - (n - i) / (0.5 * FPS)) * 0.5)
+        yield bgr(im)
+
+
 def choose_card(n):
     """Four choices, four buttons. Pick one and draw its shape."""
     demo = [("triangle", "A sunken ship"), ("circle", "A giant's foot"), ("cross", "A flashlight"), ("square", "A crab")]
