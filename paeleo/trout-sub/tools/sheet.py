@@ -231,6 +231,72 @@ def slips():
     open("youtube/slips.html", "w").write('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Porthole Slips</title><style>%s</style></head><body>%s</body></html>' % (SLIP_CSS, pages))
 
 
+ONE_CSS = '''
+.one{padding:8mm 11mm 6mm;gap:2mm;font-size:12px}
+.one .top{display:grid;grid-template-columns:34mm 1fr auto;column-gap:5mm;align-items:center}
+.one .top img{width:34mm;height:34mm;border-radius:50%;object-fit:cover}.one .top .n{font-size:64px;font-weight:900;line-height:1}
+.one h1{font-size:22px;margin:0}.one .cl{font-size:14px;font-weight:700;margin-top:.6mm}.one .rl{font-size:10.5px;color:#5f6c70}
+.one .cols{display:grid;grid-template-columns:1fr 1fr;column-gap:7mm;flex:1}
+.one .z{border-top:1.2px solid #16293a;padding-top:1.4mm;margin-top:1.8mm}
+.one .zh{display:flex;align-items:baseline;gap:2mm;font-size:15px;font-weight:900}.one .zh i{font-style:normal;color:#c95c3e;font-size:19px}.one .zh em{font-style:normal;font-size:10px;font-weight:700;color:#5f6c70}
+.one .ln{height:7mm;border-bottom:.8px solid #8c979d}.one .q{font-size:12.5px;margin-top:1.2mm}
+.one .ring{width:54mm;height:54mm;display:block;margin:1mm auto 0}
+.one .ch{display:flex;align-items:center;gap:1.8mm;font-weight:700;font-size:13px;margin-top:1mm}.one .btn{width:6mm;height:6mm;flex:none}
+.one .pk{display:grid;grid-template-columns:1fr auto;align-items:center}.one .pk .dr b{display:block;width:12mm;height:12mm;border:1.2px dashed #8c979d;border-radius:50%}
+.one .pk small{display:block;font-size:9.5px;color:#5f6c70;text-align:center;font-weight:700}
+.one .bt{display:flex;align-items:center;gap:1.6mm;margin-top:1.2mm;font-size:11.5px}.one .bt b{font-weight:900}.one .die{width:5.4mm;height:5.4mm}
+.one .rollrow{display:flex;align-items:center;gap:2mm;margin-top:1.2mm;font-weight:700}.one .rollrow .die{width:6.6mm;height:6.6mm}
+.one .how{font-size:10.5px;color:#5f6c70;font-weight:700;margin-top:auto;padding-top:1.5mm}
+'''
+def one(n):
+    """The whole activity for one porthole on one side of one sheet: nothing to cut, nothing else to print.
+    Three people fill it in turn, in the order of the red numbers."""
+    r = seeds[n - 1]; station = html.escape(r[0].split("·")[1].strip()); num = "%02d" % n
+    to, tr = options(r[3]), options(r[4]); kt, kr = ["triangle", "circle", "hexagon"][:len(to)], ["cross", "square", "hexagon"][:len(tr)]
+    chs = lambda kinds, words: "".join('<div class="ch">%s%s</div>' % (button(k), html.escape(w)) for k, w in zip(kinds, words))
+    zh = lambda k, t, who: '<div class="zh"><i>%d</i>%s<em>%s</em></div>' % (k, t, who)
+    ln = lambda k: '<div class="ln"></div>' * k
+    bolts = lambda a: "".join('<div class="bt">%s<b>%s</b> %s</div>%s' % (die(a + i), w, say, ln(2)) for i, (w, say) in enumerate(
+        (("Probable", "what you expect"), ("Plausible", "strange, but it fits"), ("Preposterous", "a wild surprise!"))))
+    friend = lambda k, title, who, tag, kinds, words, a: ('<div class="z">%s<div class="q">Name <span style="display:inline-block;width:45mm;border-bottom:.8px solid #8c979d"></span></div>'
+        '<div class="pk"><div><div class="q"><b>%s.</b> Pick one.</div>%s</div><div class="dr"><b></b><small>draw it</small></div></div>%s</div>'
+        % (zh(k, title, who), tag, chs(kinds, words), bolts(a)))
+    return '''<section class="page one">
+<div class="top"><img src="../stills/p%s.jpg" alt=""><div><div class="kick">TOURKEY TROUTTOWN · PORTHOLE LOG</div><h1>%s</h1><div class="cl">%s</div><div class="rl">Rule: %s</div></div><div class="n">%s</div></div>
+<div class="cols"><div>
+ <div class="z">%s<div class="q">Name <span style="display:inline-block;width:55mm;border-bottom:.8px solid #8c979d"></span></div>%s</div>
+ <div class="z">%s<div class="q"><b>1.</b> Who is outside the glass? What do they think our sub is?</div>%s
+  <div class="q"><b>2.</b> What one thing does Turkey do?</div>%s<div class="q"><b>3.</b> How could this use up our air?</div>%s
+  <div class="q"><b>&rarr; Pass this paper to a friend.</b></div></div>
+ <div class="z">%s<div class="rollrow">Roll one die. Circle it: %s</div></div>
+ <div class="z">%s<div class="q">What do the trout tell the newspaper?</div>%s<div class="q">Why did Turkey come to Trout Town?</div>%s</div>
+</div><div>%s%s</div></div>
+<div class="how">Follow the red numbers. 1, 2, 3: the pilot. 4: a friend. 5: another friend. Then back to the pilot for 6 and 7. Film: youtu.be/ooiBjWKV8vQ%s</div>
+</section>''' % (num, station, html.escape(r[1]), html.escape(r[5]), num,
+                  zh(1, "Pilot", "that is you"), "", zh(2, "Draw what Turkey sees", ""), ring().replace('class="ring"', 'class="ring"'),
+                  "", "", "", "", "", "", "", "", "") if False else _one(num, station, r, zh, ln, friend, kt, to, kr, tr)
+
+
+def _one(num, station, r, zh, ln, friend, kt, to, kr, tr):
+    when = (" · your porthole plays at " + timing[num]) if timing.get(num) else ""
+    return '''<section class="page one">
+<div class="top"><img src="../stills/p%s.jpg" alt=""><div><div class="kick">TOURKEY TROUTTOWN · PORTHOLE LOG</div><h1>%s</h1><div class="cl">%s</div><div class="rl">Rule: %s</div></div><div class="n">%s</div></div>
+<div class="cols"><div>
+ <div class="z">%s<div class="q">Name <span style="display:inline-block;width:55mm;border-bottom:.8px solid #8c979d"></span></div>%s</div>
+ <div class="z">%s<div class="q"><b>Who is outside the glass?</b> What do they think our sub is?</div>%s
+  <div class="q"><b>What one thing does Turkey do?</b></div>%s<div class="q"><b>How could this use up our air?</b></div>%s
+  <div class="q"><b>&rarr; Pass this paper to a friend.</b></div></div>
+ <div class="z">%s<div class="rollrow">Roll one die. Circle it: %s</div></div>
+ <div class="z">%s<div class="q">What do the trout tell the newspaper?</div>%s<div class="q">Why did Turkey come to Trout Town?</div>%s</div>
+</div><div>%s%s
+</div></div>
+<div class="how">Follow the red numbers. 1 and 2: the pilot. 3: a friend. 4: another friend. Back to the pilot for 5 and 6. Film: youtu.be/ooiBjWKV8vQ%s</div>
+</section>''' % (num, station, html.escape(r[1]), html.escape(r[5]), num,
+                  zh(1, "Pilot: draw what Turkey sees", ""), ring(), zh(2, "Pilot: write 3 things", ""), ln(2), ln(2), ln(2),
+                  zh(5, "Pilot: roll", ""), "".join(die(k) for k in range(1, 7)), zh(6, "Pilot: tell what happened", ""), ln(2), ln(2),
+                  friend(3, "First friend", "", "Turkey thinks", kt, to, 1), friend(4, "Next friend", "", "The trout think", kr, tr, 4), when)
+
+
 GUIDE = '''<section class="page guide">
 <header><div class="kick">TOURKEY TROUTTOWN · FOR THE GROWN-UP IN THE ROOM<h1>Run it in 40 minutes</h1></div></header>
 <div class="g2">
@@ -269,6 +335,8 @@ if __name__ == "__main__":
     os.makedirs("youtube", exist_ok=True); os.makedirs("sheets", exist_ok=True)
     open("youtube/porthole-logs.html", "w").write(page("".join(log(n) for n in range(1, 56))))
     slips()
+    open("youtube/one-sheets.html", "w").write(page("".join(one(n) for n in range(1, 56))).replace("</style>", ONE_CSS + "</style>"))
+    open("youtube/one-sheet.html", "w").write(page(one(7)).replace("</style>", ONE_CSS + "</style>"))
     open("youtube/class-pack.html", "w").write(page(GUIDE + log(None)).replace("</style>", GUIDE_CSS + "</style>"))
     open("sheets/master.html", "w").write(page(log(31)))     # the film shows a filled example, porthole 31
     js = r'''
@@ -276,6 +344,9 @@ const {chromium}=require('playwright');(async()=>{
  const b=await chromium.launch();
  let p=await b.newPage();await p.goto('file://'+process.cwd()+'/youtube/porthole-logs.html');await p.evaluate(()=>document.fonts.ready);
  await p.pdf({path:'youtube/porthole-logs.pdf',width:'8.5in',height:'11in',printBackground:true});
+ for (const f of ['one-sheets','one-sheet']){const o=await b.newPage();await o.goto('file://'+process.cwd()+'/youtube/'+f+'.html');await o.evaluate(()=>document.fonts.ready);
+  await o.pdf({path:'youtube/'+f+'.pdf',width:'8.5in',height:'11in',printBackground:true});
+  if(f==='one-sheets')console.log('one-sheet overflow',await o.evaluate(()=>[...document.querySelectorAll('.page')].filter(e=>e.scrollHeight>e.clientHeight+1).length));}
  const g=await b.newPage();await g.goto('file://'+process.cwd()+'/youtube/class-pack.html');await g.evaluate(()=>document.fonts.ready);
  await g.pdf({path:'youtube/class-pack.pdf',width:'8.5in',height:'11in',printBackground:true});
  const q=await b.newPage();await q.goto('file://'+process.cwd()+'/youtube/slips.html');await q.evaluate(()=>document.fonts.ready);
@@ -289,4 +360,5 @@ const {chromium}=require('playwright');(async()=>{
  require('fs').writeFileSync('sheets/steps.json',JSON.stringify(steps,null,1));
  console.log(JSON.stringify({overflowing_pages:over,steps:steps.length}));await b.close()})()'''
     import subprocess
-    print(subprocess.run(["node", "-e", js], capture_output=True, text=True, env=dict(os.environ, NODE_PATH=os.environ.get("NODE_PATH", ""))).stdout.strip() or "node failed")
+    r_ = subprocess.run(["node", "-e", js], capture_output=True, text=True)
+    print(r_.stdout.strip() or ("node failed: " + r_.stderr[-400:]))
