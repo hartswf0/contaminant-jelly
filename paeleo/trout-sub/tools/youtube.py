@@ -5,10 +5,12 @@ Submarine Porthole Log worksheet (tour_key_porthole_worksheet.pdf).
     python3 tools/youtube.py     # youtube/tourkey-trouttown.mp4, chapters.txt, slips.html, timing.json
 
 Rules of the cut
-- Nothing is ever printed over the picture. The film plays in a box on a paper page,
-  like the worksheet's drawing box; one strip under it carries the worksheet's own
-  header fields in the worksheet's order: Porthole #, Sub Station, Rim Clue & River Rule.
-  The two crewmate questions live on the printed slip, not on screen.
+- The film plays in a box on a paper page, like the worksheet's drawing box; one strip
+  under it carries the worksheet's own header fields in the worksheet's order:
+  Porthole #, Sub Station, Rim Clue & River Rule.
+- The only thing on the picture is the this-or-that: the choices from the porthole's
+  question, drawn small beside the glass the way a game draws a prompt, Turkey's on
+  his side of the cut and the trout's on theirs. The live choice steps on the beat.
 - Four dives of 16, 16, 16 and 7 portholes, one class set each, each with its own song
   from the album DEEP SEA VOYAGE. Portholes change on the song's own beats (every
   BEATS beats, tracked from the audio), so every cut lands on the music.
@@ -32,6 +34,7 @@ TRANS = 0.5                                     # seconds of the through-the-por
 FD = "/usr/share/fonts/opentype/inter/"
 font = lambda size, weight="Regular": ImageFont.truetype(FD + "Inter-%s.otf" % weight, size)
 seeds = json.load(open("seeds.json"))
+units = json.load(open("units.json")) if os.path.exists("units.json") else {}
 # dive: (name, first, last, song file, song title, beats between portholes)
 DIVES = [("Dive 1", 1, 16, "music/lake-merritt-clave.ogg", "Lake Merritt Clave", 16),
          ("Dive 2", 17, 32, "music/submersible-propulsion.ogg", "Submersible Propulsion", 16),
@@ -120,6 +123,53 @@ def through(a, b, u):
     r = R0 * 0.2 + (R1 - R0 * 0.2) * e
     m = np.clip((r - DIST) / 10.0 + 0.5, 0, 1)[..., None]
     return a * (1 - m) + b * m
+
+
+def options(question):
+    """'Shipwreck, giant's foot, or tunnel?' -> ['SHIPWRECK', "GIANT'S FOOT", 'TUNNEL']"""
+    import re
+    q = question.strip().rstrip("?")
+    parts = [x.strip() for x in re.split(r",\s*or\s+|,\s*|\s+or\s+", q) if x.strip()]
+    return [x.upper() for x in parts]
+
+
+def prompt(opts, lit, colour):
+    """A this-or-that prompt as a game draws one: a ring on the live choice, dots on the others,
+    one thin line joining them. Sits beside the porthole, which the lock keeps in one place.
+    Returns (x, y, bgr float image, alpha) for the film box."""
+    pad, gap = 10, 36
+    probe = ImageDraw.Draw(Image.new("L", (4, 4)))
+    size = 23
+    while max(probe.textlength(o, font=font(size, "Bold")) for o in opts) > 250 and size > 15:
+        size -= 1
+    wmax = int(max(probe.textlength(o, font=font(size, "Bold")) for o in opts)) + 44 + 2 * pad
+    hgt = gap * len(opts) + 2 * pad
+    im = Image.new("RGBA", (wmax, hgt), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
+    cx = pad + 11
+    d.line((cx, pad + gap / 2, cx, pad + gap * (len(opts) - 0.5)), fill=(255, 255, 255, 170), width=2)
+    for i, o in enumerate(opts):
+        cy = pad + gap * i + gap / 2
+        on = i == lit
+        for dx, dy in ((2, 2), (1, 1)):                                  # soft shadow so it reads on any picture
+            d.text((pad + 34 + dx, cy - size * 0.62 + dy), o, font=font(size, "Bold"), fill=(0, 0, 0, 150))
+        if on:
+            d.ellipse((cx - 11, cy - 11, cx + 11, cy + 11), fill=(12, 18, 20, 235), outline=colour, width=3)
+            d.ellipse((cx - 4, cy - 4, cx + 4, cy + 4), fill=colour)
+        else:
+            d.ellipse((cx - 5, cy - 5, cx + 5, cy + 5), fill=(255, 255, 255, 190))
+        d.text((pad + 34, cy - size * 0.62), o, font=font(size, "Bold"), fill=(255, 255, 255, 255 if on else 165))
+    a = np.array(im).astype(np.float32)
+    x = int(BW / 2 + U.CANON_R * BW + 18); y = int(BH / 2 - hgt / 2)
+    x = min(x, BW - wmax - 6)
+    return x, y, a[:, :, 2::-1].copy(), a[:, :, 3:4] / 255.0
+
+
+def stamp_prompt(box, pr, fade=1.0):
+    x, y, rgb, al = pr
+    h, w = rgb.shape[:2]
+    reg = box[y:y + h, x:x + w]
+    box[y:y + h, x:x + w] = reg * (1 - al * fade) + rgb * (al * fade)
+    return box
 
 
 def put(canvas, box):
@@ -220,8 +270,21 @@ def dive(out, spec, times):
         fr, _ = U.frames("units/p%02d.mp4" % pid, frames_n, BW, BH)      # the whole unit, time-fitted to its bars
         canvas = strip_porthole(pid)
         times[pid] = out.t
+        u_ = units.get("p%02d" % pid) or {}
+        cut = u_.get("cut") if u_.get("lock_end") and u_.get("cut") else U.LEN - 0.9
+        cut_f = int(cut / U.LEN * frames_n)
+        row = seeds[pid - 1]
+        sides = []
+        for q, col in ((row[3], (240, 178, 90, 255)), (row[4], (111, 195, 184, 255))):
+            o = options(q); sides.append([prompt(o, k, col) for k in range(len(o))])
+        beat_f = max(8, int(round((end - start) / step * FPS)))          # the live choice steps on the beat
         for i in range(frames_n):
             box = fr[i].astype(np.float32)
+            side = sides[0] if i < cut_f else sides[1]
+            since = i - nt if i < cut_f else i - cut_f
+            if since >= 0 and i < frames_n - 3:
+                k = (since // (2 * beat_f)) % len(side)
+                box = stamp_prompt(box, side[k], min(1.0, (since + 1) / 6.0))
             if i < nt:
                 u = (i + 1) / float(nt)
                 frame = put(canvas, through(prev_tail, box, u))
@@ -325,6 +388,7 @@ if __name__ == "__main__":
     out.close("youtube/tourkey-trouttown.mp4")
     open("youtube/chapters.txt", "w").write("\n".join("%s %s" % (stamp(s), nme) for s, nme in chapters) + "\n\nMusic from DEEP SEA VOYAGE: "
         + ", ".join([HOWTO_SONG[1]] + [d[4] for d in DIVES] + [CLOSE_SONG[1]]) + ".\n")
-    json.dump({"length": round(out.t, 2), "portholes": {"%02d" % n: stamp(s) for n, s in sorted(times.items())}}, open("youtube/timing.json", "w"), indent=1)
+    json.dump({"length": round(out.t, 2), "portholes": {"%02d" % n: stamp(s) for n, s in sorted(times.items())},
+               "seconds": {"%02d" % n: round(s, 3) for n, s in sorted(times.items())}}, open("youtube/timing.json", "w"), indent=1)
     slips(times, None)
     print("youtube/tourkey-trouttown.mp4  %s" % stamp(out.t))
