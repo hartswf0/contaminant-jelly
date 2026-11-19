@@ -44,6 +44,31 @@ def wrap(c, text, font, size, width):
     return out + [cur]
 
 
+import re, math
+def options(question):
+    q = question.strip().rstrip("?")
+    parts = [x.strip() for x in re.split(r",\s*or\s+|,\s*|\s+or\s+", q) if x.strip()]
+    return [x[0].upper() + x[1:] for x in parts]
+
+
+SHAPE_RGB = {"circle": (0.69, 0.48, 0.16), "triangle": (0.18, 0.5, 0.46), "square": (0.79, 0.36, 0.24), "diamond": (0.25, 0.44, 0.69), "hexagon": NAVY}
+def shape(c, kind, cx, cy, r):
+    """The same button the film shows, for the student to copy."""
+    col = SHAPE_RGB[kind]
+    c.setStrokeColorRGB(*col); c.setFillColorRGB(1, 1, 1); c.setLineWidth(1.2); c.circle(cx, cy, r, fill=1, stroke=1)
+    q = r * 0.52; c.setLineWidth(1.4)
+    if kind == "circle":
+        c.circle(cx, cy, q, fill=0, stroke=1); return
+    pts = {"triangle": [(cx, cy + q), (cx + q * 0.92, cy - q * 0.72), (cx - q * 0.92, cy - q * 0.72)],
+           "square": [(cx - q * .8, cy - q * .8), (cx + q * .8, cy - q * .8), (cx + q * .8, cy + q * .8), (cx - q * .8, cy + q * .8)],
+           "diamond": [(cx, cy + q), (cx + q, cy), (cx, cy - q), (cx - q, cy)],
+           "hexagon": [(cx + q * math.cos(math.pi / 3 * i), cy + q * math.sin(math.pi / 3 * i)) for i in range(6)]}[kind]
+    path = c.beginPath(); path.moveTo(*pts[0])
+    for pnt in pts[1:]:
+        path.lineTo(*pnt)
+    path.close(); c.drawPath(path, fill=0, stroke=1)
+
+
 def front(n):
     r = seeds[n - 1]; station = r[0].split("·")[1].strip()
     buf = io.BytesIO(); c = canvas.Canvas(buf, pagesize=(612, PH))
@@ -75,20 +100,22 @@ def back(n):
     y0, h = 30, 92
     c.setFillColorRGB(*GOLD); c.setFont("B", 6.5)
     c.drawString(37, y0 + h + 8, "SLIP %02d · %s · A QUESTION TO START EACH RIVER WITNESS" % (n, station.upper()))
-    for x, crew, who, bolts, q in ((37, "Crewmate B · River Witness #1", "TURKEY LOOKS OUT · BOLTS 1 2 3", None, r[3]),
-                                   (312, "Crewmate C · River Witness #2", "TROUT LOOK IN · BOLTS 4 5 6", None, r[4])):
+    to, tr = options(r[3]), options(r[4])
+    kinds_t = ["circle", "triangle", "hexagon"][:len(to)]
+    kinds_r = ["square", "diamond", "hexagon"][:len(tr)]
+    for x, crew, who, opts, kinds in ((37, "Crewmate B · River Witness #1", "TURKEY THINKS · PICK ONE, DRAW ITS SHAPE", to, kinds_t),
+                                      (312, "Crewmate C · River Witness #2", "THE TROUT THINK · PICK ONE, DRAW ITS SHAPE", tr, kinds_r)):
         w = 263
         c.setFillColorRGB(*PALE); c.setStrokeColorRGB(*LINE); c.setLineWidth(0.8); c.roundRect(x, y0, w, h, 4, fill=1, stroke=1)
         c.setFillColorRGB(*NAVY); c.rect(x, y0 + h - 2.2, w, 2.2, fill=1, stroke=0)
         c.setFont("B", 9); c.drawString(x + 9, y0 + h - 16, crew)
         c.setFillColorRGB(*GOLD); c.setFont("B", 6.5); c.drawString(x + 9, y0 + h - 27, who)
-        c.setFillColorRGB(*NAVY)
-        size = 13; lines = wrap(c, q, "B", size, w - 18)
-        if len(lines) > 3:
-            size = 11; lines = wrap(c, q, "B", size, w - 18)
-        c.setFont("B", size)
-        for i, l in enumerate(lines):
-            c.drawString(x + 9, y0 + h - 45 - i * (size + 3), l)
+        gap = 20 if len(opts) > 2 else 26
+        yy = y0 + h - 44
+        for kind, o in zip(kinds, opts):
+            shape(c, kind, x + 17, yy + 3.5, 8)
+            c.setFillColorRGB(*NAVY); c.setFont("B", fit(c, o, "B", 12.5, w - 44)); c.drawString(x + 32, yy, o)
+            yy -= gap
     c.save(); buf.seek(0); return PdfReader(buf).pages[0]
 
 

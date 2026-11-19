@@ -69,6 +69,30 @@ def porthole(d, cx, cy, r, sweep=1.0, bolts=1.0):
             d.regular_polygon((x, y, q * 1.7), 6, rotation=0, fill=CREAM + (255,), outline=NAVY + (255,))
 
 
+SHAPES = ["circle", "triangle", "square", "diamond", "hexagon"]
+SHAPE_COL = {"circle": GOLD, "triangle": TEAL, "square": RUST, "diamond": (120, 170, 230), "hexagon": CREAM}
+def shape_points(kind, cx, cy, r):
+    if kind == "triangle":
+        return [(cx, cy - r), (cx + r * 0.92, cy + r * 0.72), (cx - r * 0.92, cy + r * 0.72)]
+    if kind == "square":
+        q = r * 0.78; return [(cx - q, cy - q), (cx + q, cy - q), (cx + q, cy + q), (cx - q, cy + q)]
+    if kind == "diamond":
+        return [(cx, cy - r), (cx + r, cy), (cx, cy + r), (cx - r, cy)]
+    if kind == "hexagon":
+        return [(cx + r * math.cos(math.pi / 3 * i), cy + r * math.sin(math.pi / 3 * i)) for i in range(6)]
+    return None
+def button(d, cx, cy, r, kind, on=True):
+    """A round button with its shape on it. on=False draws it dimmed."""
+    col = SHAPE_COL[kind]; a = 255 if on else 120
+    d.ellipse((cx - r, cy - r, cx + r, cy + r), fill=(12, 18, 20, 235 if on else 170), outline=col + (a,), width=4 if on else 2)
+    q = r * 0.5; pts = shape_points(kind, cx, cy, q)
+    w = max(3, int(r * 0.17))
+    if pts is None:
+        d.ellipse((cx - q, cy - q, cx + q, cy + q), outline=col + (a,), width=w)
+    else:
+        d.line(pts + [pts[0], pts[1]], fill=col + (a,), width=w, joint="curve")
+
+
 def bars(im, u, colours=(RUST, GOLD, TEAL, NAVY, RUST), direction=1):
     """Cut-paper bars sweep across and off. u 0..1: 0-0.5 cover, 0.5-1 uncover."""
     d = ImageDraw.Draw(im); n = len(colours); h = H / float(n)
@@ -148,23 +172,23 @@ def title(film, n1=int(5.6 * FPS)):
 
 # One card per command on the worksheet. crop and lights are in PDF points (612 x 792 page).
 CARDS = [
-    dict(num="1", page=1, crop=(28, 22, 584, 132), chip="FRONT · PILOT A · 6 MIN", title="COPY YOUR SLIP",
-         say="Porthole #, Sub Station, Rim Clue & River Rule.",
+    dict(num="1", page=1, crop=(28, 22, 584, 132), chip="Front · Pilot · 6 minutes", title="Copy your slip",
+         say="Write your number, your station and your clue.",
          lights=[(262, 82, 392, 101), (398, 82, 580, 101), (34, 107, 580, 127)], film=("films/intro-1.mp4", 0.0)),
-    dict(num="2", page=1, crop=(120, 130, 492, 420), chip="FRONT · PILOT A · 6 MIN", title="DRAW WHAT THE TURKEY SEES RIGHT NOW",
-         say="Trout Town outside the glass, inside your six bolts.",
+    dict(num="2", page=1, crop=(120, 130, 492, 420), chip="Front · Pilot · 6 minutes", title="Draw what Turkey sees",
+         say="Draw it inside the ring.",
          lights=[(180, 134, 430, 157), (205, 397, 405, 419)], film=("films/intro-3.mp4", 2.0)),
-    dict(num="3", page=1, crop=(28, 424, 584, 688), chip="FRONT · PILOT A · 6 MIN", title="E · P · O?  THEN PASS YOUR PORTHOLE LEFT",
-         say="What we see. My sub command. The risk to our 24 hours of air.",
+    dict(num="3", page=1, crop=(28, 424, 584, 688), chip="Front · Pilot · 6 minutes", title="Write 3 things. Pass left.",
+         say="What we see. What Turkey does. What could go wrong.",
          lights=[(34, 428, 580, 497), (34, 503, 580, 572), (34, 578, 580, 647), (34, 653, 580, 684)], film=("films/intro-2.mp4", 1.0)),
-    dict(num="4", page=2, crop=(28, 100, 584, 462), chip="BACK · B & C + ROLL · 12 MIN", title="SIX BOLTS AROUND THE PORTHOLE",
-         say="B: River Witness #1, bolts 1 2 3. Pass left again. C: River Witness #2, bolts 4 5 6.",
+    dict(num="4", page=2, crop=(28, 100, 584, 462), chip="Back · Two friends · 12 minutes", title="Friends write 6 endings",
+         say="First friend: 1, 2, 3. Pass left. Next friend: 4, 5, 6.",
          lights=[(34, 110, 260, 430), (34, 433, 260, 459), (352, 110, 580, 430), (352, 433, 580, 459)], film=("units/p07.mp4", 5.6)),
-    dict(num="5", page=2, crop=(28, 262, 584, 508), chip="BACK · B & C + ROLL · 12 MIN", title="PILOT A ROLLS ONCE",
-         say="Return to the original pilot. Roll 1d6. Write I ROLLED, or circle the bolt.",
+    dict(num="5", page=2, crop=(28, 262, 584, 508), chip="Back · Pilot", title="Roll the die one time",
+         say="Circle the number you rolled.",
          lights=[(352, 433, 580, 459), (258, 270, 354, 380), (34, 478, 580, 502)], film=("films/intro-4.mp4", 2.4)),
-    dict(num="6", page=2, crop=(28, 474, 584, 648), chip="BACK · B & C + ROLL · 12 MIN", title="TROUT GOSSIP · BLACK-BOX MESSAGE",
-         say="What do the trout tell FANTROL 88.7?  Dear Alien, why did the Turkey come to Trout Town?",
+    dict(num="6", page=2, crop=(28, 474, 584, 648), chip="Back · Pilot", title="Tell what happened",
+         say="Write the trout gossip. Then write a message home.",
          lights=[(34, 503, 580, 562), (34, 566, 580, 644)], film=("films/intro-5.mp4", 2.0)),
 ]
 
@@ -174,13 +198,13 @@ def card(spec, film, n, first=False):
     pg = sheet(spec["page"]); k = pg.size[0] / 612.0
     x0, y0, x1, y1 = spec["crop"]
     crop = pg.crop((int(x0 * k), int(y0 * k), int(x1 * k), int(y1 * k)))
-    AW, AH = 730, 456
+    AW, AH = 730, 444
     s = min(AW / float(crop.size[0]), AH / float(crop.size[1]))
     pw, ph = int(crop.size[0] * s), int(crop.size[1] * s)
     crop = crop.resize((pw, ph), Image.LANCZOS)
-    px, py = 60 + (AW - pw) // 2, 204 + (AH - ph) // 2
+    px, py = 60 + (AW - pw) // 2, 218 + (AH - ph) // 2
     fcx, fcy, fr_ = 1040, 432, 190
-    per = max(1.0, (n / float(FPS) - 1.6) / len(spec["lights"]))
+    per = max(1.0, (n / float(FPS) - 2.0) / len(spec["lights"]))
     for i in range(n):
         t = i / float(FPS)
         im = Image.new("RGBA", (W, H), PAPER + (255,)); d = ImageDraw.Draw(im)
@@ -190,14 +214,14 @@ def card(spec, film, n, first=False):
         d.text((38 - 160 * (1 - u), 20), spec["num"], font=font(150, "Black"), fill=PAPER + (255,))
         # the worksheet's own words
         u2 = ease(span(t, 0.4, 0.9))
-        tf = font(46, "Black"); size = 46
-        while d.textlength(spec["title"], font=tf) > W - 250 and size > 26:
+        tf = font(58, "Black"); size = 58
+        while d.textlength(spec["title"], font=tf) > W - 250 and size > 30:
             size -= 2; tf = font(size, "Black")
         d.text((196 + 60 * (1 - u2), 44), spec["title"], font=tf, fill=NAVY + (int(255 * u2),))
-        d.text((198 + 60 * (1 - u2), 44 + size + 14), spec["say"], font=font(24, "SemiBold"), fill=NAVY + (int(215 * u2),))
+        d.text((198 + 60 * (1 - u2), 44 + size + 14), spec["say"], font=font(31, "Bold"), fill=NAVY + (int(235 * u2),))
         cw = d.textlength(spec["chip"], font=font(17, "Bold")) + 28
-        d.rounded_rectangle((198, 150, 198 + cw, 182), 8, fill=(251, 243, 223, int(255 * u2)), outline=GOLD + (int(255 * u2),), width=2)
-        d.text((212, 156), spec["chip"], font=font(17, "Bold"), fill=NAVY + (int(255 * u2),))
+        d.rounded_rectangle((198, 162, 198 + cw, 194), 8, fill=(251, 243, 223, int(255 * u2)), outline=GOLD + (int(255 * u2),), width=2)
+        d.text((212, 168), spec["chip"], font=font(17, "Bold"), fill=NAVY + (int(255 * u2),))
         # the worksheet itself rises into place
         u3 = back(span(t, 0.5, 1.05), 1.0); oy = int((1 - u3) * 560)
         d.rectangle((px + 8, py + 10 + oy, px + pw + 8, py + ph + 10 + oy), fill=(22, 43, 52, 60))
@@ -234,6 +258,32 @@ def card(spec, film, n, first=False):
         yield bgr(im)
 
 
+def choose_card(n):
+    """Four choices, four buttons. Pick one and draw its shape."""
+    demo = [("circle", "A sunken ship"), ("triangle", "A giant's foot"), ("square", "A flashlight"), ("diamond", "A crab")]
+    for i in range(n):
+        t = i / float(FPS)
+        im = Image.new("RGBA", (W, H), DEEP + (255,)); d = ImageDraw.Draw(im)
+        u = ease(span(t, 0.2, 0.8))
+        d.text((90, 70 + 30 * (1 - u)), "See four choices.", font=font(72, "Black"), fill=CREAM + (int(255 * u),))
+        u2 = ease(span(t, 1.6, 2.2))
+        d.text((90, 160 + 30 * (1 - u2)), "Pick one. Draw its shape.", font=font(72, "Black"), fill=GOLD + (int(255 * u2),))
+        for k, (kind, word) in enumerate(demo):
+            ts = 2.6 + 0.7 * k
+            if t < ts:
+                continue
+            v = back(span(t, ts, ts + 0.4)); x = 120 + (k % 2) * 560; y = 360 + (k // 2) * 150
+            r = int(52 * v)
+            if r > 6:
+                button(d, x + 52, y + 52, r, kind)
+            d.text((x + 130, y + 22), word, font=font(44, "Bold"), fill=CREAM + (int(255 * min(1, v)),))
+        if t < 0.75:
+            bars(im, 0.5 + t / 1.5)
+        if n - i <= int(0.6 * FPS):
+            bars(im, (1 - (n - i) / (0.6 * FPS)) * 0.5, direction=-1)
+        yield bgr(im)
+
+
 def dive_card(name, a, b, song, n):
     """Frames for a dive title: the numeral slams in, the slips of this dive orbit and line up."""
     count = b - a + 1
@@ -254,7 +304,7 @@ def dive_card(name, a, b, song, n):
         d.text((x, 196), word, font=font(170, "Black"), fill=DEEP + (255,))
         u2 = ease(span(t, 0.5, 1.0))
         d.text((74, 446 + 24 * (1 - u2)), "Slips %02d to %02d" % (a, b), font=font(50, "Bold"), fill=CREAM + (int(255 * u2),))
-        d.text((76, 512 + 24 * (1 - u2)), "Watch for your number. Then write.", font=font(26, "SemiBold"), fill=TEAL + (int(255 * u2),))
+        d.text((76, 512 + 24 * (1 - u2)), "Watch for your number.", font=font(26, "SemiBold"), fill=TEAL + (int(255 * u2),))
         d.text((76, 660), "MUSIC  ·  %s  ·  DEEP SEA VOYAGE" % song.upper(), font=font(16, "Bold"), fill=GOLD + (int(200 * u2),))
         if n - i <= int(0.5 * FPS):
             bars(im, (1 - (n - i) / (0.5 * FPS)) * 0.5)
