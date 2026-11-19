@@ -54,7 +54,7 @@ def options(question):
 def choices(n):
     """All the choices of a porthole with their shapes: Turkey's first, then the trout's."""
     row = seeds[n - 1]; t, r = options(row[3]), options(row[4])
-    shapes = (["circle", "triangle", "hexagon"][:len(t)] if len(t) > 2 else ["circle", "triangle"]) + ["square", "diamond", "hexagon"][:len(r)]
+    shapes = ["triangle", "circle", "hexagon"][:len(t)] + ["cross", "square", "hexagon"][:len(r)]
     return [(shapes[i], w, "turkey") for i, w in enumerate(t)] + [(shapes[len(t) + i], w, "trout") for i, w in enumerate(r)]
 
 
@@ -71,27 +71,30 @@ def wrap(d, text, f, width):
 
 RIM = U.CANON_R * W                              # outer rim radius of the locked porthole, in pixels
 def side_panel(items, side, live):
-    """One side's buttons. side 'turkey' sits right of the glass, 'trout' left of it."""
-    pw = int(W / 2 - RIM - 30)
+    """One side's buttons. side 'turkey' sits right of the glass, 'trout' left of it. Each choice is
+    a plate with its controller button on it and an edge in the button's colour."""
+    pw = int(W / 2 - RIM - 26)
     im = Image.new("RGBA", (pw, H), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
-    size = 30
-    while size > 21 and any(len(wrap(d, w, font(size, "Bold"), pw - 92)) > 2 for _, w, _ in items):
+    size = 29; tx = 92
+    while size > 21 and any(len(wrap(d, w, font(size, "Bold"), pw - tx - 14)) > 2 for _, w, _ in items):
         size -= 1
-    blocks = [wrap(d, w, font(size, "Bold"), pw - 92) for _, w, _ in items]
-    heights = [max(64, len(b) * (size + 6) + 22) for b in blocks]
+    blocks = [wrap(d, w, font(size, "Bold"), pw - tx - 14) for _, w, _ in items]
+    heights = [max(78, len(b) * (size + 6) + 26) for b in blocks]
     total = sum(heights) + 14 * (len(items) - 1) + 44
     y = (H - total) // 2 - 34
     tag = "Turkey thinks" if side == "turkey" else "The trout think"
-    d.text((8, y), tag, font=font(22, "Bold"), fill=(255, 255, 255, 235 if live else 120)); y += 44
+    d.text((8, y), tag, font=font(22, "Bold"), fill=(255, 255, 255, 240 if live else 120)); y += 44
     for (kind, word, _), lines, hgt in zip(items, blocks, heights):
-        d.rounded_rectangle((0, y, pw - 2, y + hgt), 16, fill=(10, 16, 18, 205 if live else 120))
-        C.button(d, 34, y + hgt / 2, 24, kind, on=live)
+        col = C.SHAPE_COL[kind]
+        d.rounded_rectangle((0, y, pw - 2, y + hgt), 18, fill=(8, 10, 14, 215 if live else 120))
+        d.rounded_rectangle((0, y, pw - 2, y + hgt), 18, outline=col + (255 if live else 90,), width=3 if live else 2)
+        C.button(d, 44, y + hgt / 2, 30, kind, on=live)
         ty = y + (hgt - len(lines) * (size + 6)) / 2 - 2
         for l in lines:
-            d.text((72, ty), l, font=font(size, "Bold"), fill=(255, 255, 255, 255 if live else 150)); ty += size + 6
+            d.text((tx, ty), l, font=font(size, "Bold"), fill=(255, 255, 255, 255 if live else 150)); ty += size + 6
         y += hgt + 14
     a = np.array(im).astype(np.float32)
-    x = int(W / 2 + RIM + 14) if side == "turkey" else int(W / 2 - RIM - 14 - pw)
+    x = int(W / 2 + RIM + 12) if side == "turkey" else int(W / 2 - RIM - 12 - pw)
     return x, 0, a[:, :, 2::-1].copy(), a[:, :, 3:4] / 255.0
 
 
@@ -307,13 +310,13 @@ SNAIL = ('<svg class="snail" viewBox="0 0 28 20"><path d="M3 16h20c2 0 3-2 3-4" 
          '<circle cx="12" cy="9" r="6.2" fill="#f3e3bf" stroke="#8a5a12" stroke-width="1.6"/><circle cx="12" cy="9" r="2.6" fill="none" stroke="#8a5a12" stroke-width="1.4"/></svg>')
 
 
-SVG_COL = {"circle": "#b07a28", "triangle": "#2f7f76", "square": "#c95c3e", "diamond": "#3f6fb0", "hexagon": "#16293a"}
+SVG_COL = {"triangle": "#16a56f", "circle": "#e04848", "cross": "#3f7fe0", "square": "#d457a8", "hexagon": "#c98a1e"}
 def svg_shape(kind):
-    inner = {"circle": '<circle cx="12" cy="12" r="5.2"/>', "triangle": '<path d="M12 6.2 17.6 16.4H6.4Z"/>',
-             "square": '<rect x="7.4" y="7.4" width="9.2" height="9.2"/>', "diamond": '<path d="M12 5.8 18.2 12 12 18.2 5.8 12Z"/>',
+    inner = {"circle": '<circle cx="12" cy="12" r="5.4"/>', "triangle": '<path d="M12 6 17.8 16.2H6.2Z"/>',
+             "square": '<rect x="7.2" y="7.2" width="9.6" height="9.6"/>', "cross": '<path d="M7.4 7.4 16.6 16.6M16.6 7.4 7.4 16.6"/>',
              "hexagon": '<path d="M17.6 12 14.8 16.8H9.2L6.4 12 9.2 7.2h5.6Z"/>'}[kind]
-    return ('<svg class="btn" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.6" fill="#fff" stroke="%s" stroke-width="1.8"/>'
-            '<g fill="none" stroke="%s" stroke-width="2" stroke-linejoin="round">%s</g></svg>' % (SVG_COL[kind], SVG_COL[kind], inner))
+    return ('<svg class="btn" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.8" fill="#14161b"/>'
+            '<g fill="none" stroke="%s" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">%s</g></svg>' % (SVG_COL[kind], inner))
 
 
 def choice_html(n, who):
@@ -370,7 +373,7 @@ h2{margin:.3mm 0 0;font-size:17px;line-height:1.1;font-weight:800}h2 b{font-size
 .box{border:1.1px solid #9fb0bf;border-top:2.2px solid #16293a;background:#f1f5f8;border-radius:1.6mm;padding:1.6mm 2.2mm}
 .who{display:flex;align-items:center;gap:1.2mm;font-size:9px}.who b{font-size:10.5px}.dice{margin-left:auto;display:flex;gap:.8mm}.die{width:4.6mm;height:4.6mm}
 .look{font-size:7.5px;font-weight:800;letter-spacing:.07em;color:#8a5a12;margin-top:.6mm}
-.box p{margin:.8mm 0 0;font-size:12.5px;line-height:1.2;font-weight:700;display:flex;flex-direction:column;gap:.9mm}.ch{display:flex;align-items:center;gap:1.4mm}.btn{width:5.4mm;height:5.4mm;flex:none}
+.box p{margin:.8mm 0 0;font-size:12.5px;line-height:1.2;font-weight:700;display:flex;flex-direction:column;gap:.9mm}.ch{display:flex;align-items:center;gap:1.4mm}.btn{width:6.2mm;height:6.2mm;flex:none}
 .bar{display:flex;justify-content:space-between;background:#16344a;color:#fff;border-radius:1.4mm;padding:1.3mm 2.6mm;font-size:7.6px;font-weight:800;letter-spacing:.05em}
 @media screen{body{max-width:216mm;margin:0 auto;padding:16px}}
 @media screen and (max-width:700px){.strip{height:auto;flex-direction:column}.two{grid-template-columns:1fr}.strip img{width:40vw;height:40vw}header{flex-direction:column}}

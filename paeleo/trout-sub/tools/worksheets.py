@@ -51,17 +51,19 @@ def options(question):
     return [x[0].upper() + x[1:] for x in parts]
 
 
-SHAPE_RGB = {"circle": (0.69, 0.48, 0.16), "triangle": (0.18, 0.5, 0.46), "square": (0.79, 0.36, 0.24), "diamond": (0.25, 0.44, 0.69), "hexagon": NAVY}
+SHAPE_RGB = {"triangle": (0.09, 0.65, 0.44), "circle": (0.88, 0.28, 0.28), "cross": (0.25, 0.5, 0.88), "square": (0.83, 0.34, 0.66), "hexagon": (0.79, 0.54, 0.12)}
 def shape(c, kind, cx, cy, r):
-    """The same button the film shows, for the student to copy."""
+    """The same controller button the film shows, for the student to copy."""
     col = SHAPE_RGB[kind]
-    c.setStrokeColorRGB(*col); c.setFillColorRGB(1, 1, 1); c.setLineWidth(1.2); c.circle(cx, cy, r, fill=1, stroke=1)
-    q = r * 0.52; c.setLineWidth(1.4)
+    c.setFillColorRGB(0.08, 0.09, 0.11); c.circle(cx, cy, r, fill=1, stroke=0)
+    c.setStrokeColorRGB(*col); c.setLineWidth(1.9); c.setLineCap(1); c.setLineJoin(1)
+    q = r * 0.5
     if kind == "circle":
         c.circle(cx, cy, q, fill=0, stroke=1); return
-    pts = {"triangle": [(cx, cy + q), (cx + q * 0.92, cy - q * 0.72), (cx - q * 0.92, cy - q * 0.72)],
+    if kind == "cross":
+        k = q * 0.85; c.line(cx - k, cy - k, cx + k, cy + k); c.line(cx - k, cy + k, cx + k, cy - k); return
+    pts = {"triangle": [(cx, cy + q), (cx + q * 0.95, cy - q * 0.68), (cx - q * 0.95, cy - q * 0.68)],
            "square": [(cx - q * .8, cy - q * .8), (cx + q * .8, cy - q * .8), (cx + q * .8, cy + q * .8), (cx - q * .8, cy + q * .8)],
-           "diamond": [(cx, cy + q), (cx + q, cy), (cx, cy - q), (cx - q, cy)],
            "hexagon": [(cx + q * math.cos(math.pi / 3 * i), cy + q * math.sin(math.pi / 3 * i)) for i in range(6)]}[kind]
     path = c.beginPath(); path.moveTo(*pts[0])
     for pnt in pts[1:]:
@@ -101,8 +103,8 @@ def back(n):
     c.setFillColorRGB(*GOLD); c.setFont("B", 6.5)
     c.drawString(37, y0 + h + 8, "SLIP %02d · %s · A QUESTION TO START EACH RIVER WITNESS" % (n, station.upper()))
     to, tr = options(r[3]), options(r[4])
-    kinds_t = ["circle", "triangle", "hexagon"][:len(to)]
-    kinds_r = ["square", "diamond", "hexagon"][:len(tr)]
+    kinds_t = ["triangle", "circle", "hexagon"][:len(to)]
+    kinds_r = ["cross", "square", "hexagon"][:len(tr)]
     for x, crew, who, opts, kinds in ((37, "Crewmate B · River Witness #1", "TURKEY THINKS · PICK ONE, DRAW ITS SHAPE", to, kinds_t),
                                       (312, "Crewmate C · River Witness #2", "THE TROUT THINK · PICK ONE, DRAW ITS SHAPE", tr, kinds_r)):
         w = 263
@@ -113,8 +115,8 @@ def back(n):
         gap = 20 if len(opts) > 2 else 26
         yy = y0 + h - 44
         for kind, o in zip(kinds, opts):
-            shape(c, kind, x + 17, yy + 3.5, 8)
-            c.setFillColorRGB(*NAVY); c.setFont("B", fit(c, o, "B", 12.5, w - 44)); c.drawString(x + 32, yy, o)
+            shape(c, kind, x + 18, yy + 4, 9)
+            c.setFillColorRGB(*NAVY); c.setFont("B", fit(c, o, "B", 12.5, w - 44)); c.drawString(x + 34, yy, o)
             yy -= gap
     c.save(); buf.seek(0); return PdfReader(buf).pages[0]
 

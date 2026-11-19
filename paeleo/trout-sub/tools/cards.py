@@ -69,27 +69,34 @@ def porthole(d, cx, cy, r, sweep=1.0, bolts=1.0):
             d.regular_polygon((x, y, q * 1.7), 6, rotation=0, fill=CREAM + (255,), outline=NAVY + (255,))
 
 
-SHAPES = ["circle", "triangle", "square", "diamond", "hexagon"]
-SHAPE_COL = {"circle": GOLD, "triangle": TEAL, "square": RUST, "diamond": (120, 170, 230), "hexagon": CREAM}
+# The four face buttons of a game controller: a shape and a colour each, so a choice can be
+# named by either ("the green triangle"). A fifth, amber hexagon covers the rare third choice.
+SHAPES = ["triangle", "circle", "cross", "square", "hexagon"]
+SHAPE_COL = {"triangle": (56, 214, 150), "circle": (255, 92, 92), "cross": (96, 160, 255), "square": (255, 128, 210), "hexagon": (255, 190, 80)}
 def shape_points(kind, cx, cy, r):
     if kind == "triangle":
-        return [(cx, cy - r), (cx + r * 0.92, cy + r * 0.72), (cx - r * 0.92, cy + r * 0.72)]
+        return [(cx, cy - r), (cx + r * 0.95, cy + r * 0.68), (cx - r * 0.95, cy + r * 0.68)]
     if kind == "square":
-        q = r * 0.78; return [(cx - q, cy - q), (cx + q, cy - q), (cx + q, cy + q), (cx - q, cy + q)]
-    if kind == "diamond":
-        return [(cx, cy - r), (cx + r, cy), (cx, cy + r), (cx - r, cy)]
+        q = r * 0.8; return [(cx - q, cy - q), (cx + q, cy - q), (cx + q, cy + q), (cx - q, cy + q)]
     if kind == "hexagon":
         return [(cx + r * math.cos(math.pi / 3 * i), cy + r * math.sin(math.pi / 3 * i)) for i in range(6)]
     return None
 def button(d, cx, cy, r, kind, on=True):
-    """A round button with its shape on it. on=False draws it dimmed."""
-    col = SHAPE_COL[kind]; a = 255 if on else 120
-    d.ellipse((cx - r, cy - r, cx + r, cy + r), fill=(12, 18, 20, 235 if on else 170), outline=col + (a,), width=4 if on else 2)
-    q = r * 0.5; pts = shape_points(kind, cx, cy, q)
-    w = max(3, int(r * 0.17))
-    if pts is None:
+    """A controller face button: black glossy cap, the shape drawn bold in its colour."""
+    col = SHAPE_COL[kind]; a = 255 if on else 110
+    if on:
+        d.ellipse((cx - r - 5, cy - r - 5, cx + r + 5, cy + r + 5), fill=col + (70,))        # glow
+    d.ellipse((cx - r, cy - r, cx + r, cy + r), fill=(8, 10, 14, 250 if on else 190), outline=col + (a,), width=3 if on else 2)
+    if on:
+        d.arc((cx - r + 5, cy - r + 5, cx + r - 5, cy + r - 5), 205, 335, fill=(255, 255, 255, 70), width=3)   # gloss
+    q = r * 0.5; w = max(4, int(round(r * 0.2)))
+    if kind == "circle":
         d.ellipse((cx - q, cy - q, cx + q, cy + q), outline=col + (a,), width=w)
+    elif kind == "cross":
+        k = q * 0.85
+        d.line((cx - k, cy - k, cx + k, cy + k), fill=col + (a,), width=w); d.line((cx - k, cy + k, cx + k, cy - k), fill=col + (a,), width=w)
     else:
+        pts = shape_points(kind, cx, cy, q)
         d.line(pts + [pts[0], pts[1]], fill=col + (a,), width=w, joint="curve")
 
 
@@ -260,7 +267,7 @@ def card(spec, film, n, first=False):
 
 def choose_card(n):
     """Four choices, four buttons. Pick one and draw its shape."""
-    demo = [("circle", "A sunken ship"), ("triangle", "A giant's foot"), ("square", "A flashlight"), ("diamond", "A crab")]
+    demo = [("triangle", "A sunken ship"), ("circle", "A giant's foot"), ("cross", "A flashlight"), ("square", "A crab")]
     for i in range(n):
         t = i / float(FPS)
         im = Image.new("RGBA", (W, H), DEEP + (255,)); d = ImageDraw.Draw(im)
