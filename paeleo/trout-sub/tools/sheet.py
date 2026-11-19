@@ -19,7 +19,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(ROOT)
 seeds = json.load(open("seeds.json"))
 timing = json.load(open("youtube/timing.json"))["portholes"] if os.path.exists("youtube/timing.json") else {}
-COL = {"triangle": "#38d696", "circle": "#ff5c5c", "cross": "#60a0ff", "square": "#ff80d2", "hexagon": "#ffbe50"}
+COL = {"triangle": "#12905f", "circle": "#d63a3a", "cross": "#2f6fd6", "square": "#c9469c", "hexagon": "#b87a12"}
 DIVES = [("Dive 1", 1, 16), ("Dive 2", 17, 32), ("Dive 3", 33, 48), ("Dive 4", 49, 55)]
 
 
@@ -32,7 +32,7 @@ def button(kind, cls="btn"):
     inner = {"circle": '<circle cx="12" cy="12" r="5.4"/>', "triangle": '<path d="M12 6 17.8 16.2H6.2Z"/>',
              "square": '<rect x="7.2" y="7.2" width="9.6" height="9.6"/>', "cross": '<path d="M7.4 7.4 16.6 16.6M16.6 7.4 7.4 16.6"/>',
              "hexagon": '<path d="M17.6 12 14.8 16.8H9.2L6.4 12 9.2 7.2h5.6Z"/>'}[kind]
-    return ('<svg class="%s" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#0a0c10"/><circle cx="12" cy="12" r="10.2" fill="none" stroke="%s" stroke-width="1.1"/>'
+    return ('<svg class="%s" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.6" fill="#fff" stroke="%s" stroke-width="1.3"/>'
             '<g fill="none" stroke="%s" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">%s</g></svg>' % (cls, COL[kind], COL[kind], inner))
 
 
@@ -40,7 +40,7 @@ PIPS = {1: [(12, 12)], 2: [(7, 7), (17, 17)], 3: [(7, 7), (12, 12), (17, 17)], 4
         5: [(7, 7), (17, 7), (12, 12), (7, 17), (17, 17)], 6: [(7, 6), (17, 6), (7, 12), (17, 12), (7, 18), (17, 18)]}
 def die(n, cls="die", at=None):
     pos = ' x="%.1f" y="%.1f" width="26" height="26"' % at if at else ""
-    return ('<svg class="%s"%s viewBox="0 0 24 24"><rect x="1.5" y="1.5" width="21" height="21" rx="4.4" fill="#fbf6e9" stroke="#6e4810" stroke-width="1.6"/>%s</svg>'
+    return ('<svg class="%s"%s viewBox="0 0 24 24"><rect x="1.5" y="1.5" width="21" height="21" rx="4.4" fill="#fff" stroke="#16293a" stroke-width="1.2"/>%s</svg>'
             % (cls, pos, "".join('<circle cx="%d" cy="%d" r="2.05" fill="#16293a"/>' % p for p in PIPS[n])))
 
 
@@ -51,8 +51,8 @@ def ring():
     for k in range(6):
         a = math.radians(-90 + 60 * k)
         dice += die(k + 1, "rd", (150 + 128 * math.cos(a) - 13, 150 + 128 * math.sin(a) - 13))
-    return ('<svg class="ring" viewBox="0 0 300 300"><circle cx="150" cy="150" r="128" fill="#fff" stroke="#d69e3c" stroke-width="26"/>'
-            '<circle cx="150" cy="150" r="141.5" fill="none" stroke="#16293a" stroke-width="1.6"/><circle cx="150" cy="150" r="114.5" fill="none" stroke="#16293a" stroke-width="1.6"/>%s</svg>' % dice)
+    return ('<svg class="ring" viewBox="0 0 300 300"><circle cx="150" cy="150" r="128" fill="#fff" stroke="#fff" stroke-width="26"/>'
+            '<circle cx="150" cy="150" r="141.5" fill="none" stroke="#16293a" stroke-width="1"/><circle cx="150" cy="150" r="114.5" fill="none" stroke="#16293a" stroke-width="1"/>%s</svg>' % dice)
 
 
 def lines(n):
@@ -147,6 +147,7 @@ def log(n=None):
 
 
 CSS = '''
+/*INK*/
 @font-face{font-family:Inter;font-weight:400;src:url(file:///usr/share/fonts/opentype/inter/Inter-Regular.otf)}
 @font-face{font-family:Inter;font-weight:600;src:url(file:///usr/share/fonts/opentype/inter/Inter-SemiBold.otf)}
 @font-face{font-family:Inter;font-weight:700;src:url(file:///usr/share/fonts/opentype/inter/Inter-Bold.otf)}
@@ -177,20 +178,71 @@ footer{margin-top:auto;font-size:9px;font-weight:700;color:#5f6c70;text-align:ri
 .plates.three{gap:.7mm}.plates.three .plate{min-height:6.3mm;padding-top:.3mm;padding-bottom:.3mm;font-size:12px}.plates.three .btn{width:5.2mm;height:5.2mm}.draw{display:flex;align-items:center;justify-content:space-between;font-weight:700;font-size:12px}.draw b{display:block;width:11mm;height:11mm;border:1.6px dashed #16293a;border-radius:50%;background:#fff}
 .bolt{display:grid;grid-template-columns:auto auto 1fr;column-gap:1.6mm;align-items:center}.bolt b{font-weight:900;font-size:13px}.bolt span{font-size:11.5px;font-weight:600;color:#44525a}.bolt .lines{grid-column:1/-1}.bolt .lines i{height:5.5mm}.back .lines i{height:6.2mm}.back .bolt .lines i{height:5.5mm}.back{gap:2.1mm}
 .roll{display:flex;align-items:center;gap:7mm;font-weight:700;font-size:14px}.six{display:flex;align-items:center;gap:1.3mm}.six .die{width:7.4mm;height:7.4mm}
+
+/* Low-ink finish. Only colours change here, never sizes, so every line stays where the film points. */
+.badge{background:none;color:#16293a}
+.zone{border-color:transparent;border-top-color:#16293a;border-radius:0}
+.slab{background:none;color:#c95c3e;transform:none}
+.zone-h em{border-color:transparent;background:none;color:#5f6c70}
+.kinds span,.pick{background:none;border-color:transparent}
+.plate{background:none;color:#16293a}
+.bar,.bar.gold{background:none;color:#16293a}
+.lines i{border-bottom-color:#8c979d;border-bottom-width:.8px}
+.fill{border-bottom-color:#8c979d}
+.draw b{border-color:#8c979d;border-width:1.2px}
 '''
 def page(body):
     return '<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Porthole Log</title><style>%s</style></head><body>%s</body></html>' % (CSS, body)
 
 
+SLIP_CSS = '''
+@font-face{font-family:Inter;font-weight:600;src:url(file:///usr/share/fonts/opentype/inter/Inter-SemiBold.otf)}
+@font-face{font-family:Inter;font-weight:700;src:url(file:///usr/share/fonts/opentype/inter/Inter-Bold.otf)}
+@font-face{font-family:Inter;font-weight:900;src:url(file:///usr/share/fonts/opentype/inter/Inter-Black.otf)}
+@page{size:8.5in 11in;margin:0}*{box-sizing:border-box}
+body{margin:0;font:600 15px/1.25 Inter,Arial,sans-serif;color:#16293a;background:#fff}
+section{width:8.5in;height:11in;padding:8mm 12mm;display:flex;flex-direction:column;break-after:page}
+.slip{flex:1;display:grid;grid-template-columns:74mm 1fr;column-gap:8mm;align-items:center;border-bottom:1px dashed #8c979d;padding:3mm 0}
+section .slip:last-child{border-bottom:0}
+.slip img{width:74mm;height:74mm;border-radius:50%;object-fit:cover}
+.top{display:flex;align-items:baseline;gap:4mm}.num{font-size:74px;font-weight:900;line-height:.9}.st{font-size:26px;font-weight:900}
+.clue{font-size:17px;font-weight:700;margin:1.5mm 0 .5mm}.rule{font-size:12.5px;color:#5f6c70;margin-bottom:2.5mm}
+.two{display:grid;grid-template-columns:1fr 1fr;column-gap:6mm}.who{font-size:12.5px;font-weight:900;color:#5f6c70;margin-bottom:1mm}
+.ch{display:flex;align-items:center;gap:2.4mm;font-size:16px;font-weight:700;margin-bottom:1.4mm;line-height:1.15}.btn{width:8.4mm;height:8.4mm;flex:none}
+.when{font-size:11.5px;color:#5f6c70;margin-top:1.5mm}
+'''
+def slips():
+    """One slip per pilot, three to a page: the porthole's cartoon, its number as large as it will go,
+    and the four choices with their buttons. Nothing else."""
+    out = []
+    for n in range(1, 56):
+        r = seeds[n - 1]; station = html.escape(r[0].split("·")[1].strip()); num = "%02d" % n
+        to, tr = options(r[3]), options(r[4])
+        kt, kr = ["triangle", "circle", "hexagon"][:len(to)], ["cross", "square", "hexagon"][:len(tr)]
+        ch = lambda kinds, words: "".join('<div class="ch">%s<span>%s</span></div>' % (button(k), html.escape(w)) for k, w in zip(kinds, words))
+        dive = next(d[0] for d in DIVES if d[1] <= n <= d[2])
+        out.append('''<div class="slip"><img src="../stills/p%s.jpg" alt="Porthole %s"><div>
+<div class="top"><span class="num">%s</span><span class="st">%s</span></div>
+<div class="clue">%s</div><div class="rule">Rule: %s</div>
+<div class="two"><div><div class="who">Turkey thinks</div>%s</div><div><div class="who">The trout think</div>%s</div></div>
+<div class="when">In the film: %s%s</div></div></div>''' % (num, num, num, station, html.escape(r[1]), html.escape(r[5]), ch(kt, to), ch(kr, tr), dive,
+                                                               (", at " + timing[num]) if timing.get(num) else ""))
+    pages = "".join("<section>%s</section>" % "".join(out[i:i + 3]) for i in range(0, 55, 3))
+    open("youtube/slips.html", "w").write('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Porthole Slips</title><style>%s</style></head><body>%s</body></html>' % (SLIP_CSS, pages))
+
+
 if __name__ == "__main__":
     os.makedirs("youtube", exist_ok=True); os.makedirs("sheets", exist_ok=True)
     open("youtube/porthole-logs.html", "w").write(page("".join(log(n) for n in range(1, 56))))
+    slips()
     open("sheets/master.html", "w").write(page(log(31)))     # the film shows a filled example, porthole 31
     js = r'''
 const {chromium}=require('playwright');(async()=>{
  const b=await chromium.launch();
  let p=await b.newPage();await p.goto('file://'+process.cwd()+'/youtube/porthole-logs.html');await p.evaluate(()=>document.fonts.ready);
  await p.pdf({path:'youtube/porthole-logs.pdf',width:'8.5in',height:'11in',printBackground:true});
+ const q=await b.newPage();await q.goto('file://'+process.cwd()+'/youtube/slips.html');await q.evaluate(()=>document.fonts.ready);
+ await q.pdf({path:'youtube/slips.pdf',width:'8.5in',height:'11in',printBackground:true});
  const over=await p.evaluate(()=>[...document.querySelectorAll('.page')].filter(e=>e.scrollHeight>e.clientHeight+1).length);
  p=await b.newPage({viewport:{width:816,height:1056},deviceScaleFactor:2.3});await p.goto('file://'+process.cwd()+'/sheets/master.html');await p.evaluate(()=>document.fonts.ready);
  const pages=await p.$$('.page');for(let i=0;i<pages.length;i++)await pages[i].screenshot({path:'sheets/master-'+(i+1)+'.png'});
