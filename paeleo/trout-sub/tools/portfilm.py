@@ -5,7 +5,8 @@
     python3 tools/portfilm.py gen intro-2 --prompt-file prompts/intro-2.txt --atlas a03 --still p01
     python3 tools/portfilm.py gen p07 --prompt-file prompts/p07.txt --dry-run
 
-Sends prompt + reference images to minimax/h3-max/reference-to-video on the fal
+Sends prompt + reference images to minimax/h3-max-turbo/reference-to-video (or,
+with --model max, minimax/h3-max/reference-to-video for hero shots) on the fal
 queue (a paid API; the cloud session's proxy supplies the key). References, in
 order: masters/cockpit.jpg, masters/outside.jpg, the porthole still, then any
 atlas frames. Writes the raw clip and a contact sheet to .raw/, a web-sized
@@ -14,8 +15,7 @@ films/<id>.mp4, and appends to fal_log.json.
 import argparse, base64, fcntl, json, os, subprocess, sys, time, urllib.request, urllib.error
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ENDPOINT = "minimax/h3-max/reference-to-video"
-QUEUE = "https://queue.fal.run/" + ENDPOINT
+ENDPOINTS = {"max": "minimax/h3-max/reference-to-video", "turbo": "minimax/h3-max-turbo/reference-to-video"}
 RAW = os.path.join(ROOT, ".raw")
 LOG = os.path.join(ROOT, "fal_log.json")
 
@@ -73,7 +73,9 @@ def gen(a):
             "prompt_expansion_mode": "disabled"}
     if a.seed is not None:
         args["seed"] = a.seed
-    print("id %s | %d chars | refs %s | %s" % (a.id, len(prompt), refs, args))
+    ENDPOINT = ENDPOINTS[a.model]
+    QUEUE = "https://queue.fal.run/" + ENDPOINT
+    print("id %s | %s | %d chars | refs %s | %s" % (a.id, ENDPOINT, len(prompt), refs, args))
     if a.dry_run:
         print(prompt)
         return
@@ -142,7 +144,9 @@ if __name__ == "__main__":
     g.add_argument("--still")
     g.add_argument("--no-masters", action="store_true")
     g.add_argument("--duration", type=int, default=10)
-    g.add_argument("--resolution", default="768P")
+    g.add_argument("--resolution", default="480P")
+    g.add_argument("--model", choices=["max", "turbo"], default="turbo",
+                   help="turbo 480P for everyday films; max 768P for hero shots")
     g.add_argument("--seed", type=int)
     g.add_argument("--dry-run", action="store_true")
     u = sp.add_parser("use")

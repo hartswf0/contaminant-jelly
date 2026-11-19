@@ -1,6 +1,6 @@
 # Trout Sub · swarm brief
 
-One film per porthole of the 55 Portholes deck, plus six intro shots, one per core SCION prompt. Every film is generated on fal (`minimax/h3-max/reference-to-video`, 10 s, 16:9, with sound) from a written prompt and reference images. All paths below are relative to this folder.
+One film per porthole of the 55 Portholes deck, plus six intro shots, one per core SCION prompt. Every film is generated on fal (16:9, with sound; `minimax/h3-max-turbo/reference-to-video` at 480P for everyday films, `minimax/h3-max/reference-to-video` at 768P for the hero films p01-p05) from a written prompt and reference images. All paths below are relative to this folder.
 
 ## What you have
 - `seeds.json`: 55 rows, `[station, rim clue, lineage, Turkey's question looking out, Trout's question looking in, Ouxpo/SCION rule, kind]`. Row 0 is porthole p01.
@@ -10,10 +10,10 @@ One film per porthole of the 55 Portholes deck, plus six intro shots, one per co
 - `scions.json`: the six core SCION prompts (cockpit, Works kit, The Bend That Moved, LEGOS beat, postcard and world memory, Trout Town world).
 - `prompts/p01.txt` and `ledger/p01.json`: the pilot that worked. Look at `.raw/p01_t1_sheet.jpg` to see what it produced.
 
-## The film, three beats in 10 seconds
-1. **Turkey's seat (0-3 s).** Setup A exactly as the cockpit master. One control is used: the lamp toggle (lower right) or a ballast weight dropped into the slot (lower left). Choose the one that fits the porthole. Only a wing tip enters frame; a whole turkey body or tail fan blocks the room.
-2. **The port (3-7 s).** Push in to the glass. The silhouette of the still is revealed and does one clear thing that keeps both of Turkey's readings possible.
-3. **Across the glass (7-10 s).** Hard cut to Trout's side as in the outside master: the tin, Turkey small behind the amber port, and the same thing seen from the river, now staged so both of Trout's readings are possible.
+## The film, three beats in 8 seconds
+1. **Turkey's seat (0-2.5 s).** Setup A exactly as the cockpit master. One control is used: the lamp toggle (lower right) or a ballast weight dropped into the slot (lower left). Choose the one that fits the porthole. Only a wing tip enters frame; a whole turkey body or tail fan blocks the room.
+2. **The port (2.5-5.5 s).** Push in to the glass. The silhouette of the still is revealed and does one clear thing that keeps both of Turkey's readings possible.
+3. **Across the glass (5.5-8 s).** Hard cut to Trout's side as in the outside master: the tin, Turkey small behind the amber port, and the same thing seen from the river, now staged so both of Trout's readings are possible.
 
 Apply the row's Ouxpo/SCION rule as the constraint on how the thing moves or is shown.
 
@@ -28,9 +28,9 @@ Long oval dented metal bread-roll tin (riveted steel, never bread), dent on the 
 
 ## Making it
 ```
-python3 tools/portfilm.py gen pNN --prompt-file prompts/pNN.txt --atlas a50,a39
+python3 tools/portfilm.py gen pNN --prompt-file prompts/pNN.txt --duration 8 --atlas a50,a39
 ```
-It takes about a minute, writes `films/pNN.mp4`, and prints the path of a contact sheet (12 frames in time order). Read the sheet. `python3 tools/portfilm.py use pNN 1` puts an earlier take back. Each `gen` is a paid call: a director makes one take, a critic at most one repair take.
+It takes about a minute, writes `films/pNN.mp4`, and prints the path of a contact sheet (12 frames in time order). Read the sheet. `python3 tools/portfilm.py use pNN 1` puts an earlier take back. Each `gen` is a paid call and the whole deck has a fixed budget: ONE take per film, no repairs. Whoever makes the take reads its sheet and writes the ledger honestly, including when the still is stronger.
 
 ## Ledger
 `ledger/pNN.json`: `{id, station, clue, rule, control, atlas: [{id, why}], prompt_file, takes: [{take, by, verdict, seen, changed}], final_take, verdict, open}`. Verdict is `pass`, `reference stronger` (the still does it better than the film) or `inconclusive`. `seen` is what a viewer can point to, with the time. `open` lists what is still wrong. Write only what the sheet shows.
