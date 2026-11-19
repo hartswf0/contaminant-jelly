@@ -201,20 +201,20 @@ SLIP_CSS = '''
 @font-face{font-family:Inter;font-weight:700;src:url(file:///usr/share/fonts/opentype/inter/Inter-Bold.otf)}
 @font-face{font-family:Inter;font-weight:900;src:url(file:///usr/share/fonts/opentype/inter/Inter-Black.otf)}
 @page{size:8.5in 11in;margin:0}*{box-sizing:border-box}
-body{margin:0;font:600 15px/1.25 Inter,Arial,sans-serif;color:#16293a;background:#fff}
-section{width:8.5in;height:11in;padding:8mm 12mm;display:flex;flex-direction:column;break-after:page}
-.slip{flex:1;display:grid;grid-template-columns:74mm 1fr;column-gap:8mm;align-items:center;border-bottom:1px dashed #8c979d;padding:3mm 0}
-section .slip:last-child{border-bottom:0}
-.slip img{width:74mm;height:74mm;border-radius:50%;object-fit:cover}
-.top{display:flex;align-items:baseline;gap:4mm}.num{font-size:74px;font-weight:900;line-height:.9}.st{font-size:26px;font-weight:900}
-.clue{font-size:17px;font-weight:700;margin:1.5mm 0 .5mm}.rule{font-size:12.5px;color:#5f6c70;margin-bottom:2.5mm}
-.two{display:grid;grid-template-columns:1fr 1fr;column-gap:6mm}.who{font-size:12.5px;font-weight:900;color:#5f6c70;margin-bottom:1mm}
-.ch{display:flex;align-items:center;gap:2.4mm;font-size:16px;font-weight:700;margin-bottom:1.4mm;line-height:1.15}.btn{width:8.4mm;height:8.4mm;flex:none}
-.when{font-size:11.5px;color:#5f6c70;margin-top:1.5mm}
+body{margin:0;font:600 12.5px/1.2 Inter,Arial,sans-serif;color:#16293a;background:#fff}
+section{width:8.5in;height:11in;padding:7mm 9mm;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(3,1fr);break-after:page}
+.slip{display:grid;grid-template-columns:36mm 1fr;column-gap:4mm;align-items:start;padding:4mm 4mm 3mm;border-bottom:1px dashed #8c979d;border-right:1px dashed #8c979d;overflow:hidden}
+.slip:nth-child(2n){border-right:0}.slip:nth-last-child(-n+2):nth-child(n+5){border-bottom:0}
+.slip img{width:36mm;height:36mm;border-radius:50%;object-fit:cover}
+.left{display:flex;flex-direction:column;align-items:center;gap:1mm}.num{font-size:58px;font-weight:900;line-height:.95}
+.st{font-size:19px;font-weight:900;line-height:1.05}.clue{font-size:13px;font-weight:700;margin:.8mm 0 .3mm}.rule{font-size:10px;color:#5f6c70;margin-bottom:1.6mm}
+.who{font-size:10.5px;font-weight:900;color:#5f6c70;margin:1.2mm 0 .7mm}
+.ch{display:flex;align-items:center;gap:2mm;font-size:14px;font-weight:700;margin-bottom:.9mm;line-height:1.1}.btn{width:6.6mm;height:6.6mm;flex:none}
+.when{font-size:9.5px;color:#5f6c70;margin-top:1mm}
 '''
 def slips():
-    """One slip per pilot, three to a page: the porthole's cartoon, its number as large as it will go,
-    and the four choices with their buttons. Nothing else."""
+    """One slip per pilot: the porthole's cartoon, its number as large as it will go,
+    and the four choices with their buttons. Six to a page, ten pages."""
     out = []
     for n in range(1, 56):
         r = seeds[n - 1]; station = html.escape(r[0].split("·")[1].strip()); num = "%02d" % n
@@ -222,13 +222,12 @@ def slips():
         kt, kr = ["triangle", "circle", "hexagon"][:len(to)], ["cross", "square", "hexagon"][:len(tr)]
         ch = lambda kinds, words: "".join('<div class="ch">%s<span>%s</span></div>' % (button(k), html.escape(w)) for k, w in zip(kinds, words))
         dive = next(d[0] for d in DIVES if d[1] <= n <= d[2])
-        out.append('''<div class="slip"><img src="../stills/p%s.jpg" alt="Porthole %s"><div>
-<div class="top"><span class="num">%s</span><span class="st">%s</span></div>
-<div class="clue">%s</div><div class="rule">Rule: %s</div>
-<div class="two"><div><div class="who">Turkey thinks</div>%s</div><div><div class="who">The trout think</div>%s</div></div>
+        out.append('''<div class="slip"><div class="left"><img src="../stills/p%s.jpg" alt="Porthole %s"><span class="num">%s</span></div><div>
+<div class="st">%s</div><div class="clue">%s</div><div class="rule">Rule: %s</div>
+<div class="who">Turkey thinks</div>%s<div class="who">The trout think</div>%s
 <div class="when">In the film: %s%s</div></div></div>''' % (num, num, num, station, html.escape(r[1]), html.escape(r[5]), ch(kt, to), ch(kr, tr), dive,
-                                                               (", at " + timing[num]) if timing.get(num) else ""))
-    pages = "".join("<section>%s</section>" % "".join(out[i:i + 3]) for i in range(0, 55, 3))
+                                                           (", at " + timing[num]) if timing.get(num) else ""))
+    pages = "".join("<section>%s</section>" % "".join(out[i:i + 6]) for i in range(0, 55, 6))
     open("youtube/slips.html", "w").write('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Porthole Slips</title><style>%s</style></head><body>%s</body></html>' % (SLIP_CSS, pages))
 
 
@@ -238,7 +237,7 @@ GUIDE = '''<section class="page guide">
 <div><h2>Print</h2><ol>
 <li><b>This page.</b> Once. It is yours.</li>
 <li><b>The next two pages</b> (the Porthole Log). Double-sided. <b>One sheet per child.</b></li>
-<li><b>slips.pdf.</b> One page for every 3 children. 21 children: print pages 1 to 7. Cut on the dashed lines.</li>
+<li><b>slips.pdf.</b> One page for every 6 children. 21 children: print pages 1 to 4. Cut on the dashed lines.</li>
 </ol>
 <h2>Bring</h2><ol><li>One die for every 3 children.</li><li>Pencils. Crayons if you have them.</li><li>A screen with sound for the film.</li></ol></div>
 <div><h2>Do not print</h2><ol><li>Anything else. Three files exist; you need this one and the slips.</li></ol>
