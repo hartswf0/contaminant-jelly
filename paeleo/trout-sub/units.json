@@ -59,79 +59,105 @@
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 6.5
+  "cut": 6.5,
+  "pushed_in": 35,
+  "lost": 62
  },
  "p09": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 6.333333333333333
+  "cut": 6.333,
+  "pushed_in": 41,
+  "lost": 46
  },
  "p10": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 5.5
+  "cut": 5.5,
+  "pushed_in": 63,
+  "lost": 41
  },
  "p11": {
   "kind": "film",
   "lock_start": true,
   "lock_end": false,
-  "cut": 6.083333333333333
+  "cut": 6.083,
+  "pushed_in": 1,
+  "lost": 108
  },
  "p12": {
   "kind": "film",
   "lock_start": true,
-  "lock_end": true,
-  "cut": null
+  "lock_end": false,
+  "cut": null,
+  "pushed_in": 36,
+  "lost": 89
  },
  "p13": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 6.5
+  "cut": 6.5,
+  "pushed_in": 57,
+  "lost": 46
  },
  "p14": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 5.416666666666667
+  "cut": 5.417,
+  "pushed_in": 47,
+  "lost": 39
  },
  "p15": {
   "kind": "film",
   "lock_start": true,
   "lock_end": false,
-  "cut": 6.458333333333333
+  "cut": 6.458,
+  "pushed_in": 0,
+  "lost": 69
  },
  "p16": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 6.0
+  "cut": 6.0,
+  "pushed_in": 60,
+  "lost": 46
  },
  "p17": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 7.0
+  "cut": 7.0,
+  "pushed_in": 40,
+  "lost": 75
  },
  "p18": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 6.291666666666667
+  "cut": 6.292,
+  "pushed_in": 15,
+  "lost": 79
  },
  "p19": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": null
+  "cut": 6.542,
+  "pushed_in": 0,
+  "lost": 80
  },
  "p20": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 6.708333333333333
+  "cut": 6.708,
+  "pushed_in": 42,
+  "lost": 77
  },
  "p21": {
   "kind": "film",
@@ -145,163 +171,217 @@
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 3.75
+  "cut": 3.75,
+  "pushed_in": 0,
+  "lost": 0
  },
  "p23": {
   "kind": "film",
   "lock_start": true,
   "lock_end": false,
-  "cut": null
+  "cut": null,
+  "pushed_in": 78,
+  "lost": 54
  },
  "p24": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 6.583333333333333
+  "cut": 6.583,
+  "pushed_in": 0,
+  "lost": 81
  },
  "p25": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 6.0
+  "cut": 6.0,
+  "pushed_in": 34,
+  "lost": 60
  },
  "p26": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": null
+  "cut": 7.375,
+  "pushed_in": 0,
+  "lost": 99
  },
  "p27": {
   "kind": "film",
   "lock_start": true,
   "lock_end": false,
-  "cut": null
+  "cut": null,
+  "pushed_in": 41,
+  "lost": 47
  },
  "p28": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 6.083333333333333
+  "cut": 6.083,
+  "pushed_in": 35,
+  "lost": 86
  },
  "p29": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": null
+  "cut": 6.792,
+  "pushed_in": 42,
+  "lost": 65
  },
  "p30": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 6.0
+  "cut": 6.0,
+  "pushed_in": 48,
+  "lost": 56
  },
  "p31": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 6.5
+  "cut": 6.5,
+  "pushed_in": 24,
+  "lost": 78
  },
  "p32": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": null
+  "cut": 7.375,
+  "pushed_in": 59,
+  "lost": 63
  },
  "p33": {
   "kind": "film",
   "lock_start": true,
-  "lock_end": true,
-  "cut": null
+  "lock_end": false,
+  "cut": null,
+  "pushed_in": 51,
+  "lost": 57
  },
  "p34": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": null
+  "cut": 7.125,
+  "pushed_in": 58,
+  "lost": 85
  },
  "p35": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": null
+  "cut": 6.458,
+  "pushed_in": 32,
+  "lost": 77
  },
  "p36": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 6.166666666666667
+  "cut": 6.167,
+  "pushed_in": 45,
+  "lost": 39
  },
  "p37": {
   "kind": "film",
   "lock_start": true,
   "lock_end": false,
-  "cut": 6.166666666666667
+  "cut": 6.167,
+  "pushed_in": 28,
+  "lost": 67
  },
  "p38": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": null
+  "cut": 6.292,
+  "pushed_in": 29,
+  "lost": 61
  },
  "p39": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 7.416666666666667
+  "cut": 7.417,
+  "pushed_in": 37,
+  "lost": 99
  },
  "p40": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": null
+  "cut": 6.708,
+  "pushed_in": 63,
+  "lost": 50
  },
  "p41": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": null
+  "cut": 6.625,
+  "pushed_in": 0,
+  "lost": 73
  },
  "p42": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": null
+  "cut": 7.375,
+  "pushed_in": 39,
+  "lost": 81
  },
  "p43": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 6.083333333333333
+  "cut": 6.083,
+  "pushed_in": 0,
+  "lost": 68
  },
  "p44": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 6.166666666666667
+  "cut": 6.167,
+  "pushed_in": 32,
+  "lost": 40
  },
  "p45": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": null
+  "cut": 7.042,
+  "pushed_in": 0,
+  "lost": 91
  },
  "p46": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 6.625
+  "cut": 6.625,
+  "pushed_in": 0,
+  "lost": 73
  },
  "p47": {
   "kind": "film",
   "lock_start": true,
   "lock_end": false,
-  "cut": null
+  "cut": null,
+  "pushed_in": 52,
+  "lost": 72
  },
  "p48": {
   "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 6.708333333333333
+  "cut": 6.708,
+  "pushed_in": 0,
+  "lost": 77
  },
  "p49": {
   "kind": "keyframe",
@@ -315,36 +395,48 @@
   "kind": "keyframe",
   "lock_start": true,
   "lock_end": true,
-  "cut": 5.5
+  "cut": 5.5,
+  "pushed_in": 0,
+  "lost": 0
  },
  "p51": {
   "kind": "keyframe",
   "lock_start": true,
   "lock_end": true,
-  "cut": 5.5
+  "cut": 5.5,
+  "pushed_in": 0,
+  "lost": 0
  },
  "p52": {
   "kind": "keyframe",
   "lock_start": true,
   "lock_end": true,
-  "cut": 5.5
+  "cut": 5.5,
+  "pushed_in": 0,
+  "lost": 0
  },
  "p53": {
   "kind": "keyframe",
   "lock_start": true,
   "lock_end": true,
-  "cut": 5.5
+  "cut": 5.5,
+  "pushed_in": 0,
+  "lost": 0
  },
  "p54": {
   "kind": "keyframe",
   "lock_start": true,
   "lock_end": true,
-  "cut": 5.5
+  "cut": 5.5,
+  "pushed_in": 0,
+  "lost": 0
  },
  "p55": {
   "kind": "keyframe",
   "lock_start": true,
   "lock_end": true,
-  "cut": 5.5
+  "cut": 5.5,
+  "pushed_in": 0,
+  "lost": 0
  }
 }

@@ -1,0 +1,8 @@
+# feedstock: the-impossible-voyage | control: lamp | atlas: a07
+Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. Two shots, one hard cut.
+
+Shot 1 (0-5.5s), Turkey's seat, locked-off camera, the camera never moves: exactly the cockpit reference for the whole shot: riveted steel tin, centered brass six-bolt porthole chipped at two o'clock, empty ballast slot lower left, chalk chart lower center, brass lamp toggle lower right, amber lamp overhead, dent in the right wall. From the first frame the glass holds the porthole reference's machine, seen side-on with its front wall removed like a toy theatre: a brass boiler with gears at left, pleated bellows in the middle, a rank of copper pipes on top. Inside the open bellows room three tiny trout stand in a row at one pump handle; the orange firebox sits apart, low in the boiler. Only this view is hand-tinted over grey tone: saffron metal, sea-green streaked water, wobbling color edges, soft flicker. At 1s only a wing tip flips the toggle; the firebox brightens. The machine stays fixed; the three trout pump in jerky steps and the pipes puff bubbles left to right.
+
+Shot 2 (5.5-8s), Trout's side, locked-off camera, the camera never moves: exactly the outside reference: the tin on the riverbed, port centered, turkey small behind the amber glass. At lower right, clear of the port, the same open-fronted machine sits on a long flat barge, the three trout still pumping; its bellows pleats rattle like radiator fins, the pipes toot bubbles in time, and one speckled trout beside it bobs along.
+
+From the last reference take only the flat side-on section and saffron tint; no people. No text, no labels, no captions.

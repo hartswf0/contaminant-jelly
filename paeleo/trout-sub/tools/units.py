@@ -121,6 +121,20 @@ def follow(F, i0, i1, first):
     return out
 
 
+def settle(F, end_port):
+    """Walking back from the last frame, the first frame of the run in which the rim already
+    sits where it ends (within 4 % in size, 2 % of width in place). None if that run is under half a second."""
+    k = F.shape[2] / float(pt.W)
+    prev = (end_port[0] / k, end_port[1] / k, end_port[2] / k)
+    first = None
+    for i in range(len(F) - 1, int(len(F) * 0.4), -2):
+        cx, cy, r, sc = pt.fit_near(cv2.resize(F[i], (pt.W, pt.H), interpolation=cv2.INTER_AREA), prev)
+        if sc < MIN_SCORE or abs(r / prev[2] - 1) > 0.04 or np.hypot(cx - prev[0], cy - prev[1]) > 0.02 * pt.W:
+            break
+        first = i
+    return first if first is not None and len(F) - first >= FPS // 2 else None
+
+
 def keyframe_film(pid):
     """Frames for a porthole with no film: the cockpit master with the deck drawing in its port
     (dim, then lit), a cut, and the outside master. Returns frames and the known ports."""
@@ -169,6 +183,8 @@ def unit(pid):
         tc = cut_time(src, dur)
         nc = int(round(tc / dur * N)) if tc else None
         end_port = (en["cx"] * W, en["cy"] * W, en["r"] * W) if en and en["score"] >= MIN_SCORE else None
+        if nc is None and end_port:
+            nc = settle(F, end_port)          # no hard cut: the trout's shot starts where the port settles on its closing place
         lock_end = bool(end_port) and nc is not None and covers(end_port, W, F.shape[1])
         n_in = nc if nc is not None else N - int(0.9 * FPS)
         tr = follow(F, 0, n_in, (st[0] * pt.W / W, st[1] * pt.W / W, st[2] * pt.W / W))
