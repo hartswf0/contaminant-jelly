@@ -63,13 +63,17 @@ video{width:100%;aspect-ratio:16/9;background:#000;display:block}h2{font:800 28p
 .tag.pass{color:var(--teal)}.tag.nearly{color:#9a6a12}.tag.not-yet,.tag.none{color:var(--accent)}
 article>*{min-width:0}body{overflow-wrap:break-word}td:first-child{word-break:break-all;max-width:220px}details{overflow-x:auto}p{margin:0 0 10px}.note{color:var(--mute)}details{border-top:1px solid var(--rule);padding:7px 0}summary{cursor:pointer;font:13px ui-monospace,Menlo,monospace;letter-spacing:.04em;text-transform:uppercase}
 details p,details ul{font-size:15px}ul{margin:4px 0 8px;padding-left:20px}table{width:100%;border-collapse:collapse;font-size:13.5px}td,th{text-align:left;vertical-align:top;border-top:1px solid var(--rule);padding:5px 8px 5px 0}
-a{color:var(--accent)}.links{font:13px ui-monospace,Menlo,monospace;margin-top:8px}.shared{border-top:2px solid var(--ink);padding-top:18px}
+.hero{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:22px;align-items:start;border-top:2px solid var(--ink);padding:22px 0}.hero>*{min-width:0}@media(max-width:760px){.hero{grid-template-columns:1fr}}a{color:var(--accent)}.links{font:13px ui-monospace,Menlo,monospace;margin-top:8px}.shared{border-top:2px solid var(--ink);padding-top:18px}
 @media(max-width:760px){article{grid-template-columns:1fr}}
 </style></head><body><main>
 <div class="mono">Tourkey Trouttown · hand films · batch 1</div>
 <h1>Made by hand</h1>
 <p class="lede">Each porthole gets a short film in which the thing is made on a table, then seen by Turkey through the glass, then by the trout from the river. The rule for all of them: <b>handmake or forage, no style costumes</b>. Everything on screen is either real printed matter from open archives, cut and hinged, or the actual object built in code.</p>
 <p class="lede">Every film was made by one agent and then repaired by a second who had not seen it made. Their reports, the sources and the scripts are all here.</p>
+<section class="hero"><video controls playsinline preload="metadata" src="assets/nobody-is-holding-the-chalk.mp4"></video>
+<div><div class="mono">The five as one film · 3:27</div><h2>Nobody Is Holding the Chalk</h2>
+<p>Written backwards from its ending. In every film the scissors, scalpel, pins, pen and chalk move with no hand on them. A card before each film says so. The last film is the chalkboard, because it ends in Room 4, and that is where the camera pulls back to show who has been making all of it.</p>
+<p class="links"><a href="assets/nobody-is-holding-the-chalk.mp4" download>Download</a> · <a href="anthology.py.txt">How it is cut</a></p></div></section>
 @@CARDS@@
 <section class="shared"><h2>How the batch was run</h2>
 <p>One maker and one independent critic per porthole, five portholes at a time.</p>
@@ -77,6 +81,6 @@ a{color:var(--accent)}.links{font:13px ui-monospace,Menlo,monospace;margin-top:8
 <p class="note">Not checked: the critics read each licence from the film's credits file and did not query the archive again. Sound is synthesized except where a source is listed.</p></section>
 </main></body></html>'''.replace("@@CARDS@@", "\n".join(cards))
 open("index.html", "w").write(page)
-for f in ("BRIEF.md", "films/BRIEF-2-oulipo.md", "swarm-batch-1.js"):
+for f in ("BRIEF.md", "films/BRIEF-2-oulipo.md", "swarm-batch-1.js", "anthology.py", "voice_pass.py"):
     open(f + ".txt", "w").write(open(f).read())
 print("hand/index.html", len(cards), "films")
