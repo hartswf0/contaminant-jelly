@@ -1323,8 +1323,9 @@ def camera(part, t):
         dx = 12 * math.sin(0.55 * (t - T_RIVER)) + 4 * math.sin(1.3 * t)
         dy = 3 * math.sin(0.8 * t)
     else:
-        z = lerp(1.0, 1.06, ramp(t, T_TROUT, SECONDS))
-        F = (lerp(470, 498, ramp(t, T_TROUT, SECONDS)), 268)
+        push = ease(t, 29.2, 32.4)      # critic: close on the tin, its window and the hook for the trout's question
+        z = lerp(1.0, 1.06, ramp(t, T_TROUT, SECONDS)) + 0.08 * push
+        F = (lerp(470, 498, ramp(t, T_TROUT, SECONDS)) + 34 * push, 268 + 30 * push)
         dx = lerp(-22, 22, ramp(t, T_TROUT, SECONDS))
         dy = 2 * math.sin(0.7 * t)
     return dict(part=part, z=z, F=F, dx=dx, dy=dy)
@@ -1497,7 +1498,7 @@ def track(name, t):
     elif name == "tin":
         e = eo(ramp(t, T_TROUT - 0.2, 27.8))
         e2 = ease(t, 30.0, 33.0)
-        d.update(x=lerp(1210, 768, e) - 22 * e2 + bob(3, 0.5), y=158 + 10 * e + 8 * e2 + bob(5, 0.9), pitch=lerp(-7, -2, e) + bob(1.2, 0.7), scale=0.74, speed=(1 - e) * 1.0 + 0.12, show=part == 3)
+        d.update(x=lerp(1260, 786, e) - 22 * e2 + bob(3, 0.5), y=166 + 10 * e + 8 * e2 + bob(5, 0.9), pitch=lerp(-7, -2, e) + bob(1.2, 0.7), scale=0.90, speed=(1 - e) * 1.0 + 0.12, show=part == 3)
     return d
 
 
@@ -1861,7 +1862,7 @@ def turkey_reflection(t):
 def caption(ink, s, t, a, b):
     al = min(ramp(t, a, a + 0.35), 1 - ramp(t, b - 0.35, b))
     if al > 0:
-        ink.caption(s, alpha=al, size=25)
+        ink.caption(s, alpha=al, size=28)
 
 
 CAP2 = "Mister Hook, the famous guest speaker? Or the Monster, most wanted?"

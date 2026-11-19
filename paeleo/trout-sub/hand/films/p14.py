@@ -23,9 +23,10 @@ from kit import *  # noqa
 from kit_anim import contact, forage, load_audio  # noqa
 
 SLUG = "p14"
-SECONDS = 32.0
-T2 = 12.6          # cut: bench -> through the porthole
-T3 = 22.2          # cut: the river side
+D_PAINT = 1.9      # critic: time added on the bench so the top sheet's weed is painted in front of us
+SECONDS = 32.0 + D_PAINT
+T2 = 12.6 + D_PAINT          # cut: bench -> through the porthole
+T3 = 22.2 + D_PAINT          # cut: the river side
 SRC = HERE / "sources" / SLUG
 CACHE = SRC / "cache"
 CACHE.mkdir(parents=True, exist_ok=True)
@@ -338,6 +339,22 @@ def paint_near():
     return s.finish(thin=0.15)
 
 
+def front_blades():
+    """The weed blades of the front sheet: (left side?, root x, length, width, lean, sway), in the order they are painted."""
+    rs = np.random.RandomState(55)
+    out = []
+    for k in range(30):
+        side = rs.rand() < 0.5
+        x = rs.uniform(-30, 250) if side else rs.uniform(PW - 250, PW + 30)
+        out.append((side, x, rs.uniform(300, 760), rs.uniform(26, 50), (0.22 if side else -0.22) + rs.uniform(-0.2, 0.2), rs.uniform(-1, 1)))
+    return out
+
+
+def blade_axis(x, ln, lean, sway, f):
+    """Centre line of blade_poly at fraction f of its length (paint px)."""
+    return x + lean * ln * f * f + sway * math.sin(f * 3.0) * ln * 0.1, 910 - ln * f
+
+
 def paint_front():
     """Sheet 4: nearest the lens: black-green weed at the edges, and a veil of thin murk."""
     s = Sheet(5)
@@ -346,11 +363,8 @@ def paint_front():
         x, y = rs.uniform(0, PW), rs.uniform(0, PH)
         s.dab(x, y, rs.uniform(-0.1, 0.25), rs.uniform(160, 420), rs.uniform(26, 60), (70 + rs.uniform(-10, 10), 118 + rs.uniform(-10, 10), 108 + rs.uniform(-10, 10)), 0.10)
     dark = grad([(200, (22, 62, 50)), (900, (6, 26, 28))])
-    for k in range(30):
-        side = rs.rand() < 0.5
-        x = rs.uniform(-30, 250) if side else rs.uniform(PW - 250, PW + 30)
-        ln = rs.uniform(300, 760)
-        s.fill_poly(blade_poly(x, 910, ln, rs.uniform(26, 50), (0.22 if side else -0.22) + rs.uniform(-0.2, 0.2), rs.uniform(-1, 1)),
+    for (side, x, ln, wd, lean, sway) in front_blades():
+        s.fill_poly(blade_poly(x, 910, ln, wd, lean, sway),
                     jit(dark, rs, 6), ang=-1.57, wide=10, long=90, load=1.0, dens=1.8, angj=0.12, edge=False)
     # an overhanging root, top left
     root = catmull([(-30, 60), (120, 90), (260, 60), (380, 120), (470, 100)], 8)
@@ -422,7 +436,7 @@ A = {}      # every built asset
 
 
 def build_sheets():
-    A["paint"] = [cached(f"sheet{k}", fn) for k, fn in enumerate(PAINTERS)]
+    A["paint"] = [cached("sheet4b" if k == 4 else f"sheet{k}", fn) for k, fn in enumerate(PAINTERS)]
     for k, up in ((1, 96), (2, 64)):         # the far sheets sit higher in their frames: more to slide past
         im = A["paint"][k]
         new = Image.new("RGBA", im.size)
@@ -1006,8 +1020,10 @@ def draw_trout(cv, tr, t, cam, F):
 UPPH = None            # units per photograph pixel
 PHOTO_C = (1880.0, 300.0)       # where the photograph lies on the cutting mat
 LEAF_REST = (-40.0, -235.0)     # where the leaf ends up on the carrier sheet
-LAND = [0.45, 1.35, 2.25, 3.15, 4.05, 4.95]     # each sheet starts down at; lands 0.8 s later
-T_MAT, T_CUT0, T_CUT1, T_GRIP, T_LIFT, T_CARRY, T_SLIDE, T_IN, T_PUSH = 6.1, 7.5, 9.55, 9.95, 10.45, 11.3, 11.3, 12.25, 11.9
+LAND = [0.3, 0.95, 1.6, 2.25, 2.9, 3.55]     # each sheet starts down at; lands 0.8 s later
+T_MAT, T_CUT0, T_CUT1, T_GRIP, T_LIFT, T_CARRY, T_SLIDE, T_IN, T_PUSH = [v + D_PAINT for v in (6.1, 7.5, 9.55, 9.95, 10.45, 11.3, 11.3, 12.25, 11.9)]
+T_P0, T_P1 = 4.75, T_MAT - 0.15       # the top sheet's left-hand weed is painted on the stand, blade by blade
+PAINT_CAM = (-540.0, 120.0, 0.47)
 POSTS = [(-1330, -860), (1330, -860), (-1330, 860), (1330, 860)]
 BW = 2.0               # bench texture: units per px
 BENCH_C = (700.0, 0.0)
@@ -1078,7 +1094,9 @@ CAM2_START = (-40.0, 40.0, 0.66)
 
 def bench_cam(t):
     mx, my = PHOTO_C[0] + 10, PHOTO_C[1] + 6
-    ks = [(0.0, (640.0, 60.0, math.log(0.205))), (T_MAT, (500.0, 20.0, math.log(0.215))), (7.35, (mx, my, math.log(1.9))),
+    px_, py_, pf_ = PAINT_CAM
+    ks = [(0.0, (640.0, 60.0, math.log(0.205))), (3.7, (560.0, 40.0, math.log(0.212))), (T_P0 - 0.05, (px_, py_, math.log(pf_))),
+          (T_MAT, (px_ + 30, py_ - 20, math.log(pf_ * 1.06))), (T_MAT + 1.25, (mx, my, math.log(1.9))),
           (T_GRIP, (mx + 14, my - 8, math.log(2.0))), (T_CARRY, (820.0, -120.0, math.log(0.36))), (T_PUSH, (640.0, -150.0, math.log(0.40))),
           (T2, (CAM2_START[0], CAM2_START[1], math.log(CAM2_START[2])))]
     x, y, lf = keys(t, ks)
@@ -1122,6 +1140,88 @@ def build_track1():
     ang[: int(T_GRIP * FPS)] = 0
     ang *= np.array([1 - ramp(i / FPS, T_IN, T_IN + 0.5) for i in range(n)])
     TRK1.update(X=X, Y=Y, Z=Z, ang=ang)
+
+
+def build_painting():
+    """Schedule for painting the front sheet's left blades, and the masks that hide what is not painted yet."""
+    bl = [b for b in front_blades() if b[0]]
+    bl.sort(key=lambda b: b[1])                      # left to right, as a hand would work across the glass
+    n = len(bl)
+    dt = (T_P1 - T_P0) / n
+    full = A["paint"][4]
+    polys = [Image.new("L", (PW, PH), 0) for _ in bl]
+    for m, (_, x, ln, wd, lean, sway) in zip(polys, bl):
+        ImageDraw.Draw(m).polygon(blade_poly(x, 910, ln, wd + 6, lean, sway), fill=255)
+    keep = Image.new("L", (PW, PH), 0)               # paint that is on the sheet when it arrives: the mound at the foot
+    ImageDraw.Draw(keep).polygon(mound(-140, 160, 900, 120, 31), fill=255)
+    A["painting"] = dict(blades=bl, dt=dt, polys=polys, keep=keep, alpha=full.getchannel("A"), n=n)
+    spr = Image.new("RGBA", (1240, 120), (0, 0, 0, 0))          # the brush: 2 px per unit, tip at the left end
+    d = ImageDraw.Draw(spr, "RGBA")
+    cy = 60
+    d.polygon([(0, cy), (40, cy - 13), (116, cy - 17), (116, cy + 17), (40, cy + 13)], fill=(16, 40, 34, 255), outline=(6, 18, 16, 255))
+    for q in range(7):
+        d.line([(6 + q * 3, cy - 2 + q * 0.3), (112, cy - 14 + q * 4.6)], fill=(38, 84, 66, 200), width=1)
+    d.polygon([(112, cy - 19), (212, cy - 15), (212, cy + 15), (112, cy + 19)], fill=(196, 186, 160, 255), outline=(70, 62, 44, 255))
+    d.line([(116, cy - 12), (208, cy - 10)], fill=(250, 246, 226, 230), width=3)
+    for xx in (140, 186):
+        d.line([(xx, cy - 17), (xx, cy + 17)], fill=(110, 100, 78, 255), width=2)
+    d.polygon([(212, cy - 14), (760, cy - 19), (1180, cy - 10), (1236, cy), (1180, cy + 10), (760, cy + 19), (212, cy + 14)],
+              fill=(132, 42, 30, 255), outline=(52, 16, 12, 255))
+    d.line([(230, cy - 9), (1150, cy - 6)], fill=(214, 110, 84, 200), width=3)
+    d.line([(230, cy + 10), (1150, cy + 6)], fill=(70, 20, 16, 200), width=4)
+    A["brush"] = spr
+
+
+def painting_state(t):
+    """-> (alpha of the front sheet as painted so far, brush tip in paint px or None, brush lift 0..1)."""
+    P = A["painting"]
+    hide = Image.new("L", (PW, PH), 0)
+    dh = ImageDraw.Draw(hide)
+    show = Image.new("L", (PW, PH), 0)
+    tip, lift = None, 1.0
+    k_now = (t - T_P0) / P["dt"]
+    for k, (b, m) in enumerate(zip(P["blades"], P["polys"])):
+        _, x, ln, wd, lean, sway = b
+        p = clamp((k_now - k) / 0.72)                # the stroke takes 72% of the slot; the rest is the lift across
+        if p >= 1:
+            show = ImageChops.lighter(show, m)
+            continue
+        hide = ImageChops.lighter(hide, m)
+        if p > 0:
+            yy = int(910 - ln * p)
+            part = m.copy()
+            ImageDraw.Draw(part).rectangle([0, 0, PW, yy], fill=0)
+            ax_, ay_ = blade_axis(x, ln, lean, sway, p)          # the wet end of the stroke is round, like the brush
+            rr = max(4.0, wd * 0.42 * (1 - p) ** 0.7)
+            cap = Image.new("L", (PW, PH), 0)
+            ImageDraw.Draw(cap).ellipse([ax_ - rr, ay_ - rr * 1.3, ax_ + rr, ay_ + rr * 0.6], fill=255)
+            show = ImageChops.lighter(show, ImageChops.lighter(part, ImageChops.multiply(cap, m)))
+    hide = ImageChops.subtract(ImageChops.subtract(hide, show), P["keep"])
+    alpha = ImageChops.subtract(P["alpha"], hide.filter(ImageFilter.GaussianBlur(1.0)).point(lambda v: min(255, v * 2)))
+    if T_P0 - 0.6 < t < T_P1 + 0.7:
+        k = int(clamp(k_now, 0, P["n"] - 1e-3))
+        _, x, ln, wd, lean, sway = P["blades"][k]
+        u = k_now - k
+        if k_now < 0:                                 # coming in from the bench
+            f = ease(t, T_P0 - 0.6, T_P0)
+            r0 = blade_axis(x, ln, lean, sway, 0.0)
+            tip, lift = (r0[0] - (1 - f) * 500, r0[1] + (1 - f) * 260), 1 - f
+        elif k_now >= P["n"]:                         # and away
+            f = ease(t, T_P1, T_P1 + 0.7)
+            e = blade_axis(x, ln, lean, sway, 1.0)
+            tip, lift = (e[0] - f * 700, e[1] + f * 500), f
+        elif u < 0.72:
+            tip, lift = blade_axis(x, ln, lean, sway, u / 0.72), 0.0
+        else:
+            f = smooth((u - 0.72) / 0.28)
+            e = blade_axis(x, ln, lean, sway, 1.0)
+            if k + 1 < P["n"]:
+                _, x2, ln2, _, lean2, sway2 = P["blades"][k + 1]
+                r = blade_axis(x2, ln2, lean2, sway2, 0.0)
+            else:
+                r = e
+            tip, lift = (lerp(e[0], r[0], f), lerp(e[1], r[1], f)), math.sin(f * math.pi)
+    return alpha, tip, lift
 
 
 def put_tool(cv, spr, tip, z, cam, F, rot, shadow=10.0):
@@ -1246,6 +1346,9 @@ def bench(t, k_frame):
             ty = lY - stem[0] * math.sin(a_) + stem[1] * math.cos(a_) + (1 - fi) * 60 - fo * 40
             put_tool(cv, A["tweezers"], (tx, ty), lZ + 4 + 40 * (1 - fi), cam, F, rot=-7 + 5 * (1 - fi), shadow=0 if in_stack else 8 + lZ * 0.06)
 
+    part_alpha, brush_tip, brush_lift = (painting_state(t) if t < T_P1 + 0.7 else (None, None, 1.0))
+    if t >= T_P1:
+        part_alpha = None
     for idx, (name, z, u) in enumerate(SHEETS):
         t0 = LAND[idx]
         if t < t0:
@@ -1256,7 +1359,10 @@ def bench(t, k_frame):
         x0, y0, x1, y1 = pane_rect(u, zz, cam, F, off)
         if name in A["shadow"]:
             gap = 55.0 + (zz - z)
-            shm = place(A["shadow"][name], u, max(0.0, z - 55.0), cam, F, (off[0] + gap * 0.5, off[1] + gap * 0.7))
+            shd = A["shadow"][name]
+            if name == "front" and part_alpha is not None:
+                shd = part_alpha.resize((PW // 4, PH // 4), Image.BILINEAR).filter(ImageFilter.GaussianBlur(3))
+            shm = place(shd, u, max(0.0, z - 55.0), cam, F, (off[0] + gap * 0.5, off[1] + gap * 0.7))
             shm = shm.point(lambda v: int(v * 0.5 * (0.35 + 0.65 * f)))
             cv.paste(Image.new("RGB", (W, H), (8, 20, 22)), (0, 0), shm)
             d = ImageDraw.Draw(cv, "RGBA")
@@ -1269,7 +1375,11 @@ def bench(t, k_frame):
         else:
             d.rectangle([x0, y0, x1, y1], fill=(196, 236, 224, 15))
             if name != "carrier":
-                im = place(A["paint"][PAINT_OF[name]], u, zz, cam, F, off)
+                pim = A["paint"][PAINT_OF[name]]
+                if name == "front" and part_alpha is not None:
+                    pim = pim.copy()
+                    pim.putalpha(part_alpha)
+                im = place(pim, u, zz, cam, F, off)
                 cv.paste(im, (0, 0), im)
                 d = ImageDraw.Draw(cv, "RGBA")
             # glare of the lamp on the glass: it slides as the camera moves, a different amount per sheet
@@ -1290,6 +1400,11 @@ def bench(t, k_frame):
         d.polygon(top, fill=(150, 108, 66, 255), outline=(50, 32, 16, 255))
     if not in_stack:
         leaf_and_tweezers()
+    if brush_tip is not None:                      # the brush, loaded with weed green, working on the top sheet
+        uf = SHEETS[5][2]
+        bt = ((brush_tip[0] - PW / 2) * uf, (brush_tip[1] - PH / 2) * uf)
+        put_tool(cv, A["brush"], bt, SHEETS[5][1] + 2 + 70 * brush_lift, cam, F, rot=-52 + 6 * math.sin(t * 9.0) * (1 - brush_lift),
+                 shadow=3 + 22 * brush_lift)
     # the bench lamp; it is turned down as the camera goes in
     dim = ease(t, T_PUSH + 0.2, T2 - 0.1)
     arr = np.asarray(cv, np.float32) * (A["lamp"] * (1 - dim) + dim)
@@ -1546,8 +1661,10 @@ def river_frame(t, k_frame):
 
 
 # ------------------------------------------------------------ the film ---
-CAPTIONS = [(T2 + 3.3, T3 - 0.5, "A spark, gone under the water? Or the calendar, ticking down to Thanksgiving?"),
-            (T3 + 3.4, SECONDS - 0.5, "A feather, fallen out of the sky? Or a flare: is somebody up there in trouble?")]
+CAPTIONS = [(T2 + 2.4, T2 + 5.5, "A spark, gone under the water?"),
+            (T2 + 5.8, T3 - 0.4, "Or the calendar, ticking down to Thanksgiving?"),
+            (T3 + 2.5, T3 + 5.6, "A feather, fallen out of the sky?"),
+            (T3 + 5.9, SECONDS - 0.4, "Or a flare: is somebody up there in trouble?")]
 
 
 def picture(t, ink):
@@ -1568,7 +1685,7 @@ def picture(t, ink):
     ink._grain = False
     for a, b, s in CAPTIONS:
         if a <= t <= b:
-            ink.caption(s, alpha=min(ramp(t, a, a + 0.35), 1 - ramp(t, b - 0.35, b)), size=23)
+            ink.caption(s, alpha=min(ramp(t, a, a + 0.3), 1 - ramp(t, b - 0.3, b)), size=29)
 
 
 def build():
@@ -1578,6 +1695,7 @@ def build():
     build_turkey()
     build_tin()
     build_bench()
+    build_painting()
     build_track1()
     build_port()
     build_track2()
@@ -1614,6 +1732,13 @@ def sound(mix):
                 sig = (np.sin(2 * np.pi * f * t_) + 0.5 * np.sin(2 * np.pi * f * 2.76 * t_)) * np.exp(-t_ * 22)
                 mix.add(sig, at + dt, 0.07 - 0.012 * q, pan=-0.4 + 0.4 * q)
             mix.thud(at, freq=120, gain=0.14)
+    P = A["painting"]
+    for k in range(P["n"]):                          # the brush on glass: a soft drag for every blade
+        at = T_P0 + k * P["dt"]
+        m_ = int(P["dt"] * 0.72 * RATE)
+        tb = np.arange(m_) / RATE
+        drag = mix.band(rs.normal(0, 1, m_), 500, 2600) * np.sin(np.pi * tb / tb[-1]) ** 0.6
+        mix.add(drag, at, 0.045, pan=-0.35)
     n = int((T_CUT1 - T_CUT0) * RATE)
     tt = np.arange(n) / RATE
     cut = mix.band(rs.normal(0, 1, n), 2600, 8000) * (0.55 + 0.45 * np.sin(2 * np.pi * 1.7 * tt + 1) * np.sin(2 * np.pi * 0.6 * tt))

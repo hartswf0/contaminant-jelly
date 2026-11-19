@@ -126,8 +126,8 @@ BOOT_SRC = Image.open(SRC / "boot.jpg").convert("RGB")
 BK = BOOT_SRC.width / 960.0                      # coordinates below were read off the 960 px file
 BOOT_POLY = [(320, 458), (371, 443), (372, 420), (385, 405), (400, 402), (412, 415), (415, 436), (466, 422),
              (462, 530), (458, 615), (458, 680), (462, 720), (475, 740), (510, 760), (550, 770), (572, 780),
-             (581, 792), (577, 804), (560, 814), (520, 821), (455, 817), (416, 813), (416, 841), (360, 841),
-             (357, 820), (358, 790), (355, 760), (344, 705), (332, 650), (325, 580)]
+             (581, 792), (577, 804), (560, 814), (520, 821), (455, 817), (416, 812), (415, 823), (361, 823),
+             (357, 806), (358, 790), (355, 760), (344, 705), (332, 650), (325, 580)]
 BOOT_PIN = (398, 712)
 POSTER_BOX = (252, 388, 612, 862)
 WS = 1.25                                        # world scale of the boot paper
@@ -436,12 +436,18 @@ def make_tin():
     R(110, 16, 150, 34, 5, (176, 178, 170, 255), (70, 72, 68, 255))
     R(104, 12, 156, 20, 4, (176, 138, 62, 255), (70, 50, 20, 255))
     # paper label
-    R(44, 66, 122, 112, 2, (238, 226, 196, 255), (128, 40, 40, 255), 1)
+    # paper label, glued on. The whole tin is laid mirrored on the table, so the label is printed mirrored here.
+    lab = Image.new("RGBA", (78 * S, 46 * S), (0, 0, 0, 0))
+    ld = ImageDraw.Draw(lab)
+    ld.rounded_rectangle([0, 0, 78 * S - 1, 46 * S - 1], radius=2 * S, fill=(238, 226, 196, 255), outline=(128, 40, 40, 255), width=S)
+    ld.rectangle([3 * S, 3 * S, 75 * S - 1, 43 * S - 1], outline=(128, 40, 40, 255), width=1)
     f1 = ImageFont.truetype(str(FONTS / "instrument-serif.woff2"), 15 * S)
-    f2 = ImageFont.truetype(str(FONTS / "ibm-plex-mono.woff2"), 6 * S)
-    d.text((83 * S, 79 * S), "BREAD", font=f1, fill=(128, 40, 40, 255), anchor="mm")
-    d.text((83 * S, 94 * S), "ROLLS", font=f1, fill=(128, 40, 40, 255), anchor="mm")
-    d.text((83 * S, 106 * S), "TROUT TOWN · 1 DOZ", font=f2, fill=(70, 60, 50, 255), anchor="mm")
+    f2 = ImageFont.truetype(str(FONTS / "ibm-plex-mono.woff2"), 5 * S)
+    ld.text((39 * S, 13 * S), "BREAD", font=f1, fill=(128, 40, 40, 255), anchor="mm")
+    ld.text((39 * S, 27 * S), "ROLLS", font=f1, fill=(128, 40, 40, 255), anchor="mm")
+    ld.text((39 * S, 38 * S), "TROUT TOWN · 1 DOZ", font=f2, fill=(70, 60, 50, 255), anchor="mm")
+    im.alpha_composite(lab.transpose(Image.FLIP_LEFT_RIGHT), (44 * S, 66 * S))
+    d = ImageDraw.Draw(im, "RGBA")
     # lamp bracket and housing (bow, right)
     R(244, 88, 262, 94, 2, dk)
     R(256, 78, 276, 104, 4, (176, 138, 62, 255), (70, 50, 20, 255))
@@ -455,6 +461,33 @@ def make_tin():
 
 
 TIN = make_tin()
+
+
+def make_claw(upper=True):
+    """One jaw of the tin's bread tongs: cut tinplate with a toothed inner edge, riveted at the bow.
+    Two of them, pinned above and below the lamp, open and shut like a crab's pincer."""
+    S = 4
+    Wd, Hd = 84, 44
+    im = Image.new("RGBA", (Wd * S, Hd * S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im, "RGBA")
+    outer = [(4, 10), (10, 4), (40, 5), (58, 9), (70, 17), (77, 28), (78, 39)]
+    inner = [(72, 34), (69, 27), (66, 29), (63, 22), (59, 24), (56, 18), (51, 20), (47, 15), (40, 16), (10, 17), (4, 14)]
+    pts = [(x * S, y * S) for x, y in outer + inner]
+    d.polygon(pts, fill=(172, 174, 166, 255))
+    d.line(pts + pts[:1], fill=(66, 68, 64, 255), width=S, joint="curve")
+    d.line([(12 * S, 8 * S), (42 * S, 9 * S), (58 * S, 13 * S), (68 * S, 20 * S)], fill=(224, 226, 216, 255), width=S)
+    d.ellipse([5 * S, 5 * S, 15 * S, 15 * S], fill=(184, 144, 62, 255), outline=(78, 56, 20, 255), width=S)
+    d.ellipse([7 * S, 6 * S, 11 * S, 10 * S], fill=(246, 222, 150, 230))
+    a = np.asarray(im, np.float32)
+    a[..., :3] *= 1 + 0.10 * noise_tex(im.size, 9, 33 if upper else 34)[..., None]
+    im = Image.fromarray(a.clip(0, 255).astype(np.uint8), "RGBA").resize((Wd, Hd), Image.LANCZOS)
+    if not upper:
+        return Piece(im.transpose(Image.FLIP_TOP_BOTTOM), (10, Hd - 10), "claw_lo")
+    return Piece(im, (10, 10), "claw_up")
+
+
+CLAW_UP, CLAW_LO = make_claw(True), make_claw(False)
+CLAW_AT = ((246 - 138, 64 - 130), (246 - 138, 118 - 130))    # rivets on the bow, relative to the tin pivot
 TIN_PORT = (182 - 138, 86 - 130)      # porthole centre relative to the tin pivot
 TIN_LAMP = (282 - 138, 91 - 130)      # lamp lens relative to the pivot
 TIN_PORT_R = 27.0
@@ -467,9 +500,9 @@ def make_window():
     d = ImageDraw.Draw(im, "RGBA")
     d.ellipse([4, 4, n - 4, n - 4], fill=(246, 214, 140, 255))
     d.ellipse([18, 10, n - 30, n - 44], fill=(255, 238, 190, 120))
-    t, (px, py) = TURKEY.get(0, 0.30)
+    t, (px, py) = TURKEY.get(0, 0.30, flip=True)          # mirrored again when the tin is laid down
     lay = Image.new("RGBA", (n, n), (0, 0, 0, 0))
-    lay.paste(t, (int(74 - px), int(124 - py)), t)
+    lay.paste(t, (int(46 - px), int(124 - py)), t)
     m = Image.new("L", (n, n), 0)
     ImageDraw.Draw(m).ellipse([4, 4, n - 4, n - 4], fill=255)
     lay.putalpha(ImageChops.multiply(lay.getchannel("A"), m))
@@ -493,6 +526,41 @@ def make_pin(r=9):
 
 
 PIN = make_pin()
+
+def make_weed(L, seed):
+    """A strip of green tissue, cut freehand."""
+    r = np.random.RandomState(seed)
+    S = 3
+    wd = 70
+    im = Image.new("RGBA", (wd * S, (L + 8) * S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    ph, amp = r.uniform(0, 6), r.uniform(7, 13)
+    left, right, mid = [], [], []
+    for k in range(0, L + 1, 6):
+        f = k / L
+        cx = wd / 2 + amp * math.sin(f * 4.2 + ph) * f
+        hw = lerp(8.5, 1.5, f ** 0.8) + r.uniform(-0.8, 0.8)
+        y = L + 4 - k
+        left.append(((cx - hw) * S, y * S))
+        right.append(((cx + hw) * S, y * S))
+        mid.append((cx * S, y * S))
+    col = (int(r.uniform(52, 80)), int(r.uniform(128, 160)), int(r.uniform(84, 112)), 225)
+    d.polygon(left + right[::-1], fill=col)
+    d.line(mid, fill=(col[0] - 22, col[1] - 34, col[2] - 26, 235), width=S)
+    return Piece(im.resize((wd, L + 8), Image.LANCZOS), (wd / 2, L + 4), "weed")
+
+
+WEEDS = [(make_weed(L, i), x, i) for i, (x, L) in enumerate(((36, 170), (118, 120), (236, 210), (268, 150), (452, 130),
+                                                              (700, 190), (742, 240), (776, 160), (902, 200), (938, 140)))]
+
+
+def weed_items(t, f=1.0, kick=0.0):
+    out = []
+    for p, x, i in WEEDS:
+        ang = 5.5 * math.sin(t * 0.9 + i * 1.3) + kick * 9 * math.sin(t * 7 + i)
+        out.append(place(p, x, GROUND + 8 + (1 - f) * 300, ang, 1.0, 1.5, kind="tint", stage="far", occ=False))
+    return out
+
 
 GELS = [  # name, colour (transmission), world polygon top edge y, seed
     ("far", (0.50, 0.86, 0.80), -160, 1),
@@ -523,7 +591,7 @@ def make_table():
     x0, y0, x1, y1 = WORLD_BOX
     w, h = x1 - x0, y1 - y0
     base = np.empty((h, w, 3), np.float32)
-    base[:] = (224, 221, 208)
+    base[:] = (201, 204, 197)
     n = noise_tex((w, h), 40, 61)[..., None] * 7 + noise_tex((w, h), 1.0, 62)[..., None] * 4
     base += n
     im = Image.fromarray(base.clip(0, 255).astype(np.uint8))
@@ -574,7 +642,19 @@ def to_screen(wx, wy):
     return ((wx - cx) * z + W / 2, (wy - cy) * z + H / 2)
 
 
-def place(piece, wx, wy, ang=0.0, s=1.0, lift=2.0, kind="opaque", flip=False, stage="near", occ=True):
+def mscreen(wx, wy):
+    """Scene coordinates are laid out toe-left and then mirrored, because the boot is printed toe-right
+    and a paper cutout cannot be turned over without showing its blank back."""
+    return to_screen(W - wx, wy)
+
+
+def cam(z, cx, cy):
+    CAM[0], CAM[1], CAM[2] = z, W - cx, cy
+
+
+def place(piece, wx, wy, ang=0.0, s=1.0, lift=2.0, kind="opaque", flip=False, stage="near", occ=True, mirror=True):
+    if mirror:
+        wx, ang, flip = W - wx, -ang, not flip
     return dict(piece=piece, w=(wx, wy), ang=ang, s=s, lift=lift, kind=kind, flip=flip, stage=stage, occ=occ)
 
 
@@ -657,11 +737,17 @@ _MOTES = np.random.RandomState(12).uniform(0, 1, (150, 4))
 
 def shadow_of(occ, L):
     """Shadow volume of an occluder mask from a point lamp: polar unwrap, running max, wrap back."""
-    R = 1150.0
-    pol = cv2.warpPolar(occ, (575, 1440), (float(L[0]), float(L[1])), R, cv2.WARP_POLAR_LINEAR | cv2.INTER_LINEAR)
+    R, NR, NA = 1150.0, 575, 1440
+    th = (np.arange(NA, dtype=np.float32) / NA * 2 * np.pi)[:, None]
+    rr = (np.arange(NR, dtype=np.float32) / NR * R)[None, :]
+    pol = cv2.remap(occ, (L[0] + rr * np.cos(th)).astype(np.float32), (L[1] + rr * np.sin(th)).astype(np.float32),
+                    cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT, borderValue=0)
     pol = np.maximum.accumulate(pol, axis=1)
-    sh = cv2.warpPolar(pol, (W, H), (float(L[0]), float(L[1])), R, cv2.WARP_POLAR_LINEAR | cv2.WARP_INVERSE_MAP | cv2.INTER_LINEAR)
-    return cv2.GaussianBlur(sh, (0, 0), 1.6)
+    ang = np.arctan2(_YY - L[1], _XX - L[0]) % (2 * np.pi)
+    dist = np.hypot(_XX - L[0], _YY - L[1])
+    sh = cv2.remap(pol, (dist / R * NR).astype(np.float32), (ang / (2 * np.pi) * NA).astype(np.float32),
+                   cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
+    return np.clip(cv2.GaussianBlur(sh, (0, 0), 1.6), 0, 1)
 
 
 STATS = {}
@@ -681,11 +767,12 @@ def backlit(items, lamp, beam_dir, beam_amt=1.0, half=17.0, t=0.0, glass=1.0):
     far_done = False
 
     def add_beam(F):
-        L = to_screen(*lamp)
+        L = mscreen(*lamp)
+        bd = math.radians(180 - beam_dir)
         o = np.asarray(occ, np.float32) / 255
         ang = np.arctan2(_YY - L[1], _XX - L[0])
         dist = np.hypot(_XX - L[0], _YY - L[1])
-        diff = np.abs((ang - math.radians(beam_dir) + np.pi) % (2 * np.pi) - np.pi)
+        diff = np.abs((ang - bd + np.pi) % (2 * np.pi) - np.pi)
         hf = math.radians(half)
         cone = np.clip((hf - diff) / (hf * 0.5), 0, 1)
         cone = cone * cone * (3 - 2 * cone)
@@ -702,12 +789,14 @@ def backlit(items, lamp, beam_dir, beam_amt=1.0, half=17.0, t=0.0, glass=1.0):
         for mx, my, ph, sz in _MOTES:
             wx = 300 + mx * 640 + 9 * math.sin(t * 0.5 + ph * 6.3)
             wy = 150 + my * 330 - ((t * 5 + ph * 90) % 60) * 0.25
-            sx, sy = to_screen(wx, wy)
+            sx, sy = mscreen(wx, wy)
             rr = (0.7 + sz * 1.3) * z
             dd.ellipse([sx - rr, sy - rr, sx + rr, sy + rr], fill=int(150 + 100 * sz))
         dots = np.asarray(dots.filter(ImageFilter.GaussianBlur(0.6)), np.float32) / 255
         light = (beam * 0.95 + hot + dots * beam * 1.6) * beam_amt
-        F = F + light[..., None] * AMBER[None, None, :]
+        # the beam is an amber gel: it replaces the green where it falls, it does not just add to it
+        k = np.clip(light * 0.75, 0, 0.8)[..., None]
+        F = F * (1 - k) + light[..., None] * AMBER[None, None, :] * 1.35
         return F, beam * beam_amt
 
     beam = None
@@ -715,9 +804,8 @@ def backlit(items, lamp, beam_dir, beam_amt=1.0, half=17.0, t=0.0, glass=1.0):
         if it["stage"] == "near" and not far_done:
             # flush the far silhouettes, then light the water
             a = np.asarray(sil, np.float32) / 255
-            F = F * (1 - a[..., 3:]) + a[..., :3] * a[..., 3:]
+            F = F * (1 - a[..., 3:] * 0.74) + a[..., :3] * a[..., 3:] * 0.74      # far paper, seen through more water
             sil = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-            # occluders are gathered from the near items below, so add the beam after them
             far_done = True
         if it["kind"] == "gel":
             if sil.getbbox():
@@ -731,6 +819,17 @@ def backlit(items, lamp, beam_dir, beam_amt=1.0, half=17.0, t=0.0, glass=1.0):
         if it["kind"] == "emissive":
             emis.append(it)
             continue
+        if it["kind"] == "tint":                         # coloured tissue: passes its own colour
+            if sil.getbbox():
+                a = np.asarray(sil, np.float32) / 255
+                F = F * (1 - a[..., 3:]) + a[..., :3] * a[..., 3:]
+                sil = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+            im, x, y = _blit(it)
+            lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+            lay.paste(im, (x, y), im)
+            e = np.asarray(lay, np.float32) / 255
+            F = F * (1 - e[..., 3:]) + F * e[..., :3] * 1.15 * e[..., 3:]
+            continue
         im, x, y = _blit(it, dark=True)
         sil.paste(im, (x, y), im)
         if it["occ"] and it["stage"] == "near":
@@ -740,7 +839,7 @@ def backlit(items, lamp, beam_dir, beam_amt=1.0, half=17.0, t=0.0, glass=1.0):
     al = a[..., 3]
     # paper is not perfectly opaque: a breath of the light behind it comes through, and edges catch it
     glowmap = cv2.GaussianBlur(beam, (0, 0), 5 * z)
-    rim = np.clip(cv2.GaussianBlur(beam * (1 - al), (0, 0), 1.8) * 2.2, 0, 1) * al
+    rim = np.clip(cv2.GaussianBlur(beam * (1 - al), (0, 0), 2.2 * z) * 3.2, 0, 1) * al
     body = a[..., :3] * (1.0 + 2.2 * glowmap[..., None]) + AMBER[None, None, :] * (0.10 * glowmap[..., None])
     F = F * (1 - al[..., None]) + body * al[..., None]
     F += rim[..., None] * AMBER[None, None, :] * 0.85
@@ -760,14 +859,14 @@ def backlit(items, lamp, beam_dir, beam_amt=1.0, half=17.0, t=0.0, glass=1.0):
 
 def tone(F):
     F = np.clip(F, 0, None)
-    F = 1 - np.exp(-F * 1.55)            # shoulder, so the lamp burns without clipping flat
-    return F
+    F = 1 - np.exp(-F * 1.6)             # shoulder, so the lamp burns without clipping flat
+    return F ** 1.32                     # and a toe, so paper in front of the light stays black
 
 
 # ------------------------------------------------------------- the world ---
 
 GROUND = 474.0
-PIN_STAND = (612.0, GROUND - (842 - BOOT_PIN[1]) * WS + 2)      # ankle pin when the boot stands
+PIN_STAND = (612.0, GROUND - (823 - BOOT_PIN[1]) * WS + 2)      # ankle pin when the boot stands
 TIN_X = 168.0
 LAMP = (TIN_X + TIN_LAMP[0], GROUND + TIN_LAMP[1])
 
@@ -785,13 +884,22 @@ def boot_items(pin, leg_ang, rel, lift=3.0, pinned=True, whole=False, split=0.0)
     return out
 
 
-def trout_items(x, y, s, t, lift=3.0, wag=1.0, ang=0.0, ph=0.0):
-    w = 15 * wag * math.sin(t * 5.2 + ph)
-    a = math.radians(ang)
-    # body pivot is the tail pin; the pin sits behind the body centre
-    return [place(TROUT_TAIL, x, y, ang + w, s, lift),
-            place(TROUT_BODY, x, y, ang - w * 0.12, s, lift + 1),
-            place(PIN, x, y, 0, 0.55, lift + 2, occ=False)]
+def trout_items(x, y, s, t, lift=3.0, wag=1.0, ang=0.0, ph=0.0, stage="near", flip=False):
+    w = 15 * wag * math.sin(t * 5.2 + ph) * (-1 if flip else 1)
+    out = [place(TROUT_TAIL, x, y, ang + w, s, lift, stage=stage, flip=flip, occ=stage == "near"),
+           place(TROUT_BODY, x, y, ang - w * 0.12, s, lift + 1, stage=stage, flip=flip, occ=stage == "near")]
+    if s > 0.12:
+        out.append(place(PIN, x, y, 0, 0.55, lift + 2, occ=False, stage=stage))
+    return out
+
+
+def shoal_items(t, f=1.0):
+    """Far trout, small, behind the last sheet of tissue."""
+    out = []
+    for i, (x0, y0, s, v) in enumerate(((120, 150, 0.085, 9), (60, 185, 0.065, 11), (330, 105, 0.07, 8), (900, 210, 0.06, -7))):
+        x = x0 + v * (t - 10) + (1 - f) * 500
+        out += trout_items(x, y0 + 4 * math.sin(t * 0.7 + i), s, t, lift=1.5, wag=0.5, ph=i * 2.0, stage="far", flip=v > 0)
+    return out
 
 
 def bed_items(f=1.0, lift=2.0):
@@ -806,16 +914,20 @@ def bed_items(f=1.0, lift=2.0):
 
 def bed_front(f=1.0, lift=2.5):
     dy = (1 - f) * 260
-    return [
-        place(ROCK["turf"], 150, GROUND + 78 + dy, 0, 1.75, lift),
-        place(ROCK["mound"], 560, GROUND + 66 + dy * 1.15, 0, 1.75, lift),
-        place(ROCK["low"], 900, GROUND + 70 + dy * 0.9, 0, 1.7, lift),
-        place(ROCK["low"], 395, GROUND + 92 + dy * 1.3, 0, 1.25, lift + 1, flip=True),
-    ]
+    out = []
+    for name, x, top, s, fl, k in (("turf", 150, -8, 1.75, False, 1.0), ("mound", 560, -6, 1.75, False, 1.15),
+                                   ("low", 900, -4, 1.7, False, 0.9), ("low", 380, 26, 1.25, True, 1.3),
+                                   ("mound", 60, 34, 1.3, True, 1.2), ("turf", 800, 30, 1.2, True, 1.1)):
+        out.append(place(ROCK[name], x, GROUND + top + ROCK[name].im.height * s + dy * k, 0, s, lift, flip=fl))
+    return out
 
 
-def tin_items(x, y=GROUND, lift=3.0, ring=1.0, ring_drop=0.0, window=True, lamp_on=0.0):
+def tin_items(x, y=GROUND, lift=3.0, ring=1.0, ring_drop=0.0, window=True, lamp_on=0.0, claw=1.0):
+    """claw: 1 = tongs held open, 0 = snapped shut."""
     out = [place(TIN, x, y, 0, 1.0, lift, occ=False)]
+    og = 6 + 20 * claw
+    out.append(place(CLAW_UP, x + CLAW_AT[0][0], y + CLAW_AT[0][1], -og, 1.35, lift + 1, occ=False))
+    out.append(place(CLAW_LO, x + CLAW_AT[1][0], y + CLAW_AT[1][1], og, 1.35, lift + 1, occ=False))
     if window:
         out.append(place(WINDOW, x + TIN_PORT[0], y + TIN_PORT[1], 0, TIN_PORT_R * 2 / 112, lift, kind="emissive" if lamp_on > 0 else "opaque", occ=False))
         out[-1]["amt"] = lamp_on
@@ -824,15 +936,15 @@ def tin_items(x, y=GROUND, lift=3.0, ring=1.0, ring_drop=0.0, window=True, lamp_
     return out
 
 
-def scissor_items(tipx, tipy, ang, open_, lift=7.0, s=0.34):
+def scissor_items(tipx, tipy, ang, open_, lift=7.0, s=0.43):
     """The crotch of the blades sits on (tipx, tipy); the screw is behind it along the heading."""
     s = s / SC_K * 2
     back = 62 * SC_K * s
     a = math.radians(ang)
     px, py = tipx - back * math.cos(a), tipy - back * math.sin(a)
     close = (1 - open_) * 7.5
-    return [place(SC_B, px, py, ang + 7 + close, s, lift, occ=False),
-            place(SC_A, px, py, ang + 7 - close, s, lift + 1, occ=False)]
+    return [place(SC_B, px, py, ang + 7 + close, s, lift, occ=False, mirror=False),
+            place(SC_A, px, py, ang + 7 - close, s, lift + 1, occ=False, mirror=False)]
 
 
 # -------------------------------------------------------------- timeline ---
@@ -857,12 +969,11 @@ def part1(t):
     items = []
     # camera: wide over the poster, then in to the scene
     k = ease(t, 5.0, 6.3)
-    CAM[0], CAM[1], CAM[2] = lerp(0.84, 1.0, k), lerp(500, 480, k), lerp(262, 270, k)
+    cam(lerp(0.74, 1.0, k), lerp(460, 480, k), lerp(317, 270, k))     # the sheet sits above the caption
     f = ramp(t, CUT0, CUT1)
     f = int(f * 40) / 40.0 if f < 1 else 1.0
     lifted = ease(t, 4.6, 5.3)
     away = ease(t, 5.0, 6.2)
-    turned = t >= 5.3
     # the scene pieces that slide in underneath
     g1, g2, g3 = ease(t, 7.4, 8.0), ease(t, 7.7, 8.3), ease(t, 8.0, 8.6)
     for name, g in (("far", g1), ("mid", g2)):
@@ -871,19 +982,22 @@ def part1(t):
     bf = ease(t, 8.3, 9.1)
     if bf > 0:
         items += bed_items(bf)
+        items += weed_items(t, ease(t, 8.5, 9.4))
+        if t > 9.2:
+            items += shoal_items(t, ease(t, 9.2, 10.0))
     if g3 > 0:
         items.append(dict(kind="gel", name="near", amt=1.0, dy=-(1 - g3) * 700, stage="far"))
     # poster
     if away < 1:
         px = POSTER_C[0] - away * 900
         pp = poster_piece(f, t >= 4.6)
-        items.append(place(pp, px, POSTER_C[1] + away * 40, -away * 14, POSTER_S, 1.5, occ=False))
+        items.append(place(pp, px, POSTER_C[1] + away * 40, -away * 14, POSTER_S, 1.5, occ=False, mirror=False))
     # boot
     if t < 4.6:
         pass                                                   # still part of the sheet
     else:
         go = ease(t, 5.3, 6.4)
-        pin = lerp2(PIN_IN_POSTER, (560, 330), go)
+        pin = lerp2(PIN_IN_POSTER, (400, 330), go)
         pin = (pin[0], pin[1] - 26 * math.sin(math.pi * lifted) * (1 if t < 5.3 else 0))
         snipped = t >= 6.9
         pinned = t >= 7.25
@@ -891,15 +1005,16 @@ def part1(t):
         if pinned:
             rel = 22 * math.exp(-(t - 7.3) * 1.6) * math.sin((t - 7.3) * 9.0) if t < 9.4 else 0.0
         stand = ease(t, 8.9, 9.7)
+        pin = (W - pin[0], pin[1])                               # from here on in scene coordinates
         pin = lerp2(pin, (PIN_STAND[0], PIN_STAND[1] - 150), stand)
         if not snipped:
-            it = place(BOOT["whole"], pin[0], pin[1], lerp(0, -4, go), BS, 3 + 9 * math.sin(math.pi * clamp(lifted)) if t < 5.3 else 4, flip=turned)
+            it = place(BOOT["whole"], pin[0], pin[1], lerp(0, -4, go), BS, 3 + 9 * math.sin(math.pi * clamp(lifted)) if t < 5.3 else 4, flip=True)
             items.append(it)
         else:
             sp = 7 * (1 - ease(t, 7.05, 7.3))
             its = boot_items(pin, lerp(-4, 0, stand), rel, lift=4, pinned=pinned, split=sp)
             if pinned and t < 7.45:                             # the pin drops in
-                its[-1]["w"] = (pin[0], pin[1] - (1 - ramp(t, 7.25, 7.45)) * 60)
+                its[-1]["w"] = (W - pin[0], pin[1] - (1 - ramp(t, 7.25, 7.45)) * 60)
                 its[-1]["lift"] = 6 + (1 - ramp(t, 7.25, 7.45)) * 20
             items += its
     # bed front, tin, trout
@@ -935,21 +1050,23 @@ def part1(t):
     elif 6.45 < t < 7.2:
         # the ankle snip
         e = ramp(t, 6.5, 6.95)
-        x = lerp(560 + 150, 560 - 60, e)
+        x = lerp(400 + 150, 400 - 60, e)
         op = 0.5 + 0.5 * math.cos(e * 6 * math.pi)
         out = ease(t, 6.95, 7.2)
         items += scissor_items(x + out * 300, 330 + 4 + out * 260, 180 + 4 - out * 30, op)
     return items
 
 
-def scene_items(t, pin, leg_ang, rel, tin_x, trout=True, lamp_on=1.0, trout_dx=0.0):
+def scene_items(t, pin, leg_ang, rel, tin_x, trout=True, lamp_on=1.0, trout_dx=0.0, kick=0.0, claw=1.0):
     items = [dict(kind="gel", name="far", amt=1.0, stage="far"),
              dict(kind="gel", name="mid", amt=1.0, stage="far")]
     items += bed_items()
+    items += shoal_items(t)
+    items += weed_items(t, kick=kick)
     items.append(dict(kind="gel", name="near", amt=1.0, stage="far"))
     items += boot_items(pin, leg_ang, rel)
     items += bed_front()
-    items += tin_items(tin_x, lamp_on=lamp_on)
+    items += tin_items(tin_x, lamp_on=lamp_on, claw=claw)
     if trout:
         items += trout_items(815 + trout_dx, 318 + 5 * math.sin(t * 0.9), 0.235, t, wag=0.55)
         items += trout_items(775 + trout_dx * 1.3, 420 + 4 * math.sin(t * 1.1 + 1), 0.165, t, wag=0.5, ph=1.7)
@@ -989,8 +1106,22 @@ def tin_pose3(u):
     x = TIN_X
     for a, b in LIFTS:
         k = ramp(u, a + 0.35, a + 1.2) * (1 - ramp(u, b - 0.45, b + 0.05))
-        x += int(k * 5) / 5 * 58
+        x += int(k * 5) / 5 * 44
+        for n in NIPS:                                    # three nips at the toe
+            x += 13 * max(0.0, 1 - abs((u - (a + 1.35 + n)) / 0.17)) if a + 1.2 < u < b - 0.5 else 0
     return x
+
+
+NIPS = (0.0, 0.5, 1.0)
+
+
+def claw_pose3(u):
+    """The tongs: a slow flex while waiting, three hard snaps at the lifted toe."""
+    c = 0.8 + 0.2 * math.sin(u * 2.1)
+    for a, b in LIFTS:
+        for n in NIPS:
+            c = min(c, clamp(abs(u - (a + 1.35 + n)) / 0.17))
+    return c
 
 
 def silt(u0, x, y, n=16, seed=0):
@@ -1014,17 +1145,52 @@ def draw_silt(F, pts, beam=None):
     d = ImageDraw.Draw(lay)
     z = CAM[0]
     for x, y, r_ in pts:
-        sx, sy = to_screen(x, y)
+        sx, sy = mscreen(x, y)
         d.polygon([(sx - r_ * z, sy), (sx, sy - r_ * z * 0.8), (sx + r_ * z, sy + 1), (sx, sy + r_ * z)], fill=255)
     a = np.asarray(lay, np.float32)[..., None] / 255
     col = np.array([0.05, 0.07, 0.07], np.float32)
     return F * (1 - a) + col * a
 
 
+def _bubble_list():
+    r = np.random.RandomState(31)
+    out = []
+    tt = 10.4
+    while tt < SECONDS:                                  # the tin breathes through its hatch
+        out.append((tt, TIN_X - 8 + r.uniform(-5, 5), GROUND - 120, r.uniform(48, 70), r.uniform(2.0, 4.2), r.uniform(0, 6)))
+        tt += r.uniform(0.25, 0.8)
+    for t0 in [P2 + 3.3] + [P3 + b + 0.22 for a, b in LIFTS]:    # air knocked out from under the sole
+        for _ in range(14):
+            out.append((t0 + r.uniform(0, 0.5), r.uniform(385, 650), GROUND - r.uniform(0, 20), r.uniform(70, 120), r.uniform(1.6, 4.5), r.uniform(0, 6)))
+    return out
+
+
+BUBBLES = _bubble_list()
+
+
+def draw_bubbles(F, t):
+    """Hole-punch confetti of clear film: each one a small bright ring."""
+    lay = Image.new("L", (W, H), 0)
+    d = ImageDraw.Draw(lay)
+    z = CAM[0]
+    for t0, x, y, v, r_, ph in BUBBLES:
+        u = t - t0
+        if u < 0 or u > 7:
+            continue
+        sx, sy = mscreen(x + 7 * math.sin(u * 2.3 + ph), y - v * u)
+        if sy < -10:
+            continue
+        rr = r_ * z * (1 + 0.08 * u)
+        d.ellipse([sx - rr, sy - rr, sx + rr, sy + rr], outline=230, width=max(1, int(round(0.9 * z))))
+        d.ellipse([sx - rr * 0.5, sy - rr * 0.6, sx - rr * 0.1, sy - rr * 0.2], fill=255)
+    a = np.asarray(lay.filter(ImageFilter.GaussianBlur(0.5)), np.float32)[..., None] / 255
+    return F + a * np.array([0.42, 0.6, 0.52], np.float32)
+
+
 def porthole_view(F, t):
     """Part 2 foreground: the tin's inside wall, the brass ring, Turkey's head, all lit only by
     what comes in through the glass."""
-    cx, cy, R = 470.0, 258.0, 206.0
+    cx, cy, R = 430.0, 250.0, 210.0
     r = np.hypot(_XX - cx, _YY - cy)
     inside = np.clip((R - r) / 1.5, 0, 1)
     # glass: a soft reflection arc and a darker edge
@@ -1044,15 +1210,16 @@ def porthole_view(F, t):
     fg.paste(ring, (int(cx - px), int(cy - py)), ring)
     # Turkey, bottom right, looking out
     bob = 5 * math.sin(t * 1.3) + (10 * math.exp(-(t - (P2 + 3.3)) * 3) * math.sin((t - P2 - 3.3) * 14) if t > P2 + 3.3 else 0)
-    tk, (tx, ty) = TURKEY.get(-8 + 3 * math.sin(t * 0.8), 1.0)
-    tpos = (int(770 - tx), int(590 + bob - ty))
+    tk, (tx, ty) = TURKEY.get(4 + 2.5 * math.sin(t * 0.8), 1.0)
+    tpos = (int(758 - tx), int(556 + bob - ty))
     tsh = tk.getchannel("A").filter(ImageFilter.GaussianBlur(10)).point(lambda v: int(v * 0.6))
     fg.paste((6, 5, 4), (tpos[0] - 12, tpos[1] + 10), tsh)
     fg.paste(tk, tpos, tk)
     f = np.asarray(fg, np.float32) / 255
     al = f[..., 3:]
-    lightfg = 0.07 + spill * 1.25 + spill_near * 0.75
-    out_wall = wall * (0.035 + spill * 0.95)
+    cabin = np.array([1.0, 0.80, 0.56], np.float32) * (0.42 - 0.16 * np.clip(np.hypot(_XX - 820, _YY - 120) / 900, 0, 1))[..., None]
+    lightfg = cabin * 1.25 + spill * 1.3 + spill_near * 0.9
+    out_wall = wall * (cabin * 0.55 + spill * 1.0)
     outside = out_wall * (1 - al) + f[..., :3] * lightfg * al
     k = inside[..., None]
     comp = F * k + outside * (1 - k)
@@ -1078,20 +1245,20 @@ def compose(t):
         img = A
     elif tq < P3:
         u = tq - P2
-        CAM[0], CAM[1], CAM[2] = 1.5, 438.0, 392.0
+        cam(1.3, 474.0, 392.0)          # the whole foot, heel to toe, and the ankle fit in the glass
         pin, la, rel = boot_pose2(u)
-        items = scene_items(tq, pin, la, rel, TIN_X, trout=False)
-        sweep = -8 + (10 * math.sin((u - 5.2) * 1.15) if u > 5.2 else 0) * ease(u, 5.2, 6.0)
+        items = scene_items(tq, pin, la, rel, TIN_X, trout=False, kick=math.exp(-(u - 3.3) * 1.5) if u > 3.3 else 0)
+        sweep = -7 + 2.5 * math.sin(u * 1.3) + (11 * math.sin((u - 5.2) * 1.15) if u > 5.2 else 0) * ease(u, 5.2, 6.0)
         F = backlit(items, LAMP, sweep, beam_amt=1.0, half=19, t=tq)
         F = draw_silt(F, silt(u - 3.3, 520, GROUND, seed=1) if u > 3.3 else [])
-        F = tone(F)
+        F = tone(draw_bubbles(F, tq))
         img = porthole_view(F, tq)
     else:
         u = tq - P3
-        CAM[0], CAM[1], CAM[2] = 1.08, 490.0, 292.0
+        cam(1.08, 490.0, 292.0)
         pin, la, rel, up = boot_pose3(u)
         tx = tin_pose3(u)
-        items = scene_items(tq, pin, la, rel, tx, trout=True, trout_dx=(1 - ease(u, 0.0, 1.4)) * 260 - 14 * up)
+        items = scene_items(tq, pin, la, rel, tx, trout=True, trout_dx=(1 - ease(u, 0.0, 1.4)) * 260 - 14 * up, claw=claw_pose3(u))
         lamp = (tx + TIN_LAMP[0], GROUND + TIN_LAMP[1])
         F = backlit(items, lamp, -3 + 5 * up, beam_amt=1.0 + 0.25 * up, half=18, t=tq)
         pts = []
@@ -1099,7 +1266,7 @@ def compose(t):
             if u > b + 0.22:
                 pts += silt(u - b - 0.22, 520, GROUND, seed=int(a * 10))
         F = draw_silt(F, pts)
-        img = tone(F)
+        img = tone(draw_bubbles(F, tq))
         # a soft dark surround so the eye stays on the table
         rr = np.hypot((_XX - W / 2) / (W / 2), (_YY - H / 2) / (H / 2))
         img = img * (1 - 0.35 * np.clip(rr - 0.75, 0, 1) ** 1.5)[..., None]
@@ -1189,6 +1356,9 @@ def sound(mix):
         for k in range(5):
             mix.click(P3 + a + 0.35 + k * 0.17, gain=0.16, bright=2600, seconds=0.04, pan=-0.4)
             mix.click(P3 + b - 0.45 + k * 0.1, gain=0.14, bright=2600, seconds=0.04, pan=-0.4)
+        for n in NIPS:                                 # the tongs snap
+            mix.click(P3 + a + 1.35 + n, gain=0.34, bright=5200, seconds=0.04, pan=-0.3)
+            mix.click(P3 + a + 1.37 + n, gain=0.16, bright=1800, seconds=0.07, pan=-0.3)
         mix.thud(P3 + b + 0.22, freq=50, gain=0.6, seconds=0.6)
     mix.murmur(23.2, 2.4, gain=0.04, pitch=320, pan=0.6, seed=8)        # the trout confer
     mix.reverb(0.18, 1.3)
