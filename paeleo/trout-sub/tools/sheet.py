@@ -83,6 +83,7 @@ def log(n=None):
         dive = next(d[0] for d in DIVES if d[1] <= n <= d[2]); when = "%s, at %s" % (dive, timing.get(num, "")) if timing else dive
     else:
         station = num = clue = rule = ""; to, tr = ["", ""], ["", ""]; when = ""
+        blank_note = True
     kt, kr = ["triangle", "circle", "hexagon"][:len(to)], ["cross", "square", "hexagon"][:len(tr)]
     fill = lambda v: '<b class="fill">%s</b>' % v if v else '<b class="fill blank"></b>'
     front = '''<section class="page">
@@ -231,16 +232,53 @@ def slips():
     open("youtube/slips.html", "w").write('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Porthole Slips</title><style>%s</style></head><body>%s</body></html>' % (SLIP_CSS, pages))
 
 
+GUIDE = '''<section class="page guide">
+<header><div class="kick">TOURKEY TROUTTOWN · FOR THE GROWN-UP IN THE ROOM<h1>Run it in 40 minutes</h1></div></header>
+<div class="g2">
+<div><h2>Print</h2><ol>
+<li><b>This page.</b> Once. It is yours.</li>
+<li><b>The next two pages</b> (the Porthole Log). Double-sided. <b>One sheet per child.</b></li>
+<li><b>slips.pdf.</b> One page for every 3 children. 21 children: print pages 1 to 7. Cut on the dashed lines.</li>
+</ol>
+<h2>Bring</h2><ol><li>One die for every 3 children.</li><li>Pencils. Crayons if you have them.</li><li>A screen with sound for the film.</li></ol></div>
+<div><h2>Do not print</h2><ol><li>Anything else. Three files exist; you need this one and the slips.</li></ol>
+<h2>Seat</h2><ol><li>Groups of 3 in a circle. A group of 4 works too.</li><li>Hand each child <b>one slip</b> and <b>one log</b>.</li></ol></div>
+</div>
+<h2>Run</h2>
+<table>
+<tr><th>Clock</th><th>You do</th><th>Children do</th></tr>
+<tr><td>0 to 3 min</td><td>Play the film from the start. Stop at <b>3:05</b>.</td><td>Watch. The film reads every step aloud.</td></tr>
+<tr><td>3 to 9</td><td>Say: “Front page. Zones 1, 2, 3.”</td><td>Copy the slip into zone 1. Draw in the ring. Write 3 lines.</td></tr>
+<tr><td>9 to 15</td><td>Say: “Pass your paper left.” Then: “Zone 5.”</td><td>Read the slip that came with the paper. Pick a button, draw it. Write endings 1, 2, 3.</td></tr>
+<tr><td>15 to 21</td><td>Say: “Pass left again. Zone 6.”</td><td>Pick a button, draw it. Write endings 4, 5, 6.</td></tr>
+<tr><td>21 to 27</td><td>Say: “Give it back. Roll once. Zones 7 and 8.”</td><td>Roll. Circle the die. Write the gossip and the message home.</td></tr>
+<tr><td>27 to 40</td><td>Play the film from <b>3:05</b>. Stop after the highest slip number you handed out.</td><td>Stand when your number plays. Read your rolled ending aloud.</td></tr>
+</table>
+<h2>Rules</h2><ol>
+<li>The slip travels with the paper. Each friend reads the choices from the slip.</li>
+<li>Any ending counts if it has one action and one thing you can see.</li>
+<li>A child who cannot write draws or tells a partner, who writes.</li>
+<li>Out of time: skip minute 27 onward. The logs are complete without it.</li>
+</ol>
+<footer>Film: youtu.be/ooiBjWKV8vQ · Each porthole plays about 14 seconds. Dive 1 is slips 1 to 16, Dive 2 is 17 to 32, Dive 3 is 33 to 48, Dive 4 is 49 to 55.</footer></section>'''
+GUIDE_CSS = '''.grow>.fill.blank{min-width:78mm}.rule .fill.blank{min-width:50mm}.guide{font-size:13.5px;font-weight:600;gap:2.4mm}.guide h2{font-size:17px;font-weight:900;margin:2.5mm 0 1mm;color:#c95c3e}.guide ol{margin:0;padding-left:5.5mm}.guide li{margin-bottom:1.2mm}
+.g2{display:grid;grid-template-columns:1fr 1fr;column-gap:10mm}.guide table{border-collapse:collapse;width:100%}.guide th{text-align:left;font-size:11px;color:#5f6c70;border-bottom:1px solid #16293a;padding:1mm 2mm 1mm 0}
+.guide td{vertical-align:top;border-bottom:1px solid #c9d0d4;padding:1.8mm 3mm 1.8mm 0}.guide td:first-child{white-space:nowrap;font-weight:900}'''
+
+
 if __name__ == "__main__":
     os.makedirs("youtube", exist_ok=True); os.makedirs("sheets", exist_ok=True)
     open("youtube/porthole-logs.html", "w").write(page("".join(log(n) for n in range(1, 56))))
     slips()
+    open("youtube/class-pack.html", "w").write(page(GUIDE + log(None)).replace("</style>", GUIDE_CSS + "</style>"))
     open("sheets/master.html", "w").write(page(log(31)))     # the film shows a filled example, porthole 31
     js = r'''
 const {chromium}=require('playwright');(async()=>{
  const b=await chromium.launch();
  let p=await b.newPage();await p.goto('file://'+process.cwd()+'/youtube/porthole-logs.html');await p.evaluate(()=>document.fonts.ready);
  await p.pdf({path:'youtube/porthole-logs.pdf',width:'8.5in',height:'11in',printBackground:true});
+ const g=await b.newPage();await g.goto('file://'+process.cwd()+'/youtube/class-pack.html');await g.evaluate(()=>document.fonts.ready);
+ await g.pdf({path:'youtube/class-pack.pdf',width:'8.5in',height:'11in',printBackground:true});
  const q=await b.newPage();await q.goto('file://'+process.cwd()+'/youtube/slips.html');await q.evaluate(()=>document.fonts.ready);
  await q.pdf({path:'youtube/slips.pdf',width:'8.5in',height:'11in',printBackground:true});
  const over=await p.evaluate(()=>[...document.querySelectorAll('.page')].filter(e=>e.scrollHeight>e.clientHeight+1).length);
