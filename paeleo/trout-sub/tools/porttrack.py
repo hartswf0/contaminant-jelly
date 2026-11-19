@@ -5,8 +5,9 @@
     python3 tools/porttrack.py p07 p21
 
 For each film it samples three frames in the opening 0.5 s and three in the
-closing 0.5 s, and fits the outer edge of the brass rim: brass just inside the circle, wall just
-outside it. ports.json holds centre and rim radius as fractions of frame width, plus a fit score.
+closing 0.5 s, and finds the brass rim by matching the rim annulus cut from the
+two masters (bolts, hinge, latch; the glass is masked out) at every size.
+ports.json holds the centre and outer rim radius as fractions of frame width, plus a fit score.
 tools/units.py uses it to lock the port to one place and size at both ends.
 """
 import json, os, subprocess, sys
@@ -26,46 +27,81 @@ def frame(path, t):
     return np.frombuffer(raw, np.uint8).reshape(H, W, 3) if len(raw) == W * H * 3 else None
 
 
-def brass(img):
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    h, s, v = hsv[..., 0], hsv[..., 1], hsv[..., 2]
-    m = ((h >= 10) & (h <= 30) & (s >= 80) & (v >= 60) & (v <= 235)).astype(np.float32)
-    return cv2.GaussianBlur(m, (5, 5), 0)
+# The two masters carry the same port. Its rim (outer-edge circle) was measured
+# by hand on each: centre x, centre y, outer radius, in 1344x768 pixels.
+MASTERS = {"masters/cockpit.jpg": (670, 356, 195), "masters/outside.jpg": (675, 387, 268)}
+GLASS = 0.77          # glass radius / outer rim radius
+TSIZE = 128           # template is the rim annulus at outer radius 56 px in a 128 px tile
+_T = []
 
 
-def ring(m, cx, cy, r, fracs):
-    """Mean of mask m sampled on circles of radius r*f around (cx, cy)."""
-    tot = 0.0
-    for f in fracs:
-        x = cx + r * f * COS
-        y = cy + r * f * SIN
-        ok = (x >= 0) & (x < W) & (y >= 0) & (y < H)
-        tot += float((m[np.clip(y, 0, H - 1).astype(int), np.clip(x, 0, W - 1).astype(int)] * ok).mean())
-    return tot / len(fracs)
+def templates():
+    """Rim annulus (bolts, hinge, latch) cut from each master; the glass is masked out."""
+    if not _T:
+        for path, (cx, cy, r) in MASTERS.items():
+            im = cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2GRAY)
+            half = int(r * TSIZE / 112.0)
+            tile = cv2.resize(im[cy - half:cy + half, cx - half:cx + half], (TSIZE, TSIZE), interpolation=cv2.INTER_AREA)
+            yy, xx = np.mgrid[:TSIZE, :TSIZE] - TSIZE / 2.0
+            d = np.hypot(xx, yy)
+            mask = ((d > 56 * (GLASS - 0.04)) & (d < 56 * 1.12)).astype(np.uint8) * 255
+            _T.append((tile, mask))
+    return _T
 
 
-def score(m, cx, cy, r):
-    """r is the OUTER edge of the brass rim: brass just inside it, wall just outside."""
-    return ring(m, cx, cy, r, (0.82, 0.88, 0.94)) - ring(m, cx, cy, r, (1.07, 1.15, 1.25))
-
-
-def fit(img):
-    """Circle candidates come from edges (Hough); the brass test picks the rim among them."""
-    m = brass(img)
-    gray = cv2.medianBlur(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), 5)
-    best = (W / 2, H / 2, 70.0, -1.0)
-    for p2 in (40, 28):
-        c = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, dp=1.2, minDist=6, param1=110, param2=p2, minRadius=40, maxRadius=230)
-        if c is None:
-            continue
-        for cx, cy, r in c[0][:60]:
-            for dr in (-2, -1, 0, 1, 2):
-                sc = score(m, cx, cy, r + dr)
-                if sc > best[3]:
-                    best = (float(cx), float(cy), float(r + dr), sc)
-        if best[3] > 0.5:
-            break
+def match(gray, r, pad, box=None):
+    """Best place for the rim at outer radius r in a padded grey image: (score, cx, cy)."""
+    n = max(16, int(round(TSIZE * r / 56.0)))
+    best = (-1.0, 0.0, 0.0)
+    if n >= min(gray.shape):
+        return best
+    for tile, mask in templates():
+        t = cv2.resize(tile, (n, n), interpolation=cv2.INTER_AREA)
+        k = cv2.resize(mask, (n, n), interpolation=cv2.INTER_NEAREST)
+        res = cv2.matchTemplate(gray, t, cv2.TM_CCOEFF_NORMED, mask=k)
+        res[~np.isfinite(res) | (res > 1.01)] = -1
+        if box is not None:          # keep only centres inside box = (x0, y0, x1, y1), unpadded pixels
+            x0, y0, x1, y1 = [int(round(v + pad - n / 2.0)) for v in box]
+            keep = np.zeros(res.shape, bool)
+            keep[max(0, y0):max(0, y1), max(0, x0):max(0, x1)] = True
+            res[~keep] = -1
+        _, mx, _, loc = cv2.minMaxLoc(res)
+        if mx > best[0]:
+            best = (float(mx), loc[0] - pad + n / 2.0, loc[1] - pad + n / 2.0)
     return best
+
+
+# Where the port may sit, per end of the film: outer rim radius range and centre box,
+# as fractions of frame width. Every film is generated from the same two masters, so
+# the port opens near (0.50, 0.26) r 0.145 and closes near (0.50, 0.285) r 0.20.
+SEARCH = {"start": ((0.12, 0.20), (0.40, 0.16, 0.60, 0.36)),
+          "end": ((0.15, 0.32), (0.30, 0.14, 0.70, 0.44))}
+
+
+def fit(img, key):
+    (rlo, rhi), box = SEARCH[key]
+    RMIN, RMAX = rlo * W, rhi * W
+    box = [v * W for v in box]
+    """Coarse scan of rim sizes at half resolution, then a fine scan around the hit."""
+    g = cv2.createCLAHE(2.0, (8, 8)).apply(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY))
+    half = cv2.resize(g, (W // 2, H // 2), interpolation=cv2.INTER_AREA)
+    pad = 60
+    hp = cv2.copyMakeBorder(half, pad, pad, pad, pad, cv2.BORDER_CONSTANT, value=int(g.mean()))
+    radii = list(np.arange(RMIN, RMAX, 4.0))
+    sc = [match(hp, r / 2.0, pad, [v / 2.0 for v in box]) for r in radii]
+    i = int(np.argmax([x[0] for x in sc]))
+    r0, cx0, cy0 = radii[i], sc[i][1] * 2, sc[i][2] * 2
+    pad = 120
+    gp = cv2.copyMakeBorder(g, pad, pad, pad, pad, cv2.BORDER_CONSTANT, value=int(g.mean()))
+    m = int(r0 * 1.25 + 14)
+    x0, y0 = max(0, int(cx0 + pad - m)), max(0, int(cy0 + pad - m))
+    roi = gp[y0:int(cy0 + pad + m), x0:int(cx0 + pad + m)]
+    best = (-1.0, cx0, cy0, r0)
+    for r in np.arange(max(RMIN, r0 - 4), r0 + 4.1, 1.0):
+        s_, x, y = match(roi, r, 0)
+        if s_ > best[0]:
+            best = (s_, x + x0 - pad, y + y0 - pad, float(r))
+    return best[1], best[2], best[3], best[0]
 
 
 def track(pid, src=None):
@@ -78,7 +114,7 @@ def track(pid, src=None):
         for t in times:
             img = frame(path, t)
             if img is not None:
-                fits.append(fit(img))
+                fits.append(fit(img, key))
         if not fits:
             continue
         a = np.array(fits)

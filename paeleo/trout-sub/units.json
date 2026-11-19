@@ -1,0 +1,277 @@
+{
+ "p01": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p02": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p03": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p04": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p05": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p06": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p07": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p08": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p09": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p10": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p11": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": false
+ },
+ "p12": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p13": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p14": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p15": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": false
+ },
+ "p16": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p17": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p18": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p19": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p20": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p21": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p22": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p23": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": false
+ },
+ "p24": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p25": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p26": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p27": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": false
+ },
+ "p28": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p29": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p30": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p31": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p32": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p33": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p34": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p35": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p36": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p37": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": false
+ },
+ "p38": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p39": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p40": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p41": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p42": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p43": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p44": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p45": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p46": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p47": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": false
+ },
+ "p48": {
+  "kind": "film",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p49": {
+  "kind": "keyframe",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p50": {
+  "kind": "keyframe",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p51": {
+  "kind": "keyframe",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p52": {
+  "kind": "keyframe",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p53": {
+  "kind": "keyframe",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p54": {
+  "kind": "keyframe",
+  "lock_start": true,
+  "lock_end": true
+ },
+ "p55": {
+  "kind": "keyframe",
+  "lock_start": true,
+  "lock_end": true
+ }
+}

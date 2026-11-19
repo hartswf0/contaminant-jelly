@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Trout Sub · 55 Porthole Films</title>
+<title>Tourkey Trouttown</title>
 <style>
 :root{--bg:#10201f;--panel:#172b2a;--line:#2c4947;--ink:#e9e4d4;--dim:#9fb0a8;--amber:#f0b25a;--rust:#d9775a;--teal:#6fc3b8;--brass:#b08d3e}
 *{box-sizing:border-box}
@@ -48,7 +48,8 @@ a{color:var(--amber)}
 <body>
 <main>
 <div class="mono">Trout Sub · Double Duck/Rabbit Deck · PAE-09</div>
-<h1>55 portholes, one film each</h1>
+<h1>TOURKEY TROUTTOWN</h1>
+<p class="lede" style="color:var(--amber);margin-bottom:6px">Turkey takes a tour of Trout Town: 55 portholes, one film each.</p>
 <p class="lede">Every film holds one room: Turkey flips the lamp or fits ballast, the thing arrives at the glass, and the cut crosses to the trout looking in. 48 were written by a director, generated once and logged against the deck drawing; the last 7 are keyframe units built from the drawings.</p>
 
 <h2>Start here: the activity</h2>
@@ -64,7 +65,7 @@ a{color:var(--amber)}
 </div>
 
 <h2>The dive: all 55 as one chain</h2>
-<p class="lede">Every porthole is one standard unit: 8 seconds, opening and closing through the same iris of river water. Any unit loops on itself and joins any other, in deck order or shuffled.</p>
+<p class="lede">Every porthole is one standard unit of 8 seconds. Its first and last frames hold the brass porthole at the same place and size, so the trout’s view that ends one unit lands rim on rim with Turkey’s view that opens the next. Any unit loops on itself and joins any other, in deck order or shuffled.</p>
 <div class="dive">
   <div class="stage"><video id="dA" playsinline preload="auto"></video><video id="dB" playsinline preload="auto"></video></div>
   <div class="now">
@@ -113,13 +114,23 @@ D.intro.forEach(function (s, i) {
     var f = vids[front]; f.src = src(pos); cue();
     if (play) f.play();
   }
-  vids.forEach(function (v, i) {
-    v.addEventListener("ended", function () {
-      if (i !== front || hold) return;
+  var swapping = false;
+  function swap() {           // dissolve rim-on-rim into the next unit
+    if (swapping) return; swapping = true;
+    var f = vids[front], b = vids[1 - front];
+    b.currentTime = 0; b.style.opacity = 1; b.play();
+    f.style.transition = "opacity .25s linear"; f.style.opacity = 0;
+    setTimeout(function () {
+      f.pause(); f.style.transition = "none";
       pos = (pos + 1) % order.length; front = 1 - front;
-      vids[front].currentTime = 0; vids[front].play(); cue();
-    });
-  });
+      cue(); vids[1 - front].style.opacity = 1; swapping = false;
+    }, 260);
+  }
+  (function tick() {
+    var f = vids[front];
+    if (playing && !hold && f.duration && f.duration - f.currentTime < 0.3) swap();
+    requestAnimationFrame(tick);
+  })();
   $("#dPlay").onclick = function () {
     playing = !playing; this.textContent = playing ? "❚❚ Pause" : "▶ Dive";
     if (playing) vids[front].play(); else vids[front].pause();
