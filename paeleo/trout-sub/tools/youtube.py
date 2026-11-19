@@ -26,6 +26,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(ROOT)
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import units as U
+import cards as C
 
 W, H, FPS = 1280, 720, 24
 BX, BY, BW, BH = 72, 16, 1136, 639             # the film box
@@ -235,33 +236,50 @@ class Out:
                         "-c:a", "aac", "-b:a", "160k", "-t", "%.3f" % self.t, "-movflags", "+faststart", dest], check=True)
 
 
-def shots(out, specs, song):
-    t0 = out.t; prev = None
-    for src, ss, t, title, body in specs:
-        fr = clip(src, ss, t); canvas = strip_caption(title, body)
-        for i in range(len(fr)):
-            box = fr[i].astype(np.float32)
-            if prev is not None and i < int(TRANS * FPS):
-                u = (i + 1) / (TRANS * FPS)
-                box = prev * (1 - u) + box * u
-            out.add(put(canvas, box))
-        prev = fr[-1].astype(np.float32)
-    bt, rms, sr, dur = beats(song[0])
-    out.song(song[0], float(bt[min(8, len(bt) - 1)]), t0, min(out.t - t0 + 0.4, dur - 1))
+def film_frames(src, ss, n, w=BW, h=BH):
+    raw = subprocess.run(["ffmpeg", "-v", "error", "-ss", str(ss), "-i", src, "-vf", "fps=%d,scale=%d:%d:flags=lanczos" % (FPS, w, h),
+                          "-frames:v", str(n), "-f", "rawvideo", "-pix_fmt", "bgr24", "-"], capture_output=True).stdout
+    a = np.frombuffer(raw, np.uint8).reshape(-1, h, w, 3)
+    return np.concatenate([a, np.repeat(a[-1:], n - len(a), 0)]) if len(a) < n else a
+
+
+CARD_SECONDS = [6.0, 6.0, 7.5, 8.0, 6.5, 6.5]
+def opening(out):
+    """Title sequence, then one card per command on the worksheet."""
+    t0 = out.t
+    for f in C.title(film_frames("films/intro-6.mp4", 2.4, int(5.2 * FPS))):
+        out.add(f)
+    for k, (spec, secs) in enumerate(zip(C.CARDS, CARD_SECONDS)):
+        n = int(secs * FPS)
+        for f in C.card(spec, film_frames(spec["film"][0], spec["film"][1], n, 640, 360), n, first=(k == 0)):
+            out.add(f)
+    bt, rms, sr, dur = beats(HOWTO_SONG[0])
+    out.song(HOWTO_SONG[0], float(bt[min(8, len(bt) - 1)]), t0, min(out.t - t0 + 0.4, dur - 1))
+
+
+def closing(out):
+    """The last two commands again, for the moment the logs come back."""
+    t0 = out.t
+    for k, spec in enumerate(C.CARDS[4:]):
+        n = int(6.0 * FPS)
+        for f in C.card(spec, film_frames(spec["film"][0], spec["film"][1], n, 640, 360), n, first=False):
+            out.add(f)
+    bt, rms, sr, dur = beats(CLOSE_SONG[0])
+    out.song(CLOSE_SONG[0], float(bt[min(8, len(bt) - 1)]), t0, min(out.t - t0 + 0.4, dur - 1))
 
 
 def dive(out, spec, times):
     name, a, b, path, title, step = spec
     bt, rms, sr, dur = beats(path)
     n = b - a + 1
-    lead = 8                                               # beats under the title card
+    lead = 8                                               # beats under the dive card
     i0 = pick_start(bt, rms, sr, lead + step * n, dur)
     T = lambda k: float(bt[min(i0 + k, len(bt) - 1)] - bt[i0])   # seconds from the song start point to beat k
     t0 = out.t
-    card = title_card(name, a, b, title)
-    for _ in range(int(round(T(lead) * FPS))):
+    card = None
+    for card in C.dive_card(name, a, b, title, int(round(T(lead) * FPS))):
         out.add(card)
-    prev_tail = card[BY:BY + BH, BX:BX + BW].astype(np.float32); prev_canvas = card
+    prev_tail = card[BY:BY + BH, BX:BX + BW].astype(np.float32); prev_canvas = card; card_full = card.astype(np.float32)
     nt = int(TRANS * FPS)
     for j in range(n):
         pid = a + j
@@ -285,7 +303,11 @@ def dive(out, spec, times):
             if since >= 0 and i < frames_n - 3:
                 k = (since // (2 * beat_f)) % len(side)
                 box = stamp_prompt(box, side[k], min(1.0, (since + 1) / 6.0))
-            if i < nt:
+            if i < nt and j == 0:                      # out of the dive card: the bars clear to the first porthole
+                u = (i + 1) / float(nt)
+                frame = put(canvas, box)
+                frame = C.bgr(C.bars(Image.fromarray(frame[:, :, ::-1]), 0.5 + 0.5 * u))
+            elif i < nt:
                 u = (i + 1) / float(nt)
                 frame = put(canvas, through(prev_tail, box, u))
                 frame[BY + BH + 4:] = (prev_canvas[BY + BH + 4:] * (1 - u) + canvas[BY + BH + 4:] * u).astype(np.uint8)
@@ -378,13 +400,13 @@ if __name__ == "__main__":
         slips({int(k): v for k, v in tt.items()})
         sys.exit(print("youtube/slips.html"))
     out, times, chapters = Out(), {}, [(0, "How to play")]
-    shots(out, HOWTO, HOWTO_SONG)
+    opening(out)
     for spec in DIVES:
         t0 = dive(out, spec, times)
         chapters.append((t0, "%s · slips %02d to %02d · %s" % (spec[0], spec[1], spec[2], spec[4])))
         print(spec[0], stamp(t0), flush=True)
     chapters.append((out.t, "Roll once and send it up"))
-    shots(out, CLOSE, CLOSE_SONG)
+    closing(out)
     out.close("youtube/tourkey-trouttown.mp4")
     open("youtube/chapters.txt", "w").write("\n".join("%s %s" % (stamp(s), nme) for s, nme in chapters) + "\n\nMusic from DEEP SEA VOYAGE: "
         + ", ".join([HOWTO_SONG[1]] + [d[4] for d in DIVES] + [CLOSE_SONG[1]]) + ".\n")
