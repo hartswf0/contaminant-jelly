@@ -1,0 +1,83 @@
+[
+ {
+  "file": "youtube/mixes/mix-02-nobody-living-can-ever-stop-me.mp4",
+  "title": "Nobody Living Can Ever Stop Me",
+  "length": "4:10",
+  "first": 18,
+  "last": 35,
+  "portholes": 18,
+  "beats_per_porthole": 28
+ },
+ {
+  "file": "youtube/mixes/mix-03-the-prophet.mp4",
+  "title": "The Prophet",
+  "length": "2:40",
+  "first": 36,
+  "last": 46,
+  "portholes": 11,
+  "beats_per_porthole": 24
+ },
+ {
+  "file": "youtube/mixes/mix-04-motor-run-on-the-water.mp4",
+  "title": "水上のモーター走行 (Motor Run on the Water)",
+  "length": "1:59",
+  "first": 47,
+  "last": 54,
+  "portholes": 8,
+  "beats_per_porthole": 32
+ },
+ {
+  "file": "youtube/mixes/mix-05-whales-belly-escape.mp4",
+  "title": "Whale's Belly Escape",
+  "length": "2:00",
+  "first": 55,
+  "last": 8,
+  "portholes": 9,
+  "beats_per_porthole": 32
+ },
+ {
+  "file": "youtube/mixes/mix-06-warning-unheeded.mp4",
+  "title": "Warning Unheeded",
+  "length": "2:38",
+  "first": 9,
+  "last": 19,
+  "portholes": 11,
+  "beats_per_porthole": 36
+ },
+ {
+  "file": "youtube/mixes/mix-07-exodus-song.mp4",
+  "title": "Exodus Song: Viennese Epic to Satire",
+  "length": "4:20",
+  "first": 20,
+  "last": 37,
+  "portholes": 18,
+  "beats_per_porthole": 40
+ },
+ {
+  "file": "youtube/mixes/mix-08-the-verne-bench.mp4",
+  "title": "The Verne Bench",
+  "length": "1:26",
+  "first": 38,
+  "last": 43,
+  "portholes": 6,
+  "beats_per_porthole": 36
+ },
+ {
+  "file": "youtube/mixes/mix-09-gaslit-feerie.mp4",
+  "title": "Gaslit Feerie Pit-Piano and Star-Film Salon",
+  "length": "1:32",
+  "first": 44,
+  "last": 49,
+  "portholes": 6,
+  "beats_per_porthole": 20
+ },
+ {
+  "file": "youtube/mixes/mix-10-whale-belly-breach.mp4",
+  "title": "Whale Belly Breach",
+  "length": "1:23",
+  "first": 50,
+  "last": 55,
+  "portholes": 6,
+  "beats_per_porthole": 40
+ }
+]
