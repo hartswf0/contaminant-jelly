@@ -1345,5 +1345,168 @@
   "files": [
    "films/p54-v2.mp4"
   ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "p55-v2",
+  "take": 1,
+  "seconds": 11.4,
+  "arguments": {
+   "duration": 8,
+   "resolution": "480P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 244180361,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "stills/p55.jpg",
+   "atlas/a44.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images.\n\nShot 1 (0-5.5s), Turkey's seat, locked-off camera, the camera never moves: exactly the cockpit reference throughout in the house watercolour: steel tin, brass six-bolt porthole chipped at two o'clock, ballast slot, chalk chart, lamp toggle. From frame one the porthole reference is in the glass as a photographed miniature, not a drawing: real brass, cork and glass, cool white light from above, violet dusk behind. A corked brass-capped glass tube full of rolled pastel postcards hangs large and close in a slow eddy. Small and deep behind it, a tidy grid of small colour squares. At 1s only a wing tip enters lower right, flips the toggle and leaves. The eddy carries the tube once round. As it passes closest one card slides half out past the cork and opens flat against the port like a notice on a door: a tiny drawing of a brass porthole with a tiny corked tube inside it, over three wavy ink lines that are not letters.\n\nShot 2 (5.5-8s), Trout's side, hard cut, locked-off camera, the camera never moves: exactly the outside reference, held still, the port clear, Turkey small behind the amber port. In the left foreground the same tube stands upright on the riverbed and one speckled trout faces it at arm's length, the loose card held between them in the trout's mouth. The trout pushes the card back in beside the cork like posting a letter, lets go and stares at the tube, which glints pale green. The tube begins the same circle again.\n\nTwo parties at hand distance, one object between them, as in the last reference only. No text, no letters, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab3133f/JNT765o17uoZciethLneK_minimax-h3.mp4",
+  "files": [
+   "films/p55-v2.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "intro-2",
+  "take": 1,
+  "seconds": 19.1,
+  "arguments": {
+   "duration": 8,
+   "resolution": "768P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 1573333895,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "atlas/a36.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. One continuous 8-second shot, no cuts, camera locked.\n\nThe fixed eye-level view inside the riveted steel tin submarine exactly as in the cockpit reference: centered brass six-bolt porthole with a chip at two o'clock, hinge and offset latch, ONE empty rectangular slot at lower left of the console, chalk route chart under glass at lower center, brass lamp toggle at lower right, amber lamp overhead, dent in the right wall. Two small worn metal parts rest on the console beside the slot: a stubby brass lamp with a round lens, and a low grey iron ballast weight with one handle. Outside the glass: murky blue-green river silt, nothing clear.\n\n0-3s: only the tip of a brown feathered turkey wing reaches in from the lower left edge, lifts the small brass lamp and presses it down into the slot; it clicks in. An amber beam shines out through the porthole and the silt outside clears to show a notch in a far rock.\n\n3-5s: the wing tip pulls the lamp back out and sets it on the console. The slot is empty; the beam goes out and the view through the glass is murky again.\n\n5-8s: the wing tip drops the iron ballast weight into the same slot. The whole room settles gently downward and the view through the porthole sinks to calm water low among riverbed pebbles and weed. The lamp stays on the console beside the slot.\n\nOnly one part is ever in the slot. Material as in the last reference: small hand-worn objects with visible seams sitting on a tactile surface; do not show the animal in it. No turkey body, head or tail in frame, only the wing tip. Bubbles rise outside. No text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab31340/Uxvz6eB3t7InT08-bBv_5_minimax-h3.mp4",
+  "files": [
+   "films/intro-2.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "intro-4",
+  "take": 1,
+  "seconds": 20.0,
+  "arguments": {
+   "duration": 8,
+   "resolution": "768P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 1958282674,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "atlas/a51.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. One continuous 8-second shot, no cuts, camera locked.\n\nThe fixed eye-level view from the pilot's seat inside a small submarine built from a long oval dented riveted steel tin (metal, never bread), exactly as in the cockpit reference: centered round brass six-bolt porthole with hinge, offset latch and a chip in the rim at two o'clock; empty ballast slot at lower left; chalk route chart under glass at lower center; brass lamp toggle at lower right; caged amber lamp overhead; dent in the right wall. The three upper bolts of the brass rim are small round glass bolt lights, all dark: teal on the left, green at the top, rust on the right. Outside the glass, in cool blue-green river water, two speckled brook trout crewmates hover side by side, faces close to the port, looking in. The pilot is never seen: only the tip of one brown feathered turkey wing, small, at the bottom edge, never covering the porthole.\n\n0-2.5s: the wing tip rises at lower center holding one ivory six-sided die with black pips, shakes it once; both trout lean in.\n2.5-5s: the wing tip rolls the die once across the chart glass; it tumbles, clatters and stops at the center showing two pips. The wing tip withdraws.\n5-8s: the green bolt light at the top of the rim switches on and glows bright; teal and rust stay dark. Green light falls on the die and on the trout; one trout nods, the other flicks its tail and blows a bubble. Hold.\n\nFrom the last reference take only the staging: trout gathered close around one small object on a low surface in dim blue water; keep the watercolor look, do not copy its figures or props.. No text, no numerals, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab31340/LfX3Gd9BxK024EOnVVQ1l_minimax-h3.mp4",
+  "files": [
+   "films/intro-4.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "intro-3",
+  "take": 1,
+  "seconds": 20.2,
+  "arguments": {
+   "duration": 8,
+   "resolution": "768P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 2027706263,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "atlas/a17.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. One single continuous 8-second shot, no cuts, camera locked off.\n\nThe fixed eye-level view from the pilot's seat inside a small submarine built from a long oval dented riveted steel tin (metal, never bread), exactly as in the cockpit reference: centered round brass six-bolt porthole with hinge, offset latch and a chip in the rim at two o'clock; empty ballast slot at lower left; chalk route chart under glass at lower center; brass lamp toggle at lower right; caged amber lamp overhead; dent in the right wall. The room never changes. The pilot is never seen: only the tip of one brown feathered turkey wing rises from the bottom right edge, small, never covering the porthole.\n\nThrough the glass is a river bend: grey stone steps climbing the bank at the left, two dark upright tree trunks at the right, and between them a far rock with a V-shaped notch. These never move.\n\n0-2.5s: a brown cloud of silt rolls across the bend and buries the rock; the notch is gone, the steps and both trunks still show at the edges.\n2.5-4s: the wing tip flips the brass toggle.\n4-7s: a narrow amber beam shines out from below the porthole, sweeps slowly from the steps toward the trunks and stops on the rock; inside the beam the silt glows thin and the V notch appears again, sharp and amber-lit, in exactly the same place.\n7-8s: the beam holds on the notch; the wing tip rests on the chart.\n\nFrom the last reference take only how a pale cone of light cuts through a grainy field; not its grey color, black bars or vessels. Bubbles drift past. No text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab31340/H1vDahLsu-1BxVO0BvhtH_minimax-h3.mp4",
+  "files": [
+   "films/intro-3.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "intro-1",
+  "take": 1,
+  "seconds": 20.2,
+  "arguments": {
+   "duration": 8,
+   "resolution": "768P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 1516714820,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "atlas/a15.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. One single continuous 8-second shot, no cuts, camera locked off.\n\nThe fixed eye-level view from the pilot's seat inside a small submarine built from a long oval dented riveted steel tin (metal, never bread), exactly as in the cockpit reference: centered round brass six-bolt porthole with hinge on the left, offset latch on the right and a chip in the rim at two o'clock; empty rectangular ballast slot at lower left; chalk route chart under glass at lower center; brass lamp toggle at lower right; caged amber lamp overhead; dent in the right wall; worn red seat edge at the bottom. Outside the glass is cool blue-green river, dim and silty. The room and its size never change. The pilot is never seen: only the tip of one brown feathered turkey wing rises from the bottom edge of the frame, small, never covering the porthole.\n\n0-2.5s: the wing tip reaches to the lower right and flips the brass toggle. At once an amber beam shines out below the porthole and, through the glass, the silt glows and a notch in a far rock becomes visible.\n2.5-5.5s: the wing tip crosses to the lower left and drops one small grey iron weight into the ballast slot; the view through the porthole sinks a little, the riverbed rising in the glass.\n5.5-8s: the wing tip settles on the center chart and traces the white chalk route line along the glass, then rests there, the amber beam still on.\n\nFrom the last reference take only the staging: one small hand at the frame edge serving a large round opening; do not take its brown color or anything drawn in it. Bubbles drift past the glass. No text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab31340/NsmlrbDcv32S5TDgxY05D_minimax-h3.mp4",
+  "files": [
+   "films/intro-1.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "intro-5",
+  "take": 1,
+  "seconds": 22.6,
+  "arguments": {
+   "duration": 8,
+   "resolution": "768P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 1261803941,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "atlas/a50.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. One single continuous 8-second shot, no cuts, camera locked off.\n\nThe fixed eye-level view from the pilot's seat inside a small submarine built from a long oval dented riveted steel tin (metal, never bread), exactly as in the cockpit reference: centered round brass six-bolt porthole with hinge, offset latch and a chip in the rim at two o'clock; empty ballast slot at lower left; chalk route chart under glass at lower center; brass lamp toggle at lower right; caged amber lamp overhead; dent in the right wall. The room never changes. The pilot is never seen: only the tip of one brown feathered turkey wing rises from the bottom edge, small, never covering the porthole.\n\nThrough the glass, cool blue-green river: a speckled brook trout floats at the right beside a small brass bell hanging from a twig; at the left a pale swirl of silt drifts.\n\n0-3s: the wing tip holds a stub of white chalk and draws one bold white X on the chart under glass, at the end of the chalk route line.\n3-6s: the wing tip sets a blank round cream card the size and shape of the porthole on the console beside the chart, and slides it forward toward the viewer until it rests at the very front edge. Outside, the silt swirl thins and vanishes completely.\n6-8s: the trout outside nudges the bell with its nose; the bell swings and rings, bright, twice. The wing tip withdraws. The X and the round card stay.\n\nFrom the last reference take only the idea of a fish close beside a small hanging brass bell; not its photographic look, glasses, tie or other fish. Bubbles rise. No text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab31340/KtGOzTEqh6dJFNpquBXRI_minimax-h3.mp4",
+  "files": [
+   "films/intro-5.mp4"
+  ]
+ },
+ {
+  "endpoint": "minimax/h3-max-turbo/reference-to-video",
+  "name": "intro-6",
+  "take": 1,
+  "seconds": 16.1,
+  "arguments": {
+   "duration": 8,
+   "resolution": "768P",
+   "aspect_ratio": "16:9",
+   "prompt_expansion_mode": "disabled"
+  },
+  "seed": 1141622000,
+  "references": [
+   "masters/cockpit.jpg",
+   "masters/outside.jpg",
+   "atlas/a42.jpg",
+   "atlas/a40.jpg"
+  ],
+  "prompt": "Hand-inked watercolor storybook animation in the ink line, paper grain and palette of the reference images. One single continuous 8-second shot, no cuts: a wide establishing view of a small town on the bed of a cool blue-green river, camera drifting very slowly forward.\n\nThe town, held still for the whole shot: in the left foreground a low wooden counter with one amber shaded work lamp glowing warm and a row of small plain coloured squares, and behind it an upright speckled brook trout in an apron wiping the counter. In the middle distance two tall bare tree trunks stand like a gate at the bend of the river. To the right of the trunks shallow stone steps climb along the bank, and an upright trout in a work vest walks down them. At the foot of the steps a small brass bell hangs on a post with a third upright trout waiting beside it. Pale rock with one notch far behind. Slanting sun shafts, drifting silt, rising bubbles.\n\n0-3s: the residents work; far off between the two trunks a small amber glow appears in the murk.\n3-6s: the glow becomes the submarine of the outside reference: a long oval dented riveted steel tin (metal, never bread) with a handle on top, a dent on its right side and a centered round brass six-bolt porthole chipped at two o'clock, a small turkey behind the amber glass. It glides in between the trunks and its amber beam sweeps over the stone steps.\n6-8s: the tin settles on the pebbles by the counter. All three trout turn to look at it; the trout at the post rings the brass bell.\n\nFrom the last two references take only staging and light: upright residents at trout height among trunks, sun cutting down through water. Do not copy their figures, clothes, tools or photographic look. No text, no labels, no captions.",
+  "source_url": "https://v3b.fal.media/files/b/0ab31342/xGm9QHYAcbWUOjMXBTKMW_minimax-h3.mp4",
+  "files": [
+   "films/intro-6.mp4"
+  ]
  }
 ]

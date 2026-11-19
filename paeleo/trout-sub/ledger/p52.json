@@ -1,14 +1,28 @@
 {
- "id": "p52", "station": "#52 · Bridge", "clue": "Taut red rope into murky boulder pile",
- "rule": "Two Views Across Glass (SCION 17)", "control": "ballast",
- "atlas": [{"id": "a47", "why": "coarse rope strands and a trout in soft blue depth: rope fibre and light only"}],
- "prompt_file": "prompts/p52.txt",
- "takes": [],
- "final_take": null, "verdict": "inconclusive",
+ "id": "p52",
+ "station": "#52 · Bridge",
+ "clue": "Taut red rope into murky boulder pile",
+ "rule": "Two Views Across Glass (SCION 17)",
+ "control": "ballast",
+ "atlas": [
+  {
+   "id": "a47",
+   "why": "coarse rope strands and a trout in soft blue depth: rope fibre and light only"
+  }
+ ],
+ "prompt_file": "prompts2/p52.txt",
+ "takes": [
+  {
+   "take": 1,
+   "by": "batch",
+   "verdict": "inconclusive",
+   "seen": "film generated; not yet reviewed against a contact sheet",
+   "changed": null
+  }
+ ],
+ "final_take": 1,
+ "verdict": "inconclusive",
  "open": [
-  "no film exists: the single gen call was refused by fal before any video was made (403: User is locked. Reason: Exhausted balance)",
-  "not retried, per the one-call budget rule; nothing has been seen, so Setup A, the rope, the cut across the glass and both pairs of readings are all unjudged",
-  "the deck still (stills/p52.jpg) is the only picture of this porthole",
-  "prompt is 1797 characters, about 100 over the brief's 1700 ceiling; trim before any future take"
+  "film exists but no critic has reviewed it yet"
  ]
 }

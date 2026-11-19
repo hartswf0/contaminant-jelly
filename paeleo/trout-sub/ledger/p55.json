@@ -1,0 +1,18 @@
+{
+ "id": "p55",
+ "takes": [
+  {
+   "take": 1,
+   "by": "batch",
+   "verdict": "inconclusive",
+   "seen": "film generated; not yet reviewed against a contact sheet",
+   "changed": null
+  }
+ ],
+ "final_take": 1,
+ "verdict": "inconclusive",
+ "open": [
+  "film exists but no critic has reviewed it yet"
+ ],
+ "prompt_file": "prompts2/p55.txt"
+}

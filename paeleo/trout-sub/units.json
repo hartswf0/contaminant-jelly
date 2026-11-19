@@ -384,59 +384,59 @@
   "lost": 77
  },
  "p49": {
-  "kind": "keyframe",
+  "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 5.5,
+  "cut": 5.875,
   "pushed_in": 0,
   "lost": 0
  },
  "p50": {
-  "kind": "keyframe",
+  "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 5.5,
-  "pushed_in": 0,
-  "lost": 0
+  "cut": 6.0,
+  "pushed_in": 21,
+  "lost": 83
  },
  "p51": {
-  "kind": "keyframe",
+  "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 5.5,
+  "cut": 5.875,
   "pushed_in": 0,
-  "lost": 0
+  "lost": 116
  },
  "p52": {
-  "kind": "keyframe",
+  "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 5.5,
-  "pushed_in": 0,
-  "lost": 0
+  "cut": 5.375,
+  "pushed_in": 4,
+  "lost": 99
  },
  "p53": {
-  "kind": "keyframe",
+  "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 5.5,
+  "cut": 6.208,
   "pushed_in": 0,
-  "lost": 0
+  "lost": 149
  },
  "p54": {
-  "kind": "keyframe",
+  "kind": "film",
   "lock_start": true,
   "lock_end": true,
-  "cut": 5.5,
+  "cut": 5.333,
   "pushed_in": 0,
-  "lost": 0
+  "lost": 82
  },
  "p55": {
-  "kind": "keyframe",
+  "kind": "film",
   "lock_start": true,
   "lock_end": true,
   "cut": 5.5,
-  "pushed_in": 0,
-  "lost": 0
+  "pushed_in": 20,
+  "lost": 79
  }
 }

@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-"""intro: the four steps of the activity, cut from footage already made, with captions.
+"""intro: the activity in six shots, one per core SCION prompt, with captions.
 
-Uses the raw films in films/ (no fal call). The six SCION intro shots in
-prompts/intro-*.txt are written but unrun; when they exist they replace this.
+Cuts films/intro-1..6.mp4 (made from prompts/intro-*.txt) into films/intro.mp4. No fal call.
 """
 import os, subprocess
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -10,11 +9,12 @@ os.chdir(ROOT)
 FONT = "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf"
 # (source, start, length, step, caption)
 SHOTS = [
-    ("films/p03.mp4", 0.0, 3.2, 1, "1  Take Turkey's seat", "One window. Ballast slot left, chalk chart centre, lamp toggle right."),
-    ("films/p14.mp4", 0.0, 5.0, 1, "2  Operate one part", "Flip the lamp or fit the ballast, and watch what changes in the port."),
-    ("films/p08.mp4", 4.0, 2.6, 1.5, "3  Turkey looks out", "Odd faces 1, 3, 5. What does Turkey suspect?"),
-    ("films/p08.mp4", 6.75, 1.25, 3, "3  Trout looks in", "Even faces 2, 4, 6. What do the trout suspect?"),
-    ("films/p22.mp4", 6.75, 1.25, 3.5, "4  Roll once, pass it on", "Circle the roll, mark the chart under glass, hand the clue to the next pilot."),
+    ("films/intro-6.mp4", 2.6, 5.4, 1, "TOURKEY TROUTTOWN", "Turkey takes a tour of Trout Town. 55 portholes, one window at a time."),
+    ("films/intro-1.mp4", 0.0, 5.0, 1, "1  Take Turkey's seat", "One window. Ballast slot left, chalk chart centre, lamp toggle right."),
+    ("films/intro-2.mp4", 1.0, 6.0, 1, "2  Operate one part", "One slot: fit the lamp or the ballast, and watch what changes in the port."),
+    ("films/intro-3.mp4", 2.0, 6.0, 1, "3  Read both sides of the glass", "Turkey looks out: odd faces 1, 3, 5. Trout look in: even faces 2, 4, 6."),
+    ("films/intro-4.mp4", 2.6, 5.4, 1, "4  Roll once", "Probable, Plausible or Preposterous. One die decides, and one light comes on."),
+    ("films/intro-5.mp4", 2.0, 6.0, 1, "5  Pass the record", "Mark the chart under glass and hand the postcard to the next pilot."),
 ]
 parts, ins = [], []
 for i, (src, ss, t, slow, step, cap) in enumerate(SHOTS):

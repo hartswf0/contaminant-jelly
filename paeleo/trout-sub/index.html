@@ -50,9 +50,9 @@ a{color:var(--amber)}
 <div class="mono">Trout Sub · Double Duck/Rabbit Deck · PAE-09</div>
 <h1>TOURKEY TROUTTOWN</h1>
 <p class="lede" style="color:var(--amber);margin-bottom:6px">Turkey takes a tour of Trout Town: 55 portholes, one film each.</p>
-<p class="lede">Every film holds one room: Turkey flips the lamp or fits ballast, the thing arrives at the glass, and the cut crosses to the trout looking in. 48 were written by a director, generated once and logged against the deck drawing; the last 7 are keyframe units built from the drawings.</p>
+<p class="lede">Every film holds one room: Turkey flips the lamp or fits ballast, the thing arrives at the glass, and the cut crosses to the trout looking in. Each was written by a director, generated once and logged against the deck drawing.</p>
 
-<h2>Start here: the activity</h2>
+<h2>Start here: the activity in six shots</h2>
 <div class="intro">
   <div><video id="introV" controls playsinline preload="metadata"></video>
     <div class="shots" id="shots"></div></div>
@@ -164,7 +164,7 @@ function render() {
   D.ports.forEach(function (p, i) {
     if (!show(p, i)) return;
     var c = el("article", "card");
-    var clip = p.film ? "films/" + p.id + ".mp4" : (p.unit ? "units/" + p.id + ".mp4" : null);
+    var clip = p.clip || (p.unit ? "units/" + p.id + ".mp4" : null);
     var poster = el("button", "poster" + (clip ? "" : " none")); poster.type = "button";
     poster.style.backgroundImage = "url(stills/" + p.id + ".jpg)"; poster.setAttribute("aria-label", "Play film " + p.station);
     poster.onclick = function () {
@@ -185,13 +185,15 @@ function render() {
     if (p.control) row.appendChild(el("span", "tag", p.control));
     if (p.takes) row.appendChild(el("span", "tag", p.takes + (p.takes === 1 ? " take" : " takes")));
     row.appendChild(el("span", "tag", p.rule));
+    if (p.feedstock) row.appendChild(el("span", "tag", "style: " + p.feedstock));
     b.appendChild(row);
     if (p.prompt) {
       var d = el("details"); d.appendChild(el("summary", null, "Shot prompt, references, open notes"));
       p.atlas.forEach(function (a) { d.appendChild(el("div", "mono", a.id + " · " + a.why)); });
       if (p.open.length) { var ul = el("ul", "open"); p.open.forEach(function (o) { ul.appendChild(el("li", null, o)); }); d.appendChild(ul); }
       d.appendChild(el("pre", null, p.prompt));
-      if (p.film) { var a = el("a", null, "MP4"); a.href = "films/" + p.id + ".mp4"; d.appendChild(a); }
+      if (p.prompt2) { d.appendChild(el("div", "mono", p.v2 ? "Version 2 prompt (two locked shots), filmed" : "Version 2 prompt (two locked shots), not yet filmed")); d.appendChild(el("pre", null, p.prompt2)); }
+      if (p.clip) { var a = el("a", null, "MP4"); a.href = p.clip; d.appendChild(a); }
       b.appendChild(d);
     }
     c.appendChild(b); g.appendChild(c);
