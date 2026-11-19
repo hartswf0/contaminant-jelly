@@ -33,7 +33,7 @@ import cards as C
 W, H, FPS = 1280, 720, 24
 BX, BY, BW, BH = 0, 0, W, H                     # the film fills the frame
 TRANS = 0.6                                     # seconds of the through-the-porthole change
-MAX_MB = 92                                     # the finished file is held under this
+MAX_MB = 95                                     # the finished file is held under this
 font = C.font
 seeds = json.load(open("seeds.json"))
 units = json.load(open("units.json")) if os.path.exists("units.json") else {}
@@ -146,7 +146,30 @@ def hud(n):
     return regs
 
 
+BOLT_R = 0.925        # bolt circle radius / outer rim radius, on the locked porthole
+def bolt_dice(side):
+    """A die face on each of the six bolts, as on the worksheet's ring. Clockwise from the top:
+    1, 2, 3 down the right (the first friend's bolts, Turkey's side), 4, 5, 6 up the left (the next
+    friend's, the trout's side). The three that belong to the shot on screen are lit."""
+    pad = int(RIM + 40); im = Image.new("RGBA", (2 * pad, 2 * pad), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
+    for k in range(6):
+        ang = math.radians(-90 + 60 * k)
+        on = (k < 3) == (side == "turkey")
+        C.die_face(d, pad + RIM * BOLT_R * math.cos(ang), pad + RIM * BOLT_R * math.sin(ang), 46 if on else 38, k + 1, on)
+    a = np.array(im).astype(np.float32)
+    return int(W / 2 - pad), int(H / 2 - pad), a[:, :, 2::-1].copy(), a[:, :, 3:4] / 255.0
+
+
 def stamp_on(frame, reg, fade=1.0):
+    x, y, rgb, al = reg
+    if y < 0:                                  # the ring of dice is taller than the frame: trim it
+        rgb, al, y = rgb[-y:], al[-y:], 0
+    if y + rgb.shape[0] > H:
+        rgb, al = rgb[:H - y], al[:H - y]
+    return _stamp(frame, (x, y, rgb, al), fade)
+
+
+def _stamp(frame, reg, fade=1.0):
     x, y, rgb, al = reg
     h, w = rgb.shape[:2]
     frame[y:y + h, x:x + w] = frame[y:y + h, x:x + w] * (1 - al * fade) + rgb * (al * fade)
@@ -242,7 +265,7 @@ def opening(out):
 def closing(out):
     """The last two commands again, for the moment the logs come back."""
     t0 = out.t
-    for spec in C.CARDS[4:]:
+    for spec in C.CARDS[6:]:
         n = int(C.card_seconds(spec) * FPS)
         for f in C.card(spec, film_frames(spec["film"][0], spec["film"][1], n, 640, 360), n, first=False):
             out.add(f)
@@ -284,6 +307,7 @@ def dive(out, spec, times):
             sides = {"turkey": [c for c in ch if c[2] == "turkey"], "trout": [c for c in ch if c[2] == "trout"]}
             panels = {(s_, k): side_panel(items, s_, k) for s_, items in sides.items() for k in list(range(len(items))) + [None]}
             regs = hud(pid)
+            dice = {"turkey": bolt_dice("turkey"), "trout": bolt_dice("trout")}
             times[pid] = out.t
             for i in range(frames_n):
                 frame = one[order[i]].astype(np.float32)
@@ -292,6 +316,7 @@ def dive(out, spec, times):
                 else:
                     side, local, m = "trout", i - half_n, frames_n - half_n
                 fade = min(1.0, max(0.0, (local - (nt if side == "turkey" else 0) + 4) / 8.0))
+                stamp_on(frame, dice[side])
                 if fade > 0:
                     stamp_on(frame, panels[(side, reading(m, len(sides[side]), local))], fade)
                 for reg in regs:

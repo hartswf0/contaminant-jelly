@@ -100,6 +100,17 @@ def button(d, cx, cy, r, kind, on=True):
         d.line(pts + [pts[0], pts[1]], fill=col + (a,), width=w, joint="curve")
 
 
+PIPS = {1: [(0, 0)], 2: [(-1, -1), (1, 1)], 3: [(-1, -1), (0, 0), (1, 1)], 4: [(-1, -1), (1, -1), (-1, 1), (1, 1)],
+        5: [(-1, -1), (1, -1), (0, 0), (-1, 1), (1, 1)], 6: [(-1, -1), (1, -1), (-1, 0), (1, 0), (-1, 1), (1, 1)]}
+def die_face(d, cx, cy, size, n, on=True):
+    """A die face in the worksheet's style: cream square, brown edge, dark pips."""
+    h = size / 2.0; a = 255 if on else 105
+    d.rounded_rectangle((cx - h, cy - h, cx + h, cy + h), size * 0.2, fill=(251, 246, 233, a), outline=(110, 72, 16, a), width=max(2, int(size * 0.07)))
+    q = size * 0.26; r = size * 0.085
+    for px_, py_ in PIPS[n]:
+        d.ellipse((cx + px_ * q - r, cy + py_ * q - r, cx + px_ * q + r, cy + py_ * q + r), fill=(22, 41, 58, a))
+
+
 def bars(im, u, colours=(RUST, GOLD, TEAL, NAVY, RUST), direction=1):
     """Cut-paper bars sweep across and off. u 0..1: 0-0.5 cover, 0.5-1 uncover."""
     d = ImageDraw.Draw(im); n = len(colours); h = H / float(n)
@@ -178,22 +189,52 @@ def title(film, n1=int(5.6 * FPS)):
 
 
 # One card per command on the worksheet. crop and lights are in PDF points (612 x 792 page).
+# Every entry line and every printed prompt on the worksheet gets its own step: one box on the
+# page (PDF points), one short line of words. Nothing on the sheet is left for the child to find alone.
 CARDS = [
-    dict(num="1", page=1, crop=(28, 22, 584, 132), chip="Front · Pilot", title="Copy your slip",
-         lights=[((262, 82, 392, 101), "Write your number."), ((398, 82, 580, 101), "Write your station."), ((34, 107, 580, 127), "Write your clue and your rule.")],
-         film=("films/intro-1.mp4", 0.0)),
-    dict(num="2", page=1, crop=(120, 130, 492, 420), chip="Front · Pilot", title="Draw what Turkey sees",
-         lights=[((150, 160, 462, 396), "Draw inside the ring.")], film=("films/intro-3.mp4", 2.0)),
-    dict(num="3", page=1, crop=(28, 424, 584, 688), chip="Front · Pilot", title="Write 3 things",
-         lights=[((34, 428, 580, 497), "1. What do we see?"), ((34, 503, 580, 572), "2. What does Turkey do?"),
-                 ((34, 578, 580, 647), "3. What could go wrong?"), ((34, 653, 580, 684), "Pass it left.")], film=("films/intro-2.mp4", 1.0)),
-    dict(num="4", page=2, crop=(28, 100, 584, 462), chip="Back · Two friends", title="Friends write 6 endings",
-         lights=[((34, 110, 260, 430), "First friend writes 1, 2, 3."), ((34, 433, 260, 459), "Pass it left again."),
-                 ((352, 110, 580, 430), "Next friend writes 4, 5, 6."), ((352, 433, 580, 459), "Give it back to the pilot.")], film=("units/p07.mp4", 5.6)),
-    dict(num="5", page=2, crop=(28, 262, 584, 508), chip="Back · Pilot", title="Roll the die one time",
-         lights=[((258, 270, 354, 380), "Roll the die."), ((34, 478, 580, 502), "Circle your number.")], film=("films/intro-4.mp4", 2.4)),
-    dict(num="6", page=2, crop=(28, 474, 584, 648), chip="Back · Pilot", title="Tell what happened",
-         lights=[((34, 503, 580, 562), "What do the trout say?"), ((34, 566, 580, 644), "Write a message home.")], film=("films/intro-5.mp4", 2.0)),
+    dict(num="1", page=1, crop=(28, 22, 584, 132), chip="Front · Pilot", title="Copy your slip", film=("films/intro-1.mp4", 0.0), lights=[
+        ((34, 82, 262, 101), "Write your name."),
+        ((262, 82, 392, 101), "Write your number."),
+        ((398, 82, 580, 101), "Write your station."),
+        ((34, 107, 580, 127), "Write your clue and your rule.")]),
+    dict(num="2", page=1, crop=(120, 130, 492, 420), chip="Front · Pilot", title="Draw", film=("films/intro-3.mp4", 2.0), lights=[
+        ((180, 134, 430, 157), "Look. What does Turkey see?"),
+        ((150, 160, 462, 396), "Draw it inside the ring."),
+        ((205, 397, 405, 419), "This is Trout Town.")]),
+    dict(num="3", page=1, crop=(28, 424, 584, 688), chip="Front · Pilot", title="Write 3 things", film=("films/intro-2.mp4", 1.0), lights=[
+        ((34, 428, 580, 452), "1. Who is outside the glass?"),
+        ((34, 428, 580, 452), "What do they think our sub is?"),
+        ((34, 452, 580, 497), "Write it here."),
+        ((34, 503, 580, 527), "2. What one thing does Turkey do?"),
+        ((34, 527, 580, 572), "Write it here."),
+        ((34, 578, 580, 602), "3. How could this use up our air?"),
+        ((34, 602, 580, 647), "Write it here."),
+        ((34, 653, 580, 684), "Pass your paper left.")]),
+    dict(num="4", page=2, crop=(28, 70, 584, 110), chip="Back · Everyone", title="Three kinds of endings", film=("units/p22.mp4", 2.0), lights=[
+        ((36, 79, 226, 104), "Probable: what you expect."),
+        ((212, 79, 426, 104), "Plausible: strange, but it fits."),
+        ((420, 79, 580, 104), "Preposterous: a wild surprise!")]),
+    dict(num="5", page=2, crop=(28, 104, 300, 462), chip="Back · First friend", title="First friend", film=("units/p07.mp4", 0.5), lights=[
+        ((36, 112, 262, 180), "First friend: write your name."),
+        ((36, 184, 262, 266), "Bolt 1. What would you expect?"),
+        ((36, 268, 262, 349), "Bolt 2. Strange, but it fits."),
+        ((36, 351, 262, 431), "Bolt 3. A wild surprise!"),
+        ((34, 433, 262, 459), "Pass it left again.")]),
+    dict(num="6", page=2, crop=(312, 104, 584, 462), chip="Back · Next friend", title="Next friend", film=("units/p07.mp4", 5.6), lights=[
+        ((352, 112, 580, 180), "Next friend: write your name."),
+        ((352, 184, 580, 266), "Bolt 4. What would you expect?"),
+        ((352, 268, 580, 349), "Bolt 5. Strange, but it fits."),
+        ((352, 351, 580, 431), "Bolt 6. A wild surprise!"),
+        ((352, 433, 580, 459), "Give it back to the pilot.")]),
+    dict(num="7", page=2, crop=(28, 262, 584, 508), chip="Back · Pilot", title="Roll", film=("films/intro-4.mp4", 2.4), lights=[
+        ((258, 270, 354, 380), "Roll the die one time."),
+        ((266, 477, 342, 502), "Write the number you rolled."),
+        ((342, 477, 580, 502), "Or circle that die.")]),
+    dict(num="8", page=2, crop=(28, 474, 584, 648), chip="Back · Pilot", title="Tell what happened", film=("films/intro-5.mp4", 2.0), lights=[
+        ((34, 503, 580, 524), "What do the trout tell the newspaper?"),
+        ((34, 524, 580, 562), "Write it here."),
+        ((34, 566, 580, 601), "Why did Turkey come to Trout Town?"),
+        ((34, 601, 580, 644), "Write your message home.")]),
 ]
 LINE_SECONDS, CARD_LEAD = 3.6, 1.4
 def card_seconds(spec):
