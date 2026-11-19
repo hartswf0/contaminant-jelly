@@ -1299,8 +1299,8 @@ def bench(t, k_frame):
 # ------------------------------------------------------------ part 2: Turkey looks out ---
 PC = (522, 256)        # porthole centre on screen
 RG = 190               # glass radius
-N2 = 46.0              # one notch, units
-L2 = dict(x0=-124.0, y0=-212.0)
+N2 = 54.0              # one notch, units
+L2 = dict(x0=-124.0, y0=-196.0)
 
 
 def build_port():
