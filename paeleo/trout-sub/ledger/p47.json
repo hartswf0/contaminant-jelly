@@ -1,0 +1,22 @@
+{
+ "id": "p47", "station": "#47 · Armada", "clue": "100 upside-down canning jars lashed together",
+ "rule": "Bricolage Armada (SCION 29)", "control": "lamp",
+ "atlas": [{"id": "a51", "why": "dim underwater trading place with fish on different sides of the goods: light and blocking for Trout's side (trade skiff); nothing from it asked to appear"}],
+ "prompt_file": "prompts/p47.txt",
+ "takes": [{"take": 1, "by": "director", "verdict": "pass", "seen": "0-3 s cockpit matches the master (chipped six-bolt port, empty slot, chalk chart, toggle, lamp, dent); Turkey's tail fan enters at the lower right from about 1 s and by 1.7 s an amber cone of light lies across the console and Turkey's face is reflected low right in the glass; 3.3-5.5 s push-in to the glass: a raft of upside-down glass jars netted in knotted brown rope hangs on ropes from the surface, air pockets pale in the jar tops, a green pickle lying on top, trout below over mossy stones; about 5 s a trout noses one jar up under the middle of the raft and by 5.9 s the trout is upright against the netting; about 6.3 s the outside view appears still ringed by the brass port rim, which is gone by 7 s; 6.3-8 s riveted metal tin with handle on the riverbed, Turkey small behind the amber port, the jar raft filling the top of frame, a wicker basket on a rope lowered from the raft with a jar in it; at 7 s a trout is at the basket and a small round disc hangs beside it; at 7.7 s two trout face in from left and right", "changed": null}],
+ "final_take": 1, "verdict": "pass",
+ "open": [
+  "the cut across the glass is not a hard cut: at about 6.3 s the outside view is seen through the brass port rim, which then slides off frame",
+  "Turkey's tail fan and back fill the lower right corner from about 1 s to 3 s instead of a wing tip only; the port and chart stay clear, but no wing is seen flipping the toggle",
+  "the lamp beam reads as a cone of light falling on the console inside the room, not a beam outside below the port",
+  "bottle-cap-opener reading is not supported: no bottle is seen and no cap is popped; only a small round disc beside the trout at about 7 s",
+  "trade-skiff reading is half there: the basket comes down with a jar in it, but no trout puts a button or anything else in, so no exchange is visible",
+  "pickling-factory reading is thin: the pickle lies on top of the raft rather than inside a jar, and nothing is being packed",
+  "the rope loop cinching the new jar is not visible; the bricolage rule shows only as the netted mismatched jars and one jar being added",
+  "in the outside view the basket and its jar hang in front of the right side of the port at 7-8 s, partly over the latch and the dent",
+  "the dent on the tin's right wall is visible at about 6.3 s but hidden behind the basket afterwards",
+  "trout count drifts: three or four below the raft through the port, one at the basket, then two different trout at the frame edges at 7.7 s",
+  "the dim trading-place light of a51 is not visible; the outside view is as bright as the master",
+  "sound not judged (sheet and stills only)"
+ ]
+}

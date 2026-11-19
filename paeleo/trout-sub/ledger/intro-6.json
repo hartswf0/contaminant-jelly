@@ -1,0 +1,20 @@
+{
+ "id": "intro-6", "station": "Trout Town world", "clue": "Trout Town world", "rule": "Trout Town world",
+ "control": "none of the three controls; exterior wide view, the tin's amber lamp beam sweeps the stone steps as it arrives",
+ "atlas": [
+  {"id": "a42", "why": "staging only: upright residents at trout height among tree trunks with slanting light"},
+  {"id": "a40", "why": "light only: sun cutting down through water onto a submerged working space"}
+ ],
+ "prompt_file": "prompts/intro-6.txt",
+ "takes": [],
+ "final_take": null, "verdict": "inconclusive",
+ "open": [
+  "no film exists: the single permitted gen call was refused by fal before producing anything (403: User is locked. Reason: Exhausted balance. Top up your balance at fal.ai/dashboard/billing.); not retried",
+  "nothing has been seen, so the watercolor look, the tin (metal, not bread), the town of upright trout, the counter with amber lamp, the two trunks, the stone steps and the bell are all unproven",
+  "the SCION's hard proof (three-shot introduction at counter, bend and landing with an inset hand-drawn map, bend repeated after Brook arrives, one evidence tile per destination) is not shown; the prompt as written puts counter, bend and landing in one wide shot with no map, no Culvert ring, no Works and no repeat of the bend",
+  "Setup A interior (ballast slot, chart, toggle) is not in this shot by design; only the tin's exterior invariants (dent, chipped six-bolt port, amber lamp) are asked for",
+  "the tool printed the turbo model (minimax/h3-max-turbo) with 768P when no --model was passed; whether that is the intended hero model is unchecked",
+  "prompt is 1756 characters, slightly over the brief's 1700 limit",
+  "prompt is written and unrun; needs one take once the fal balance is topped up"
+ ]
+}

@@ -1,0 +1,23 @@
+{
+ "id": "p43", "station": "#43 · Snout", "clue": "Crayon-spotted yellow shark nose on glass",
+ "rule": "Dollhouse Cutaway (SCION 31): in the outside view a strip of the tin's wall left of the port is sliced away to show a flat side-on section of the interior with shelves of cans", "control": "lamp",
+ "atlas": [{"id": "a07", "why": "flat side-on cut-open hull: staging for the sliced-away wall section of the tin in the outside view; prompt asks for the cross-section staging only, no people, no signs"}],
+ "prompt_file": "prompts/p43.txt",
+ "takes": [{"take": 1, "by": "director", "verdict": "pass", "seen": "0-3 s cockpit matches the master (six-bolt port with chip at two o'clock, hinge, latch, empty ballast slot, chalk chart, brass toggle, dent, amber lamp), a turkey tail fan enters at the lower right from about 0.7 s and at about 2.0 s the overhead lamp throws a bright amber cone over the port; 3.3-5.9 s close on the port: the plump yellow leopard-spotted shark with cream belly from the still, a small speckled trout behind it, Turkey's reflection low left on the glass; at about 4.0 s the shark's mouth is open showing a row of teeth, by 4.7 s it is closed into a smile; about 6.0-6.5 s hard cut to the outside: riveted steel tin on pebbles with handle and dent, the wall left of the port cut away showing two shelves of small round cans, Turkey behind the amber port, the yellow shark nose to the port, two trout in the left foreground; from about 6.7 s the whole tin glows yellow; from about 7.3 s one can lies on the pebbles under the tin", "changed": null}],
+ "final_take": 1, "verdict": "pass",
+ "open": [
+  "the clue itself is missing: the shark's snout never presses flat on the glass in the port view; it floats mid-water as in the still, and the two nudges are not visible",
+  "a turkey tail fan and part of the body fill the lower-right corner from 0.7 s to 3 s instead of only a wing tip; the toggle stays visible beside it but no wing is seen flipping it",
+  "the lamp reads as the overhead cabin lamp flaring into a cone that whites out the port (2.0-2.7 s), not a beam switching on outside; nothing is visible through the glass before the close-up",
+  "the push-in is a jump to the close port view between 2.7 s and 3.3 s on the sheet, not a visible slow push",
+  "the cutaway is not held: the sliced-away wall with can shelves is there at 6.0-6.5 s, then by 6.7 s the wall is whole again and yellow, so the rule is on screen for roughly half a second",
+  "scale breaks across the cut: the shark fills the port from inside but is smaller than the port from outside, and in the outside view it covers most of Turkey from 6.7 s",
+  "Turkey is shown nearly full body with tail fan behind the port at 6.0-6.5 s, not head and chest only; an amber lamp fitting sits at the bottom of the port",
+  "two trout in the outside foreground instead of the one trailing trout; neither clearly looks at the can or the shark",
+  "the tin rocking and the can actually dropping cannot be confirmed from frames; the can is simply on the pebbles from about 7.3 s",
+  "'rescue sub' rests only on the shark's smile after the teeth; nothing sub-like is shown on the shark. 'Fellow yellow fish' rests on the tin turning yellow in the last 1.3 s",
+  "cans carry round label blobs; no readable lettering found in the frames checked (6.1, 6.4, 7.8 s)",
+  "prompt as sent was 1830 characters, above the brief's 1700 guide",
+  "sound not reviewed; judged from frames only"
+ ]
+}

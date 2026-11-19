@@ -1,0 +1,14 @@
+{
+ "id": "p53", "station": "#53 · Flume", "clue": "Iron gristmill wheel clicking cellar latch",
+ "rule": "Reversible Gear Jam (SCION 43)", "control": "ballast",
+ "atlas": [{"id": "a39", "why": "wide flat layered ribbons of blue current for the mill-race water on Trout's side"}],
+ "prompt_file": "prompts/p53.txt",
+ "takes": [],
+ "final_take": null, "verdict": "inconclusive",
+ "open": [
+  "no film exists: the single permitted gen call was refused by fal before generating (403: User is locked. Reason: Exhausted balance), so nothing was made and nothing was charged",
+  "nothing in the prompt has been tested on screen: Setup A, the wheel jam and reverse, the cut across the glass and both pairs of readings are all unverified",
+  "the prompt is 1887 characters, over the brief's 900-1700 range",
+  "until a take exists the still stills/p53.jpg is the only version of this porthole"
+ ]
+}

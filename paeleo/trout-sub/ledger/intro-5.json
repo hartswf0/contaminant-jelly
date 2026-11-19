@@ -1,0 +1,35 @@
+{
+ "id": "intro-5",
+ "station": "Porthole postcard and world memory",
+ "clue": "Porthole postcard and world memory",
+ "rule": "Porthole postcard and world memory",
+ "control": "chalk route chart under glass (lower center): a wing tip chalks one X on it, then slides a blank round porthole-shaped card forward on the console",
+ "atlas": [
+  {
+   "id": "a50",
+   "why": "staging only: a fish close beside a small hanging brass bell, for the trout that rings the bell outside the port; not its photographic look, glasses, tie or other fish"
+  }
+ ],
+ "prompt_file": "prompts/intro-5.txt",
+ "takes": [
+  {
+   "take": 1,
+   "by": "director",
+   "verdict": "inconclusive",
+   "seen": "nothing: no film was produced. The single allowed gen call was refused by fal before generation (403: User is locked. Reason: Exhausted balance).",
+   "changed": null
+  }
+ ],
+ "final_take": null,
+ "verdict": "inconclusive",
+ "open": [
+  "no film exists for intro-5: fal refused the one gen call with 403 'User is locked. Reason: Exhausted balance. Top up your balance at fal.ai/dashboard/billing.'; not retried per the budget rule",
+  "final_take is null rather than 1 because there is no take 1 file (.raw/intro-5_t1.mp4 and films/intro-5.mp4 do not exist)",
+  "prompt is written and unrun (prompts/intro-5.txt, 1692 characters, atlas a50); it was trimmed by about 100 characters after the refused call to fit the brief's 1700 limit, so the stored prompt is slightly shorter than the one submitted",
+  "nothing could be judged: Setup A hold, sound-off readability, stray text, tin versus bread and turkey body blocking the room are all untested",
+  "the SCION's hard proof is not shown: even as written the shot has only the sending half (chalk mark, card slid forward, trout rings the bell, silt swirl vanishing as the temporary effect); a second pilot starting from the entry, using it and choosing a new action, the before/after state sheet, and the alternative branch (unread or partly hidden dispatch) are not in the shot",
+  "the postcard is written as blank (no text on screen), so it carries no porthole still or From/Seen/Action fields; whether a child reads it as a postcard for the next pilot is untested",
+  "a50 is a photographic vertical frame; risk that its look leaks into the watercolor film is untested",
+  "the gen call went to minimax/h3-max-turbo at 768P (tool default with no --model), so a rerun as commanded uses the cheap model, not the hero model"
+ ]
+}

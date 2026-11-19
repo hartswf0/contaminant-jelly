@@ -1,0 +1,38 @@
+{
+ "id": "p44",
+ "station": "#44 · Rotor",
+ "clue": "Spinning black-and-white spiral word disc",
+ "rule": "Rotating Type & Depth (Oucipo)",
+ "control": "lamp",
+ "atlas": [
+  {
+   "id": "a39",
+   "why": "sent as the fourth and last reference (after cockpit, outside and the p44 still): wide flat ribbons of blue water, asked for only as the way bubbles and weed curl toward the disc's center in beat 2"
+  }
+ ],
+ "prompt_file": "prompts/p44.txt",
+ "takes": [
+  {
+   "take": 1,
+   "by": "director",
+   "verdict": "reference stronger",
+   "seen": "0-2.5 s cockpit matches the master (riveted steel tin, centered six-bolt brass port with chip at two o'clock, hinge and latch, empty slot lower left, chalk chart under glass, brass toggle lower right, caged amber lamp, dent with cracks on the right wall); in the port a round dark disc on an A-frame stand in blue-green water; about 0.25-1.5 s a striped turkey tail fan sits in the lower right corner, then leaves; about 2.75 s an amber glow fills the port and a beam falls from the lamp; about 3.5 s the glow clears to the black-and-white spiral disc on its rusty A-frame with hub bolt, as in the still; 3.5-5.5 s one push-in to the glass; the disc swivels on its stand like a revolving door (edge-on about 4.75 s, full face about 5.0-5.25 s, edge-on about 5.6 s, full face about 6.0-6.5 s); a speckled trout holds at the right from about 4.75 s and by about 6.1 s its nose is at the hub; faint turkey face reflected low left on the glass about 4.75-5.75 s; about 5.75-6.5 s the camera passes the porthole rim with no cut and the disc fills the frame with the trout at its hub; about 6.6 s the riveted steel tin fades in behind the disc, two speckled trout at the left; about 6.9 s the disc is edge-on in front of the tin's port; about 7.25 s the disc collapses into a loose striped swirl around the stand and the turkey is seen small behind the amber port; about 7.4-8 s white suds froth at the hub, the disc is gone, a small striped scrap lies at the foot of the stand lower right. No lettering seen anywhere. Sound was not listened to.",
+   "changed": null
+  }
+ ],
+ "final_take": 1,
+ "verdict": "reference stronger",
+ "open": [
+  "a whole striped tail fan, not a wing tip, sits in the lower right corner from about 0.25 s to 1.5 s; it does not cover the port or the toggle, but no wing touches the toggle and no flip is visible; the beam comes on by itself about 2.75 s, more than a second after the fan has left",
+  "the disc does not spin about its hub: it swivels on a vertical axis like a revolving door, showing its thin edge and then its face; the spiral itself is never seen turning, so the sink-into-a-tunnel and swell-out illusion asked for by the Rotating Type & Depth rule is not there; the depth comes only from the disc turning edge-on",
+  "no hard cut across the glass: from about 5.75 s the camera drifts through the porthole and the tin fades in behind the disc about 6.6 s, about a second late; the outside view with the turkey readable lasts only from about 7.25 s",
+  "the disc does not survive beat 3: about 7.25 s it dissolves into a striped swirl and from about 7.5 s only the stand, hub and suds remain, so the two sides of the glass do not share the thing at the end",
+  "Trout's pie-prize-wheel reading is not supported: no tail flick on the rim, no slowing and stopping, no waiting line; two trout hover at the left",
+  "Trout's washing-machine reading is only weakly supported: suds at the hub from about 7.4 s and a striped swirl, but no sock is seen tumbling with the disc; the striped scrap at the foot of the stand is too small to read",
+  "Turkey's whirlpool-turbine reading is not supported: bubbles rise straight and the weeds do not bend toward the center; the flat ribbons of water asked from a39 are not visible",
+  "Turkey's hypnosis-trap reading is the only one that holds: one trout faces the disc and ends with its nose at the hub about 6.1 s, and the turkey reflection is on the glass, though it does not visibly sway",
+  "in beat 3 the disc stands directly in front of the tin's porthole and hides the turkey until it collapses",
+  "the prompt is 1765 characters, about 65 over the brief's 1700 limit",
+  "the still holds the spiral, the stand, the trout and the turkey reflection in one frame and the film matches it closely about 3.5-5.5 s, but adds no true spin and loses the disc on Trout's side, so the still does the porthole better"
+ ]
+}

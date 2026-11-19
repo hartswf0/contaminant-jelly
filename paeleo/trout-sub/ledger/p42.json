@@ -1,0 +1,23 @@
+{
+ "id": "p42", "station": "#42 · Ferry", "clue": "Two pin-jointed elders between twin trees",
+ "rule": "Fixed Bank, New Mark (SCION 16)", "control": "ballast",
+ "atlas": [
+  {"id": "a28", "why": "fixed stage: one profile figure bracketed by two trees over a ground strip; take the bracketed staging only"},
+  {"id": "a29", "why": "same stage with changed blocking: trees and ground hold, only the figures change, which is the row's rule"}
+ ],
+ "prompt_file": "prompts/p42.txt",
+ "takes": [{"take": 1, "by": "director", "verdict": "reference stronger", "seen": "0-2.5 s cockpit matches the master (six-bolt port with chip at two o'clock, hinge, latch, ballast slot, chalk chart, toggle, amber lamp, dent on the right wall) with the twin spotted trunks alone in the port; at about 0.9 s a grey ball weight hangs beside a turkey tail fan at the left edge and by 1.7 s it sits in the ballast slot; 2.7-5 s push-in, the two pin-jointed elders in waistcoats stand on the mossy bank between the trunks with the carved boundary stone lower right, as in the still; at about 4.0-5.0 s each raises one stiff arm from the shoulder pin (toll gate); at about 5.5-6.3 s both have turned to face each other in profile while trunks, bank and stone have not moved; a faint reddish turkey reflection sits lower left on the glass throughout the push-in; at about 6.6 s a cross-dissolve (the outside porthole with Turkey shows through the elders) leads to the outside view at 7-8 s: riveted metal tin on pebbles, Turkey behind the amber port, two speckled trout at left looking in", "changed": null}],
+ "final_take": 1, "verdict": "reference stronger",
+ "open": [
+  "outside view (7-8 s) has no boundary stone, no elders and no twin trunks: the tin is not beside the stone, nobody points or offers a coin, so neither of Trout's readings (boundary-stone thief / new ferryboat) is staged; the still at least holds trout, stone and elders in one frame",
+  "the cut across the glass is a cross-dissolve at about 6.6 s, not a hard cut at 5.5 s, leaving about 1.3 s outside",
+  "the elders turn to profile but stay full-width figures; they never become paper-thin edges, so the 'paper cutouts' reading rests only on the brass pin joints and the stiff arm swing",
+  "the trout that crosses in front of the elders in the still is absent from the port view (beat 2)",
+  "a turkey tail fan, not just a wing tip, enters at the left edge in beat 1; it stays at the edge and the room remains readable, but no wing is seen releasing the weight (the ball is simply in the air, then in the slot)",
+  "the tin does not visibly settle after the weight drops",
+  "two trout outside instead of one; Turkey is shown whole body with legs and fan in the port",
+  "the rule reads in beat 2 only (bank fixed, figures change); no new mark is made on the bank in the outside view",
+  "boundary stone carries carved glyph-like marks (inherited from the still), not readable words; no other stray text seen",
+  "sound not reviewed"
+ ]
+}

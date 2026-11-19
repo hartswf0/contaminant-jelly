@@ -1,0 +1,19 @@
+{
+ "id": "p41", "station": "#41 · Catwalk", "clue": "Sea bream in sunglasses walking on stick legs",
+ "rule": "Substrate Collision (SCION 22): the bream is a flat cut-paper figure on wooden sticks set against the soft watercolor river", "control": "ballast",
+ "atlas": [{"id": "a39", "why": "wide layered ribbons of water: the ripple band that passes over the bream and makes it waver like a mirage; no lettering to leak"}],
+ "prompt_file": "prompts/p41.txt",
+ "takes": [{"take": 1, "by": "director", "verdict": "pass", "seen": "0-3.3 s cockpit matches the master (six-bolt port with chip at two o'clock, hinge, latch, chart, toggle, dent, amber lamp), a turkey tail fan enters at the left edge and from about 0.7 s a grey ballast weight sits in the lower-left slot; 3.3-6.6 s close on the port: the pink bream in black sunglasses from the still walks left to right on two wooden stick legs, a puff of silt at a foot at about 4.0 s and 5.4 s, Turkey's reflection low left on the glass; about 6.0-6.5 s white ripple ribbons cross the glass and the bream's lower body and legs go pale and half transparent; 6.7-8 s hard cut to the outside: riveted steel tin on pebbles with dent and handle, Turkey behind the amber port, the bream on its stick legs in the left foreground facing the tin, bubbles rising from the handle at about 7.8 s", "changed": null}],
+ "final_take": 1, "verdict": "pass",
+ "open": [
+  "a turkey tail fan and part of the body fill the lower-left corner from 0.7 s to 3.3 s instead of only a wing tip; it does not cover the port, chart or toggle but crowds the ballast slot, and the wing actually dropping the weight is not visible on the sheet",
+  "the tin settling lower after the ballast is not visible; the view through the port does not change before the cut to the close-up",
+  "the push-in is a jump to the close port view between 2.7 s and 3.3 s on the sheet rather than a visible slow push",
+  "the paper-versus-watercolor material collision is weak: the bream has a slight cut-out edge and drop shadow but is drawn in the same ink and wash as the river",
+  "in the outside view the bream does not tip its sunglasses down, and the tin rocking or rolling forward cannot be confirmed from the frames, so 'wheelchair' rests only on Turkey's legs being hidden; 'soup can' rests on the bubbles from the handle, visible only in the last half second",
+  "Turkey is shown nearly full body with tail fan in the outside view, lower body hidden by an amber lamp beam and fitting at the bottom of the port that was not asked for (ballast film, lamp not used)",
+  "across-the-glass beat is short (about 1.3 s from 6.7 s) and the mirage ripple arrives late, just before the cut",
+  "prompt as sent was 1852 characters, above the brief's 1700 guide",
+  "sound not reviewed; judged from frames only"
+ ]
+}

@@ -1,0 +1,22 @@
+{
+ "id": "p54",
+ "station": "#54 · Ledge",
+ "clue": "Wrinkled Hellbender swaying frilly folds",
+ "rule": "Anatomical Double Take (Oubapo)",
+ "control": "lamp",
+ "atlas": [
+  {
+   "id": "a39",
+   "why": "wide rounded ribbons of layered water, asked for only as the slow sway of the salamander's frilly side folds in beat 2"
+  }
+ ],
+ "prompt_file": "prompts/p54.txt",
+ "takes": [],
+ "final_take": null,
+ "verdict": "inconclusive",
+ "open": [
+  "no film exists: the single gen call was refused by fal before anything was produced (403: User is locked. Reason: Exhausted balance. Top up your balance at fal.ai/dashboard/billing.); not retried, per the one-call budget rule",
+  "nothing has been seen, so Setup A, the hellbender, the cut across the glass and both pairs of readings are all unjudged; the still stills/p54.jpg is the only picture of this porthole",
+  "the prompt was trimmed by about 65 characters (1746 to 1681) after the refused call to fit the 1700-character limit; the trimmed text has never been sent"
+ ]
+}

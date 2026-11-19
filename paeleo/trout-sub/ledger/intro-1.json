@@ -1,0 +1,14 @@
+{
+ "id": "intro-1", "station": "Turkey Sub cockpit", "clue": "Turkey Sub cockpit", "rule": "Turkey Sub cockpit",
+ "control": "lamp toggle, ballast slot and chalk chart, each touched once by a wing tip",
+ "atlas": [{"id": "a15", "why": "staging only: one small hand at the frame edge serving a large round opening"}],
+ "prompt_file": "prompts/intro-1.txt",
+ "takes": [],
+ "final_take": null, "verdict": "inconclusive",
+ "open": [
+  "no film exists: the single permitted gen call was refused by fal before producing anything (403: User is locked. Reason: Exhausted balance)",
+  "nothing has been seen, so Setup A, the wing tip on the three controls and the changed port view are all unproven",
+  "the SCION's hard proof (lamp proof showing the notch, ballast proof showing the lower sightline) is not shown",
+  "prompt is written and unrun; needs one take once the fal balance is topped up"
+ ]
+}

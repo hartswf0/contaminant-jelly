@@ -1,0 +1,16 @@
+{
+ "id": "intro-3", "scion": "The Bend That Moved",
+ "control": "lamp toggle (lower right), flipped once by a wing tip; the aimed amber beam finds the silted rock notch",
+ "atlas": [{"id": "a17", "why": "staging of light only: a pale cone cutting through a grainy field, for the amber beam in the silt; not its grey color, black bars or vessels"}],
+ "prompt_file": "prompts/intro-3.txt",
+ "takes": [{"take": 1, "by": "director", "verdict": "inconclusive", "seen": "nothing: no film was produced. The single allowed gen call was refused by fal before generation (403: User is locked. Reason: Exhausted balance).", "changed": null}],
+ "final_take": null, "verdict": "inconclusive",
+ "open": [
+  "no film exists for intro-3: fal refused the one gen call with 403 'User is locked. Reason: Exhausted balance. Top up your balance at fal.ai/dashboard/billing.'; not retried per the budget rule",
+  "final_take is null rather than 1 because there is no take 1 file (.raw/intro-3_t1.mp4 and films/intro-3.mp4 do not exist)",
+  "prompt is written and unrun (prompts/intro-3.txt, 1672 characters, atlas a17)",
+  "nothing could be judged: Setup A hold, sound-off readability, stray text, tin versus bread and turkey body blocking the room are all untested",
+  "the SCION's hard proof is not shown: silt with lamp is only written, never seen; fast flow with ballast, mismatched part with a return, a Stone Steps finish, Brook verifying the crossing and ringing the bell, and the saved chart mark are not in the shot as written",
+  "the gen call ran on minimax/h3-max-turbo at 768P (tool default with no --model), so when rerun it will be the cheap model, not the hero model"
+ ]
+}

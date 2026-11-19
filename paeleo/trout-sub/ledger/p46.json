@@ -1,0 +1,27 @@
+{
+ "id": "p46", "station": "#46 · Steps", "clue": "Solid brass letters G-O-B-B-L-E as stairs",
+ "rule": "Verbal Slapstick (SCION 47): the word itself takes the pratfall, the top letter E falls off its own staircase",
+ "control": "ballast",
+ "atlas": [
+  {"id": "a37", "why": "a stair diagonal read against a round opening in cool blue: the letter staircase inside the port"},
+  {"id": "a50", "why": "brass against a stony river bottom, for the material of the letters in the outside view"}
+ ],
+ "prompt_file": "prompts/p46.txt",
+ "takes": [{
+  "take": 1, "by": "director", "verdict": "pass",
+  "seen": "0-3 s cockpit matches the master (six-bolt port with chip, empty slot lower left, chalk chart, toggle lower right, dent right, amber lamp); a striped tail-fan edge enters at the lower left and lowers a grey bell-shaped weight on a cord toward the ballast slot at about 0.7 s, then bubbles rise by the slot. About 3.3-5 s push in to the port: brass letters G O B B L E stacked as a staircase on a mossy slope with three or four trout alongside and the turkey's face reflected at lower left, very close to the still. About 5.3-6 s the E tips off the top step and falls beside the stair, leaving G O B B L. About 6-8 s hard cut to the outside: riveted tin on the riverbed, turkey behind the amber port, plain brass block steps in the foreground with the E standing on top at about 6.5 s, then the E lying in the silt beside one brass block with a puff at about 7.5 s while two trout swim across.",
+  "changed": null
+ }],
+ "final_take": 1, "verdict": "pass",
+ "open": [
+  "Beat 1: it is the turkey's tail fan, not a wing tip, that enters at the lower left; it stays at the edge and does not block the room",
+  "Beat 1: the ballast weight is drawn as a small bell on a cord (leak from atlas a50) and is not clearly seen going into the slot; the slot still looks empty afterwards",
+  "Beat 3: the outside staircase is plain brass blocks; the letters G O B B L are gone, only the E survives, so the word is not readable from Trout's side",
+  "Beat 3: continuity break, the E is back on the top step right after the cut although it had already fallen in beat 2, and the staircase shrinks from three steps to one block by 7.5 s",
+  "Beat 3: no trout climbs the steps; the 'free staircase' reading rests only on the bare brass steps, and the fallen E on its side can read as an M or a rack rather than a sign letter",
+  "Beat 3: the two trout pass in front of the port and partly cover the turkey in the last second",
+  "Turkey's 'sinking lead weights' reading rests on the single falling E; the lower letters never sink",
+  "Prompt is 1819 characters, over the brief's 1700 limit",
+  "Sound not checked"
+ ]
+}

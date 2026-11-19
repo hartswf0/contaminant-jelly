@@ -1,0 +1,23 @@
+{
+ "id": "p51",
+ "station": "#51 · Grotto",
+ "clue": "Basketball pearl wedged in giant stone clam",
+ "rule": "Repeated Observation (SCION 41)",
+ "control": "lamp",
+ "atlas": [
+  {
+   "id": "a09",
+   "why": "a vessel's pale beam under a jagged rock arch: staging for the tin's lamp reaching into the grotto (asked for in full colour)"
+  }
+ ],
+ "prompt_file": "prompts/p51.txt",
+ "takes": [],
+ "final_take": null,
+ "verdict": "inconclusive",
+ "open": [
+  "no film exists: the single permitted gen call was refused by fal before any render (403: User is locked. Reason: Exhausted balance); not retried",
+  "nothing could be judged from a sheet: Setup A, the clam and pearl, the cut across the glass and both pairs of readings are all unverified",
+  "prompt was trimmed from 1756 to under 1700 characters after the refused call, so the text on file is slightly shorter than the text that was sent",
+  "a09 is a black-and-white frame; watch for desaturation if this is ever generated"
+ ]
+}

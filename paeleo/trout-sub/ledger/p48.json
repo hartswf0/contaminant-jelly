@@ -1,0 +1,36 @@
+{
+ "id": "p48",
+ "station": "#48 · Belfry",
+ "clue": "Flooded tin church steeple at waterline",
+ "rule": "Waterline Acoustic Split (SCION 44)",
+ "control": "ballast",
+ "atlas": [
+  {
+   "id": "a39",
+   "why": "flat layered bands of water: how to draw the waterline that splits the port into dry air and green hush"
+  }
+ ],
+ "prompt_file": "prompts/p48.txt",
+ "takes": [
+  {
+   "take": 1,
+   "by": "director",
+   "verdict": "reference stronger",
+   "seen": "0-3.3 s cockpit matches the master (tin, chipped six-bolt port, empty slot, chart, toggle, dent, amber lamp); 0-1 s a striped wing enters lower left holding a small bell-shaped weight over the ballast slot; 1.5-3.3 s the green water slides down the port until the waterline cuts the glass in half; 3.3-6.7 s push in to the glass: the still's white tin steeple at the waterline, corrugated roof and arrow weathervane in dry air with autumn trees above, dark bell in the arch in green water below, Turkey's faint reflection lower left; about 6 s the bell swings to one side with rings spreading in the water; 6.7-8 s hard cut to the outside master: riveted tin on the riverbed, Turkey behind the amber port, two brook trout in the foreground looking in",
+   "changed": null
+  }
+ ],
+ "final_take": 1,
+ "verdict": "reference stronger",
+ "open": [
+  "the steeple, bell and weathervane are absent from the outside view (6.7-8 s): the thing is never seen from the river, so Trout's 'bell-clapper or weathervane?' is not staged on Trout's side",
+  "no trout ever shares a frame with the steeple; the still has the trout beside the bell, the film does not",
+  "outside view shows the tin fully submerged on the riverbed, contradicting the rise to the waterline in beat 1; no waterline split in beat 3",
+  "weathervane carries letters S, W, N, E (inherited from the still, in scrambled order) despite the no-text instruction",
+  "the weathervane arrow does not visibly turn (same heading at 4.0 s and 6.2 s), so the dry half of the acoustic split has no action; Turkey's 'roost or lightning rod?' rests only on the static roof and rod",
+  "the ballast weight is drawn as a small hand bell and is not seen going into the slot; the slot still reads empty afterwards",
+  "more than a wing tip enters at 0-1 s (a full wing fan at left edge), though it does not block the room",
+  "two trout in the outside view instead of one",
+  "sound (wind above, muffled clang below) not checked; judged from frames only"
+ ]
+}

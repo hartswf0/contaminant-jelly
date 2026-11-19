@@ -1,0 +1,23 @@
+{
+ "id": "p45", "station": "#45 · Extruder", "clue": "Plastic funnel sucking baster into pellets",
+ "rule": "Reverse Manufacture (Outrapo)", "control": "ballast",
+ "atlas": [{"id": "a39", "why": "flat layered water with drifting round shapes: how the pellets and water should move on Trout's side; nothing from it asked to appear"}],
+ "prompt_file": "prompts/p45.txt",
+ "takes": [{"take": 1, "by": "director", "verdict": "pass", "seen": "0-3.3 s cockpit matches the master (chipped six-bolt port, empty slot, chalk chart, toggle, lamp, dent); a grey weight hangs in the air left of the port at about 0.7 s and by 1.4 s something dark sits in the ballast slot; 3.3-5.5 s push-in to the glass: coral funnel on two strings, red-bulbed baster drawn into the wide mouth and shrinking until only the bulb is left, coloured pellets leaving the brass spout, trout below and Turkey's reflection lower left; about 5.5 s the baster is gone and the funnel has swung its wide mouth toward the glass; about 6 s the port swings open like a door onto the outside view; 6.5-8 s the riveted tin on the riverbed, Turkey behind the amber port, the funnel hanging mouth-down drawing a column of gravel off the bed, coloured pellets rising beside it, two trout watching from the left", "changed": null}],
+ "final_take": 1, "verdict": "pass",
+ "open": [
+  "the cut across the glass is not a hard cut: at about 6 s the porthole swings open like a hinged door and the outside view is revealed through it",
+  "Turkey's tail fan sits at the left edge through all of beat 1 instead of a wing tip only; it does not cover the port or the controls, but no wing is seen dropping the weight",
+  "the ballast weight appears floating beside the port, bell-shaped with a hook, rather than falling from a wing; its landing in the slot is only a small dark shape",
+  "the outside view does not visibly sink after the weight drops",
+  "hull-recycler reading is thin: the funnel only turns its mouth toward the port; nothing metal goes near it",
+  "in the outside view the funnel hangs directly in front of the port and covers Turkey's head",
+  "the trout do not touch a pellet; the bubble-toy reading rests only on the pellets rising",
+  "in the outside view the pellets read as being inside the port glass rather than in the river",
+  "two trout outside where one was asked",
+  "the funnel changes orientation across the cut (sideways through the port, mouth-down outside)",
+  "the layered flat-water look of a39 is not visible",
+  "prompt is 1780 characters, over the brief's 1700",
+  "sound not judged (sheet only)"
+ ]
+}

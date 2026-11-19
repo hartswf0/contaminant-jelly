@@ -1,0 +1,14 @@
+{
+ "id": "intro-2", "scion": "The Works construction kit",
+ "control": "single slot: lamp fitted, removed, then ballast weight fitted",
+ "atlas": [{"id": "a36", "why": "a small hand-worn object with visible seams on a tactile surface: the material of the two kit parts on the console"}],
+ "prompt_file": "prompts/intro-2.txt",
+ "takes": [{"take": 1, "by": "director", "verdict": "inconclusive", "seen": "nothing: no film was produced. The single allowed gen call was refused by fal before generation (403: User is locked. Reason: Exhausted balance).", "changed": null}],
+ "final_take": null, "verdict": "inconclusive",
+ "open": [
+  "no film exists for intro-2: fal refused the one gen call with 403 'User is locked. Reason: Exhausted balance. Top up your balance at fal.ai/dashboard/billing.'; not retried per the budget rule",
+  "prompt is written and unrun (1710 characters, 10 over the brief's 1700 ceiling)",
+  "nothing could be judged: Setup A hold, sound-off readability, and the hard proof (one slot, lamp in, lamp out to the console, ballast in, port view changing each time) are all untested",
+  "the SCION's incompatible-part attempt and top-down parts drawing are not in the shot as written"
+ ]
+}

@@ -1,0 +1,16 @@
+{
+ "id": "intro-4", "station": "The students’ LEGOS beat", "clue": "The students’ LEGOS beat", "rule": "The students’ LEGOS beat",
+ "control": "none of the three controls; a wing tip rolls one six-sided die once on the chart glass and one of three bolt lights (teal, green, rust) on the porthole rim lights green",
+ "atlas": [{"id": "a51", "why": "staging only: trout gathered close around one small object on a low surface in dim blue water"}],
+ "prompt_file": "prompts/intro-4.txt",
+ "takes": [],
+ "final_take": null, "verdict": "inconclusive",
+ "open": [
+  "no film exists: the single permitted gen call was refused by fal before producing anything (403: User is locked. Reason: Exhausted balance. Top up your balance at fal.ai/dashboard/billing.); not retried",
+  "nothing has been seen, so Setup A, the two trout crewmates outside the port, the single die roll and the one lit bolt light are all unproven",
+  "the SCION's hard proof (six-panel face sheet and two linked played beats from different authors) is not shown; the prompt as written would show only one roll selecting one of three colour tiers, not six faces or a second author's beat",
+  "the prompt turns the three upper rim bolts into coloured glass lights, a small addition to Setup A that has not been tested against the master",
+  "prompt is 1756 characters, slightly over the brief's 1700 limit",
+  "prompt is written and unrun; needs one take once the fal balance is topped up"
+ ]
+}
