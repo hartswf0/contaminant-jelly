@@ -63,6 +63,9 @@ nav a{margin-right:12px;font:700 16px system-ui,sans-serif}
 <h1>The Class Portholes</h1>
 <p>Five Porthole Logs filled in by a fourth-grade class, made into five short films. Every sentence on screen and every sentence spoken is one a child wrote. The spelling is tidied for the caption and kept as written in the tables below. Lines the children left blank stay blank, and no die is thrown.</p>
 <p>Children are named by first initial only. The photographs of their sheets are not published.</p>
+<section><h2>How to Play the Porthole Game</h2><p class=clue>All five films in one, 6:22. It teaches the four steps first, names the step and the question under every picture, and gives one thing to watch for before each porthole.</p>
+<video controls preload=none src="assets/how-to-play-the-porthole-game.mp4"></video>
+<p class=meta><a href="assets/how-to-play-the-porthole-game.mp4" download>Download the film</a> · <a href="class_cut.py.txt">how it was cut</a></p></section>
 <nav>%s</nav>
 %s
 <section><h2>How these were made</h2>
@@ -75,4 +78,4 @@ for s in tj["sheets"]:
     for f in ("pilot", "first_friend", "next_friend"):
         if len(s[f].get("name") or "") > 2: s[f]["name"] = "(not read)"
 json.dump(tj, open("transcripts.json", "w"), indent=1, ensure_ascii=False)
-open("class.html", "w").write(page); print("class.html", len(page))
+txt("class_cut.py"); open("class.html", "w").write(page); print("class.html", len(page))
