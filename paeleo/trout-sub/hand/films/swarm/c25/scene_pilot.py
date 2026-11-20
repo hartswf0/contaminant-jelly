@@ -72,8 +72,8 @@ _SLOSH1 = w.Follower(_kick1, SECONDS, f=1.8, zeta=0.3)
 
 # ------------------------------------------------------------------ P2: the river side ---
 
-TIN_C, TIN_S = (668, 300), 1.3
-WALK_X0, WALK_Y, WALK_H = 262, 478, 300
+TIN_C, TIN_S = (625, 285), 1.5
+WALK_X0, WALK_Y, WALK_H = 222, 478, 300
 
 
 def _lean(u):                                                        # u = seconds into P2
@@ -101,23 +101,23 @@ def _p2(ink, t):
     ln = _lean(u)
     w.river_backdrop(ink, t)
     tp = w.tin(ink, TIN_C, TIN_S, t, mood="freak", wing=_wing_free(t), angle=-1.2 * ln)
-    w.gauge(ink, 6, *w.tin_dial_xy(tp), r=28, t=t)                   # the air is still full
+    w.gauge(ink, 6, *w.tin_dial_xy(tp), r=30, t=t)                   # the air is still full
     # the bottle is the tin's own outline moved, in pencil, for the length of the lean
     bf = ease(u, 0.9, 1.8) - ease(u, 3.3, 4.1)
     ba = ease(u, 0.75, 1.05) - ease(u, 4.05, 4.3)
-    if ba > 0:
-        w.bottle_lines(ink, TIN_C, TIN_S, f=bf, alpha=ba, angle=-1.2 * ln, width=4)
     s = _SLOSH2.at(t)
-    w.walker(ink, WALK_X0 + 40 * ln, WALK_Y, WALK_H, flip=True, lean=11 * ln, step=0.0,
+    w.walker(ink, WALK_X0 + 53 * ln, WALK_Y, WALK_H, flip=True, lean=11 * ln, step=0.0,
              phase=t * 3, amp=4, slosh=s, wave=clamp(abs(s) / 8), bowl_bubbles=t, bob=False)
+    if ba > 0:                                                       # over the trout: it is what the trout thinks
+        w.bottle_lines(ink, TIN_C, TIN_S, f=bf, alpha=ba, angle=-1.2 * ln, width=4)
 
 
 # ------------------------------------------------------------------ P3, P4: Turkey's seat ---
 
 BEATS = [T_P4 + 0.75, T_P4 + 1.5, T_P4 + 2.25]                       # P4: three counted wing-beats
 P3_BEATS = [T_P3 + 0.55 + 0.42 * k for k in range(6)]                # P3: he throws them up and beats, uncounted
-REFL = dict(cx=366, cy=372, height=262, alpha=0.78)                  # Turkey's reflection, low left in the glass
-PUFF = (306, 268)                                                    # where the bubbles leave, by the left rim
+REFL = dict(cx=388, cy=338, height=236, alpha=0.8)                  # Turkey's reflection, low left in the glass
+PUFF = (300, 305)                                                    # where the bubbles leave, by the left rim
 
 
 def _wing_seat(t):
@@ -152,12 +152,12 @@ _SLOSH3 = w.Follower(_kick3, SECONDS, f=1.5, zeta=0.32)
 def _seat(ink, t):
     s = _SLOSH3.at(t)
     # the trout outside does nothing at all: it only stands there (pose of the drawing, mirror of P2)
-    wk = dict(x=520, step=0.0, bob=False, phase=t * 1.2, amp=2.0, slosh=s, wave=clamp(abs(s) / 8), bowl_bubbles=t)
+    wk = dict(x=572, height=288, step=0.0, bob=False, phase=t * 1.2, amp=2.0, slosh=s, wave=clamp(abs(s) / 8), bowl_bubbles=t)
     tk = dict(REFL, mood="freak", t=t, wing=_wing_seat(t), wattle=_WATTLE.at(t))
     w.seat_scene(ink, t, wk, tk, notches=6, bolt=None, frame=False)
     for b in BEATS:                                                  # one puff per beat, and only on the beat
         if t >= b + 0.12:
-            w.bubbles(ink, PUFF, t, t0=b + 0.12, n=7, rise=150, size=7.5)
+            w.bubbles(ink, PUFF, t, t0=b + 0.12, n=9, rise=170, size=9, spread=22)
     w.seat_frame(ink)
     n = clamp(_NEEDLE.at(t), 0, 6)
     tick = max([1 - clamp((t - b - 0.12) / 0.3) for b in BEATS if t >= b + 0.12] + [0.0])
