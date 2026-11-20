@@ -1,0 +1,69 @@
+{
+ "song": "warning-unheeded",
+ "song_from_seconds": 22,
+ "lines": [
+  {
+   "at": 16.6,
+   "voice": "am_michael",
+   "speaker": "narrator",
+   "text": "A ship that sunk.",
+   "caption": "A ship that sunk.",
+   "seconds": 1.33,
+   "caption_held": 2.5
+  },
+  {
+   "at": 22.0,
+   "voice": "am_michael",
+   "speaker": "narrator",
+   "text": "Look in the window, trying to get out.",
+   "caption": "Look in the window, trying to get out.",
+   "seconds": 1.99,
+   "caption_held": 2.6
+  },
+  {
+   "at": 28.6,
+   "voice": "am_michael",
+   "speaker": "narrator",
+   "text": "He could be freaking out, trying to get out, losing air, breathing heavy.",
+   "caption": "He could be freaking out, trying to get out, losing air, breathing heavy.",
+   "seconds": 4.07,
+   "caption_held": 3.4
+  },
+  {
+   "at": 45.2,
+   "voice": "am_santa",
+   "speaker": "turkey",
+   "text": "Someone trapped him.",
+   "caption": "Someone trapped him.",
+   "seconds": 1.43,
+   "caption_held": 2.5
+  },
+  {
+   "at": 49.6,
+   "voice": "am_santa",
+   "speaker": "turkey",
+   "text": "Trying to save a hot Cheeto.",
+   "caption": "Trying to save a hot Cheeto.",
+   "seconds": 1.94,
+   "caption_held": 2.5
+  },
+  {
+   "at": 52.3,
+   "voice": "am_santa",
+   "speaker": "turkey",
+   "text": "That's his home.",
+   "caption": "That's his home.",
+   "seconds": 1.34,
+   "caption_held": 2.6
+  },
+  {
+   "at": 72.6,
+   "voice": "af_bella",
+   "speaker": "trout",
+   "text": "A movie.",
+   "caption": "A movie.",
+   "seconds": 0.62,
+   "caption_held": 2.5
+  }
+ ]
+}

@@ -107,7 +107,7 @@ def one(pid):
     spoken = LINES.get(pid)
     if spoken and len(spoken) != len(caps):
         print(pid, "spoken lines do not match the %d captions; reading the captions" % len(caps)); spoken = None
-    pops = []; cls = class_speakers(pid) if pid.startswith("c") else None
+    pops = []; cls = class_speakers(pid) if pid[0] in "cm" else None
     if cls and len(cls) != len(caps):
         sys.exit("%s: %d captions but the sheet has %d sentences" % (pid, len(caps), len(cls)))
     for q, (a, b, text) in enumerate(caps):
@@ -133,7 +133,7 @@ def one(pid):
         i = max(0, int((a + 0.02) * sr)); fx[i:i + n] += cue[:len(fx) - i].astype(np.float32)
     vw = tempfile.mktemp(suffix=".wav"); sf.write(vw, y, sr)
     fw = tempfile.mktemp(suffix=".wav"); sf.write(fw, fx, sr)
-    song, ss = SONGS_CLASS.get(pid) or SONGS.get(pid, DEFAULT_SONG)
+    song, ss = SONGS_CLASS.get("c" + pid[1:] if pid[0] == "m" else pid) or SONGS.get(pid, DEFAULT_SONG)
     os.makedirs("assets/voiced", exist_ok=True); out = "assets/voiced/%s.mp4" % pid
     fc = ("[0:v][3:v]overlay,format=yuv420p[v];"
           # voice: clear of rumble, a lift where consonants live, firm compression
@@ -146,7 +146,7 @@ def one(pid):
           "[0:a]aresample=44100,aformat=channel_layouts=stereo,highpass=f=70,equalizer=f=6500:t=q:w=1.2:g=4,volume=1.05[fa];"
           "[4:a]aformat=channel_layouts=stereo[cue];"
           "[duck][nv][fa][cue]amix=inputs=4:normalize=0,alimiter=limit=0.93[a]" % (dur - 2.5))
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", src, "-i", vw, "-ss", str(ss), "-t", "%.2f" % dur, "-i", "../music/%s.ogg" % song, "-i", (blank() if pid.startswith("c") else badge(int(pid[1:]))), "-i", fw,
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", src, "-i", vw, "-ss", str(ss), "-t", "%.2f" % dur, "-i", "../music/%s.ogg" % song, "-i", (blank() if pid[0] in "cm" else badge(int(pid[1:]))), "-i", fw,
                     "-filter_complex", fc, "-map", "[v]", "-map", "[a]", "-c:v", "libx264", "-preset", "slow", "-crf", "22", "-c:a", "aac", "-b:a", "192k",
                     "-t", "%.2f" % dur, "-movflags", "+faststart", out], check=True)
     json.dump({"song": song, "song_from_seconds": ss, "lines": script}, open("films/notes/%s.voice.json" % pid, "w"), indent=1, ensure_ascii=False)

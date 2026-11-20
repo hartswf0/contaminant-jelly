@@ -1,0 +1,60 @@
+{
+ "song": "the-verne-bench",
+ "song_from_seconds": 20,
+ "lines": [
+  {
+   "at": 22.0,
+   "voice": "am_michael",
+   "speaker": "narrator",
+   "text": "The trout. The trout think the sub is a bell-ringer prank.",
+   "caption": "The trout. The trout think the sub is a bell-ringer prank.",
+   "seconds": 2.73,
+   "caption_held": 2.5
+  },
+  {
+   "at": 24.8,
+   "voice": "am_michael",
+   "speaker": "narrator",
+   "text": "Freak out.",
+   "caption": "Freak out.",
+   "seconds": 1.04,
+   "caption_held": 2.5
+  },
+  {
+   "at": 27.6,
+   "voice": "am_michael",
+   "speaker": "narrator",
+   "text": "He is going to be turkey dinner.",
+   "caption": "He is going to be turkey dinner.",
+   "seconds": 1.87,
+   "caption_held": 2.5
+  },
+  {
+   "at": 46.6,
+   "voice": "am_santa",
+   "speaker": "turkey",
+   "text": "The dinner bell to go off.",
+   "caption": "The dinner bell to go off.",
+   "seconds": 1.95,
+   "caption_held": 2.6
+  },
+  {
+   "at": 50.4,
+   "voice": "am_santa",
+   "speaker": "turkey",
+   "text": "The dinner bell goes off and the fish go crazy.",
+   "caption": "The dinner bell goes off and the fish go crazy.",
+   "seconds": 2.85,
+   "caption_held": 2.6
+  },
+  {
+   "at": 53.6,
+   "voice": "am_santa",
+   "speaker": "turkey",
+   "text": "The fish go quiet and calm.",
+   "caption": "The fish go quiet and calm.",
+   "seconds": 2.49,
+   "caption_held": 2.6
+  }
+ ]
+}
