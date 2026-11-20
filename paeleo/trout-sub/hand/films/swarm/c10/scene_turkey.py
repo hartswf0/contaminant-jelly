@@ -134,7 +134,7 @@ B1_FLAPS = (0.5, 1.05, 2.75)
 def _intercom(tgt, T, u, flaps, trout=None):
     """River, brick flat, fries, (trout), and the clam shell flapping like something talking."""
     Wd.river(tgt, T, seed=0)
-    Wd.brick_wall(tgt, 648, 0, 340, 540, seed=2, flip=True)
+    Wd.brick_wall(tgt, 598, 0, 390, 540, seed=2, flip=True)
     _fry_school(tgt, FRIES_A, T, kicks=[T - u + f + 0.1 for f in flaps], amp=14, scale=0.6, seed=21)
     if trout:
         trout(tgt)
@@ -192,9 +192,9 @@ FRIES_B = [(432, 356), (540, 372), (668, 366), (586, 404), (474, 404)]
 @lru_cache(None)
 def _surface():
     """The bright surface, far up and to the left: a pale cut-paper strip with a rippled lower edge."""
-    top = [(0, 0), (240, 0)]
-    low = [(240 - 12 * k, 30 + (7 if k % 2 else -3) + 0.05 * k * k * 0.2) for k in range(21)]
-    return Wd.cut(top + low, (232, 246, 236), curve=False, seed=611, grain=0.05)
+    top = [(0, 0), (300, 0)]
+    low = [(300 - 12 * k, 86 + (6 if k % 2 else -4)) for k in range(26)]
+    return Wd.cut(top + low, (246, 250, 232), curve=False, seed=611, grain=0.05)
 
 
 @lru_cache(None)
@@ -204,11 +204,11 @@ def _rail(n, thick, seed):
 
 def _way_back(tgt, T):
     """Top left through the glass: the light of the surface and the foot of a dock ladder."""
-    Wd.glow(tgt, 452, 92, 210, (236, 250, 232), 0.95)
-    Wd.glow(tgt, 446, 84, 120, (255, 252, 226), 0.9)
-    Wd.draw_sprite(tgt, _surface(), Tm(352, 44) @ Rm(1.5 * math.sin(T * 1.1)), (2, 4, 3, 0.25))
+    Wd.glow(tgt, 470, 120, 230, (236, 250, 232), 1.0)
+    Wd.glow(tgt, 462, 104, 150, (255, 252, 226), 1.0)
+    Wd.draw_sprite(tgt, _surface(), Tm(340, 30) @ Rm(1.2 * math.sin(T * 1.1)), (2, 5, 4, 0.3))
     # ladder: two rails and four rungs of plank, leaning a little
-    M = Tm(470, 52) @ Rm(5.0)
+    M = Tm(462, 62) @ Rm(5.0)
     for k, yy in enumerate((34, 76, 118, 160)):
         Wd.draw_sprite(tgt, _rail(74, 11, 40 + k), M @ Tm(-4, yy), (2, 3, 2, 0.3))
     for xx, n in ((0, 186), (62, 198)):
@@ -246,7 +246,7 @@ B3_BAT0, B3_BAT1 = 0.8, 1.22          # the valve's half turn
 B3_HIT = 1.0                          # it meets the tin
 B3_TURN0, B3_TURN1 = 1.0, 1.8         # the river sweeps down and out about the shell's pin
 B3_HOME0, B3_HOME1 = 1.6, 2.2         # home swings in on the page pin
-B3_FRY = (668, 318)                   # the one little french fry that stays stuck to the glass
+B3_FRY = (596, 392)                   # the one little french fry that stays stuck to the glass
 
 
 def _b3_gape(u):
@@ -293,7 +293,7 @@ def _kitchen_wall():
 
 
 TIN_S = 0.33
-SHELF_Y = (196, 338)
+SHELF_Y = (204, 340)
 SHELF_TINS = [(404, 0), (560, 0), (716, 0), (404, 1), (716, 1)]        # the gap is at (560, lower shelf)
 
 
@@ -328,7 +328,7 @@ def _drops(tgt, u):
     lay = Image.new("RGBA", (W * S, H * S), (0, 0, 0, 0))
     d = ImageDraw.Draw(lay)
     rs = random.Random(91)
-    for _ in range(26):
+    for _ in range(13):
         x = rs.uniform(392, 728)
         y0 = rs.uniform(40, 330)
         v = rs.uniform(26, 80)
@@ -336,7 +336,7 @@ def _drops(tgt, u):
         y = y0 + v * max(0.0, u - B3_HOME0)
         ln = rs.uniform(30, 110)
         wob = 2.5 * math.sin(y * 0.05 + x)
-        d.line([((x) * S, (y - ln) * S), ((x + wob) * S, y * S)], fill=(214, 240, 236, 120), width=int(r * 0.7 * S))
+        d.line([((x) * S, (y - ln) * S), ((x + wob) * S, y * S)], fill=(214, 240, 236, 70), width=int(r * 0.6 * S))
         d.ellipse([(x + wob - r) * S, (y - r) * S, (x + wob + r) * S, (y + r * 1.25) * S], fill=(196, 230, 228, 190), outline=(246, 255, 250, 240), width=S)
         d.ellipse([(x + wob - r * 0.5) * S, (y - r * 0.5) * S, (x + wob) * S, y * S], fill=(255, 255, 255, 230))
     Wd._comp(tgt, lay.resize((W, H), Image.LANCZOS), (0, 0))
@@ -381,16 +381,17 @@ def _die(ink, n, bolts, u):
     Wd.die(ink, n, bx + ox * ca - oy * sa, by + ox * sa + oy * ca, size=40, angle=a)
 
 
-def _inside(ink, T, u, bolt, level, turkey_dx=0.0, look=(1.5, -0.5), pose=None):
+def _inside(ink, T, u, bolt, level, turkey_dx=0.0, look=(1.5, -0.5), pose=None, turkey_dy=0.0, tag=True):
     c = Wd.cabin(ink, T, lit=(bolt,) if bolt else ())
     Wd.brad(ink, PAGE_PIN[0], PAGE_PIN[1], 7)
     Wd.feather(ink, STUCK[0], STUCK[1], 1.35, 28)                   # still stuck to the glass
     Wd.air_gauge(ink, GAUGE[0], GAUGE[1], clamp(level), t=T)
     x, y, s = TURKEY
-    Wd.turkey(ink, x + turkey_dx, y, s, "freak", T * 1.35, flip=True, look=look, shade=0.2, pose=pose)
+    Wd.turkey(ink, x + turkey_dx, y + turkey_dy, s, "freak", T * 1.35, flip=True, look=look, shade=0.2, pose=pose)
     if bolt:
         _die(ink, bolt, c["bolts"], u)
-        Wd.bolt_tag(ink, bolt)
+        if tag:
+            Wd.bolt_tag(ink, bolt)
     return c
 
 
@@ -410,7 +411,7 @@ def draw(t, ink):
     if T < T_B1:
         u = T
         _t0_out(ink, T, u)
-        _inside(ink, T, u, None, HALF)
+        _inside(ink, T, u, None, HALF, turkey_dy=96 * (1 - ease(u, 2.1, 2.5)), turkey_dx=-10 * (1 - ease(u, 2.1, 2.5)))   # ducked under the card
         a = -104.0 * (1 - ease(u, 0.12, 0.6)) + 5.0 * Wd.settle(u, 0.6, 1.0, 2.8, 6.0) - 104.0 * ease(u, 2.08, 2.5) ** 1.4
         Wd.pick_card(ink, "circle", "Turkey thinks", "Morning intercom", "M.", angle=a, pin_at=(22, 22),
                      drawn=ramp(u, 0.75, 1.45), pressed=ease(u, 0.6, 0.78), lit=ease(u, 0.6, 0.9))
@@ -439,15 +440,14 @@ def draw(t, ink):
             _b3_out(ink, T, u)
         level = HALF - 0.1 * ease(u, B3_HIT, B3_HIT + 0.2) + 0.6 * ease(u, B3_HOME1 - 0.1, B3_HOME1 + 0.6) + 0.07 * Wd.settle(u, B3_HOME1 + 0.6, 1.0, 2.6, 4.5)
         thrown = Wd.settle(u, B3_HIT, 1.0, 1.7, 2.6)
-        _inside(ink, T, u, 3, level, turkey_dx=-26 * thrown, look=(2.0, 0.0))
+        _inside(ink, T, u, 3, level, turkey_dx=-26 * thrown, look=(2.0, 0.0), tag=False)
         # the whole tin is thrown: the cabin tips about the porthole and settles; beak, needle and dice keep their pins
         tip = 4.0 * thrown + 2.0 * Wd.settle(u, B3_HOME1, 1.0, 2.2, 4.0)
         if abs(tip) > 0.08:
             img = Wd._img(ink)
             rot = img.rotate(tip, resample=Image.BICUBIC, center=PORT, fillcolor=(22, 16, 12))
             img.paste(rot)
-        if u >= 0.12:
-            Wd.bolt_tag(ink, 3)
+        Wd.bolt_tag(ink, 3)
     Wd.badge(ink)
 
 

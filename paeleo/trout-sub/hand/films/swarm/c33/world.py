@@ -813,7 +813,7 @@ def button(ink, kind, x, y, r=26, pressed=0.0, lit=1.0, alpha=1.0):
 
 
 def button_disc(ink, kind, x, y, r=10, alpha=1.0):
-    """The small flat mark a pick leaves behind (e.g. a green triangle left on the helmet): the button's shape, no well."""
+    """The small flat mark a pick leaves behind (e.g. a red circle left beside the stone mouth): the button's shape, no well."""
     col = BUTTONS[kind]
     pts = [(x + px + 1, y + py + 2) for px, py in _glyph_pts(kind, r)]
     ink.d.polygon(pts, fill=(20, 10, 8, int(120 * alpha)))
@@ -1005,7 +1005,7 @@ def weed(ink, x, base_y, height=160, lean=0.0, t=0.0, seed=0, n=5, spread=34, sw
 
 def bubbles(ink, origin, t, t0=0.0, n=7, rise=120.0, spread=16.0, size=6.0, sink=False, drop_at=None, alpha=1.0, clip_y=None):
     """A puff of n bubbles that left `origin` at time t0. Outside the tin they RISE (sink=False), wobbling, and fade
-    over about 2 s. sink=True sends them DOWN instead (the rule: inside the bowl bubbles sink). drop_at = a time
+    over about 2 s. sink=True sends them DOWN instead. drop_at = a time
     after which every bubble stops rising and falls like a pebble (bolt 3: it is not wet). clip_y = bubbles above
     this y are not drawn (the hem of the lifted river)."""
     tt = t - t0
@@ -1165,44 +1165,6 @@ def bolt_mark(ink, n, lit=1.0, die=True, c=PORT_C, r=PORT_R, size=30, style="ivo
     if die:
         die_face(ink, n, x, y, size, style, lit=lit)
     return x, y
-
-
-def gauge(ink, notches=6.0, x=None, y=None, r=46, tremble=0.0, t=0.0):
-    """The air gauge: a brass dial, ivory face, E at the left stop and F at the right, six ticks, one needle.
-    notches 6 = FULL, 3 = half, 0 = EMPTY (the needle resting on the pin). Give it a float and ease it down one
-    whole tick per wing-beat. Default place STAGE['gauge'] (low left on the tin wall beside the glass).
-    tremble 0..1 shakes the needle."""
-    x = STAGE["gauge"][0] if x is None else x
-    y = STAGE["gauge"][1] if y is None else y
-    N = 6
-    ring = brass_ring(int(r * 0.8), int(r), 0, 6, 9)
-    ink.d.ellipse([x - r + 4, y - r + 7, x + r + 8, y + r + 12], fill=(0, 0, 0, 110))
-    ink.d.ellipse([x - r * 0.84, y - r * 0.84, x + r * 0.84, y + r * 0.84], fill=PAL["ivory"] + (255,))
-    ink.d.pieslice([x - r * 0.7, y - r * 0.7, x + r * 0.7, y + r * 0.7], 135, 135 + 270 / N, fill=(206, 70, 56, 150))
-    for k in range(N + 1):
-        a = math.radians(135 + 270 * k / N)
-        p0 = (x + math.cos(a) * r * 0.56, y + math.sin(a) * r * 0.56)
-        p1 = (x + math.cos(a) * r * 0.76, y + math.sin(a) * r * 0.76)
-        ink.d.line([p0, p1], fill=PAL["pip"] + (255,), width=3 if k % 3 == 0 else 2)
-    if r >= 26:
-        f = font("mono", max(8, int(r * 0.24)))
-        ink.d.text((x - r * 0.3, y + r * 0.36), "E", font=f, fill=(170, 40, 34, 255), anchor="mm")
-        ink.d.text((x + r * 0.3, y + r * 0.36), "F", font=f, fill=PAL["pip"] + (255,), anchor="mm")
-        ink.d.text((x, y - r * 0.34), "AIR", font=font("mono", max(8, int(r * 0.2))), fill=PAL["pip"] + (255,), anchor="mm")
-    a0 = math.radians(135 - 7)                                              # the pin the needle rests on when empty
-    ink.d.ellipse([x + math.cos(a0) * r * 0.6 - 2.5, y + math.sin(a0) * r * 0.6 - 2.5, x + math.cos(a0) * r * 0.6 + 2.5, y + math.sin(a0) * r * 0.6 + 2.5],
-                  fill=PAL["brass_line"] + (255,))
-    a = math.radians(135 + 270 * clamp(notches / N) + tremble * 3 * math.sin(t * 37))
-    tipn = (x + math.cos(a) * r * 0.66, y + math.sin(a) * r * 0.66)
-    tail = (x - math.cos(a) * r * 0.16, y - math.sin(a) * r * 0.16)
-    wd = max(2, int(r * 0.09))
-    ink.d.line([(tail[0] + 2, tail[1] + 3), (tipn[0] + 2, tipn[1] + 3)], fill=(0, 0, 0, 80), width=wd)
-    ink.d.line([tail, tipn], fill=(150, 30, 26, 255), width=wd)
-    hb = max(2.5, r * 0.11)
-    ink.d.ellipse([x - hb, y - hb, x + hb, y + hb], fill=PAL["brass"] + (255,), outline=PAL["brass_line"] + (255,))
-    ink.paste(ring, (int(x - ring.width / 2), int(y - ring.height / 2)))
-    ink.d.arc([x - r * 0.74, y - r * 0.74, x + r * 0.74, y + r * 0.74], 200, 250, fill=(255, 255, 255, 110), width=max(1, int(r * 0.06)))
-
 
 
 _TIN = {}
@@ -1409,7 +1371,7 @@ def _tin_plate(r):
     return img
 
 
-def tin_porthole(ink, c=PORT_C, r=150, mood="freak", t=0.0, glow=1.0, shake=0.0, angle=0.0, shadow=0.8, **over):
+def tin_porthole(ink, c=PORT_C, r=150, mood="shove", t=0.0, glow=1.0, shake=0.0, angle=0.0, shadow=0.8, **over):
     """Looking IN through the tin's porthole from outside, close: a riveted plate of the tin, the six-bolt brass
     ring (glass radius r), amber lamp-light inside and Turkey filling the round glass. shake px rattles the plate
     (rivets and all). Returns the glass centre on screen."""
@@ -1448,21 +1410,23 @@ def tin_porthole(ink, c=PORT_C, r=150, mood="freak", t=0.0, glow=1.0, shake=0.0,
 # ------------------------------------------------------ pick card, die cup ---
 
 PICKS = dict(
-    turkey=dict(title="Turkey thinks", rows=[("triangle", "Scuba helmet"), ("circle", "Dry-air bubble")]),
-    trout=dict(title="The trout think", rows=[("cross", "Giant astronaut suit"), ("square", "Bird in a bottle")]),
+    turkey=dict(title="Turkey thinks", rows=[("triangle", "Theater curtain"), ("circle", "Stone tunnel")]),
+    trout=dict(title="The trout think", rows=[("cross", "Rivet-toothed monster jaw"), ("square", "Movie projector")]),
 )
 CARD_W, CARD_H = 420, 230
 
 
 def pick_card(ink, c=(480, 262), side="turkey", picked=None, press=0.0, mark=0.0, scribble=0.0, angle=-2.0, alpha=1.0, initial=None, lift=0.0):
-    """The pick card, a piece of the worksheet laid over the picture: the title, the two choices each with its
-    controller button, and the dashed "Draw the one you pick" ring. side 'turkey' (green triangle Scuba helmet /
-    red circle Dry-air bubble) or 'trout' (blue cross Giant astronaut suit / pink square Bird in a bottle).
-    picked = the kind that is chosen ('triangle' for K., 'cross' for N.) or None: nothing lights.
-    press 0..1 sinks and lights the picked button; the other stays dull. mark 0..1 pencils the friend's own mark
-    of the picked shape in the dashed ring (K.'s small leaning triangle, N.'s big cross). scribble 0..1 colours
-    the picked button in with pencil (N. coloured the cross button in). initial = 'K.' printed small in the
-    corner, or None. lift 0..1 raises the card (bigger shadow) for laying down and taking away.
+    """The pick card, a piece of the worksheet laid on the table: the title, the two choices each with its
+    controller button, and the dashed "Draw the one you pick" ring. side 'turkey' (green triangle Theater curtain /
+    red circle Stone tunnel) or 'trout' (blue cross Rivet-toothed monster jaw / pink square Movie projector).
+    picked = the kind that is chosen ('circle' for the first friend, 'square' for the next) or None: nothing lights.
+    press 0..1 sinks and lights the picked button; the other stays dull. scribble 0..1 colours the picked button in
+    with pencil (round and round for the circle, corner to corner for the square: both friends coloured theirs in).
+    mark 0..1 pencils the friend's own mark of the picked shape in the dashed ring: the first friend drew ONE SMALL
+    CIRCLE (mark=1 on the turkey card); the next friend's drawing is not visible on the sheet, so keep mark=0 on the
+    trout card and the ring stays empty paper. initial = 'E.' printed small in the corner, or None. lift 0..1
+    raises the card (bigger shadow) for laying down and taking away.
     Returns {'ring': centre of the dashed ring, 'tip': pencil point (or None), 'buttons': {kind: (x, y)}} on screen."""
     P = PICKS[side]
     K = 2
@@ -1482,9 +1446,10 @@ def pick_card(ink, c=(480, 262), side="turkey", picked=None, press=0.0, mark=0.0
     rc = (368 * K, 186 * K)
     tipc = None
     if scribble > 0 and picked in pos:
-        tipc = globals()["scribble_"](lay, (pos[picked][0] * K, pos[picked][1] * K), 17 * K, scribble, weight=1.1)
+        bc = (pos[picked][0] * K, pos[picked][1] * K)
+        tipc = round_scribble(lay, bc, 15 * K, scribble) if picked == "circle" else globals()["scribble_"](lay, bc, 17 * K, scribble, weight=1.1)
     if mark > 0 and picked:
-        tp = friend_mark(lay, picked, rc, (9 if picked == "triangle" else 19) * K, mark, weight=1.3)
+        tp = friend_mark(lay, picked, rc, (9 if picked == "triangle" else 15) * K, mark, weight=1.3)
         tipc = tp if (mark < 1 or tipc is None or scribble >= 1) else tipc
     im = lay.img
     a = math.radians(angle)
@@ -1623,8 +1588,8 @@ def _resample(pts, n):
 
 
 def _mark_strokes(kind, size):
-    """The friend's own pencil mark, as strokes round (0, 0): 'triangle' small and leaning (as K. drew it),
-    'cross' two long crossing strokes (as N. drew it), 'circle', 'square', 'hexagon' for completeness."""
+    """The friend's own pencil mark, as strokes round (0, 0): 'circle' (one wobbly loop, as the first
+    friend drew it), 'triangle', 'cross', 'square', 'hexagon' for completeness."""
     rs = random.Random(hash(kind) % 97 if False else {"triangle": 3, "cross": 4, "circle": 5, "square": 6, "hexagon": 7}[kind])
     j = lambda v=0.06: rs.uniform(-v, v) * size
     if kind == "triangle":
@@ -1661,7 +1626,7 @@ scribble_ = None
 
 
 def scribble(ink, c, r=16, done=1.0, weight=1.0, alpha=0.9, target=None, seed=1):
-    """A child's pencil colouring-in over a round thing of radius r at c (N. coloured in the cross button):
+    """A child's pencil colouring-in over a round thing of radius r at c (the next friend coloured the square button in):
     one zigzag stroke, progressive with done 0..1. Returns the pencil point."""
     rs = random.Random(seed)
     pts, n = [], 15
@@ -1680,8 +1645,8 @@ scribble_ = scribble
 
 
 def crayon_ring(ink, c, rx, ry=None, color=None, done=1.0, seed=0, width=5, alpha=1.0):
-    """One hand-drawn coloured ring round something (the green ring round the helmet, the blue ring round the
-    suit): a wobbly loop that overshoots its start, drawn progressively with done 0..1. Returns the crayon point."""
+    """One hand-drawn coloured ring round something (a red ring round the tunnel mouth, a pink
+    one round the picture): a wobbly loop that overshoots its start, drawn progressively with done 0..1. Returns the crayon point."""
     ry = rx if ry is None else ry
     color = color or PAL["green"]
     rs = random.Random(seed + 11)
@@ -1783,7 +1748,7 @@ def shove(t, every=1.0):
     return math.sin(math.pi * min(1.0, x / 0.4)) ** 2 if x < 0.4 else 0.0
 
 
-_pose_c25 = turkey_pose
+_pose_base = turkey_pose
 TURKEY_MOODS = TURKEY_MOODS + ("shove", "heavy", "lunge")
 
 
@@ -1802,7 +1767,7 @@ def turkey_pose(mood="calm", t=0.0):   # noqa: F811
                     ruff=0.5 + 0.5 * b, shake=0.5 + 0.8 * b, blur=0)
     if mood == "lunge":
         return dict(neck=-14 + 3 * s(11 * t), wattle=30 * s(10 * t), beak=30, eye=1, wing=88 + 6 * s(16 * t), ruff=1, shake=2.4, blur=0)
-    return _pose_c25(mood, t)
+    return _pose_base(mood, t)
 
 
 def _silhouette(spr, color=None, eye=True):
@@ -2414,7 +2379,7 @@ def fog(ink, level=0.2, t=0.0, c=PORT_C, r=PORT_R, at=None, wipes=None, pulse=1.
     ink.paste(lay, (x0, y0))
 
 
-def gauge(ink, notches=5.0, x=None, y=None, r=46, tremble=0.0, t=0.0, of=8):   # noqa: F811
+def gauge(ink, notches=5.0, x=None, y=None, r=46, tremble=0.0, t=0.0, of=8):
     """The air gauge: a brass dial, ivory face, eight notches, one needle. notches 8 = FULL, 5 = where the pilot's
     page leaves it, 0 = EMPTY (never show 0: "could be"). Give it a float and ease it down one whole notch at a
     breath. Default place STAGE['gauge'] (low right on the tin wall beside the glass). For the small dial riveted
@@ -2819,49 +2784,70 @@ def gate(ink, open_=0.0, c=PORT_C, r=PORT_R, shift=(0.0, 0.0), alpha=1.0):
     return dict(gap=(x5 + w5 / 2, x6 - w6 / 2), plate=(px, y), slot=(sx, sy), bars=out)
 
 
-HOME_PLANES = ("far", "room", "chair", "sill")
+HOME_PLANES = ("light", "far", "room", "chair", "sill")
+HOME_FLOOR = 0.42            # the room's floor line, in room units below the centre
+
+
+def home_hole(push=0.0):
+    """How wide the house shows at a given push, as a fraction of r: use tunnel(ink, hole=home_hole(push)) so the
+    far mouth of the tunnel opens exactly round the lit room."""
+    return lerp(0.5, 0.86, smooth(clamp(push)))
 
 
 def home(ink, push=0.0, lamp=0.0, c=PORT_C, r=PORT_R, planes=HOME_PLANES, alpha=1.0):
-    """'That's his home': the house behind the bars, as black card flats on four planes that part as the camera
-    pushes in (multiplane: nearest fastest). push 0 = seen from the glass (small, deep in the tunnel), 1 = pushed
-    right in. Planes, back to front: 'far' (the bed with its pillow at the very back), 'room' (clock and oval frame
-    on the wall, kettle, the fringed lamp; lamp 0..1 lights it), 'chair' (the armchair), 'sill' (the mat on the
-    stone sill). Draw planes in separate calls to put the fish between them. Lay it over glow_ground + tunnel,
-    before curtains(), gate() and bars(). Returns anchors on screen: {'bed', 'lamp', 'chair' (the seat), 'mat',
-    'floor' (y of the room floor), 'scale' {plane: scale}}."""
+    """'That's his home': the house behind the bars, as black card flats on planes that part as the camera pushes in
+    (multiplane: nearest fastest). push 0 = seen from the glass (small, deep in the tunnel's far mouth), 1 = pushed
+    right in. Planes, back to front: 'light' (the lit wall of the room, a ruled disc of radius home_hole(push) * r,
+    and the black floor everything stands on), 'far' (the bed with its pillow at the very back), 'room' (clock and
+    oval frame on the wall, the kettle on its shelf, the fringed lamp; lamp 0..1 lights it), 'chair' (the armchair),
+    'sill' (the mat on the stone sill). Draw planes in separate calls to put the fish between them. Lay it over
+    glow_ground + tunnel, before curtains(), gate() and bars(). Returns anchors on screen: {'bed', 'lamp', 'chair'
+    (the seat), 'mat', 'floor' (y of the floor line), 'r' (radius of the lit room)}."""
     p = smooth(clamp(push))
-    out = dict(scale={})
+    rr = home_hole(push) * r
+    out = dict(r=rr)
 
-    def P(depth, u, v):                       # depth 0 far .. 1 near: where a point of that plane lands, and its scale
-        s = lerp(0.34, 1.0, depth) * (1 + p * lerp(0.35, 1.55, depth))
-        return (c[0] + u * r * s, c[1] + (v * s + 0.1 * (1 - depth) * (1 - p)) * r), s
+    def P(depth, u, v):                       # depth 0 far .. 1 near: where a room point lands, and that plane's scale
+        s = lerp(0.52, 1.0, p) * (1 + 0.22 * p * depth) * lerp(1.0, 1.0 + 0.1 * depth, 1 - p)
+        return (c[0] + u * r * s, c[1] + v * r * s), s * r / 212.0
+    (fx, fy), _ = P(0.5, 0.0, HOME_FLOOR)
+    out["floor"] = fy
+    if "light" in planes:
+        g = _ground_img((int(c[0]), int(c[1] - 0.1 * rr)), int(rr * 1.9), 0, 20)
+        m = Image.new("L", (ink.w, ink.h), 0)
+        md = ImageDraw.Draw(m)
+        md.ellipse([c[0] - rr, c[1] - rr, c[0] + rr, c[1] + rr], fill=255)
+        ink.img.paste(g, (0, 0), m)
+        fl = Image.new("L", (ink.w, ink.h), 0)
+        ImageDraw.Draw(fl).rectangle([0, fy, ink.w, ink.h], fill=255)
+        ink.img.paste(PAL["card"], (0, 0), ImageChops.multiply(fl, m))               # the floor: one black strip
+        ink.d = ImageDraw.Draw(ink.img, "RGBA")
+        ink.d.line([c[0] - rr, fy, c[0] + rr, fy], fill=PAL["card_edge"] + (160,), width=1)
+        ink.d.ellipse([c[0] - rr, c[1] - rr, c[0] + rr, c[1] + rr], outline=PAL["teal_hi"] + (130,), width=2)
     if "far" in planes:
-        (x, y), s = P(0.0, 0.0, 0.5)
-        flat(ink, "bed", x, y, 0.62 * s * r / 212.0, alpha=alpha)
-        out["bed"] = (x, y - 26 * s * r / 212.0)
-        out["scale"]["far"] = s
+        (x, y), k = P(0.0, 0.36, HOME_FLOOR)
+        flat(ink, "bed", x, y, 0.6 * k, alpha=alpha)
+        out["bed"] = (x - 20 * k, y - 30 * k)
     if "room" in planes:
-        (x, y), s = P(0.35, 0.0, 0.5)
-        k = 0.7 * s * r / 212.0
-        flat(ink, "clock", x - 0.16 * r * s, y - 0.5 * r * s, k, alpha=alpha)
-        flat(ink, "frame", x + 0.2 * r * s, y - 0.55 * r * s, k, alpha=alpha)
-        flat(ink, "kettle", x + 0.5 * r * s, y, k * 0.8, alpha=alpha)
-        flat(ink, "lamp", x - 0.52 * r * s, y, k, lit=lamp, alpha=alpha)
-        out["lamp"] = (x - 0.52 * r * s, y - 70 * k)
-        out["floor"] = y
-        out["scale"]["room"] = s
+        (x, y), k = P(0.3, -0.06, -0.06)
+        flat(ink, "clock", x, y, 0.8 * k, alpha=alpha)
+        (x, y), k = P(0.3, 0.3, -0.16)
+        flat(ink, "frame", x, y, 0.8 * k, alpha=alpha)
+        (x, y), k = P(0.35, 0.6, 0.1)
+        ink.d.rectangle([x - 34 * k, y, x + 40 * k, y + 5 * k], fill=PAL["card"] + (int(255 * alpha),))          # the kettle's shelf
+        ink.d.polygon([(x - 22 * k, y + 5 * k), (x - 14 * k, y + 5 * k), (x - 22 * k, y + 16 * k)], fill=PAL["card"] + (int(255 * alpha),))
+        flat(ink, "kettle", x, y, 0.62 * k, alpha=alpha)
+        (x, y), k = P(0.4, -0.5, HOME_FLOOR)
+        flat(ink, "lamp", x, y, 0.86 * k, lit=lamp, alpha=alpha)
+        out["lamp"] = (x, y - 70 * 0.86 * k)
     if "chair" in planes:
-        (x, y), s = P(0.62, 0.12, 0.5)
-        k = 0.78 * s * r / 212.0
-        flat(ink, "armchair", x, y, k, alpha=alpha)
-        out["chair"] = (x, y - 62 * k)
-        out["scale"]["chair"] = s
+        (x, y), k = P(0.65, -0.1, HOME_FLOOR)
+        flat(ink, "armchair", x, y, 0.9 * k, alpha=alpha)
+        out["chair"] = (x + 14 * k, y - 62 * 0.9 * k)
     if "sill" in planes:
-        (x, y), s = P(1.0, 0.06, 0.72)
-        flat(ink, "mat", x, y, 0.9 * s * r / 212.0, alpha=alpha)
-        out["mat"] = (x, y - 6)
-        out["scale"]["sill"] = s
+        (x, y), k = P(1.0, 0.12, 0.66)
+        flat(ink, "mat", x, y, 0.9 * k, alpha=alpha)
+        out["mat"] = (x, y - 8 * k)
     return out
 
 
@@ -2982,8 +2968,8 @@ def wall_picture(ink, t=0.0, c=None, r=None, show=True, mood="shove", dim=0.0, b
     hold.img, hold.d = sh, ImageDraw.Draw(sh, "RGBA")
     jerk = 2.0 * math.sin(breath_index(t) * 2.4)                                 # the picture sits a hair differently each breath
     if show:
-        th = turkey_h or r * 1.75
-        turkey_shadow(hold, S / 2 + r * 0.16 + jerk, S / 2 + r * 0.22, th, mood, t, "bust", color=(14, 26, 30), blur=max(1.0, r / 60.0), **over)
+        th = turkey_h or r * 2.0
+        turkey_shadow(hold, S / 2 + r * 0.2 + jerk, S / 2 + r * 0.3, th, mood, t, "bust", color=(14, 26, 30), blur=max(1.0, r / 60.0), **over)
         sh = hold.img
     if bar_shadows:
         hold.img, hold.d = sh, ImageDraw.Draw(sh, "RGBA")
@@ -3108,12 +3094,6 @@ def tin_dial_xy(tp):
 
 
 # ------------------------------------------------------- cards, labels, ending ---
-
-PICKS = dict(
-    turkey=dict(title="Turkey thinks", rows=[("triangle", "Theater curtain"), ("circle", "Stone tunnel")]),
-    trout=dict(title="The trout think", rows=[("cross", "Rivet-toothed monster jaw"), ("square", "Movie projector")]),
-)
-
 
 def bolt_label(ink, n, x=74, y=64, size=44, lit=1.0, word=True, alpha=1.0):
     """The label an ending carries: die face n (ivory) centred at (x, y) with the small word under it (1 and 4
@@ -3285,12 +3265,13 @@ def _demo_cheeto(ink, t):
 
 def _demo_home(ink, t, push=0.75, cur=0.0):
     def behind(i):
-        home(i, push, lamp=1.0, planes=("far", "room"))
-        shadow_fish(i, 520, 300, 120, angle=0, t=t)
-        home(i, push, planes=("chair", "sill"))
+        tunnel(i, hole=home_hole(push))
+        h = home(i, push, lamp=1.0, planes=("light", "far", "room", "chair"))
+        shadow_fish(i, h["chair"][0], h["chair"][1] - 14, 96, angle=0, t=t)
+        home(i, push, planes=("sill",))
         curtains(i, cur, glow=cur)
         gate(i, 0.9)
-    seat_scene(ink, t, behind=behind, fish=False, only=[1, 2, 3, 4, 7, 8, 9], notches=2.3, fog_level=0.72, bolt=3, shift=(0, 0))
+    seat_scene(ink, t, behind=behind, fish=False, tunnel_on=False, only=[1, 2, 3, 4, 7, 8, 9], notches=2.3, fog_level=0.6, bolt=3)
     badge(ink)
 
 
@@ -3402,7 +3383,8 @@ if __name__ == "__main__":
     demos = [("01_table_drawing_3s", _demo_table, 3.4), ("02_table_fish", _demo_table, 5.6), ("03_table_done", _demo_table, 7.9),
              ("04_page_under_porthole", _demo_page_port, 1.0), ("05_wreck_outline", _demo_wreck, 1.1), ("06_window_shove", _demo_window, 1.15),
              ("07_seat", _demo_seat, 1.2), ("08_seat_trapped", _demo_trapped, 1.1), ("09_seat_cheeto", _demo_cheeto, 1.3),
-             ("10_seat_home", _demo_home, 1.2), ("11_seat_home_curtains", lambda i, t: _demo_home(i, t, 1.0, 1.0), 1.2),
+             ("10_seat_home", lambda i, t: _demo_home(i, t, 1.0, 0.0), 1.2), ("10b_seat_home_far", lambda i, t: _demo_home(i, t, 0.0, 0.0), 1.2),
+             ("11_seat_home_curtains", lambda i, t: _demo_home(i, t, 1.0, 1.0), 1.2),
              ("12_iris", _demo_iris, 1.0), ("13_iris_nearly_shut", lambda i, t: _demo_iris(i, t, 0.9), 1.0),
              ("14_river_movie", _demo_river, 1.15), ("15_river_blank", _demo_blank, 1.0), ("16_turkeys", _demo_turkeys, 0.7),
              ("17_props", _demo_props, 1.0), ("18_cards", _demo_cards, 1.0), ("19_end", _demo_end, 1.0)]
