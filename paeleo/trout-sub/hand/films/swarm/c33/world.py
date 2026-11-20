@@ -2655,11 +2655,17 @@ def _flat_mask(name, s):
     o = (Wc / 2, Hc - 12 * s)
     P = lambda pts, fill=255: _f_poly(d, pts, s, o, fill)
     E = lambda x0, y0, x1, y1, fill=255: d.ellipse([o[0] + x0 * s, o[1] + y0 * s, o[0] + x1 * s, o[1] + y1 * s], fill=fill)
-    if name == "armchair":
-        P(catmull([(-52, 0), (-56, -40), (-50, -58), (-36, -60), (-34, -92), (-22, -112), (10, -116), (34, -106), (40, -80), (40, -60),
-                   (54, -58), (60, -42), (56, 0), (44, 0), (44, 8), (36, 8), (36, 0), (-34, 0), (-34, 8), (-42, 8), (-42, 0), (-52, 0)], 4))
-        P(catmull([(-28, -52), (-26, -88), (-14, -102), (8, -104), (26, -96), (30, -74), (30, -52), (-28, -52)], 4), 0)      # the hollow of the seat: light
-        P([(-30, -44), (32, -44), (34, -30), (-32, -30)])                                                                      # the cushion
+    if name == "armchair":                                           # side on: tall buttoned back, rolled arm, fat cushion, turned feet
+        P(catmull([(-44, -14), (-50, -60), (-52, -100), (-44, -118), (-28, -120), (-18, -108), (-14, -78), (-10, -58), (20, -58), (26, -68),
+                   (42, -70), (52, -60), (52, -44), (46, -38), (48, -14), (-44, -14)], 5))
+        P(catmull([(-12, -50), (-8, -62), (30, -62), (44, -52), (44, -40), (-10, -40), (-12, -50)], 4))                       # the cushion
+        P([(-40, -14), (-30, -14), (-33, 0), (-39, 0)])
+        P([(34, -14), (44, -14), (42, 0), (36, 0)])
+        E(-42, -4, -30, 4)
+        E(34, -4, 46, 4)
+        for q in range(3):                                           # three buttons punched in the back
+            E(-37 + q * 2.5, -100 + q * 20, -32 + q * 2.5, -95 + q * 20, 0)
+        d.line([o[0] - 8 * s, o[1] - 39 * s, o[0] + 45 * s, o[1] - 39 * s], fill=0, width=max(1, int(1.6 * s)))                   # the slit under the cushion
     elif name == "lamp":
         P([(-26, -86), (26, -86), (15, -124), (-15, -124)])                                   # the shade
         for q in range(9):                                                                  # its fringe, cut tick by tick
@@ -2775,7 +2781,6 @@ def curtains(ink, closed=0.0, c=PORT_C, r=PORT_R, span=0.8, alpha=1.0, glow=0.0)
             a = a * (1 + 0.9 * gl[..., None]) + np.array([90, 40, 16], np.float32) * gl[..., None]
         piece = _img(a).convert("RGBA")
         piece.putalpha(m.filter(ImageFilter.GaussianBlur(0.7)))
-        lay.alpha_composite(_shadow_of(piece, 4, 0.5, (8, 0, 2)), (int(-sgn * 5), 3)) if False else None
         lay.alpha_composite(piece)
         d = ImageDraw.Draw(lay, "RGBA")
         d.line([(cx + sgn * u_ * R, cy + v_ * R) for u_, v_ in inner], fill=PAL["velvet_hi"] + (200,), width=2)
@@ -3018,7 +3023,7 @@ def river_bars(ink, x0=None, x1=None, n=7, y0=20, y1=None, lean=5.0, shift=0.0):
             ink.d.ellipse([x - 3, yy_ - 6, x + 3, yy_ + 6], fill=(126, 72, 40, 150))
 
 
-def trout_audience(ink, t=0.0, settle=0.0, rows=((8, 462, 128), (7, 506, 150)), x0=300, x1=800, lid=0.0):
+def trout_audience(ink, t=0.0, settle=0.0, rows=((4, 420, 112), (5, 458, 132)), x0=330, x1=800, lid=0.0):
     """The audience: two rows of engraved brook trout low in the frame, all facing the wall (right), tails idling.
     rows = ((count, y, length), ...) back row first. settle 0..1 lowers them all together a little (they settle to
     watch). The spotted fish of the drawing is the LAST one returned (the right end of the front row).
@@ -3026,7 +3031,7 @@ def trout_audience(ink, t=0.0, settle=0.0, rows=((8, 462, 128), (7, 506, 150)), 
     out = []
     for ri, (n, y, ln) in enumerate(rows):
         for q in range(n):
-            x = lerp(x0, x1, (q + 0.5 * (ri % 2)) / max(1, n - 1 + 0.5)) + 14 * math.sin(q * 2.3 + ri)
+            x = lerp(x0, x1, (q + (0.5 if n < 5 else 0.0)) / 4.0) + 8 * math.sin(q * 2.3 + ri)
             yy_ = y + 9 * smooth(clamp(settle)) + 3 * math.sin(t * 1.3 + q * 1.7 + ri) * (1 - 0.7 * settle)
             trout(ink, x, yy_, ln, flip=True, phase=t * 3.2 + q * 1.1 + ri * 2, amp=5 + 2 * (q % 2), lid=lid, shadow=0.6,
                   angle=3 * math.sin(q * 1.9 + ri))
@@ -3034,25 +3039,38 @@ def trout_audience(ink, t=0.0, settle=0.0, rows=((8, 462, 128), (7, 506, 150)), 
     return out
 
 
-def silt(ink, x, y, w=260, h=46, puff=0.0, t=0.0, seed=0):
-    """A mound of river silt (torn paper, ruled) with its top middle at (x, y): what the wreck's nose is dug into.
-    puff 0..1 rolls a slow cloud of mud off it (P4: the tin settles)."""
+@lru_cache(maxsize=8)
+def _silt_spr(w, h, seed, dark_q):
     rs = random.Random(seed + 3)
-    pts = [(x - w / 2, y + h)] + [(x - w / 2 + w * q / 10 + rs.uniform(-6, 6), y + h - h * math.sin(math.pi * q / 10) ** 0.8 * rs.uniform(0.85, 1.1)) for q in range(11)] + [(x + w / 2, y + h)]
-    ink.d.polygon([(px + 4, py + 4) for px, py in pts], fill=(4, 20, 22, 90))
-    ink.d.polygon(pts, fill=PAL["silt"] + (255,))
-    for q in range(1, 7):
-        yy_ = y + h * q / 7
-        hw = w / 2 * (0.25 + 0.75 * q / 7)
-        ink.d.line([(x - hw + rs.uniform(-8, 8), yy_), (x + hw + rs.uniform(-8, 8), yy_ + rs.uniform(-2, 2))], fill=(40, 52, 44, 150), width=1)
-    ink.d.line(pts[1:-1], fill=(170, 176, 150, 230), width=2)
+    S = (w + 40, h + 30)
+    top = [(20 + w * q / 12.0 + rs.uniform(-5, 5), 12 + h - h * (math.sin(math.pi * q / 12.0) ** 0.7) * rs.uniform(0.82, 1.08)) for q in range(13)]
+    pts = catmull(top, 5) + [(w + 40, h + 30), (0, h + 30)]
+    col = mix_color(PAL["silt"], (8, 26, 30), dark_q / 10.0)
+    sp = _paper_piece(S, pts, col, seed=seed + 50, edge=0.2 * (1 - dark_q / 10.0) + 0.04, grain=0.2, shade=(0.3, 1.0, 0.35))
+    a = np.asarray(sp, np.float32).copy()
+    yy, xx = np.mgrid[0:S[1], 0:S[0]].astype(np.float32)
+    ph = ((yy + 0.04 * (xx - S[0] / 2) ** 2 / max(1, w) * 2 + 1.5 * np.sin(xx / 17.0)) / 4.2) % 1.0       # ruled along the mound's curve
+    line = np.clip((0.36 - np.abs(ph - 0.5) * 2) / 0.3 + 0.5, 0, 1)
+    a[..., :3] *= (1 - 0.4 * line)[..., None]
+    return Image.fromarray(np.clip(a, 0, 255).astype(np.uint8), "RGBA")
+
+
+def silt(ink, x, y, w=260, h=46, puff=0.0, t=0.0, seed=0, dark=0.0):
+    """A mound of river silt (one torn-paper piece, ruled along its curve) with its crest at (x, y): what the
+    wreck's nose is dug into. puff 0..1 rolls a slow cloud of mud off it (P4: the tin settles). dark 0..1 turns it
+    to a dark shape for the outline shot."""
+    sp = _silt_spr(int(w), int(h), int(seed), int(round(clamp(dark) * 10)))
+    ink.paste(_shadow_of(sp, 5, 0.45, (0, 12, 14)), (int(x - sp.width / 2 + 3), int(y - 12 - 6)))
+    ink.paste(sp, (int(x - sp.width / 2), int(y - 12)))
     if puff > 0:
-        for q in range(9):
-            a = rs.uniform(0, math.pi)
-            f = clamp(puff * rs.uniform(0.8, 1.3))
-            px, py = x + math.cos(a) * w * 0.55 * f + rs.uniform(-20, 20), y + h * 0.3 - math.sin(a) * 60 * f
-            rr = (10 + 26 * f) * rs.uniform(0.7, 1.2)
-            ink.d.ellipse([px - rr, py - rr * 0.7, px + rr, py + rr * 0.7], fill=(150, 156, 128, int(120 * (1 - f) ** 0.6)))
+        rs = random.Random(seed + 9)
+        col = mix_color((168, 172, 140), (20, 60, 62), dark)
+        for q in range(11):
+            a = rs.uniform(0.15, math.pi - 0.15)
+            f = clamp(puff * rs.uniform(0.75, 1.25))
+            px, py = x + math.cos(a) * w * 0.6 * f + rs.uniform(-16, 16), y + h * 0.25 - math.sin(a) * 54 * f
+            rr = (9 + 24 * f) * rs.uniform(0.7, 1.2)
+            ink.d.ellipse([px - rr, py - rr * 0.7, px + rr, py + rr * 0.7], fill=col + (int(110 * (1 - f) ** 0.6),))
 
 
 def wreck(ink, t=0.0, c=None, scale=None, mood="shove", sink=0.0, puff=0.0, outline=0.0, glow=1.0, dial=None, weed_on=True, flip=True, **over):
@@ -3072,9 +3090,9 @@ def wreck(ink, t=0.0, c=None, scale=None, mood="shove", sink=0.0, puff=0.0, outl
     if weed_on:
         tx, ty = tp["tail"]
         wx, wy = lerp(nx, tx, 0.62), lerp(ny, ty, 0.62) - 96 * scale
-        weed(ink, wx, wy + 6, 120 * scale, lean=16 * math.sin(t * 0.7), t=t, seed=3, n=4, spread=22, dark=0.6 * outline + 0.1)
+        weed(ink, wx, wy + 6, 120 * scale, lean=16 * math.sin(t * 0.7), t=t, seed=3, n=4, spread=22, dark=0.9 * outline + 0.1)
         bubbles(ink, (lerp(nx, tx, 0.42), lerp(ny, ty, 0.42) - 98 * scale), t, t0=math.floor(t / 1.4) * 1.4, n=3, rise=90, size=3.5)
-    silt(ink, nx + (18 if flip else -18) * scale, ny + 10 * scale - sink * 0.4, 250 * scale, 70 * scale, puff, t, seed=2)
+    silt(ink, nx + (-6 if flip else 6) * scale, ny + 14 * scale - sink * 0.5, 300 * scale, 78 * scale, puff, t, seed=2, dark=outline)
     tp["dial"] = tin_dial_xy(tp)
     if dial is not None:
         gauge(ink, dial, *tp["dial"], r=int(27 * scale), t=t)
@@ -3128,7 +3146,7 @@ def round_scribble(ink, c, r=16, done=1.0, weight=1.2, alpha=0.95, turns=5.0, se
     return pts[-1]
 
 
-def end_porthole(ink, c=PORT_C, r=PORT_R, shadow=0.7, faint=0.55, cant=0.0):
+def end_porthole(ink, c=PORT_C, r=PORT_R, shadow=0.7, faint=0.8, cant=0.0):
     """The ending's porthole: the brass six-bolt ring alone, square on, its glass dark teal with the nine bars and
     the cracks faint in it and no one behind them. On the table: table(ink, sheet=False) first; then bolt_mark()
     each bolt (1 to 4 lit, 5 and 6 with lit=0), die_cup(), pencil(), badge()."""
@@ -3136,7 +3154,7 @@ def end_porthole(ink, c=PORT_C, r=PORT_R, shadow=0.7, faint=0.55, cant=0.0):
     ro = int(r * RING_OUT / PORT_R)
     S = 2 * r + 2
     lay = Ink(0.0, 0, (ink.w, ink.h))
-    glow_ground(lay, c, r, cant, dim=0.42)
+    glow_ground(lay, c, r, cant, dim=0.62)
     bars(lay, None, c, r, alpha=faint, shadow=0.0)
     cracks(lay, c, r, alpha=faint)
     m = Image.new("L", (ink.w, ink.h), 0)
@@ -3287,7 +3305,7 @@ def _demo_river(ink, t):
 
 
 def _demo_blank(ink, t):
-    river_scene(ink, t, movie=False, audience=False, tin_on=False, bar_shadows=False, bolt=5)
+    river_scene(ink, t, movie=False, audience=False, mood=None, bar_shadows=False, bolt=5)
     badge(ink)
 
 
