@@ -29,3 +29,24 @@ fourth-grade class wrote on five Porthole Logs. Your film renders that sheet, in
   `p35.py`, `p44.py` and `p01.py` are finished examples: read at least one in full and reuse its approach.
   You may forage from Wikimedia Commons as before (credits file required).
 - Put the captions in a top-level list `CAPTIONS = [(start, end, text), ...]` so the voices can be added later.
+
+## How each film is made: a swarm of units, as the Oulipo films were
+Each film has its own folder `films/swarm/cNN/` and is made by units that hand work to each other:
+
+1. **Story unit** writes `board.md`: the film beat by beat. For the pilot's page and for every WRITTEN ending it
+   expands the child's sentence into a staged scene: where we are, who is in frame, the one action, and the payoff
+   that makes the sentence true. The sentence itself is never changed; the expansion is all in the picture.
+   The pilot's first page is the frame for everything: who the pilot says is outside, what Turkey does, and how the
+   air gets used up must colour every later scene (if the pilot wrote that Turkey freaks out, he is freaking out in
+   every ending). The porthole's own Ouxpo/SCION rule shapes how things move. Probable is played straight, Plausible
+   a notch stranger, Preposterous as far as the sentence will go. Blanks are listed as blanks.
+2. **World unit** builds `world.py`: the shared pieces every scene uses, foraged or handmade (Turkey, the bread-roll
+   tin and its brass porthole, the trout, this porthole's own subject, the pilot's drawing as pencil strokes, the
+   controller buttons and die faces, the palette), and writes `WORLD.md` listing each function and how to call it.
+3. **Three scene units** each write one module from the board, using only `world.py` and the kit:
+   `scene_pilot.py` (the drawing made, then the three lines), `scene_turkey.py` (the pick and bolts 1 to 3),
+   `scene_trout.py` (the pick and bolts 4 to 6). Each module exposes `SECONDS`, `CAPTIONS` (times from its own
+   start) and `draw(t, ink)`.
+4. **Editor** writes `films/cNN.py`: joins the three modules, adds the ending (the die unthrown, bolts lit or
+   empty), the number badge and the sound, a top-level `CAPTIONS`, and renders. The editor fixes what does not join.
+5. **Critic** and **rights reviewer** look independently; a **repair unit** then applies what they found and re-renders.
