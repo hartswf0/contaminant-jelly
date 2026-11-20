@@ -1,0 +1,51 @@
+{
+ "song": "submersible-propulsion",
+ "song_from_seconds": 24,
+ "lines": [
+  {
+   "at": 9.5,
+   "voice": "am_michael",
+   "speaker": "narrator",
+   "text": "A giant three-headed monster.",
+   "caption": "A giant three-headed monster.",
+   "seconds": 1.92,
+   "caption_held": 3.3
+  },
+  {
+   "at": 13.0,
+   "voice": "am_michael",
+   "speaker": "narrator",
+   "text": "Wave at his twin turkey.",
+   "caption": "Wave at his twin turkey.",
+   "seconds": 1.69,
+   "caption_held": 3.3
+  },
+  {
+   "at": 16.5,
+   "voice": "am_michael",
+   "speaker": "narrator",
+   "text": "Using up his energy.",
+   "caption": "Using up his energy.",
+   "seconds": 1.64,
+   "caption_held": 3.5
+  },
+  {
+   "at": 26.0,
+   "voice": "am_santa",
+   "speaker": "turkey",
+   "text": "There is another turkey here.",
+   "caption": "There is another turkey here.",
+   "seconds": 1.82,
+   "caption_held": 5.5
+  },
+  {
+   "at": 36.8,
+   "voice": "af_bella",
+   "speaker": "trout",
+   "text": "Two-headed tin monster fits the submarine.",
+   "caption": "Two-headed tin monster fits the submarine.",
+   "seconds": 2.51,
+   "caption_held": 5.7
+  }
+ ]
+}

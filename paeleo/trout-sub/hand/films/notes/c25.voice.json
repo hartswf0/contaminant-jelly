@@ -1,0 +1,69 @@
+{
+ "song": "whale-belly-breach",
+ "song_from_seconds": 18,
+ "lines": [
+  {
+   "at": 10.0,
+   "voice": "am_michael",
+   "speaker": "narrator",
+   "text": "A trout, and the trout think it is a bird in a bottle.",
+   "caption": "A trout, and the trout think it is a bird in a bottle.",
+   "seconds": 3.11,
+   "caption_held": 4.5
+  },
+  {
+   "at": 14.8,
+   "voice": "am_michael",
+   "speaker": "narrator",
+   "text": "Panic.",
+   "caption": "Panic.",
+   "seconds": 0.72,
+   "caption_held": 2.7
+  },
+  {
+   "at": 17.5,
+   "voice": "am_michael",
+   "speaker": "narrator",
+   "text": "By panicking.",
+   "caption": "By panicking.",
+   "seconds": 1.09,
+   "caption_held": 2.67
+  },
+  {
+   "at": 23.3,
+   "voice": "am_santa",
+   "speaker": "turkey",
+   "text": "The air runs out.",
+   "caption": "The air runs out.",
+   "seconds": 1.55,
+   "caption_held": 3.7
+  },
+  {
+   "at": 27.3,
+   "voice": "am_santa",
+   "speaker": "turkey",
+   "text": "A little uncomfy.",
+   "caption": "A little uncomfy.",
+   "seconds": 1.59,
+   "caption_held": 3.7
+  },
+  {
+   "at": 31.3,
+   "voice": "am_santa",
+   "speaker": "turkey",
+   "text": "It is not wet.",
+   "caption": "It is not wet.",
+   "seconds": 1.38,
+   "caption_held": 4.37
+  },
+  {
+   "at": 38.8,
+   "voice": "af_bella",
+   "speaker": "trout",
+   "text": "The fish swim next to the astronaut, looking...",
+   "caption": "The fish swim next to the astronaut, looking...",
+   "seconds": 2.72,
+   "caption_held": 4.7
+  }
+ ]
+}

@@ -34,6 +34,7 @@ LINES = {
  "p44": ["Is that a turbine, drinkin' the whole river down a whirlpool?", "Or a trap that hypnotizes. And I am a-starin' right at it?",
          "That's the pie-prize wheel from the diner! Who wins the slice?", "Or a washin' machine. And whose sock is that?"],
 }
+SONGS_CLASS = {"c10": ("motor-run-on-the-water", 16), "c13": ("the-verne-bench", 20), "c16": ("submersible-propulsion", 24), "c25": ("whale-belly-breach", 18), "c33": ("warning-unheeded", 22)}
 SONGS = {"p01": ("lake-merritt-clave", 22), "p03": ("the-prophet", 18), "p14": ("the-selkies-cradle", 30), "p35": ("gaslit-feerie", 14), "p44": ("ondes-in-the-abbey", 20)}
 DEFAULT_SONG = ("descent-to-the-abyss", 20)
 TIMES = {"p03": [(19.7, 24.3, "CAP2"), (28.9, 33.7, "CAP3")]}
@@ -58,6 +59,15 @@ def captions(pid):
         if ok(v) and sum(len(x[-1]) for x in v) / len(v) > 15 and len(v) > len(best):
             best = [(float(x[0]), float(x[1]), x[-1]) for x in v]
     return sorted(best)
+
+
+def class_speakers(pid):
+    """Class films read the children's own sentences: the pilot's three lines by the narrator, the first
+    friend's (Turkey thinks) by Turkey, the next friend's (the trout think) by the trout."""
+    sheets = json.load(open("../class/transcripts.json"))["sheets"]
+    s = [x for x in sheets if x["porthole"] == int(pid[1:])][0]
+    n = lambda f: sum(1 for k in ("probable", "plausible", "preposterous") if s[f][k] and s[f][k].get("reads"))
+    return ["narrator"] * 3 + ["turkey"] * n("first_friend") + ["trout"] * n("next_friend")
 
 
 def speaker(text, t, dur):
@@ -85,6 +95,11 @@ def badge(n):
     p = tempfile.mktemp(suffix=".png"); im.save(p); return p
 
 
+def blank():
+    """Class films carry their number in the picture already."""
+    p = tempfile.mktemp(suffix=".png"); Image.new("RGBA", (960, 540), (0, 0, 0, 0)).save(p); return p
+
+
 def one(pid):
     src = "assets/films/%s.mp4" % pid
     dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", src], capture_output=True, text=True).stdout)
@@ -92,9 +107,11 @@ def one(pid):
     spoken = LINES.get(pid)
     if spoken and len(spoken) != len(caps):
         print(pid, "spoken lines do not match the %d captions; reading the captions" % len(caps)); spoken = None
-    pops = []
+    pops = []; cls = class_speakers(pid) if pid.startswith("c") else None
+    if cls and len(cls) != len(caps):
+        sys.exit("%s: %d captions but the sheet has %d sentences" % (pid, len(caps), len(cls)))
     for q, (a, b, text) in enumerate(caps):
-        who = speaker(text, a, dur); say = spoken[q] if spoken else re.sub(r"^(turkey|trout|the trout)\s*:\s*", "", text, flags=re.I)
+        who = cls[q] if cls else speaker(text, a, dur); say = spoken[q] if spoken else re.sub(r"^(turkey|trout|the trout)\s*:\s*", "", text, flags=re.I)
         pops.append((a, who))
         clip = speak(say, who)
         room = (caps[q + 1][0] if q + 1 < len(caps) else dur) - a - 0.35        # never run into the next speaker
@@ -116,7 +133,7 @@ def one(pid):
         i = max(0, int((a + 0.02) * sr)); fx[i:i + n] += cue[:len(fx) - i].astype(np.float32)
     vw = tempfile.mktemp(suffix=".wav"); sf.write(vw, y, sr)
     fw = tempfile.mktemp(suffix=".wav"); sf.write(fw, fx, sr)
-    song, ss = SONGS.get(pid, DEFAULT_SONG)
+    song, ss = SONGS_CLASS.get(pid) or SONGS.get(pid, DEFAULT_SONG)
     os.makedirs("assets/voiced", exist_ok=True); out = "assets/voiced/%s.mp4" % pid
     fc = ("[0:v][3:v]overlay,format=yuv420p[v];"
           # voice: clear of rumble, a lift where consonants live, firm compression
@@ -129,7 +146,7 @@ def one(pid):
           "[0:a]aresample=44100,aformat=channel_layouts=stereo,highpass=f=70,equalizer=f=6500:t=q:w=1.2:g=4,volume=1.05[fa];"
           "[4:a]aformat=channel_layouts=stereo[cue];"
           "[duck][nv][fa][cue]amix=inputs=4:normalize=0,alimiter=limit=0.93[a]" % (dur - 2.5))
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", src, "-i", vw, "-ss", str(ss), "-t", "%.2f" % dur, "-i", "../music/%s.ogg" % song, "-i", badge(int(pid[1:])), "-i", fw,
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", src, "-i", vw, "-ss", str(ss), "-t", "%.2f" % dur, "-i", "../music/%s.ogg" % song, "-i", (blank() if pid.startswith("c") else badge(int(pid[1:]))), "-i", fw,
                     "-filter_complex", fc, "-map", "[v]", "-map", "[a]", "-c:v", "libx264", "-preset", "slow", "-crf", "22", "-c:a", "aac", "-b:a", "192k",
                     "-t", "%.2f" % dur, "-movflags", "+faststart", out], check=True)
     json.dump({"song": song, "song_from_seconds": ss, "lines": script}, open("films/notes/%s.voice.json" % pid, "w"), indent=1, ensure_ascii=False)
