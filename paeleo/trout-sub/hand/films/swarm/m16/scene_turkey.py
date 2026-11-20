@@ -266,13 +266,13 @@ def _ghost(name, seed, tall_first):
             k = rs.random()
             dy = rs.uniform(-2, 2)
             if first and tall_first:
-                out.append([(x + 5, base - 1.9 * XH), (x + 3, base - XH), (x + 2, base)])
+                out.append([(x + 5, base - 1.62 * XH), (x + 3, base - XH), (x + 2, base)])
                 out.append(_ell(x + 9, base - 0.5 * h, 0.36 * h, 0.5 * h, 0, -80, 80, 14))
                 x += 0.9 * XH
                 first = False
                 continue
             if k < 0.26:                                   # a stick, sometimes tall or hanging
-                top = base - h * (1.8 if rs.random() < 0.4 else 1.0)
+                top = base - h * (1.55 if rs.random() < 0.4 else 1.0)
                 bot = base + (0.6 * h if rs.random() < 0.2 else 0)
                 sl = rs.uniform(-2, 3)
                 out.append([(x + sl, top + dy), (x + sl * 0.4, (top + bot) / 2 + dy), (x, bot + dy)])
@@ -309,17 +309,17 @@ def _triangle():
 def _plans():
     nb = B(2, "name1.line")
     d = {}
-    d["B"] = _lettered((nb[0] + 22, nb[1], nb[2], nb[3]), "B", 170, XH * 1.25)
+    d["B"] = _lettered((nb[0] + 22, nb[1], nb[2], nb[3]), "B", 170, XH * 1.6)
     d["tri"] = _triangle()
     d["g1"] = _ghost("bolt1.1", 171, True)
     d["g2"] = _ghost("bolt1.2", 172, False)
     sb = B(2, "bolt2")
     d["stray"] = _lettered((sb[0] + 142, sb[1] - 15, sb[0] + 200, sb[1] + 9), "a", 173, 12.0)
     d["w1"] = _lettered(_col("bolt3.1", 0.10), "there is", 174, XH)
-    xa = d["w1"].x_end + 5.2 * XH                              # a gap wide enough for a word (trace 23)
+    xa = d["w1"].x_end + 6.0 * XH                              # a gap wide enough for a word (trace 23)
     b = B(2, "bolt3.1")
     d["wa"] = _lettered((xa, b[1], xa + 200, b[3]), "a", 175, XH * 0.85)
-    d["w2"] = _lettered((d["wa"].x_end + 0.8 * XH, b[1], b[2] + 500, b[3]), "another", 176, XH * 1.22, climb=0.085)
+    d["w2"] = _lettered((d["wa"].x_end + 0.8 * XH, b[1], b[2] + 500, b[3]), "another", 176, XH * 1.36, climb=0.085)
     d["w3"] = _lettered(_col("bolt3.2", 0.03), "turkey", 177, XH)
     d["w4"] = _lettered((d["w3"].x_end + 1.6 * XH, B(2, "bolt3.2")[1], b[2] + 300, B(2, "bolt3.2")[3]), "here", 178, XH)
     x, y = [st for st, k in zip(d["w3"].strokes, d["w3"].letter) if k == 5][-1][-1]
@@ -353,7 +353,7 @@ RUB_N = 6
 def _rub_boxes(name):
     b = B(2, name)
     w = (b[2] - b[0] + 10) / RUB_N
-    return [(b[0] - 6 + k * w - 14, b[1] - 20 if name.endswith(".1") else b[1] - 3, b[0] - 6 + (k + 1) * w + 14, b[3] - 3) for k in range(RUB_N)]
+    return [(b[0] - 6 + k * w - 14, b[1] + 1, b[0] - 6 + (k + 1) * w + 14, b[3] - 2) for k in range(RUB_N)]
 
 
 def _rub(img, name, t, span, seed):
@@ -361,6 +361,7 @@ def _rub(img, name, t, span, seed):
         a = lerp(span[0], span[1], k / RUB_N)
         b_ = lerp(span[0], span[1], (k + 1.25) / RUB_N)
         P.rub_mark(img, box, ramp(t, a, b_), seed + k, P.PAPER)
+        P.rub_mark(img, box, 0.45 * ramp(t, lerp(a, b_, 0.5), b_ + 0.08), seed + 40 + k, P.PAPER)      # back over it
 
 
 def _it(name, span):
@@ -461,12 +462,13 @@ C6 = (46.0, math.log(1.45), 430.0, 880.0, 440.0, 240.0)             # ending 1: 
 C8 = (46.0, math.log(1.30), 430.0, 950.0, 450.0, 236.0)             # endings 1 and 2: where nothing happens
 C9 = (44.0, math.log(1.42), 470.0, 1120.0, 400.0, 300.0)            # ending 3, with room over the gutter
 C10A = (42.0, math.log(1.6), 330.0, 1135.0, 420.0, 268.0)           # with the point along the line
+C10M = (42.0, math.log(1.6), 500.0, 1132.0, 440.0, 268.0)           # ... where it stops
 C10B = (42.0, math.log(1.6), 700.0, 1130.0, 470.0, 268.0)           # ... past the end of the rule, into the gutter
 C10C = (42.0, math.log(1.6), 380.0, 1160.0, 430.0, 262.0)           # the second line
-WIDE2 = (57.0, math.log(0.80), 440.0, 880.0, 470.0, 222.0)          # B.'s whole column
+WIDE2 = (56.0, math.log(1.0), 440.0, 900.0, 480.0, 214.0)          # B.'s whole column
 CAM_KEYS = [(0.0, WIDE1), (0.7, WIDE1), (1.7, RING), (7.3, RING), (7.65, FLIP), (8.0, NAME), (8.45, NAME), (8.95, PICK),
             (9.75, PICK), (10.05, C6), (11.9, C6), (12.5, C8), (17.8, C8), (18.4, C9), (19.0, C9), (19.25, C10A),
-            (19.75, C10A), (20.7, C10B), (20.82, C10B), (21.1, C10C), (21.6, C10C), (23.0, WIDE2)]
+            (19.55, C10A), (19.9, C10M), (20.22, C10M), (20.7, C10B), (20.82, C10B), (21.1, C10C), (21.6, C10C), (23.0, WIDE2)]
 SHAKE_KEYS = [(0.0, 2.5), (7.2, 2.5), (7.3, 0.0), (8.0, 0.0), (8.2, 2.0), (12.6, 2.0), (13.2, 0.0), (17.8, 0.0), (18.1, 2.2),
               (19.9, 2.2), (19.95, 0.6), (20.2, 0.6), (20.3, 2.2)]
 
@@ -505,7 +507,7 @@ def _closeness(v):
     return clamp((v.z * S - 0.62) / 0.7)
 
 
-def _head(fr, t, closeness, turn=0.0, tilt=0.0, x=236.0, dy=0.0):
+def _head(fr, t, closeness, turn=0.0, tilt=0.0, x=130.0, dy=0.0):
     if closeness > 0.97:
         return
     y = 590 + 330 * closeness + dy
@@ -513,7 +515,7 @@ def _head(fr, t, closeness, turn=0.0, tilt=0.0, x=236.0, dy=0.0):
 
 
 # ----------------------------------------------- where the pencil point is ---
-HOVER = (B(2, "bolt2.1")[0] + 0.36 * CW, B(2, "bolt2.1")[3] - 5)          # over the first empty Plausible line
+HOVER = (B(2, "bolt2.1")[0] + 0.60 * CW, B(2, "bolt2.1")[3] - 5)          # over the first empty Plausible line
 PASS2 = (B(2, "pass2")[0] + 150, B(2, "pass2")[3] - 8)
 AWAY = (980.0, 1560.0)
 
@@ -665,14 +667,14 @@ def desk_frame(t):
         ang = 12.0 * (1 - u)
         fr = v.render(_desktop(page1_done(), angle=ang))
         w = math.radians(ang)
-        a = (SC[0] - 520 + 60 * math.sin(w), SC[1] + 420 - 500 * math.sin(w))     # its palm rides the sheet's left side
-        P.hand(fr, *v.dpt(*a), pose="hold", tone=PLUM, scale=v.hs((240, 1400)), flip=True, t=t, arm=140)
+        a = (SC[0] - 570 + 60 * math.sin(w), SC[1] + 780 - 560 * math.sin(w))     # its palm rides the sheet's left side
+        P.hand(fr, *v.dpt(*a), pose="hold", tone=PLUM, scale=v.hs((190, 1760)), flip=True, t=t, arm=140)
         _right(fr, v, t)
         _head(fr, t, cl, tilt=5 * (1 - u), turn=0.15 * (1 - u))
         return fr
     if t < 7.3:                                   # the finger on the pilot's page
         fr = v.render(_desktop(page1_done()))
-        _left_hold(fr, v, t, (240, 1400))
+        _left_hold(fr, v, t, (190, 1760))
         _right(fr, v, t)
         _head(fr, t, cl)
         return fr
@@ -701,7 +703,7 @@ def desk_frame(t):
     if T_HOLD[0] - 0.6 < t < T_HOLD[1] + 0.6:     # the top of her head, low in the frame, while nothing is written
         sigh = math.sin(math.pi * ramp(t, *T_SIGH)) ** 2
         rise = cam.smooth(ramp(t, T_HOLD[0] - 0.6, T_HOLD[0])) * (1 - cam.smooth(ramp(t, T_HOLD[1], T_HOLD[1] + 0.6)))
-        P.head_back(fr, 250, 880 - 152 * rise + 5 * sigh, PLUM, 1.15, tilt=2 * sigh, hair=HAIR, t=t)
+        P.head_back(fr, 230, 880 - 196 * rise + 5 * sigh, PLUM, 1.15, tilt=2 * sigh, hair=HAIR, t=t)
     else:
         _head(fr, t, cl)
     return fr
@@ -876,7 +878,7 @@ def seat_frame(t):
 
 
 # ------------------------------------------- the thought (the class film) ---
-TH_AT = (724, 176, 130)
+TH_AT = (706, 196, 124)
 TH = (17.95, 18.35, 18.8, 19.02)
 _MUTE = ("badge", "die_at_bolt", "die")
 
@@ -898,7 +900,7 @@ def _c16(tc):
     finally:
         for n, f in saved.items():
             setattr(Wd, n, f)
-    cx, cy, r = 330, 318, 222
+    cx, cy, r = 430, 300, 240
     k = 16 / 9
     return ink.img.convert("RGB").crop((int(cx - r * k), cy - r, int(cx + r * k), cy + r)).resize((W, H), Image.BILINEAR)
 
@@ -907,7 +909,7 @@ def _thoughts(fr, t):
     if TH[0] < t < TH[3]:
         u = key(t, [(TH[0], 0.0), (TH[1], 1.0), (TH[2], 1.0), (TH[3], 0.0)])
         x, y, r = TH_AT
-        return cam.thought(fr, _c16(lerp(6.75, 8.3, ramp(t, TH[0], TH[3]))), x, y, r, u, wobble=3, t=t, dim=0.08)
+        return cam.thought(fr, _c16(lerp(8.35, 9.6, ramp(t, TH[0], TH[3]))), x, y, r, u, wobble=3, t=t, dim=0.0)
     return fr
 
 
