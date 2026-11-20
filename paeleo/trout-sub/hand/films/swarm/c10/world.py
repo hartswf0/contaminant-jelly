@@ -2164,17 +2164,17 @@ def die_cup(target, x, y, r=62, n=5, t=0.0, rattle=0.0):
 
 @lru_cache(None)
 def _tag(text):
-    f = font("serif", 19 * 3)
-    tw = int(f.getlength(text) / 3) + 22
-    return cut(rrect(0, 0, tw, 30, 5), (236, 228, 204), lambda d, L, S: d.text(L(tw / 2, 14.5), text, font=font("serif", 19 * S), fill=(52, 44, 38), anchor="mm"),
+    f = font("serif", 29 * 3)
+    tw = int(f.getlength(text) / 3) + 30
+    return cut(rrect(0, 0, tw, 44, 7), (236, 228, 204), lambda d, L, S: d.text(L(tw / 2, 21.5), text, font=font("serif", 29 * S), fill=(52, 44, 38), anchor="mm"),
                curve=False, seed=861)
 
 
 def bolt_tag(target, n, x=18, y=14, alpha=1.0):
     """The bolt's label for the top LEFT corner: die face n (1..6) and a paper tag reading Probable (1, 4),
     Plausible (2, 5) or Preposterous (3, 6). (x, y) = top-left corner."""
-    die(target, n, x + 19, y + 19, 38)
-    draw_sprite(target, _tag(KIND[int(n)]), Tm(x + 48, y + 4), (1.5, 2.5, 2.0, 0.4))
+    die(target, n, x + 27, y + 27, 54)
+    draw_sprite(target, _tag(KIND[int(n)]), Tm(x + 66, y + 5), (1.5, 2.5, 2.0, 0.4))
 
 
 @lru_cache(None)

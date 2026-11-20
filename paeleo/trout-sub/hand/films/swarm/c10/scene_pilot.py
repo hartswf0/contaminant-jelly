@@ -176,7 +176,7 @@ def _one_fry(tgt, x, y, scale, angle, seed):
     Wd.brad(tgt, x, y, max(2, int(round(3.2 * scale))))
 
 
-def _fry_school(tgt, spots, t, kick_t=None, amp=18.0, scale=0.62, seed=0, pins=False):
+def _fry_school(tgt, spots, t, kick_t=None, amp=18.0, scale=0.4, seed=0, pins=False):
     """Little french fries, each a rigid strip tipping about its own middle pin. After `kick_t` they rock and
     come to rest inside a second (secondary motion)."""
     rs = random.Random(seed)
@@ -224,11 +224,11 @@ def _p2(tgt, u):
     p = Wd.tin(tgt, x, y, s, t, mood="look", latch=0.0, dial=1.0)
     hit = 1.72                                              # the fry meets the latch
     Wd.padlock(tgt, p["bow"][0] - 4, p["bow"][1] + 2, 0.72, swing=7 * Wd.settle(u, hit, 1.0, 2.4, 3.6))
-    _fry_school(tgt, P2_FRIES, t, kick_t=None, scale=0.7, seed=3)
+    _fry_school(tgt, P2_FRIES, t, kick_t=None, scale=0.42, seed=3)
     # one fry tips forward about its middle pin, bumps the latch, and rocks back. The latch does not move.
     lx, ly = p["latch"]
-    half = 31.0
-    c = (lx + 24, ly + 46)                                  # the fry's pin
+    half = 19.0                                             # a little fry
+    c = (lx + 13, ly + 25)                                  # the fry's pin
     reach = math.degrees(math.atan2(lx + 9 - c[0], -(ly + 6 - c[1])))      # angle at which its top touches the latch
     rest = 30.0
     if u < hit:
@@ -280,7 +280,7 @@ def _p3(tgt, u):
                        arc=70, strength=clamp(1.6 - 1.6 * (u - P3_FLAP)), rate=1.1, width=4.0)
     # fries at the edge of the frame, rocked by the flap
     _fry_school(tgt, [(52, 300), (96, 420), (30, 150), (120, 196), (864, 436), (930, 330)], t, kick_t=P3_FLAP + 0.15,
-                amp=30, scale=1.45, seed=5, pins=True)
+                amp=30, scale=0.8, seed=5, pins=True)
     Wd.river_plane(tgt, "front", t, 0.0, seed=1)
 
 
@@ -338,7 +338,7 @@ def _p4(tgt, u):
         Wd._comp(tgt, _bubble_layer(items), (0, 0))        # behind the shell: the valves close over them
     Wd.clam_pa(tgt, hx, hy, cs, gape, t, flip=True)
     _fry_school(tgt, [(470, 452), (520, 430), (586, 462), (640, 440), (64, 250), (130, 222), (250, 216), (330, 236), (40, 470)], t,
-                kick_t=P4_SHUT + 0.12, amp=30, scale=0.7, seed=9)
+                kick_t=P4_SHUT + 0.12, amp=30, scale=0.42, seed=9)
     if P4_SHUT + 0.1 < u < P4_SHUT + 0.75:                   # the clap of the shell shutting
         Wd.sound_rings(tgt, hx - 262 * cs, hy + 16, u - P4_SHUT - 0.1, direction=180, n=2, r0=30, r1=170, arc=80,
                        strength=clamp(1.5 - 2.2 * (u - P4_SHUT - 0.1)), rate=1.3, width=3.5)

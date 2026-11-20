@@ -40,7 +40,6 @@ ease, ramp, lerp, clamp = Wd.ease, Wd.ramp, Wd.lerp, Wd.clamp
 SECONDS = 15.0
 T_B4, T_B5, T_B6 = 2.5, 6.0, 10.0
 CAPTIONS = [
-    (0.0, 2.5, "The trout think: Confiscated lunchbox"),
     (2.5, 6.0, "The trout to run."),
     (6.0, 10.0, "The trout to throw a dance party."),
     (10.0, 15.0, "The trout to come inside the sub!"),
@@ -63,7 +62,7 @@ def _bump(t, a, b, c):
     return ease(t, a, b) if t < b else 1 - ease(t, b, c)
 
 
-def _fry_school(tgt, spots, t, kicks=(), amp=20.0, scale=0.62, seed=0, aim=None, aim_k=0.0):
+def _fry_school(tgt, spots, t, kicks=(), amp=20.0, scale=0.4, seed=0, aim=None, aim_k=0.0):
     """Little french fries, each a rigid crinkle strip tipping about its own middle pin (the brad shows).
     After each time in `kicks` they rock and come to rest inside a second. aim = a point they tip toward."""
     rs = random.Random(seed)
@@ -180,13 +179,20 @@ def _r0(tgt, T, u):
     _clam(tgt, T, 4.0 + 1.2 * math.sin(T * 1.3))
     Wd.river_plane(tgt, "front", T, 0.0, seed=SEED)
     a = -104.0 * (1 - ease(u, 0.12, 0.6)) + 5.0 * Wd.settle(u, 0.6, 1.0, 2.8, 6.0) - 104.0 * ease(u, 2.08, 2.5) ** 1.4
-    Wd.pick_card(tgt, "square", "The trout think", "Confiscated lunchbox", "S.", angle=a, pin_at=(500, 22), size=(440, 240),
+    Wd.pick_card(tgt, "square", "The trout think", "Confiscated lunchbox", "S.", angle=a, pin_at=(420, 22), size=(440, 240),
                  drawn=ramp(u, 0.75, 1.45), pressed=ease(u, 0.6, 0.78), lit=ease(u, 0.6, 0.9))
 
 
 # ------------------------------------------------------------- B4 ---
-B4_OPEN0, B4_SNAP0, B4_SNAP = 0.55, 1.08, 1.18
+B4_OPEN0, B4_SNAP0, B4_SNAP = 0.46, 0.74, 0.84     # the snap comes early: the running is the scene
 B4_TURN = 0.26
+B4_STAG = 0.15                # the five go one after another
+B4_ACC, B4_V0 = 300.0, 170.0  # px/s^2, px/s: about a second each to cross the frame
+
+
+def b4_start(k):
+    """When trout k begins to turn."""
+    return B4_SNAP + 0.03 + B4_STAG * ((k * 2) % 5)
 
 
 def _b4_gape(u):
@@ -200,10 +206,10 @@ def _b4_gape(u):
 def _b4_fish(k, u):
     """Where trout k is: (x, y, c, running). It turns about its own middle, then is gone to the right."""
     x, y, s, kind, ph, pitch = FIVE[k]
-    t0 = B4_SNAP + 0.03 + 0.05 * ((k * 2) % 5)
+    t0 = b4_start(k)
     c = 1 - 2 * ease(u, t0, t0 + B4_TURN)
     dt = max(0.0, u - (t0 + B4_TURN * 0.6))
-    return x + 1000 * dt * dt + 200 * dt, y - 30 * dt * (1 if k < 2 else -0.3), c, dt > 0
+    return x + B4_ACC * dt * dt + B4_V0 * dt, y - 30 * dt * (1 if k < 2 else -0.3), c, dt > 0
 
 
 def _b4_trail(u):
@@ -211,11 +217,11 @@ def _b4_trail(u):
     rs = random.Random(404)
     for k in range(5):
         x0, y0, s = FIVE[k][0], FIVE[k][1], FIVE[k][2]
-        t0 = B4_SNAP + 0.03 + 0.05 * ((k * 2) % 5) + B4_TURN * 0.6
+        t0 = b4_start(k) + B4_TURN * 0.6
         for j in range(9):
-            dt = 0.03 + 0.055 * j
+            dt = 0.05 + 0.12 * j
             te = t0 + dt
-            bx = x0 + 1000 * dt * dt + 200 * dt - 90 * s + rs.uniform(-6, 6)
+            bx = x0 + B4_ACC * dt * dt + B4_V0 * dt - 90 * s + rs.uniform(-6, 6)
             by = y0 + rs.uniform(-10, 10)
             r = rs.uniform(5.0, 10.0)
             if u > te and bx < W + 20:

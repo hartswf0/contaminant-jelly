@@ -39,7 +39,6 @@ Tm, Rm = Wd.Tm, Wd.Rm
 SECONDS = 13.5
 T_B1, T_B2, T_B3 = 2.5, 6.0, 9.5
 CAPTIONS = [
-    (0.0, 2.5, "Turkey thinks: Morning intercom"),
     (2.5, 6.0, "The trout to be outside."),
     (6.0, 9.5, "He does not get back."),
     (9.5, 13.5, "The turkey gets back."),
@@ -75,7 +74,7 @@ def _arc_between(a, b, u, bulge=0.35):
     return (c[0] + r * math.cos(th), c[1] + r * math.sin(th))
 
 
-def _fry_school(tgt, spots, t, kicks=(), amp=20.0, scale=0.62, seed=0):
+def _fry_school(tgt, spots, t, kicks=(), amp=20.0, scale=0.4, seed=0):
     """Little french fries, each a rigid crinkle strip tipping about its own middle pin (the brad shows).
     After each time in `kicks` they rock and come to rest inside a second."""
     rs = random.Random(seed)
@@ -135,7 +134,7 @@ def _intercom(tgt, T, u, flaps, trout=None):
     """River, brick flat, fries, (trout), and the clam shell flapping like something talking."""
     Wd.river(tgt, T, seed=0)
     Wd.brick_wall(tgt, 598, 0, 390, 540, seed=2, flip=True)
-    _fry_school(tgt, FRIES_A, T, kicks=[T - u + f + 0.1 for f in flaps], amp=14, scale=0.6, seed=21)
+    _fry_school(tgt, FRIES_A, T, kicks=[T - u + f + 0.1 for f in flaps], amp=14, scale=0.4, seed=21)
     if trout:
         trout(tgt)
     g = 3.0
@@ -185,7 +184,7 @@ def _b1_out(tgt, T, u):
 # ----------------------------------- the way back and the lid (B2, B3) ---
 BIG = (715, 215, 1.25)               # the same shell, hanging between the porthole and the light
 OPEN = 58.0
-B2_SHUT0, B2_SHUT1 = 1.2, 1.52
+B2_SHUT0, B2_SHUT1 = 2.0, 2.34          # the way back is held in view for a second and a half before the lid comes down
 FRIES_B = [(432, 356), (540, 372), (668, 366), (586, 404), (474, 404)]
 
 
@@ -228,7 +227,7 @@ def _way_scene(tgt, T, u, gape, kick=None, flinch=None):
     Wd.brick_wall(tgt, 660, 0, 340, 540, seed=2, flip=True)
     _way_back(tgt, T)
     kicks = [T - u + kick] if kick is not None else ()
-    _fry_school(tgt, FRIES_B, T, kicks=kicks, amp=30, scale=0.62, seed=33)
+    _fry_school(tgt, FRIES_B, T, kicks=kicks, amp=30, scale=0.4, seed=33)
     fl = Wd.settle(u, flinch, 1.0, 2.4, 4.0) if flinch is not None else 0.0
     up = 0.0 if flinch is None else ease(u, flinch - 0.3, flinch)
     Wd.trout(tgt, 470 - 8 * fl, 376, 0.36, T, kind=0, flip=True, pose="look", phase=0.4, pitch=10 + 6 * fl, gaze=(1.5, -2.2 + 1.5 * up))
@@ -363,7 +362,7 @@ def _b3_out(ink, T, u):
         v = ease(u, B3_HIT, B3_HIT + 0.35)
         x, y = _arc_between(FRIES_B[2], B3_FRY, v, bulge=0.6)
         ang = lerp(10, 64, v) + 22 * Wd.settle(u, B3_HIT + 0.35, 1.0, 2.2, 4.0) + 10 * Wd.settle(u, B3_HOME1, 1.0, 2.2, 4.0)
-        sc = lerp(0.62, 1.5, v)
+        sc = lerp(0.4, 0.8, v)
         Wd.fry(ink, x, y, sc, ang, 33 * 7 + 2)
         Wd.brad(ink, x, y, max(2, int(round(3.4 * sc))))
 
