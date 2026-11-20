@@ -324,6 +324,7 @@ def turkey_sprite(mood="calm", t=0.0, height=300, part="bust", **over):
     for head). Any pose key (neck, wattle, beak, eye, wing, ruff, shake, blur) can be overridden by keyword."""
     P = turkey_pose(mood, t)
     P.update(over)
+    P.setdefault("wing_scale", 0.5)
     win, anchor, span = _T_PARTS[part]
     s = height / span
     s1000 = int(round(s * 1000))
@@ -338,8 +339,9 @@ def turkey_sprite(mood="calm", t=0.0, height=300, part="bust", **over):
         b = _T_BOX[name]
         return ((p[0] - b[0]) * s, (p[1] - b[1]) * s)
 
-    wing = _tpiece("wing", s1000 if part == "full" else int(s1000 * 0.5))
-    ws = s if part == "full" else s * 0.5
+    wk = 1.0 if part == "full" else float(P.pop("wing_scale", 0.5))      # the bust's wings are cut smaller; a shot may ask for bigger
+    wing = _tpiece("wing", int(s1000 * wk))
+    ws = int(s1000 * wk) / 1000.0
     wroot = ((930 - 240) * ws, (1100 - 860) * ws)                    # the wing's shoulder end, in the wing piece
     wflip = wing.transpose(Image.FLIP_LEFT_RIGHT)
     wroot_f = (wflip.width - wroot[0], wroot[1])
@@ -456,11 +458,17 @@ def turkey_reflection(ink, cx=None, cy=None, height=230, mood="panic", t=0.0, al
     spr = spr.transpose(Image.FLIP_LEFT_RIGHT)
     ax = spr.width - ax
     a = np.asarray(spr, np.float32).copy()
-    a[..., :3] = a[..., :3] * 0.72 + np.array([244, 226, 170], np.float32) * 0.34        # lamp-lit, washed by the glass
+    grey = a[..., :3].mean(axis=2, keepdims=True)
+    a[..., :3] = (a[..., :3] * 0.6 + grey * 0.4) * 0.66 + np.array([250, 236, 190], np.float32) * 0.4   # lamp-pale, washed by the glass
     hh = a.shape[0]
     a[..., 3] *= np.clip((hh * 0.9 - np.arange(hh)) / (hh * 0.3), 0, 1)[:, None]         # a reflection thins out downward
+    one = Image.fromarray(np.clip(a, 0, 255).astype(np.uint8), "RGBA").filter(ImageFilter.GaussianBlur(0.9))
     lay = Image.new("RGBA", (ink.w, ink.h), (0, 0, 0, 0))
-    lay.paste(_img(a).convert("RGBA") if False else Image.fromarray(np.clip(a, 0, 255).astype(np.uint8), "RGBA"), (int(cx - ax), int(cy - ay)))
+    ghost = one.copy()                                    # thick glass gives a second, fainter image a little to one side
+    ghost.putalpha(ghost.getchannel("A").point(lambda v: int(v * 0.38)))
+    lay.paste(ghost, (int(cx - ax) + 9, int(cy - ay) - 5))
+    lay.alpha_composite(one, (max(0, int(cx - ax)), max(0, int(cy - ay))),
+                        (max(0, -int(cx - ax)), max(0, -int(cy - ay))))
     if clip:
         (px, py), r = clip
         m = Image.new("L", (ink.w, ink.h), 0)
@@ -610,17 +618,19 @@ def _build_pilot():
         G.append(dict(group=group, pts=_c2n(pts), to=_c2n(tgt), weight=weight))
 
     # 1 the fish body: one long flat lens, level, nose to the left, pressed hard
-    add("fish", [(447, 690), (470, 655), (520, 628), (585, 607), (660, 599), (745, 600), (830, 598), (895, 594), (925, 584)], 1.4)
-    add("fish", [(455, 726), (470, 742), (505, 755), (560, 752), (625, 744), (695, 728), (765, 710), (840, 692), (905, 682)], 1.4)
+    add("fish", [(447, 690), (470, 655), (520, 628), (585, 607), (660, 599), (745, 600), (830, 598), (895, 594), (925, 584)], 2.1)
+    add("fish", [(455, 726), (470, 742), (505, 755), (560, 752), (625, 744), (695, 728), (765, 710), (840, 692), (905, 682)], 2.1)
+    add("fish", [(560, 632), (640, 618), (730, 616), (820, 614), (900, 606)], 1.5)          # the back, gone over again: shaded dark
+    add("fish", [(600, 640), (690, 630), (790, 630), (880, 622)], 1.1)
     # 2 the tail: a forked flag tipped up, the upper lobe longer
     add("tail", [(925, 584), (935, 548), (927, 512), (938, 490), (956, 502), (966, 538), (990, 558), (1025, 560), (1040, 580),
-                 (1022, 620), (992, 650), (958, 670), (905, 682)], 1.3)
+                 (1022, 620), (992, 650), (958, 670), (905, 682)], 1.8)
     # 3 back fin, the dark mouth with its teeth ticks, the fin underneath
-    add("fin_mouth", [(548, 622), (562, 575), (598, 543), (630, 546), (646, 572), (655, 596)], 1.3)
-    add("fin_mouth", [(447, 690), (444, 706), (462, 713), (482, 708), (502, 717), (514, 712)], 1.7)
-    add("fin_mouth", [(462, 713), (457, 735), (478, 746), (520, 752)], 1.5)
+    add("fin_mouth", [(548, 622), (562, 575), (598, 543), (630, 546), (646, 572), (655, 596)], 1.7)
+    add("fin_mouth", [(447, 690), (444, 706), (462, 713), (482, 708), (502, 717), (514, 712)], 2.8)
+    add("fin_mouth", [(462, 713), (457, 735), (478, 746), (520, 752)], 2.4)
     for a_, b_ in (((470, 712), (473, 723)), ((484, 709), (487, 721)), ((497, 715), (499, 726))):
-        add("fin_mouth", [a_, b_], 1.5, curve=False)
+        add("fin_mouth", [a_, b_], 2.0, curve=False)
     add("fin_mouth", [(500, 650), (512, 660), (505, 668)], 0.9)
     add("fin_mouth", [(572, 754), (588, 772), (632, 773), (662, 755), (692, 722)], 1.2)
     # 4 the bowl: loose overlapping loops scribbled round and round behind the head, light pressure
@@ -1290,9 +1300,10 @@ def gauge(ink, notches=6.0, x=None, y=None, r=46, tremble=0.0, t=0.0):
         p1 = (x + math.cos(a) * r * 0.76, y + math.sin(a) * r * 0.76)
         ink.d.line([p0, p1], fill=PAL["pip"] + (255,), width=3 if k % 3 == 0 else 2)
     if r >= 26:
-        f = font("mono", max(8, int(r * 0.24)))
-        ink.d.text((x - r * 0.3, y + r * 0.36), "E", font=f, fill=(170, 40, 34, 255), anchor="mm")
-        ink.d.text((x + r * 0.3, y + r * 0.36), "F", font=f, fill=PAL["pip"] + (255,), anchor="mm")
+        f = font("mono", max(9, int(r * 0.36)))
+        for ox in (0, 1):                                                   # struck twice: bold enough to read from the seat
+            ink.d.text((x - r * 0.3 + ox, y + r * 0.4), "E", font=f, fill=(170, 40, 34, 255), anchor="mm")
+            ink.d.text((x + r * 0.3 + ox, y + r * 0.4), "F", font=f, fill=PAL["pip"] + (255,), anchor="mm")
         ink.d.text((x, y - r * 0.34), "AIR", font=font("mono", max(8, int(r * 0.2))), fill=PAL["pip"] + (255,), anchor="mm")
     a0 = math.radians(135 - 7)                                              # the pin the needle rests on when empty
     ink.d.ellipse([x + math.cos(a0) * r * 0.6 - 2.5, y + math.sin(a0) * r * 0.6 - 2.5, x + math.cos(a0) * r * 0.6 + 2.5, y + math.sin(a0) * r * 0.6 + 2.5],
@@ -1570,14 +1581,14 @@ def pick_card(ink, c=(480, 262), side="turkey", picked=None, press=0.0, mark=0.0
     for k, (kind, label) in enumerate(P["rows"]):
         bx, by = 52 * K, (78 + k * 56) * K
         on = picked == kind
-        button(lay, kind, bx, by, r=17 * K, pressed=press if on else 0.0, lit=(0.35 + 0.65 * press) if on else 0.15)
+        button(lay, kind, bx, by, r=17 * K, pressed=press if on else 0.0, lit=(0.35 + 0.65 * press) if on else 0.5)
         pos[kind] = (bx / K, by / K)
     rc = (368 * K, 186 * K)
     tipc = None
     if scribble > 0 and picked in pos:
-        tipc = globals()["scribble_"](lay, (pos[picked][0] * K, pos[picked][1] * K), 17 * K, scribble, weight=1.1)
+        tipc = globals()["scribble_"](lay, (pos[picked][0] * K, pos[picked][1] * K), 17 * K, scribble, weight=0.7, alpha=0.4)
     if mark > 0 and picked:
-        tp = friend_mark(lay, picked, rc, (9 if picked == "triangle" else 19) * K, mark, weight=1.3)
+        tp = friend_mark(lay, picked, rc, (16 if picked == "triangle" else 19) * K, mark, weight=1.5 if picked == "triangle" else 1.3)
         tipc = tp if (mark < 1 or tipc is None or scribble >= 1) else tipc
     im = lay.img
     a = math.radians(angle)
@@ -1803,11 +1814,13 @@ def crayon_ring(ink, c, rx, ry=None, color=None, done=1.0, seed=0, width=5, alph
 
 
 _TIN_HALF = [(-200, 0), (-200, -65), (-170, -95), (170, -95), (200, -65), (200, 0)]
-_BOTTLE_HALF = [(-312, 0), (-312, -44), (-296, -44), (-294, -35), (-196, -35), (-156, -52), (-116, -90), (-84, -112), (192, -112),
+# The bottle lies on its side with the round porthole in its neck: the porthole is the bottle's mouth, and the lip
+# stops at the porthole's own rim, so whoever stands outside the glass stays outside the bottle.
+_BOTTLE_HALF = [(-134, 0), (-134, -64), (-120, -64), (-118, -57), (-36, -57), (-6, -68), (26, -94), (54, -112), (192, -112),
                 (218, -92), (218, 0)]
 
 
-def bottle_lines(ink, c=None, scale=None, f=1.0, flip=False, angle=0.0, alpha=1.0, color=(240, 236, 224), width=3, done=1.0):
+def bottle_lines(ink, c=None, scale=None, f=1.0, flip=False, angle=0.0, alpha=1.0, color=(46, 44, 50), width=3, done=1.0):
     """The tin's outline redrawn in pencil as a bottle lying on its side (Foldes change, never a fade): f=0 the line
     hugs the tin's own outline, f=1 it is a bottle whose neck and lip run out past the lamp end, body round the
     tin. Use the same c, scale, flip, angle as tin(). done 0..1 draws the line progressively. The round porthole
@@ -1825,17 +1838,22 @@ def bottle_lines(ink, c=None, scale=None, f=1.0, flip=False, angle=0.0, alpha=1.
     def M(p):
         x, y = p[0] * scale * (-1 if flip else 1), p[1] * scale
         return (c[0] + x * math.cos(an) + y * math.sin(an), c[1] - x * math.sin(an) + y * math.cos(an))
-    pts = [M((x + rs.uniform(-1.6, 1.6), y + rs.uniform(-1.6, 1.6))) for x, y in loop]
+    pts = [M((x + rs.uniform(-0.7, 0.7), y + rs.uniform(-0.7, 0.7))) for x, y in loop]
     pts = pts[: max(2, int(len(pts) * clamp(done)))]
-    ink.d.line(pts, fill=tuple(color) + (int(225 * alpha),), width=width, joint="curve")
-    ink.d.line([(x + 1, y + 1.5) for x, y in pts], fill=tuple(color) + (int(90 * alpha),), width=1)
+    if g > 0 and done >= 1:                                     # the glass of it: a pale sheet inside the line, no more
+        lay = ink.layer()
+        lay.d.polygon(pts, fill=(226, 244, 238, int(58 * alpha * g)))
+        ink.paste(lay.img)
+    ink.d.line(pts, fill=tuple(color) + (int(215 * alpha),), width=width, joint="curve")
+    ink.d.line([(x + 1.6, y + 1.2) for x, y in pts], fill=tuple(color) + (int(95 * alpha),), width=max(1, width - 2), joint="curve")
+    ink.d.line([(x - 1, y - 1.5) for x, y in pts], fill=(232, 232, 236, int(70 * alpha)), width=1)      # graphite shines a little
     if g > 0.5 and done >= 1:                                   # the lip ring and the glass's one long shine
         k = (g - 0.5) * 2
-        p0, p1 = M((-296, -35)), M((-296, 35))
+        p0, p1 = M((-120, -57)), M((-120, 57))
         ink.d.line([p0, p1], fill=tuple(color) + (int(200 * alpha * k),), width=max(1, width - 1))
-        s0, s1 = M((-60, -96)), M((150, -96))
+        s0, s1 = M((70, -98)), M((170, -98))
         ink.d.line([s0, s1], fill=tuple(color) + (int(120 * alpha * k),), width=max(1, width - 1))
-    return dict(neck=M(lerp2((-200, 0), (-312, 0), g)), base=M(lerp2((200, 0), (218, 0), g)))
+    return dict(neck=M(lerp2((-200, 0), (-134, 0), g)), base=M(lerp2((200, 0), (218, 0), g)))
 
 
 # ------------------------------------------ this porthole's subject: the walker ---

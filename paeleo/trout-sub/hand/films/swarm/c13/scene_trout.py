@@ -41,7 +41,9 @@ CARD_CLOCK = 0.0                   # ... which is twelve o'clock on the circle t
 CARD_PIVOT = (480, 640)            # the card travels on a big circle about this point, clockwise
 CARD_RAD = CARD_PIVOT[1] - CARD_C[1]
 
-DIE_SIZE = 64
+DIE_SIZE = 36                      # small enough to sit ON its bolt of the tin's porthole
+TIN_C, TIN_S = (452, 392), 1.12    # the tin a little nearer than the world's default, so its six bolts can be counted
+BOLT_RAD = 1.2                     # bolt circle, in glass radii
 DIE_LIT = 0.3                      # an unwritten bolt: its die face is dull, well short of lit; the bolt has no glow
 
 
@@ -80,7 +82,16 @@ def _old_scene(ink, t):
 def _stage(ink):
     """River side, lit and empty. Drawn at a fixed time so that nothing in it moves at all. Returns the tin's points."""
     w.river_stage(ink, 0.0, "back", calm=True)
-    return w.river_stage(ink, 0.0, "front", glow=1.0, mood=None, calm=True)
+    tin = w.tin(ink, TIN_C, TIN_S, 0.0, mood=None, glow=1.0)
+    w.weed(ink, 250, 520, 150, 0, 0.0, seed=7, n=5, sway=0)
+    w.weed(ink, 742, 528, 190, 0, 0.0, seed=8, n=6, sway=0)
+    px, py = tin["port"]
+    for n in range(6):                                  # its six brass bolts, twelve o'clock and clockwise; none lit
+        bx, by = w.clock_xy((px, py), tin["port_r"] * BOLT_RAD, n * 60)
+        ink.d.ellipse([bx - 6, by - 4, bx + 9, by + 10], fill=(0, 0, 0, 130))
+        ink.d.regular_polygon((bx, by, 7.5), 6, rotation=n * 60, fill=w.PAL["brass_dk"] + (255,), outline=w.PAL["brass_line"] + (255,))
+        ink.d.regular_polygon((bx - 1, by - 1, 4.5), 6, rotation=n * 60, fill=w.PAL["brass_hi"] + (255,))
+    return tin
 
 
 def _die_clock(t):
@@ -99,13 +110,9 @@ def _die(ink, t, tin):
     a, n = _die_clock(t)
     px, py = tin["port"]
     pr = tin["port_r"]
-    rad = pr * 1.15 + DIE_SIZE * 0.72
+    rad = pr * BOLT_RAD + DIE_SIZE * 0.42               # the face sits on its own (unlit) bolt, lapping the brass rim
     x, y = w.clock_xy((px, py), rad, a)
     alpha = ramp(t, T_BOLT[4] - STEP, T_BOLT[4] - STEP * 0.4)
-    # a short tie from the die to its own (unlit) bolt, so the face reads as that bolt's
-    bx, by = w.clock_xy((px, py), pr * 1.16, a)
-    ex, ey = w.clock_xy((px, py), rad - DIE_SIZE * 0.52, a)
-    ink.d.line([(bx, by), (ex, ey)], fill=(20, 18, 16, int(150 * alpha)), width=3)
     w.put(ink, _shadow(DIE_SIZE), x + 4, y + 6, alpha=0.55 * alpha)
     w.die_face(ink, n, x, y, DIE_SIZE, "ivory", lit=DIE_LIT, alpha=alpha)
 

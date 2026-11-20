@@ -28,7 +28,7 @@ HERE_ = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE_))
 sys.path.insert(0, str(HERE_ / "swarm" / "c13"))
 
-from kit import Film, Ink, Mix, FPS, RATE, clamp, ramp, ease, smooth, lerp  # noqa: E402
+from kit import Film, Ink, Mix, FPS, RATE, W, font, clamp, ramp, ease, smooth, lerp  # noqa: E402
 import world as w                 # noqa: E402
 import scene_pilot as sp          # noqa: E402
 import scene_turkey as st         # noqa: E402
@@ -120,10 +120,33 @@ def _river_last(ink):
     return _LAST["img"]
 
 
+CAP_Y, CAP_SIZE = 511, 25
+
+
 def _caption(ink, t):
+    """One caption, always on the same plate (paper with a dark keyline and a shadow, so it shows on the white
+    page as well as on the tin). The words are the child's; a hyphen is set tight so "bell-ringer" is one word."""
     for a, b, s in CAPTIONS:
         if a <= t < b:
-            ink.caption(s, alpha=min(ramp(t, a, a + 0.2), 1 - ramp(t, b - 0.2, b)), size=25)
+            al = min(ramp(t, a, a + 0.2), 1 - ramp(t, b - 0.2, b))
+            if al <= 0:
+                return
+            f = font("serif", CAP_SIZE)
+            parts = s.split("-")
+            hw = 9.0                                        # a hyphen ruled by hand: the font's own floats in gaps
+            tw = sum(f.getlength(q) for q in parts) + hw * (len(parts) - 1)
+            x0, y = W / 2 - tw / 2, CAP_Y
+            box = [x0 - 16, y - 19, x0 + tw + 16, y + 19]
+            ink.d.rounded_rectangle([box[0] + 3, box[1] + 4, box[2] + 3, box[3] + 4], radius=5, fill=(0, 0, 0, int(90 * al)))
+            ink.d.rounded_rectangle(box, radius=5, fill=(248, 246, 240, int(246 * al)), outline=(44, 40, 36, int(230 * al)), width=2)
+            col = (26, 24, 22, int(255 * al))
+            x = x0
+            for k, q in enumerate(parts):
+                if k:
+                    ink.d.line([(x + 1.5, y + 4), (x + 7.5, y + 4)], fill=col, width=2)
+                    x += hw
+                ink.d.text((x, y), q, font=f, fill=col, anchor="lm")
+                x += f.getlength(q)
             return
 
 

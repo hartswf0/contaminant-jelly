@@ -51,7 +51,7 @@ pencil for outlines over dark), `Wd.DARK` (dark pencil on brass). `Wd.dk(c, f)`,
   `Wd.turkey_back(ink, *Wd.SEAT_TURKEY, **Wd.wave_pose(t, energy, 13.0))`;
   the twin: `Wd.tin(ink, x, y, s, t, flip=True, **Wd.wave_pose(t, energy, 13.0, twin=True))`.
 - `needle(t, drops=(), start=1.0, notch=1/6)` -> air level: `start` less one notch per time in `drops`; each notch falls as
-  two ticks D frames apart, each overshooting and settling. Never rises. `Wd.air_gauge(ink, 104, 392, Wd.needle(t, (13.5, 14.5, 15.5)), 50)`.
+  two ticks D frames apart, each overshooting and settling. Never rises. `Wd.air_gauge(ink, 80, 300, Wd.needle(t, (13.5, 14.5, 15.5)), 50)`.
 - `settle(t, t0, amp=1.0, freq=2.2, damp=4.5)` -> a damped swing starting at `amp` at `t0` (0 before): the clink when
   something seats, a nod, a wobble.
 - `monster_idle(t, k)` -> head k's standing sway `{"dx", "dy", "tilt", "look"}`: head k does what head 0 did k * D frames ago.
@@ -92,7 +92,7 @@ mirror image about the vertical line through (x, y).
   iron hinge left, a brass dog right. Defaults `Wd.PORT`, `Wd.PORT_R`, `Wd.RING_W`. Glass: x 264..636, y 50..422.
 - `lit=(3,)` makes those bolts glow amber. `dim` 0..1 darkens the cabin.
 - `air_gauge(target, x, y, level=1.0, r=34, t=0.0)`: brass AIR dial, six notches (level k/6 sits on a long tick);
-  level 1 = full. Seat position `Wd.SEAT_GAUGE` = (104, 392, 50).
+  level 1 = full. Seat position `Wd.SEAT_GAUGE` = (80, 300, 50).
 - `brass_ring(r_in, r_out, bolts=6, start=-90.0, fittings=False)` -> RGBA image centred on the ring; lay it with
   `Wd._comp(target, img, (cx - img.width / 2, cy - img.height / 2))`. `bolt_xy(k, cx, cy, r_in, r_out)` -> bolt centre.
 - `ring_outline(target, cx, cy, r_in, r_out, bolts=True, seed=0, alpha=1.0, color=None)`: the ring as a pencil outline

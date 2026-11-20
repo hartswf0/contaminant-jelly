@@ -75,7 +75,7 @@ BELL = {1: 523.25, 2: 587.33, 3: 659.25, 4: 783.99}
 
 # ----------------------------------------------------------- the ending ---
 E_C, E_R = (440, 270), 172                    # the porthole lying on the table, small enough that all six dice are in frame
-E_LIT0, E_GAP = 1.0, 0.4
+E_LIT0, E_GAP = 0.7, 0.4
 E_SLOSH = w.Follower(lambda e: 13.0 if e < 0.42 else 0.0, END_SECONDS + 1, f=1.1, zeta=0.16)
 
 
@@ -101,7 +101,7 @@ def _ending(ink, e):
     s = E_SLOSH.at(e)
     w.seat_scene(o, e, dict(x=540, step=0.0, bob=False, phase=e * 1.2, amp=2.0, slosh=s, wave=clamp(abs(s) / 8),
                             bowl_bubbles=e),
-                 dict(cx=372, cy=356, height=262, alpha=0.8, mood="panic", t=e), frame=False)
+                 dict(cx=352, cy=372, height=212, alpha=0.68, wing_scale=0.66, mood="panic", t=e), frame=False)
     R = w.PORT_R
     px, py = w.PORT_C
     d = 2 * E_R
@@ -110,9 +110,14 @@ def _ending(ink, e):
     ink.paste(disc, (cx - E_R, cy - E_R))
     ink.d.ellipse([cx - E_R, cy - E_R, cx + E_R, cy + E_R], outline=(30, 24, 18, 150), width=6)
     ink.paste(ring, (int(cx - ring.width / 2), int(cy - ring.height / 2)))
-    for n in range(1, 7):                     # the written bolts light one after another; 5 and 6 stay dead
-        lit = ease(T_END + e, lit_time(n), lit_time(n) + 0.3) if n in WRITTEN else 0.0
-        w.bolt_mark(ink, n, lit=lit, c=E_C, r=E_R, size=36)
+    for n in range(1, 7):                     # the written bolts light one after another; 5 and 6 are empty from the first frame
+        if n in WRITTEN:
+            w.bolt_mark(ink, n, lit=ease(T_END + e, lit_time(n), lit_time(n) + 0.3), c=E_C, r=E_R, size=36)
+        else:                                 # nothing was written: no die at all, only the dark seat where one would sit
+            x, y = w.bolt_mark(ink, n, lit=0.0, die=False, c=E_C, r=E_R)
+            ink.d.rounded_rectangle([x - 18, y - 18, x + 18, y + 18], radius=6, fill=(24, 18, 12, 190),
+                                    outline=(92, 70, 34, 255), width=2)
+            ink.d.line([x - 16, y + 17, x + 16, y + 17], fill=(206, 170, 96, 120), width=1)
     w.gauge(ink, 3.0, 108, 446, r=54, t=e)    # as the pilot's page left it: half
     w.die_cup(ink, 824, 500, 158)             # the die rests in the cup. Nobody touches it.
 
@@ -268,11 +273,11 @@ def sound(mix):
         for j in range(n):
             _scratch(mix, a + (b - a) * j / n, a + (b - a) * (j + 1) / n - 0.03,
                      0.05 if g == "bowl" else 0.085, seed=k * 3 + j)
-    mix.click(7.85, 0.12, 0.3, 3000, 0.02)                # the pencil lifts
-    for k in range(5):                                    # the five cut pieces laid under the lines
-        mix.step(8.85 + 0.17 * k, 0.1 + 0.02 * k, -0.2 + 0.1 * k, "wood")
-    _scratch(mix, 8.4, 9.25, 0.04, seed=9, lo=900, hi=4000)       # the lines move
-    _bloop(mix, 9.0, 300, 0.08, -0.2, 0.2)                # the bowl is set down: the water slops
+    mix.click(7.9, 0.12, 0.3, 3000, 0.02)                 # the pencil lifts
+    _scratch(mix, SP.T_MORPH[0], SP.T_MORPH[1], 0.05, seed=9, lo=900, hi=4000)      # the lines move out to the cut edges
+    mix.whoosh(SP.T_LAY[0], SP.T_LAY[1] - SP.T_LAY[0], 0.05, 0.3)                 # the cut puppet slid in under them, in one piece
+    mix.step(SP.T_LAY[1] + 0.1, 0.2, 0.0, "wood")         # and set down
+    _bloop(mix, SP.T_LAY[1] + 0.16, 300, 0.08, -0.2, 0.2)  # the water in the bowl slops
     _turn(mix, P2 - FLIP, 0.14, 0.0)
     mix.note(P2 + 1.3, 1760, 0.25, 0.1, 0.1, "sine", decay=0.15, sustain=0.0)    # glass to glass
     mix.click(P2 + 1.3, 0.18, 0.1, 6000, 0.02)
@@ -352,8 +357,6 @@ def sound(mix):
     b = ST.B3_BEATS[1]                                    # he has not noticed: still beating, in a tin standing in dry air
     _flutter(mix, b3 + b, 0.5, 0.13, -0.4)
     _tick(mix, b3 + b + 0.25)
-    for k in range(4):
-        mix.step(b3 + b + 0.62 + 0.06 * k, 0.12, -0.5, "gravel")
 
     # --- III. the trout think
     _turn(mix, C - FLIP, 0.14, 0.0)

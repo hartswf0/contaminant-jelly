@@ -29,9 +29,9 @@ CAPTIONS = [
     (T_B3 + 0.3, SECONDS, "It is not wet."),
 ]
 
-PUFF = (322, 318)                    # where Turkey's panic bubbles leave, by the left rim of the glass
+PUFF = (296, 250)                    # where Turkey's panic bubbles leave, by the left rim of the glass
 DIE = 38
-REFL = dict(cx=350, cy=368, height=282, alpha=0.72)      # Turkey's reflection, low left in the glass, big enough to see the wings go
+REFL = dict(cx=352, cy=372, height=212, alpha=0.68, wing_scale=0.66)      # Turkey's reflection, low left in the glass, big enough to see the wings go
 
 
 def _puff(ink, u, t0, n, size=9.0):
@@ -42,7 +42,7 @@ def _puff(ink, u, t0, n, size=9.0):
 
 # ------------------------------------------------------------------ shared bits ---
 
-def _beat(u, beats, top=92.0, rest=10.0, dur=0.5):
+def _beat(u, beats, top=100.0, rest=0.0, dur=0.5):
     """Wing angle for counted beats: up and down once per beat, a small tremble between."""
     v = rest + 4 * abs(math.sin(u * 17))
     for b in beats:
@@ -74,7 +74,7 @@ def _wattle(beats, seconds):
 
 T0_LEN = T_B1
 T0_SLOSH = w.Follower(lambda u: _flip_kick(u, 8.0), T0_LEN + 1, f=1.5, zeta=0.3)
-CARD_C = (722, 150)
+CARD_C = (712, 176)
 
 
 def _card_up(ink, u):
@@ -105,7 +105,7 @@ def _card_up(ink, u):
 def scene_pick(ink, u):
     sl = T0_SLOSH.at(u)
     wp, _ = w.seat_scene(ink, u, dict(x=438, step=0.0, bowl_bubbles=u, slosh=sl, wave=clamp(abs(sl) / 8), phase=u * 3, amp=3),
-                         dict(mood="panic", t=u), notches=3.0, frame=False)
+                         dict(REFL, mood="panic", t=u), notches=3.0, frame=False)
     w.seat_frame(ink)
     # the bowl is ringed once in green, through the glass: that is the helmet
     done = ramp(u, 1.15, 2.0)
@@ -125,8 +125,8 @@ def scene_pick(ink, u):
 # --------------------------------------------------------- B1 · The air runs out. ---
 
 B1_LEN = T_B2 - T_B1
-B1_BEATS = [0.5, 1.3, 2.1, 2.9, 3.5]            # three spend the last three ticks; then the wings go and nothing comes
-B1_PUFFS = [6, 3, 1, 0, 0]
+B1_BEATS = [0.45, 1.05, 1.65, 2.35, 2.95, 3.5]  # three spend the last three ticks; then the wings go and nothing comes
+B1_PUFFS = [8, 4, 1, 0, 0, 0]
 B1_NEEDLE = _needle(B1_BEATS[:3], B1_LEN + 1)
 B1_PACE = 0.36                                       # strides a second: walking slowly
 B1_SLOSH = w.Follower(lambda u: _flip_kick(u) + 6.0 * math.sin(2 * math.pi * B1_PACE * 2 * u), B1_LEN + 1, f=1.5, zeta=0.3)
@@ -135,17 +135,26 @@ B1_WATTLE = _wattle(B1_BEATS, B1_LEN + 1)
 
 def scene_runs_out(ink, u):
     step = u * B1_PACE
-    x = 612 - step * 0.36 * 306
+    x = 640 - step * 0.36 * 306
     sl = B1_SLOSH.at(u)
     w.seat_backdrop(ink, u)
     w.walker(ink, x=x, step=step, bowl_bubbles=u, slosh=sl, wave=clamp(abs(sl) / 8), phase=u * 4, amp=5)
     for b, n in zip(B1_BEATS, B1_PUFFS):
-        _puff(ink, u, b + 0.2, n, 12.0 if n == 1 else 9.0)
+        if n == 1:                                   # the last of the air: one big bubble, alone, going up slowly. Then none.
+            v = u - b - 0.2
+            if 0 < v < 1.5:
+                bx, by = PUFF[0] + 16 + 9 * math.sin(v * 5), PUFF[1] + 60 - 150 * v / 1.5
+                r = 17 + 2 * math.sin(v * 9)
+                al = int(255 * min(1.0, v * 8) * (1 - ramp(v, 1.2, 1.5)))
+                ink.d.ellipse([bx - r, by - r, bx + r, by + r], fill=(236, 250, 250, al // 4), outline=(244, 252, 252, al), width=3)
+                ink.d.arc([bx - r * 0.6, by - r * 0.6, bx + r * 0.6, by + r * 0.6], 200, 260, fill=(255, 255, 255, al), width=2)
+        else:
+            _puff(ink, u, b + 0.2, n, 9.0)
     w.turkey_reflection(ink, mood="panic", t=u, **REFL, wing=_beat(u, B1_BEATS), wattle=B1_WATTLE.at(u),
-                        beak=14 + 14 * ease(u, 2.3, 3.0) + 3 * math.sin(u * 13), neck=-5 - 5 * ease(u, 2.3, 3.2) + 4 * math.sin(u * 9))
+                        beak=14 + 14 * ease(u, 1.9, 2.5) + 3 * math.sin(u * 13), neck=-5 - 5 * ease(u, 1.9, 2.6) + 4 * math.sin(u * 9))
     w.seat_frame(ink)
     n = max(0.0, B1_NEEDLE.at(u))
-    _gauge(ink, n, u, tremble=ease(u, 2.5, 2.8))
+    w.gauge(ink, n, 124, 424, r=88, tremble=ease(u, 2.0, 2.3), t=u)      # this ending is the dial's: it is the biggest thing on the wall
     w.bolt_mark(ink, 1, size=DIE)
 
 
@@ -165,7 +174,7 @@ def _wrig(u):
     return (math.sin(2 * math.pi * 1.6 * (u - 1.0)) if 1.0 <= u < 2.25 else 0.0) * (1 - 0.35 * ramp(u, 1.0, 2.25))
 
 
-B2_SLOSH = w.Follower(lambda u: _flip_kick(u) + 13.0 * _wrig(u), B2_LEN + 1, f=1.5, zeta=0.3)
+B2_SLOSH = w.Follower(lambda u: _flip_kick(u) + 20.0 * _wrig(u), B2_LEN + 1, f=1.5, zeta=0.3)
 B2_NEEDLE = _needle(B2_BEATS, B2_LEN + 1)
 B2_WATTLE = w.Follower(lambda u: 26.0 * _wrig(u - 1.0), B2_LEN + 1, f=2.2, zeta=0.22)
 
@@ -176,17 +185,17 @@ def scene_uncomfy(ink, u):
     wr = _wrig(u)
     sl = B2_SLOSH.at(u)
     w.seat_backdrop(ink, u)
-    wp = w.walker(ink, x=512, y=470, height=372, step=0.0, hook=hk, squash=sq,
-                  bowl_shift=(22 * wr, -5 * abs(wr)), bowl_tilt=-4 * sq - 7 * wr,
+    wp = w.walker(ink, x=530 + 9 * wr, y=486, height=404, step=0.0, hook=hk, squash=sq,
+                  bowl_shift=(40 * wr, -9 * abs(wr)), bowl_tilt=-4 * sq - 13 * wr,
                   slosh=sl, wave=clamp(abs(sl) / 7), bowl_bubbles=u, lid=0.5 * ease(u, 0.3, 0.8),
-                  phase=u * 2, amp=2, lean=2 * wr)
+                  phase=u * 2 + 5 * wr, amp=2 + 7 * abs(wr), lean=5 * wr, swing=-14 * wr)
     # Turkey does the same wriggle a beat later, neck twisting under the tin's low roof, inside the panic
     tw = _wrig(u - 1.0)
     on = ease(u, 1.9, 2.2) - ease(u, 3.3, 3.7)
     for b in B2_BEATS:
         _puff(ink, u, b + 0.2, 5)
-    w.turkey_reflection(ink, mood="panic", **REFL, t=u, wing=_beat(u, B2_BEATS, rest=14),
-                        neck=lerp(-5 + 5 * math.sin(9 * u), -8 + 15 * tw, on), wattle=B2_WATTLE.at(u) + 8 * math.sin(11 * u),
+    w.turkey_reflection(ink, mood="panic", **REFL, t=u, wing=_beat(u, B2_BEATS),
+                        neck=lerp(-5 + 5 * math.sin(9 * u), -6 + 24 * tw, on), wattle=B2_WATTLE.at(u) + 8 * math.sin(11 * u),
                         beak=lerp(13 + 6 * math.sin(13 * u), 29, on), ruff=lerp(0.55, 1.0, on))
     w.seat_frame(ink)
     _gauge(ink, B2_NEEDLE.at(u), u)
@@ -197,12 +206,12 @@ def scene_uncomfy(ink, u):
 # ----------------------------------------------------------- B3 · It is not wet. ---
 
 B3_LEN = SECONDS - T_B3
-B3_BEATS = [0.45, 3.55]                              # one in the river, one in dry air: he has not noticed
+B3_BEATS = [0.3, 3.5]                              # one in the river, one in dry air: he has not noticed
 B3_NEEDLE = _needle(B3_BEATS, B3_LEN + 1)
 B3_PACE = 0.45
 B3_SLOSH = w.Follower(lambda u: _flip_kick(u) + 7.0 * math.sin(2 * math.pi * B3_PACE * 2 * u), B3_LEN + 1, f=1.5, zeta=0.3)
 B3_WATTLE = _wattle(B3_BEATS, B3_LEN + 1)
-B3_LIFT = (0.7, 2.5)
+B3_LIFT = (0.5, 2.0)
 B3_X0 = 660
 B3_STRIDE = 0.36 * 306
 
@@ -245,9 +254,7 @@ def scene_not_wet(ink, u):
     # the bubbles of the first beat are rising when the river leaves them: each stops and drops like a pebble
     b0 = B3_BEATS[0]
     w.bubbles(ink, PUFF, u, t0=b0 + 0.2, n=6, size=9.0, rise=190, spread=22, drop_at=_hem_passes(215) + 0.02)
-    # the second beat is in dry air: what leaves the seam falls straight down
-    b1 = B3_BEATS[1]
-    w.bubbles(ink, (PUFF[0], 250), u, t0=b1 + 0.2, n=4, size=9.0, rise=0, drop_at=b1 + 0.2)
+    # the second beat is in dry air: the wings go, the needle drops, and there is nothing for a bubble to be made in
     w.turkey_reflection(ink, mood="panic", t=u, **REFL, wing=_beat(u, B3_BEATS), wattle=B3_WATTLE.at(u))
     w.seat_frame(ink)
     _gauge(ink, B3_NEEDLE.at(u), u)

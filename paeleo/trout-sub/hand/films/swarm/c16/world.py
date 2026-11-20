@@ -1933,11 +1933,11 @@ def _tin_monster():
         d.line([L(-26, 83.5), L(430, 83.5)], fill=PAL["tin_dark"], width=2 * S)
         rs = random.Random(6)
         for k in range(34):                             # rust creeping in from the two ends
-            x = rs.choice((-1, 1)) * (226 - abs(rs.gauss(0, 46))) + 202
+            x = rs.choice((-1, 1)) * (208 - abs(rs.gauss(0, 46))) + 202
             y = rs.uniform(20, 74)
             d.ellipse([L(x - 5, y - 3), L(x + 5, y + 3)], fill=PAL["rust"])
-    P.add("under", cut(rrect(-18, 60, 422, TM_RIM + 3, 3), (22, 22, 26), curve=False, seed=601, edge=0.2), (202, 80), "skirt", 1)
-    skirt = [(-10, 14), (-4, 6), (408, 6), (414, 14), (428, 76), (428, TM_RIM), (-24, TM_RIM), (-24, 76)]
+    P.add("under", cut(rrect(-5, 60, 409, TM_RIM + 3, 3), (22, 22, 26), curve=False, seed=601, edge=0.2), (202, 80), "skirt", 1)
+    skirt = [(-6, 14), (-1, 6), (405, 6), (410, 14), (412, 76), (412, TM_RIM), (-8, TM_RIM), (-8, 76)]     # the tin lid's own width (-8 .. 412): rim on rim, no eaves
     P.add("skirt", cut(skirt, lidc, skirt_deco, curve=False, seed=602, grain=0.11), (202, 40), None, 3)
 
     def head(name, cx, seed):
@@ -2260,22 +2260,22 @@ _PILOT = [
     ("right", [(540, 366), (566, 362), (576, 446), (548, 452), (541, 368)], 0.7, True),
     ("right", [(558, 470), (600, 468), (628, 480), (636, 502), (622, 520), (596, 508), (566, 492)], 0.7, False),
     # 6 · faint: the long loose curves dropping from the box, the upright mark, the loose lines towards the turkey
-    ("faint", [(255, 605), (300, 680), (350, 760), (400, 826)], 0.16, False),
-    ("faint", [(452, 556), (400, 636), (424, 700), (440, 756), (406, 824)], 0.16, False),
-    ("faint", [(168, 322), (200, 360), (232, 398), (250, 350), (268, 314), (286, 348)], 0.14, False),
-    ("faint", [(690, 388), (700, 330), (716, 272), (722, 330), (730, 420), (748, 520), (770, 604)], 0.20, False),
-    ("faint", [(690, 386), (712, 384), (736, 380)], 0.18, False),
-    ("faint", [(580, 470), (640, 540), (720, 575), (800, 548), (850, 520), (880, 470)], 0.12, False),
-    ("faint", [(742, 382), (800, 340), (850, 322)], 0.12, False),
+    ("faint", [(255, 605), (300, 680), (350, 760), (400, 826)], 0.08, False),
+    ("faint", [(452, 556), (400, 636), (424, 700), (440, 756), (406, 824)], 0.08, False),
+    ("faint", [(168, 322), (200, 360), (232, 398), (250, 350), (268, 314), (286, 348)], 0.07, False),
+    ("faint", [(694, 392), (700, 340), (712, 290), (722, 336), (736, 420), (756, 516), (784, 596)], 0.09, False),
+    ("faint", [(676, 402), (700, 392), (718, 372)], 0.06, False),
+    ("faint", [(580, 470), (640, 540), (720, 575), (800, 548), (850, 520), (880, 470)], 0.06, False),
+    ("faint", [(752, 372), (800, 340), (850, 322)], 0.06, False),
     # 7 · lighter pressure: the turkey's head to the right, beak pointing LEFT at the box, eye, wattle, neck
-    ("head", [(1150, 482), (1110, 500), (1076, 520), (1048, 545), (1012, 585)], 0.34, False),
-    ("head", [(1012, 585), (950, 640), (890, 690)], 0.42, False),
-    ("head", [(890, 692), (940, 668), (990, 672), (1036, 682)], 0.42, False),
-    ("head", [(988, 628), (1000, 634), (1012, 640)], 0.34, False),
-    ("head", _scribble(1080, 585, 11, 1.6, 0.0, 5), 0.34, False),
-    ("head", [(990, 604), (994, 608), (990, 610)], 0.4, False),
-    ("head", [(1034, 682), (1030, 702), (1002, 716), (1004, 758), (1040, 772)], 0.34, False),
-    ("head", [(1040, 772), (1050, 830), (1100, 880), (1160, 894), (1200, 896)], 0.26, False),
+    ("head", [(1090, 432), (1050, 450), (1016, 470), (988, 495), (952, 535)], 0.20, False),
+    ("head", [(952, 535), (890, 590), (830, 640)], 0.25, False),
+    ("head", [(830, 642), (880, 618), (930, 622), (976, 632)], 0.25, False),
+    ("head", [(928, 578), (940, 584), (952, 590)], 0.20, False),
+    ("head", _scribble(1020, 535, 11, 1.6, 0.0, 5), 0.20, False),
+    ("head", [(930, 554), (934, 558), (930, 560)], 0.24, False),
+    ("head", [(974, 632), (970, 652), (942, 666), (944, 708), (980, 722)], 0.20, False),
+    ("head", [(980, 722), (990, 780), (1040, 830), (1100, 844), (1140, 846)], 0.16, False),
 ]
 PILOT_TIMES = {"box": (0.6, 1.8), "dome": (1.8, 2.5), "window": (2.5, 2.8), "scribble1": (2.8, 3.3), "scribble2": (3.3, 3.8),
                "blocks": (3.9, 4.8), "right": (4.8, 5.6), "faint": (5.6, 6.4), "head": (6.4, 8.6)}
@@ -2996,7 +2996,7 @@ def seat(target, t=0.0, wave_kw=None, twin_kw=None, level=1.0, heads=True, twin_
 SEAT_TWIN = (440, 296, 0.48)                # the twin tin through the glass: x, y, scale
 SEAT_HEADS = [(340, 396, 156, False, -0.10), (452, 492, 112, False, 0.06), (566, 506, 190, True, 0.12)]     # neck root x, head joint x, y, flip, bend
 SEAT_HEAD_SCALE = 0.72
-SEAT_GAUGE = (104, 392, 50)                 # air gauge: x, y, r
+SEAT_GAUGE = (80, 300, 50)                  # air gauge: x, y, r
 SEAT_TURKEY = (748, 398, 1.45)              # Turkey's shoulder pin and scale
 SEAT_OTHER = (212, 430, 1.45)               # bolt 3: the other turkey's shoulder pin (draw turkey_back with mirror=True)
 

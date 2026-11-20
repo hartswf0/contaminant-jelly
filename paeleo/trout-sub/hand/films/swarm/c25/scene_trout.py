@@ -2,10 +2,10 @@
 
 Board beats (module time):
   R0  0.0 ..  2.5   the pick card "Giant astronaut suit", blue cross pressed and scribbled in, the tin ringed blue
-  B4  2.5 ..  8.0   bolt 4 · Probable      "The fish swim next to the astronaut, looking..."   (unsure: the last
+  B4  2.5 ..  7.5   bolt 4 · Probable      "The fish swim next to the astronaut, looking..."   (unsure: the last
                     word is off the edge of the sheet, so what they look at is never shown)
-  B5  8.0 ..  9.0   bolt 5 · Plausible     BLANK: an empty lit card and its die face
-  B6  9.0 .. 10.0   bolt 6 · Preposterous  BLANK: an empty lit card and its die face
+  B5  7.5 ..  8.75  bolt 5 · Plausible     BLANK: an empty lit card and its die face
+  B6  8.75 .. 10.0  bolt 6 · Preposterous  BLANK: an empty lit card and its die face
 
 Every cut is the card turned over (world.card_flip, 8 frames). Seen from the river the tin and its porthole are
 always in frame and Turkey is panicking behind the glass; only a counted wing-beat sends bubbles out of the seam
@@ -22,7 +22,7 @@ from kit import W, H, FPS, clamp, ramp, ease, smooth, lerp          # noqa: E402
 from PIL import Image, ImageDraw                                      # noqa: E402
 
 SECONDS = 10.0
-T_B4, T_B5, T_B6 = 2.5, 8.0, 9.0
+T_B4, T_B5, T_B6 = 2.5, 7.5, 8.75             # each blank card lies flat for nearly a second after its flip
 FLIP = 1.0 / 3.0                                                      # 8 frames
 
 CAPTIONS = [
@@ -143,14 +143,14 @@ def scene_pick(ink, u):
         elif 0.95 <= u < 1.5 and r["tip"] is not None:
             w.pencil(ink, r["tip"], 50)
         elif 1.5 <= u < 1.6:
-            q = ease(u, 1.5, 1.6)                                    # the pencil goes over to the button
-            w.pencil(ink, (lerp(r["ring"][0], bx, q), lerp(r["ring"][1], by, q)), 50, lift=math.sin(q * math.pi))
+            q = ease(u, 1.5, 1.6)                                    # the pencil goes over to the button, turning in the hand
+            w.pencil(ink, (lerp(r["ring"][0], bx, q), lerp(r["ring"][1], by, q)), lerp(50, 128, q), lift=math.sin(q * math.pi))
         elif 1.6 <= u < 2.2:
-            q = (u - 1.6) / 0.6                                      # and colours it in, zigzag
-            w.pencil(ink, (bx - 14 + 28 * q, by + 12 * math.sin(q * 40)), 50)
+            q = (u - 1.6) / 0.6                                      # and colours it in, zigzag; the barrel lies away from the words
+            w.pencil(ink, (bx - 14 + 28 * q, by + 12 * math.sin(q * 40)), 128)
         elif 2.2 <= u < 2.5:
             q = ease(u, 2.2, 2.5)
-            w.pencil(ink, (bx + 16 + 120 * q, by + 90 * q), 50, lift=min(1.0, q * 3))
+            w.pencil(ink, (bx - 16 - 150 * q, by - 60 * q), 128, lift=min(1.0, q * 3))
 
 
 # ------------------------- B4 · The fish swim next to the astronaut, looking... ---
@@ -163,11 +163,11 @@ B4_PACE = 1.0                                        # strides a second for the 
 B4_SLOSH = w.Follower(lambda u: _flip_kick(u) + 6.0 * math.sin(2 * math.pi * B4_PACE * 2 * u), B4_LEN + 1, f=1.5, zeta=0.3)
 B4_DRIFT = 38.0                                      # px a second the lock slides past: everyone is going right
 # the escort: (x, y, length, phase offset, bob). None of them is ever over the porthole glass.
-B4_FISH = [
-    (214, 118, 124, 0.0, 7),
-    (318, 442, 132, 2.1, 6),
-    (566, 478, 118, 4.0, 5),
-    (936, 446, 136, 1.2, 6),                         # the lead fish: its eye is already past the right edge of the card
+B4_FISH = [                                          # three in a file down the suit's flank, level with it, not under it
+    (232, 128, 150, 0.0, 7),
+    (196, 238, 164, 2.1, 6),
+    (248, 344, 150, 4.0, 5),
+    (938, 402, 150, 1.2, 6),                         # the lead fish: its eye is already past the right edge of the card
 ]
 
 
@@ -180,11 +180,14 @@ def _tin_pose(u):
 def scene_astronaut(ink, u):
     w.river_backdrop(ink, u, shift=104 - B4_DRIFT * u)
     c, ang = _tin_pose(u)
-    tp = w.tin(ink, c, 1.35, u, mood="panic", angle=ang, wing=_beat(u, B4_BEATS), wattle=B4_WATTLE.at(u),
-               shake=3.0 * _thump(u, B4_BEATS))
+    tp = w.tin(ink, c, 1.35, u, mood="panic", angle=ang, wing=_beat(u, B4_BEATS, rest=30.0), wattle=B4_WATTLE.at(u),
+               shake=5.0 * _thump(u, B4_BEATS))
     w.gauge(ink, max(0.0, B4_NEEDLE.at(u)), *w.tin_dial_xy(tp), r=34, t=u)
+    # the blue ring N.'s pick put round it stays on: this is the thing that was called a giant astronaut suit
+    ca = math.radians(ang)
+    w.crayon_ring(ink, (c[0] + 10 * math.cos(ca), c[1] - 10 * math.sin(ca)), 318, 190, w.PAL["blue"], 1.0, seed=2, width=7, alpha=0.8)
     bx, by = _glow_bolt(ink, tp, 4)
-    w.die_face(ink, 4, bx, by + 46, size=42)
+    w.die_face(ink, 4, bx, by, size=34)                              # its die sits on the lit bolt itself
     for b in B4_BEATS:
         _puff(ink, tp, u, b + 0.2, 9, size=14.0, scale=1.35)
     # the escort keeps station: each fish holds its place beside the suit and rides the suit's own slow bob

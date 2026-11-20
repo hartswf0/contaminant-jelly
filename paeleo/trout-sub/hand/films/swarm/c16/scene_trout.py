@@ -30,6 +30,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import world as Wd  # noqa: E402  (puts films/ on sys.path itself)
+from PIL import Image, ImageDraw  # noqa: E402
 
 W, H = Wd.W, Wd.H
 ease, ramp, lerp, clamp = Wd.ease, Wd.ramp, Wd.lerp, Wd.clamp
@@ -44,7 +45,7 @@ T_C1, T_C2, T_C3, T_END = 35.0, 36.2, 43.0, 44.2
 WAVE_T0 = 13.0                              # scene_pilot's wave: Turkey's peaks at x.5, the late ones at x.0
 
 # ------------------------------------------------------------- layout ---
-SUB = (318, 282, 0.8)                       # Turkey's tin, centre-left; flip=True: its porthole faces the twin
+SUB = (326, 292, 0.92)                      # Turkey's tin, centre-left; flip=True: its porthole faces the twin
 TWIN = (772, 262, 0.58)                     # the twin tin, facing it
 MON = (540, 452, 1.0)                       # the giant three-headed monster's bulk, behind everything
 RING = (480, 262, 112, 152)                 # a blank's porthole rim, face on: centre, glass radius, outer radius
@@ -112,13 +113,14 @@ def _river(g, ink, tilts=(0, 0, 0), drop=None, die5=0):
         Wd.tin_monster(ink, SUB[0], SUB[1], SUB[2], g, lift=max(0.0, drop), flip=True, port=p,
                        nod=(6 * Wd.settle(g, T_SEAT), -6 * Wd.settle(g, T_SEAT + Wd.DT)))
     if die5:
-        Wd.die_at_bolt(ink, 5, p["port"], p["port_r"], size=32, lit=die5 == 2, outline=die5 == 1, t=g, ring_w=17 * SUB[2])
+        # just outside the flange at bolt 5 (8 o'clock), on the tin wall: clear of the glass and of Turkey's wing
+        Wd.die_at_bolt(ink, 5, p["port"], p["port_r"] + 17 * SUB[2] + 13, size=32, lit=die5 == 2, outline=die5 == 1, t=g, ring_w=6)
     for n, tp in enumerate(PEAKS + (31.5, 31.0)):
         Wd.bubble_pair(ink, p["pipe"][0], p["pipe"][1], g, tp, rise=150, size=5.5, drift=8, life=2.0, seed=20 + n)
         Wd.bubble_pair(ink, tw["pipe"][0], tw["pipe"][1], g, tp + Wd.DT, rise=120, size=4.2, drift=6, life=1.8, seed=40 + n)
     if drop is not None:                                        # the ring of bubbles when the rims meet
         ry = SUB[1] - 46 * SUB[2]
-        for n, fx in enumerate((-222, -150, -60, 40, 130, 222)):
+        for n, fx in enumerate((-208, -140, -56, 38, 122, 208)):
             Wd.bubble_pair(ink, SUB[0] + fx * SUB[2], ry, g, T_SEAT, rise=110 + 14 * (n % 3), size=5.0, drift=12, life=1.5, seed=60 + n)
     Wd.trout_pair(ink, _trout_path, g, 0.42, pose="look")
     Wd.river_plane(ink, "front", g, 0.0, 1)
@@ -141,14 +143,23 @@ def _pick(G, ink):
 
 
 def _blank(G, ink, n, t_in):
-    """An unwritten bolt: the porthole's brass rim face on, its die face on that bolt (outline, then its painted
-    double), and nothing at all through the glass or round it."""
+    """An unwritten bolt: the tin's wall and its porthole's brass rim face on, its die face on that bolt (painted and
+    unlit from the first frame: a blank has no double), and nothing at all through the glass."""
     Wd.empty_stage(ink)
-    cx, cy, ri, ro = RING
+    # the riveted tin wall round its porthole, framed exactly as bolt 5 opens (SUB's scale times CAM_PORT, porthole
+    # at the frame centre): nobody at the window, lamp out, then the glass itself is the empty lit stage
+    s = SUB[2] * CAM_PORT
+    p = Wd.tin(ink, W / 2 - (Wd.TIN_C[0] - Wd.TIN_PORT[0]) * s, H / 2 - (Wd.TIN_PORT[1] - Wd.TIN_C[1]) * s, s, 0.0, flip=True,
+               occupants=0, lamp=0.0, spin=0.0)
+    cx, cy = p["port"]
+    ri, ro = int(round(p["port_r"])), int(round(p["port_r"] * 64 / Wd.WIN_R))
+    hole = Image.new("L", (W, H), 0)
+    ImageDraw.Draw(hole).ellipse([cx - ri - 3, cy - ri - 3, cx + ri + 3, cy + ri + 3], fill=255)
+    img = Wd._img(ink)
+    img.paste(Wd._stage().convert(img.mode), (0, 0), hole)
     ring = Wd.brass_ring(ri, ro)
-    Wd._comp(ink, Wd.shadow_of(ring.getchannel("A"), 9, 0.45), (cx - ring.width / 2 + 6, cy - ring.height / 2 + 10))
     Wd._comp(ink, ring, (cx - ring.width / 2, cy - ring.height / 2))
-    Wd.die_at_bolt(ink, n, (cx, cy), ri, size=50, lit=False, outline=Wd.arrive(G, t_in) == 1, ring_w=ro - ri)
+    Wd.die_at_bolt(ink, n, (cx, cy), ri, size=50, lit=False, outline=False, ring_w=ro - ri)
 
 
 def _bolt5(G, ink):

@@ -48,12 +48,32 @@ def _iris_f(t, mid, half=0.2):
 PENCIL_OFF = (1016, 690)                 # where the pencil waits and goes back to: off the lower right corner
 T_RING = (7.62, 8.0)                     # the brass ring is slid over the finished page
 T_SWAP = 8.2                             # the iris is shut: pencil bars become card bars
-T_PUSH = (8.45, 9.25)                    # the ring passes us and the planes slide: the wreck comes into view
+T_PUSH = (8.4, 8.95)                     # the ring passes us and the planes slide: the wreck comes into view
 
 
 @lru_cache(maxsize=1)
 def _ring_spr():
     return Wd.brass_ring(PR, Wd.RING_OUT, 6, 10, 3)
+
+
+# Repair: the pencil works a little faster (the page's 1.2 .. 7.6 s of strokes are played in 1.2 .. PEN_END), so
+# the finished drawing lies clear of pencil and brass for about a second before the ring comes down at T_RING.
+PEN_END = 6.3
+_DRAWN = Wd.PILOT_TIMES["cracks"][1]      # 7.6: the last stroke ends (world's clock)
+
+
+def page_time(t):
+    """Module time -> the world's pilot_page clock."""
+    if t <= 1.2:
+        return t
+    if t < PEN_END:
+        return 1.2 + (t - 1.2) * (_DRAWN - 1.2) / (PEN_END - 1.2)
+    return _DRAWN + 0.02
+
+
+def stroke_time(u):
+    """The world's pilot_page clock -> module time (for the editor's pencil sounds)."""
+    return u if u <= 1.2 else 1.2 + (u - 1.2) * (PEN_END - 1.2) / (_DRAWN - 1.2)
 
 
 def _page(ink, t):
@@ -67,10 +87,10 @@ def _pencil(ink, t, tip, down):
     if t < 1.2:                                              # P0: comes in from the lower right, touches down
         p = lerp2(PENCIL_OFF, tip, ease(t, 0.15, 1.05))
         Wd.pencil(ink, p, lift=1 - ease(t, 1.0, 1.2))
-    elif t < 7.62:
+    elif t < PEN_END:
         Wd.pencil(ink, tip, lift=0 if down else 1)
-    elif t < 8.05:                                           # lifts and leaves the frame
-        p = lerp2(tip, PENCIL_OFF, ease(t, 7.62, 8.0))
+    elif t < PEN_END + 0.42:                                 # lifts and leaves the frame; the drawing is left alone
+        p = lerp2(tip, PENCIL_OFF, ease(t, PEN_END + 0.02, PEN_END + 0.4))
         Wd.pencil(ink, p, lift=1)
 
 
@@ -278,7 +298,7 @@ def _p6(ink, t):
 def draw(t, ink):
     t = clamp(t, 0.0, SECONDS - 1e-6)
     if t < T_SWAP:
-        tip, down = _page(ink, t)
+        tip, down = _page(ink, page_time(t))
         if t >= T_RING[0]:
             Wd.iris(ink, _iris_f(t, T_SWAP))
             _ring_on_page(ink, t)

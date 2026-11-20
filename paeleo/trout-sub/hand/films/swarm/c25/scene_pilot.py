@@ -21,6 +21,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import world as w                                                    # noqa: E402  (puts films/ on sys.path)
 from kit import FPS, H, W, clamp, ease, lerp                         # noqa: E402
 from PIL import Image, ImageDraw                                     # noqa: E402
+import numpy as np                                                   # noqa: E402
 
 SECONDS = 20.5
 BADGE = True
@@ -42,30 +43,89 @@ _WH = P["walker_h"] * w.PORT_R
 _PARTS = ("legs", "tunic", "bowl", "fish", "arms")
 
 
+T_MORPH = (8.0, 8.8)                                                 # the pencil lines travel to the cut pieces' edges
+T_LAY = (8.55, 9.1)                                                  # the cut puppet is slid in under them, in one piece
+_PART_OF = dict(fish="fish", tail="fish", fin_mouth="fish", bowl=None, body="tunic", arms="arms", legs="legs")
+_TARGETS = []
+
+
+def _edge_points(ink, part):
+    """Screen points along the cut edge of one piece of the puppet where it lies on the sheet."""
+    o = w.offscreen(ink)
+    key = (255, 0, 255)
+    o.img.paste(key + (255,), (0, 0, W, H))
+    o.d = ImageDraw.Draw(o.img, "RGBA")
+    w.walker(o, _WX, _WY, _WH, parts=(part,), shadow=0.0)
+    a = np.asarray(o.img.convert("RGB"), np.int16)
+    m = np.abs(a - np.array(key, np.int16)).sum(axis=2) > 60
+    e = m & ~(np.roll(m, 1, 0) & np.roll(m, -1, 0) & np.roll(m, 1, 1) & np.roll(m, -1, 1))
+    ys, xs = np.nonzero(e)
+    return np.stack([xs, ys], 1).astype(np.float32)
+
+
+def _targets(ink):
+    """Foldes change, point for point: every pencil point is given the nearest point on the cut edge of the piece
+    it was a drawing of (the loops keep the world's own bowl outline). A line never jumps: no point travels more
+    than CAP px, and the travel is evened out along the stroke."""
+    if _TARGETS:
+        return _TARGETS
+    CAP = 30.0
+    edges = {}
+    for s in w.PILOT_STROKES:
+        src = np.array([w.ring_xy(u, v) for u, v in s["pts"]], np.float32)
+        part = _PART_OF[s["group"]]
+        if part is None:
+            dst = np.array([w.ring_xy(u, v) for u, v in s["to"]], np.float32)
+        else:
+            if part not in edges:
+                edges[part] = _edge_points(ink, part)
+            E = edges[part]
+            d2 = ((src[:, None, :] - E[None, :, :]) ** 2).sum(axis=2)
+            mv = E[d2.argmin(axis=1)] - src
+            ln = np.maximum(1e-6, np.hypot(mv[:, 0], mv[:, 1]))
+            mv *= np.minimum(1.0, CAP / ln)[:, None]
+            if len(src) < 8:                                          # a tooth tick moves as one piece
+                mv[:] = mv.mean(axis=0)
+            else:
+                k = np.ones(11, np.float32) / 11
+                pad = np.pad(mv, ((5, 5), (0, 0)), mode="edge")
+                mv = np.stack([np.convolve(pad[:, c], k, mode="valid") for c in (0, 1)], 1)
+            dst = src + mv
+        _TARGETS.append((src, dst, s["weight"]))
+    return _TARGETS
+
+
+def _lines(ink, f):
+    """The finished drawing with its own lines moved f = 0..1 of the way on to the puppet's cut edges."""
+    g = ease(f, 0.0, 1.0)
+    for src, dst, wt in _targets(ink):
+        pts = [tuple(p) for p in (src + (dst - src) * g)]
+        w._pencil_line(ink.d, pts, wt, 1.0)
+
+
 def _p1(ink, t):
     w.table(ink)
     w.sheet_ring(ink)
-    if t < 8.4:
+    if t < T_MORPH[0]:
         tip, down = w.pilot_page(ink, min(t, 7.95))
-        if t < 7.8:
-            w.pencil(ink, tip, lift=0 if down else 1)
-        else:                                                        # the pencil lifts and leaves by the right edge
-            a = ease(t, 7.8, 8.35)
-            w.pencil(ink, (tip[0] + 560 * a * a, tip[1] - 40 * a), lift=1)
+        w.pencil(ink, tip, lift=0 if down else 1)
         return
-    # Foldes change: each cut piece slides in under the pencil lines while the lines move onto the pieces
-    for k, part in enumerate(_PARTS):
-        a = ease(t, 8.45 + k * 0.17, 8.85 + k * 0.17)
-        if a > 0:
-            w.walker(ink, _WX, _WY, _WH, parts=(part,), shadow=0.8, lift=1 - a, alpha=min(1.0, a * 3),
-                     slosh=_SLOSH1.at(t), wave=clamp(abs(_SLOSH1.at(t)) / 8))
-    fade = 1 - ease(t, 9.25, 9.6)
-    if fade > 0:
-        w.pilot_morph(ink, ease(t, 8.4, 9.25), alpha=fade)
+    # Foldes change. The pencil lines themselves move, point for point, out to where the cut edges will be; the
+    # puppet, already cut, is slid in under them in one piece and set down; the lines stay on it as its drawn edge.
+    a = ease(t, *T_LAY)
+    if t >= T_LAY[0]:
+        drop = ease(t, T_LAY[1], T_LAY[1] + 0.12)
+        w.walker(ink, _WX + 640 * (1 - a) ** 2, _WY + 40 * (1 - a), _WH, shadow=0.8, lift=1 - drop,
+                 slosh=_SLOSH1.at(t), wave=clamp(abs(_SLOSH1.at(t)) / 8))
+    _lines(ink, (t - T_MORPH[0]) / (T_MORPH[1] - T_MORPH[0]))
+    if t < 8.5:                                                      # the pencil lifts and leaves by the right edge
+        tip, _ = w.pilot_page(ink, 7.95)
+        q = ease(t, T_MORPH[0], 8.5)
+        w.pencil(ink, (tip[0] + 560 * q * q, tip[1] - 40 * q), lift=1)
 
 
-def _kick1(t):                                                       # the bowl is set down at about 8.95: the water slops
-    return 10.0 if 8.9 <= t < 9.0 else 0.0
+def _kick1(t):                                                       # slid in, then set down at about 9.15: the water slops
+    return (-8.0 if 8.6 <= t < 8.75 else 0.0) + (11.0 if 9.1 <= t < 9.22 else 0.0)
 
 
 _SLOSH1 = w.Follower(_kick1, SECONDS, f=1.8, zeta=0.3)
@@ -105,27 +165,27 @@ def _p2(ink, t):
     # the bottle is the tin's own outline moved, in pencil, for the length of the lean
     bf = ease(u, 0.9, 1.8) - ease(u, 3.3, 4.1)
     ba = ease(u, 0.75, 1.05) - ease(u, 4.05, 4.3)
+    if ba > 0:                                                       # under the trout: the trout stays outside the bottle
+        w.bottle_lines(ink, TIN_C, TIN_S, f=bf, alpha=ba, angle=-1.2 * ln, width=6)
     s = _SLOSH2.at(t)
     w.walker(ink, WALK_X0 + 53 * ln, WALK_Y, WALK_H, flip=True, lean=11 * ln, step=0.0,
              phase=t * 3, amp=4, slosh=s, wave=clamp(abs(s) / 8), bowl_bubbles=t, bob=False)
-    if ba > 0:                                                       # over the trout: it is what the trout thinks
-        w.bottle_lines(ink, TIN_C, TIN_S, f=bf, alpha=ba, angle=-1.2 * ln, width=4)
 
 
 # ------------------------------------------------------------------ P3, P4: Turkey's seat ---
 
 BEATS = [T_P4 + 0.75, T_P4 + 1.5, T_P4 + 2.25]                       # P4: three counted wing-beats
 P3_BEATS = [T_P3 + 0.55 + 0.42 * k for k in range(6)]                # P3: he throws them up and beats, uncounted
-REFL = dict(cx=388, cy=338, height=236, alpha=0.8)                  # Turkey's reflection, low left in the glass
-PUFF = (300, 305)                                                    # where the bubbles leave, by the left rim
+REFL = dict(cx=352, cy=372, height=212, alpha=0.68, wing_scale=0.66)                  # Turkey's reflection, low left in the glass
+PUFF = (296, 250)                                                    # where the bubbles leave, by the left rim
 
 
 def _wing_seat(t):
     if t < T_P4 + 0.3:                                               # P3: up at once, then beating without stop
         up = ease(t, T_P3 + 0.3, T_P3 + 0.6)
-        v = up * (58 + 40 * math.sin(2 * math.pi * 2.4 * (t - T_P3)))
-        return max(8.0, v * (1 - ease(t, T_P4, T_P4 + 0.3)))
-    return max([96 * math.sin(math.pi * clamp((t - b + 0.12) / 0.5)) for b in BEATS] + [8.0])
+        v = up * (54 + 46 * math.sin(2 * math.pi * 2.4 * (t - T_P3)))      # from flat out sideways to straight up over his head
+        return max(0.0, v * (1 - ease(t, T_P4, T_P4 + 0.3)))
+    return max([100 * math.sin(math.pi * clamp((t - b + 0.12) / 0.5)) for b in BEATS] + [0.0])   # folded away between beats
 
 
 def _needle_target(t):
@@ -152,7 +212,7 @@ _SLOSH3 = w.Follower(_kick3, SECONDS, f=1.5, zeta=0.32)
 def _seat(ink, t):
     s = _SLOSH3.at(t)
     # the trout outside does nothing at all: it only stands there (pose of the drawing, mirror of P2)
-    wk = dict(x=572, height=288, step=0.0, bob=False, phase=t * 1.2, amp=2.0, slosh=s, wave=clamp(abs(s) / 8), bowl_bubbles=t)
+    wk = dict(x=590, height=288, step=0.0, bob=False, phase=t * 1.2, amp=2.0, slosh=s, wave=clamp(abs(s) / 8), bowl_bubbles=t)
     tk = dict(REFL, mood="freak", t=t, wing=_wing_seat(t), wattle=_WATTLE.at(t))
     w.seat_scene(ink, t, wk, tk, notches=6, bolt=None, frame=False)
     for b in BEATS:                                                  # one puff per beat, and only on the beat

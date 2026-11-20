@@ -725,8 +725,12 @@ def _die_spr(n, size, style, lit_q):
         d.rounded_rectangle([box[0] + size * 0.05, box[1] + size * 0.09, box[2] + size * 0.05, box[3] + size * 0.09], radius=rad, fill=(10, 8, 6, 110))
         d.rounded_rectangle(box, radius=rad, fill=tuple(int(v * 0.78) for v in base) + (255,))
         d.rounded_rectangle([box[0], box[1], box[2] - size * 0.05, box[3] - size * 0.06], radius=rad, fill=base + (255,))
-        d.rounded_rectangle([box[0] + size * 0.07, box[1] + size * 0.06, box[2] - size * 0.2, box[1] + size * 0.2], radius=size * 0.07,
-                            fill=(255, 255, 255, int(70 * lit + 20)))
+        hl = Image.new("RGBA", (S, S), (0, 0, 0, 0))            # the sheen is laid OVER the face (composited, so the
+        ImageDraw.Draw(hl).rounded_rectangle(                   # die stays opaque and the wall never shows through it)
+            [box[0] + size * 0.07, box[1] + size * 0.06, box[2] - size * 0.2, box[1] + size * 0.2], radius=size * 0.07,
+            fill=(255, 255, 255, int(70 * lit + 20)))
+        im.alpha_composite(hl)
+        d = ImageDraw.Draw(im, "RGBA")
         d.rounded_rectangle(box, radius=rad, outline=(40, 30, 20, 255), width=max(1, size // 22))
         pr = size * 0.095
         pipc = mix_color((60, 56, 50), PAL["pip"], lit)
@@ -3095,17 +3099,17 @@ def tin_dial_xy(tp):
 
 # ------------------------------------------------------- cards, labels, ending ---
 
-def bolt_label(ink, n, x=74, y=64, size=44, lit=1.0, word=True, alpha=1.0):
+def bolt_label(ink, n, x=92, y=70, size=64, lit=1.0, word=True, alpha=1.0):
     """The label an ending carries: die face n (ivory) centred at (x, y) with the small word under it (1 and 4
     Probable, 2 and 5 Plausible, 3 and 6 Preposterous) on a dark plate. Default place: top left corner.
     lit=0 for a BLANK bolt (grey die, grey word)."""
     die_face(ink, n, x, y, size, "ivory", lit=lit, alpha=alpha)
     if word:
         s = KINDS[n]
-        f = font("mono", 13)
+        f = font("mono", 18)
         tw = ink.d.textlength(s, font=f)
-        ink.d.rounded_rectangle([x - tw / 2 - 8, y + size * 0.62, x + tw / 2 + 8, y + size * 0.62 + 22], radius=6, fill=PAL["badge"] + (int(225 * alpha),))
-        ink.d.text((x, y + size * 0.62 + 11), s, font=f, fill=mix_color((150, 146, 140), PAL["white"], lit) + (int(255 * alpha),), anchor="mm")
+        ink.d.rounded_rectangle([x - tw / 2 - 10, y + size * 0.62, x + tw / 2 + 10, y + size * 0.62 + 30], radius=7, fill=PAL["badge"] + (int(240 * alpha),))
+        ink.d.text((x, y + size * 0.62 + 15), s, font=f, fill=mix_color((150, 146, 140), PAL["white"], lit) + (int(255 * alpha),), anchor="mm")
 
 
 def round_scribble(ink, c, r=16, done=1.0, weight=1.2, alpha=0.95, turns=5.0, seed=2):

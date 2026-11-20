@@ -2,9 +2,9 @@
 
 The children's own sheet, in order, nothing added (see swarm/c33/board.md):
   0.0 .. 20.0   the pilot's page             swarm/c33/scene_pilot.py
- 20.0 .. 38.0   Turkey thinks, bolts 1-3     swarm/c33/scene_turkey.py
- 38.0 .. 48.9   the trout think, bolts 4-6   swarm/c33/scene_trout.py   (5 and 6 are blank on the sheet)
- 48.9 .. 55.0   the die is still in the cup  (this file): bolts 1 to 4 light in turn, 5 and 6 stay dull; one die unthrown
+ 20.0 .. 39.0   Turkey thinks, bolts 1-3     swarm/c33/scene_turkey.py
+ 39.0 .. 50.9   the trout think, bolts 4-6   swarm/c33/scene_trout.py   (5 and 6 are blank on the sheet)
+ 50.9 .. 57.0   the die is still in the cup  (this file): bolts 1 to 4 light in turn, 5 and 6 stay dull; one die unthrown
 
 Foraged: Turkey (Audubon) and the trout (Denton), see credits/c33.json. Everything else is handmade cut paper,
 ruled card and pencil from swarm/c33/world.py. The porthole's rule (shadow theatre): every cut between scenes, the
@@ -39,23 +39,25 @@ ST.check()
 SR.check()
 
 T_TURKEY = SP.SECONDS                         # 20.0
-T_TROUT = T_TURKEY + ST.SECONDS               # 38.0
-T_END = T_TROUT + SR.SECONDS                  # 48.9
+T_TROUT = T_TURKEY + ST.SECONDS               # 39.0
+T_END = T_TROUT + SR.SECONDS                  # 50.9
 END_SECONDS = 6.1
-SECONDS = T_END + END_SECONDS                 # 55.0
-assert abs(SECONDS - 55.0) < 1e-6
+SECONDS = T_END + END_SECONDS                 # 57.0
+assert abs(SECONDS - 57.0) < 1e-6
+T_TURKEY_IN = T_TURKEY + ST.PICK_HOLD         # 21.0: zero of the Turkey module's clock after its (held) pick
+T_TROUT_IN = T_TROUT + SR.PICK_HOLD           # 40.0: the same for the trout module
 IRIS = 0.2                                    # half an iris move: the modules' own measure
 
 # The children's sentences, in the sheet's `reads` spelling, absolute times. One at a time, each 2.5 s or more.
 # Each is trimmed clear of the velvet iris at both ends, so no sentence is read over a closed curtain.
 CAPTIONS = [
-    (8.45, 11.25, "A ship that sunk."),
+    (8.8, 11.3, "A ship that sunk."),
     (11.75, 14.75, "Look in the window, trying to get out."),
     (15.25, 19.75, "He could be freaking out, trying to get out, losing air, breathing heavy."),
-    (22.8, 26.7, "Someone trapped him."),
-    (27.3, 31.7, "Trying to save a hot Cheeto."),
-    (32.3, 37.6, "That's his home."),
-    (40.7, 46.2, "A movie."),
+    (23.8, 27.7, "Someone trapped him."),
+    (28.3, 32.7, "Trying to save a hot Cheeto."),
+    (33.3, 38.6, "That's his home."),
+    (42.7, 48.2, "A movie."),
 ]
 _theirs = [s for m in (SP, ST, SR) for _, _, s in m.CAPTIONS]
 assert [c[2] for c in CAPTIONS] == _theirs, "captions are the modules' sentences, in order, unchanged"
@@ -66,8 +68,8 @@ for (_a, _b, _), (_c, _d, _) in zip(CAPTIONS, CAPTIONS[1:]):
 
 WRITTEN = (1, 2, 3, 4)
 UNWRITTEN = (5, 6)                            # blank on the sheet: never lit, never rung, nothing invented
-BOLT_AT = {1: T_TURKEY + ST.S1, 2: T_TURKEY + ST.S2, 3: T_TURKEY + ST.S3,
-           4: T_TROUT + SR.S4, 5: T_TROUT + SR.S5, 6: T_TROUT + SR.S6}
+BOLT_AT = {1: T_TURKEY_IN + ST.S1, 2: T_TURKEY_IN + ST.S2, 3: T_TURKEY_IN + ST.S3,
+           4: T_TROUT_IN + SR.S4, 5: T_TROUT_IN + SR.S5, 6: T_TROUT_IN + SR.S6}
 BELL = {1: 523.25, 2: 587.33, 3: 659.25, 4: 783.99}
 
 
@@ -116,7 +118,7 @@ def _picture(t, ink):
 
 
 film = Film("c33", SECONDS, boil=0, wobble=0.0)
-film.poster_at = T_TURKEY + ST.S2 + 2.4
+film.poster_at = T_TURKEY_IN + ST.S2 + 2.4
 
 
 @film.picture
@@ -127,7 +129,7 @@ def frame(t, ink):
     for a, b, text in CAPTIONS:
         if a <= t < b:
             # bolt 4's audience sits along the bottom of the frame: its caption goes under the front row
-            ink.caption(text, size=26, y=ink.h - 24 if a >= T_TROUT else None)
+            ink.caption(text, size=26, y=ink.h - 33 if a >= T_TROUT else None)
             break
 
 
@@ -234,20 +236,22 @@ def _bolt(mix, n, at, gain=0.28):
 
 @film.sound
 def sound(mix):
-    B, C, E = T_TURKEY, T_TROUT, T_END
+    # B0 / C0: where each friend's module starts (the pick). B / C: zero of that module's clock after the held pick.
+    B0, C0, E = T_TURKEY, T_TROUT, T_END
+    B, C = T_TURKEY_IN, T_TROUT_IN
     b1, b2, b3, b4, b5, b6 = (BOLT_AT[n] for n in range(1, 7))
-    seat1 = B + ST.T_SEAT                                     # 22.1: Turkey's seat again
-    river = C + SR.T_RIVER                                    # 40.05: the river side
+    seat1 = B + ST.T_SEAT                                     # 23.1: Turkey's seat again
+    river = C + SR.T_RIVER                                    # 42.05: the river side
 
     # beds: the room over the table; the river from outside; dull from inside the tin; the room again
     mix.room(0.0, SP.T_SWAP + 0.1, 0.02)
     mix.water(SP.T_SWAP, SP.T_P6 - SP.T_SWAP, 0.045)
-    mix.water(SP.T_P6, B - SP.T_P6, 0.016)
-    mix.drone(SP.T_P6, B - SP.T_P6, (55, 82.5, 110), 0.035, attack=0.4, release=0.4)
-    mix.room(B, ST.T_SEAT, 0.02)
-    mix.water(seat1, C - seat1, 0.016)
-    mix.drone(seat1, C - seat1, (55, 82.5, 110), 0.035, attack=0.4, release=0.4)
-    mix.room(C, SR.T_RIVER, 0.02)
+    mix.water(SP.T_P6, B0 - SP.T_P6, 0.016)
+    mix.drone(SP.T_P6, B0 - SP.T_P6, (55, 82.5, 110), 0.035, attack=0.4, release=0.4)
+    mix.room(B0, seat1 - B0, 0.02)
+    mix.water(seat1, C0 - seat1, 0.016)
+    mix.drone(seat1, C0 - seat1, (55, 82.5, 110), 0.035, attack=0.4, release=0.4)
+    mix.room(C0, river - C0, 0.02)
     mix.water(river, E - river, 0.045)
     mix.room(E, END_SECONDS, 0.022)
 
@@ -255,7 +259,7 @@ def sound(mix):
     _velvet(mix, SP.T_SWAP)
     _velvet(mix, SP.T_P5)
     _velvet(mix, SP.T_P6)
-    for a in (B, seat1, b2, b3, C, river, b5):
+    for a in (B0, seat1, b2, b3, C0, river, b5):
         _velvet(mix, a)
     _velvet(mix, b6, gain=0.07, half=SR.IRIS_Q)
     _velvet(mix, E, opens=False)
@@ -266,6 +270,7 @@ def sound(mix):
     mix.click(1.12, 0.1, 0.2, 3500, 0.02)                     # the pencil touches down
     for k, (g, (a, b)) in enumerate(Wd.PILOT_TIMES.items()):
         n = 3 if g.startswith("bar") else {"fish": 3, "spots": 9, "cracks": 5}.get(g, 1)
+        a, b = SP.stroke_time(a), SP.stroke_time(b)           # the pencil's own (quicker) clock
         for j in range(n):                                    # each bar: two downstrokes and the side-of-the-lead fill
             aa, bb = a + (b - a) * j / n, a + (b - a) * (j + 1) / n - 0.02
             if g == "spots":
@@ -283,25 +288,25 @@ def sound(mix):
         _knock(mix, 12.55 + 0.8 * k, 0.3, 0.0)
         mix.thud(12.6 + 0.8 * k, 60, 0.16, 0.0, 0.3)          # the tin rocks a degree on the bed
     _breaths(mix, 12.4, SP.T_P6 - 0.2, 0.02, 0.0, muffled=True)
-    _breaths(mix, SP.T_P6, B - 0.1, 0.06, -0.35, swell=0.5)   # "... losing air, breathing heavy."
+    _breaths(mix, SP.T_P6, B0 - 0.1, 0.06, -0.35, swell=0.5)   # "... losing air, breathing heavy."
     for tk in SP.TICKS:
         _tick(mix, tk + 0.1)
-    for k in range(int(SP.T_P6) + 1, int(B)):
+    for k in range(int(SP.T_P6) + 1, int(B0)):
         _knock(mix, k, 0.1)
 
     # --- II. Turkey thinks
-    _scratch(mix, B + 0.3, B + 1.15, 0.07, seed=1, lo=1200, hi=5000)          # the red circle coloured in, round and round
-    mix.click(B + 1.2, 0.2, -0.3, 2500, 0.04)                 # the button goes down
-    mix.note(B + 1.22, 440, 0.3, 0.12, -0.3, "tri")
-    _scratch(mix, B + 1.42, B + 1.82, 0.08, seed=2)           # E.'s one small circle
+    _scratch(mix, B0 + 0.3, B0 + 1.15, 0.07, seed=1, lo=1200, hi=5000)        # the red circle coloured in, round and round
+    mix.click(B0 + 1.2, 0.2, -0.3, 2500, 0.04)                # the button goes down
+    mix.note(B0 + 1.22, 440, 0.3, 0.12, -0.3, "tri")
+    _scratch(mix, B0 + 1.42, B0 + 1.82, 0.08, seed=2)         # E.'s one small circle
     for k in range(16):                                       # the stones of the tunnel mouth, laid one by one
         mix.step(seat1 + 0.27 + k * (B + 3.3 - seat1 - 0.3) / 16, 0.09, -0.5 + k / 16, "stone")
     for n in (1, 2, 3):
         _bolt(mix, n, BOLT_AT[n] + (0.0 if n == 1 else IRIS))
     _breaths(mix, seat1 + 0.2, b2 - 0.2, 0.045)
     _breaths(mix, b2 + 0.2, b3 - 0.2, 0.06, swell=0.5)        # the hardest breathing of the film
-    _breaths(mix, b3 + 0.2, C - 0.3, 0.05, swell=0.3)
-    for k in range(int(seat1) + 1, int(C)):                   # he shoves once a second; he never stops
+    _breaths(mix, b3 + 0.2, C0 - 0.3, 0.05, swell=0.3)
+    for k in range(int(seat1) + 1, int(C0)):                  # he shoves once a second; he never stops
         if abs(k - b2) > 0.3 and abs(k - b3) > 0.3 and not (b2 + 0.6 < k < b2 + 3.6):
             _knock(mix, k, 0.2 if B + 4.95 <= k < b2 else 0.1)
     # bolt 1 · "Someone trapped him."
@@ -314,7 +319,7 @@ def sound(mix):
         mix.click(B + 5.3 + 0.4 * q, 0.07 * 0.7 ** q, 0.1, 3000, 0.02)
     _tick(mix, B + 5.6)
     # bolt 2 · "Trying to save a hot Cheeto."
-    _fizz(mix, B + ST.SINK0, C - 6.0 - 0.1, 0.03)
+    _fizz(mix, B + ST.SINK0, b3 - 0.1, 0.03)
     mix.whoosh(B + 7.6, 0.35, 0.1, -0.3)                      # he slams up the pane
     _knock(mix, B + 7.93, 0.3)
     for q in range(6):                                        # one wing down the glass, keeping pace with it
@@ -336,9 +341,9 @@ def sound(mix):
 
     # --- III. the trout think
     for k in range(7):                                        # the pink square coloured in, corner to corner
-        _scratch(mix, C + 0.35 + 0.135 * k, C + 0.47 + 0.135 * k, 0.07, seed=k)
-    mix.click(C + 1.4, 0.2, 0.3, 2500, 0.04)
-    mix.note(C + 1.42, 554, 0.3, 0.12, 0.3, "tri")            # the button goes down
+        _scratch(mix, C0 + 0.35 + 0.135 * k, C0 + 0.47 + 0.135 * k, 0.07, seed=k)
+    mix.click(C0 + 1.4, 0.2, 0.3, 2500, 0.04)
+    mix.note(C0 + 1.42, 554, 0.3, 0.12, 0.3, "tri")           # the button goes down
     _bolt(mix, 4, b4)
     k = 0
     while river + 0.2 + k / 12.0 < b5 - 0.25:                 # "A movie.": the hand-cranked clatter of the picture

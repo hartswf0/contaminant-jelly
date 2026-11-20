@@ -30,17 +30,22 @@ import world as Wd                                                        # noqa
 from PIL import Image, ImageDraw, ImageFilter                            # noqa: E402
 from kit import clamp, ramp, ease, smooth, lerp, lerp2                    # noqa: E402,F401
 
-SECONDS = 10.9
-CAPTIONS = [
+# Repair: the pick is held PICK_HOLD seconds longer (the pink square lit for over a second) before the iris shuts.
+# Everything after keeps its own clock (INNER time = module time - PICK_HOLD), a whole second: breaths stay in step.
+PICK_HOLD = 1.0
+INNER_SECONDS = 10.9
+SECONDS = INNER_SECONDS + PICK_HOLD
+_CAPS = [
     (2.7, 8.3, "A movie."),
 ]
+CAPTIONS = [(a + PICK_HOLD, b + PICK_HOLD, s) for a, b, s in _CAPS]
 
 T_RIVER = 2.05          # the iris is shut here: table -> river side
 S4, S5, S6 = 2.5, 8.5, 9.7
 IRIS = 0.2              # half an iris move
 IRIS_Q = 0.14           # half of the quick iris between the two blanks
 TICK = 5.5              # the breath at which the dial drops its notch (5 -> 4)
-ROWS = ((4, 420, 112), (5, 458, 132))
+ROWS = ((4, 413, 112), (5, 450, 132))      # lifted a little: the caption sits whole under the front row
 AUD_X = (330, 800)
 SWIM_IN = 620.0         # how far left of their places the trout start (off the frame's edge)
 
@@ -55,7 +60,7 @@ def _iris_f(t):
     for a, h in ((T_RIVER, IRIS), (S5, IRIS), (S6, IRIS_Q)):
         if a - h <= t < a + h:
             f = max(f, ease(t, a - h, a) if t < a else 1 - ease(t, a, a + h))
-    return max(f, ease(t, SECONDS - IRIS, SECONDS))
+    return max(f, ease(t, INNER_SECONDS - IRIS, INNER_SECONDS))
 
 
 # ------------------------------------------------------------------ R0: the pick ---
@@ -107,7 +112,8 @@ def _pick_table(t, ink):
         lift = 0.0
     else:                                                          # and goes away: nothing is drawn in the ring
         k = ease(t, 1.3, 1.75)
-        tip = (tip[0] + 150 * k, tip[1] + 130 * k)
+        k = ease(t, 1.3, 2.1)                                       # right off the table: the held card is left alone
+        tip = (tip[0] + 420 * k, tip[1] + 330 * k)
         lift = min(1.0, 2 * k)
     Wd.pencil(ink, tip, lift=lift)
 
@@ -160,14 +166,19 @@ def _movie(t, ink):
 
 
 def _blank(t, ink, n):
-    _stage(ink, t, movie=False, audience=False, turkey=False, dial=None, bolt=n, lit=0.0)
+    # the die is shown at full contrast (the emptiness is the stage's, not the die's); the dial stays riveted on
+    # the tin where bolt 4 left it
+    _stage(ink, t, movie=False, audience=False, turkey=False, dial=4.0, bolt=n, lit=1.0)
 
 
 # ------------------------------------------------------------------------- draw ---
 def draw(t, ink):
     t = clamp(t, 0.0, SECONDS - 1e-6)
+    hold0 = T_RIVER - IRIS                            # the pick is held here, lit, before the iris moves
+    tp = t                                            # the pick's own clock runs on (the halo keeps glimmering)
+    t = t if t < hold0 else (hold0 if t < hold0 + PICK_HOLD else t - PICK_HOLD)
     if t < T_RIVER:
-        _pick(t, ink)
+        _pick(tp, ink)
     elif t < S5:
         _movie(t, ink)
     elif t < S6:
@@ -183,7 +194,7 @@ def draw(t, ink):
 def check():
     assert all(0 <= a < b <= SECONDS and b - a >= 2.5 for a, b, _ in CAPTIONS)
     assert [c[2] for c in CAPTIONS] == ["A movie."]                # bolts 5 and 6 are blank: no caption, no letter
-    assert all(S4 <= a and b <= S5 for a, b, _ in CAPTIONS)
+    assert all(S4 <= a and b <= S5 for a, b, _ in _CAPS)
     assert abs(_notches(S4) - 5) < 1e-6 and abs(_notches(S5 - 0.05) - 4) < 1e-6
     assert abs(TICK * Wd.BREATH_HZ - round(TICK * Wd.BREATH_HZ)) < 1e-9          # the notch drops on a breath
 

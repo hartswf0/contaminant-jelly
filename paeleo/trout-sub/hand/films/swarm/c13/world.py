@@ -30,7 +30,7 @@ SRC = FILMS / "sources" / "c13"
 
 PAL = dict(
     table=(118, 86, 58), table_dk=(84, 58, 38), sheet=(246, 244, 238), sheet_edge=(214, 210, 200),
-    print=(52, 50, 48), pencil=(96, 96, 104), pencil_soft=(138, 138, 146),
+    print=(52, 50, 48), pencil=(62, 62, 70), pencil_soft=(138, 138, 146),
     water_top=(150, 196, 180), water_mid=(62, 128, 126), water_deep=(20, 60, 66), shaft=(226, 236, 190),
     stone=(124, 132, 120), stone_dk=(70, 80, 74), stone_lt=(170, 176, 160),
     moss=(96, 134, 62), moss_dk=(56, 92, 46), moss_lt=(150, 176, 84),
@@ -656,6 +656,15 @@ def _build_pilot():
     add("weed_l", [(300, 1076), (304, 1000), (344, 986), (358, 908), (384, 900), (394, 960), (414, 906), (434, 950), (454, 916),
                    (474, 966), (500, 926), (520, 986), (544, 946), (560, 990), (580, 950), (572, 1000), (552, 1010)], 0.85, per=6)
     add("weed_l", [(552, 1010), (546, 1060), (556, 1110), (540, 1150), (548, 1202)], 0.75)
+    # she made the bell tiny: shrink the bell (not the far end of its twig) about the point it hangs from
+    for st in G:
+        if st["group"] == "bell":
+            px, py = _c2n([(852, 300)])[0]
+            out = []
+            for x, y in st["pts"]:
+                k = 0.6 + 0.4 * clamp((x - _c2n([(960, 0)])[0][0]) / (_c2n([(1060, 0)])[0][0] - _c2n([(960, 0)])[0][0]))
+                out.append((px + (x - px) * k, py + (y - py) * k))
+            st["pts"] = out
     # a fixed hand-wobble: the child's line is not smooth
     rs = random.Random(13)
     for st in G:
@@ -669,9 +678,9 @@ PILOT_GROUPS = ["fish1", "bubble", "bell", "weed_r", "fish2", "weed_l"]         
 PILOT_TIMES = {"fish1": (0.15, 2.2), "bubble": (2.3, 4.0), "bell": (4.1, 5.4), "weed_r": (5.5, 6.2), "fish2": (6.3, 8.0),
                "weed_l": (8.1, 8.75)}                                           # the board's A1 to A6, in seconds
 PILOT_PLACES = dict(        # where things sit in the drawing, ring units (multiply by r, add the centre)
-    fish1=(-0.07, -0.24), fish1_len=0.86, fish1_angle=-4.0,
+    fish1=(-0.045, -0.21), fish1_len=0.86, fish1_angle=-4.0,
     fish2=(0.49, 0.24), fish2_len=0.80, fish2_angle=20.0,
-    bubble=(-0.31, -0.69), bubble_tail=(-0.35, -0.42), bell=(0.24, -0.60), bell_top=(0.16, -0.78),
+    bubble=(-0.31, -0.69), bubble_tail=(-0.35, -0.42), bell=(0.21, -0.66), bell_top=(0.163, -0.758),
     weed_r=(0.80, 0.40), weed_l=(-0.48, 0.52),
 )
 
@@ -683,11 +692,11 @@ def ring_xy(u, v, c=PORT_C, r=PORT_R):
 
 def _pencil_line(d, pts, weight, sc, alpha=1.0, color=None):
     col = color or PAL["pencil"]
-    w = max(1, int(round(1.9 * weight * sc)))
-    a = int(clamp(175 + 45 * weight, 0, 245) * alpha)
+    w = max(2, int(round(2.7 * weight * sc)))                 # she pressed: a soft dark line, not a hairline
+    a = int(clamp(205 + 40 * weight, 0, 252) * alpha)
     d.line(pts, fill=col + (a,), width=w, joint="curve")
     if weight >= 1.0 and len(pts) > 1:                        # a second, lighter pass: graphite is never one clean line
-        d.line([(x + 0.7 * sc, y + 0.5 * sc) for x, y in pts], fill=col + (int(a * 0.35),), width=1)
+        d.line([(x + 0.9 * sc, y + 0.7 * sc) for x, y in pts], fill=col + (int(a * 0.4),), width=max(1, w - 1))
 
 
 def pilot_drawing(ink, done=1.0, c=PORT_C, r=PORT_R, alpha=1.0, color=None):
@@ -1414,6 +1423,40 @@ def speech_bubble(ink, tail, scale=1.0, angle=0.0, alpha=1.0, shadow=0.6):
     put(ink, spr, tail[0] + ox, tail[1] + oy, angle=angle, alpha=alpha, shadow=shadow, shadow_off=(3, 5), shadow_blur=3)
 
 
+def bubble_on(ink, x, y, heading, length, scale=0.5, alpha=1.0, glass=(PORT_C, PORT_R), keep_off=None):
+    """Pin the bubble to a trout: centre (x, y), compass heading (0 up, clockwise), length. The bubble floats just
+    ahead of and above the trout's mouth (beside it, on the glass-centre side, when the nose points down), is kept
+    inside the round glass and off `keep_off` = [(cx, cy, r), ...], and a pencil string ties it to the mouth, so
+    whose words they are is never in doubt. Returns the bubble's centre."""
+    a = math.radians(heading)
+    fx, fy = math.sin(a), -math.cos(a)
+    mx, my = x + 0.47 * length * fx, y + 0.47 * length * fy
+    down = max(fy, 0.0)
+    (gx, gy), gr = glass
+    ix, iy = gx - mx, gy - my
+    n = math.hypot(ix, iy) or 1.0
+    sx = 0.55 * fx + 1.2 * down * ix / n
+    sy = -max(0.0, 1.0 - 1.2 * down) + 0.55 * fy + 1.2 * down * iy / n
+    n = math.hypot(sx, sy) or 1.0
+    spr, tp = _bubble_spr(int(round(150 * scale)))
+    rad = 0.5 * max(spr.width, spr.height) * 0.86
+    bx, by = mx + sx / n * (rad + 16), my + sy / n * (rad + 16)
+    for _ in range(4):                                   # pushed clear of each, and again until clear of all
+        for (kx, ky, kr) in (keep_off or ()):
+            d = math.hypot(bx - kx, by - ky)
+            if d < kr + rad:
+                ux, uy = ((bx - kx) / d, (by - ky) / d) if d > 1e-6 else (0.0, -1.0)
+                bx, by = kx + ux * (kr + rad + 1), ky + uy * (kr + rad + 1)
+    d = math.hypot(bx - gx, by - gy)
+    lim = gr - rad - 4
+    if d > lim:
+        bx, by = gx + (bx - gx) * lim / d, gy + (by - gy) * lim / d
+    col = PAL["pencil"] + (int(235 * alpha),)
+    ink.d.line([(mx, my), (bx, by)], fill=col, width=2)
+    put(ink, spr, bx, by, alpha=alpha, shadow=0.5, shadow_off=(3, 5), shadow_blur=3)
+    return bx, by
+
+
 @lru_cache(maxsize=8)
 def _bubble_spr(width):
     K = 2
@@ -1572,7 +1615,7 @@ def bolt_mark(ink, n, lit=1.0, die=True, c=PORT_C, r=PORT_R, size=30, style="ivo
     return x, y
 
 
-def gauge(ink, notches=8.0, x=None, y=None, r=46, tremble=0.0, t=0.0):
+def gauge(ink, notches=8.0, x=None, y=None, r=54, tremble=0.0, t=0.0):
     """The air gauge: a brass dial with 8 notches and one needle. notches 8 = full, 0 = empty (give it a float and
     ease it so the needle falls). Default place STAGE['gauge'] (low right inside the seat). tremble shakes the needle."""
     x = STAGE["gauge"][0] if x is None else x
@@ -1586,7 +1629,11 @@ def gauge(ink, notches=8.0, x=None, y=None, r=46, tremble=0.0, t=0.0):
         p0 = (x + math.cos(a) * r * 0.56, y + math.sin(a) * r * 0.56)
         p1 = (x + math.cos(a) * r * 0.76, y + math.sin(a) * r * 0.76)
         ink.d.line([p0, p1], fill=PAL["pip"] + (255,), width=3 if k % 4 == 0 else 2)
-    ink.d.text((x, y + r * 0.42), "AIR", font=font("mono", max(9, int(r * 0.24))), fill=PAL["pip"] + (255,), anchor="mm")
+    for k in range(0, 9, 2):                                   # the notches are numbered, so a fall can be read
+        a = math.radians(135 + 270 * k / 8)
+        ink.d.text((x + math.cos(a) * r * 0.4, y + math.sin(a) * r * 0.4), str(k), font=font("mono", max(8, int(r * 0.21))),
+                   fill=PAL["pip"] + (255,), anchor="mm")
+    ink.d.text((x, y + r * 0.62), "AIR", font=font("mono", max(8, int(r * 0.19))), fill=PAL["pip"] + (255,), anchor="mm")
     a = math.radians(135 + 270 * clamp(notches / 8.0) + tremble * 3 * math.sin(t * 37))
     tipn = (x + math.cos(a) * r * 0.66, y + math.sin(a) * r * 0.66)
     tail = (x - math.cos(a) * r * 0.16, y - math.sin(a) * r * 0.16)
@@ -1610,7 +1657,10 @@ def sweep(ink, new_img, f, c=PORT_C, arm=True, length=None):
         return
     R = int(math.hypot(ink.w, ink.h))
     m = Image.new("L", (ink.w, ink.h), 0)
-    ImageDraw.Draw(m).pieslice([c[0] - R, c[1] - R, c[0] + R, c[1] + R], -90, -90 + 360 * f, fill=255)
+    # the revealed wedge is cut as a polygon whose last edge IS the arm (a pieslice this large comes out square)
+    steps = max(2, int(360 * f / 3) + 1)
+    wedge = [c] + [clock_xy(c, 2 * R, 360 * f * k / steps) for k in range(steps + 1)]
+    ImageDraw.Draw(m).polygon(wedge, fill=255)
     ink.img.paste(new_img.convert("RGB"), (0, 0), m)
     ink.d = ImageDraw.Draw(ink.img, "RGBA")
     if arm:

@@ -27,12 +27,19 @@ from PIL import Image, ImageDraw, ImageFilter                              # noq
 import world as Wd                                                        # noqa: E402
 from kit import clamp, ramp, ease, smooth, lerp, lerp2                    # noqa: E402,F401
 
-SECONDS = 18.0
-CAPTIONS = [
+# Repair: the pick is held PICK_HOLD seconds longer (lit red circle and the drawn small circle, a second and more)
+# before the iris shuts. Everything after the pick keeps its own clock (INNER time = module time - PICK_HOLD); a
+# whole second, so the film's breath and shove clocks still fall on the same beats.
+PICK_HOLD = 1.0
+INNER_SECONDS = 18.0
+SECONDS = INNER_SECONDS + PICK_HOLD
+_CAPS = [
     (2.8, 6.7, "Someone trapped him."),
     (7.3, 11.7, "Trying to save a hot Cheeto."),
     (12.3, 17.6, "That's his home."),
 ]
+CAPTIONS = [(a + PICK_HOLD, b + PICK_HOLD, s) for a, b, s in _CAPS]
+ZOOM = 1.45             # the card is looked at closer, so its lettering and the lit button read at a glance
 
 C = Wd.PORT_C
 R = Wd.PORT_R
@@ -62,7 +69,7 @@ def _iris_f(t):
     for a in (T_SEAT, S2, S3):
         if a - IRIS <= t < a + IRIS:
             f = max(f, ease(t, a - IRIS, a) if t < a else 1 - ease(t, a, a + IRIS))
-    return max(f, ease(t, SECONDS - IRIS, SECONDS))
+    return max(f, ease(t, INNER_SECONDS - IRIS, INNER_SECONDS))
 
 
 def _cross_y(x, r=R):
@@ -88,7 +95,17 @@ def _outside(i, t, shift=(0.0, 0.0), fish_kw=None):
 
 
 # ------------------------------------------------------------------ T0: the pick ---
-def _pick(t, ink):
+def _pick(t, ink0):
+    ink = Wd.offscreen(ink0)
+    _pick_table(t, ink)
+    w, h = ink0.w / ZOOM, ink0.h / ZOOM
+    cx, cy = 490, 262
+    box = (int(cx - w / 2), int(cy - h / 2), int(cx + w / 2), int(cy + h / 2))
+    ink0.img.paste(ink.img.convert("RGB").crop(box).resize((ink0.w, ink0.h), Image.LANCZOS), (0, 0))
+    ink0.d = ImageDraw.Draw(ink0.img, "RGBA")
+
+
+def _pick_table(t, ink):
     Wd.table(ink, sheet=False)
     scrib = ramp(t, 0.3, 1.15)
     press = ease(t, 1.15, 1.35)
@@ -241,7 +258,7 @@ def _home(t, ink):
     push = ease(t, 12.9, 15.4)
     gate_open = ease(t, 13.1, 13.7) - ease(t, 16.9, 17.5)
     lamp = ease(t, 14.45, 14.7)
-    closed = ease(t, 16.15, 17.25)
+    closed = 0.42 * ease(t, 16.15, 17.25)       # drawn part way only: the lamp-lit room stays in view to the end
     rb = R * (1 + 0.5 * push)
     part = 74 * push                                   # ... and the uprights slide apart as we pass between them                 # the bars' plane comes toward us and parts (nearest fastest)
     hh = Wd.home_hole(push)
@@ -298,15 +315,18 @@ def _home(t, ink):
     sh = Wd.shove(t)
     Wd.seat_scene(ink, t, behind=behind, fish=False, tunnel_on=False, cross=False, only=[],
                   notches=_notches(t, [13.5, 15.0, 16.5]),
-                  fog_level=lerp(0.18, 0.36, ramp(t, S3, 16.6)) + 0.34 * ease(t, 16.8, 17.8), bolt=3, leak_since=S3,
+                  fog_level=lerp(0.18, 0.36, ramp(t, S3, 16.6)) + 0.12 * ease(t, 16.8, 17.8), bolt=3, leak_since=S3,
                   turkey_kw=dict(cx=REFL[0] + 7 * sh, cy=REFL[1] - 5 * sh))
 
 
 # ------------------------------------------------------------------------- draw ---
 def draw(t, ink):
     t = clamp(t, 0.0, SECONDS - 1e-6)
+    hold0 = T_SEAT - IRIS                             # the pick is held here, lit, before the iris moves
+    tp = t                                            # the pick's own clock runs on (all its moves are done by 2.05)
+    t = t if t < hold0 else (hold0 if t < hold0 + PICK_HOLD else t - PICK_HOLD)
     if t < T_SEAT:
-        _pick(t, ink)
+        _pick(tp, ink)
     elif t < S2:
         _trapped(t, ink)
     elif t < S3:
@@ -323,7 +343,7 @@ def check():
     assert all(0 <= a < b <= SECONDS and b - a >= 2.5 for a, b, _ in CAPTIONS)
     assert all(b0 <= a1 for (_, b0, _), (a1, _, _) in zip(CAPTIONS, CAPTIONS[1:]))
     assert [c[2] for c in CAPTIONS] == ["Someone trapped him.", "Trying to save a hot Cheeto.", "That's his home."]
-    for a, b, ticks, end in ((S1, S2, [5.5], 4), (S2, S3, [8.5, 10.5], 3), (S3, SECONDS, [13.5, 15.0, 16.5], 2)):
+    for a, b, ticks, end in ((S1, S2, [5.5], 4), (S2, S3, [8.5, 10.5], 3), (S3, INNER_SECONDS, [13.5, 15.0, 16.5], 2)):
         assert abs(_notches(a, ticks) - 5) < 1e-6 and abs(_notches(b - 0.05, ticks) - end) < 1e-6
 
 

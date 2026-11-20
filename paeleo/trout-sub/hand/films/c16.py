@@ -310,14 +310,14 @@ def sound(mix):
     x = mix.band(mix.noise(1.6), 200, 1400) * np.hanning(int(1.6 * mix.rate))[: int(1.6 * mix.rate)]
     mix.add(x, ST.T_RIPPLE, 0.06)                                      # the pond takes one slow ripple
 
-    # --- the bolts as they come up: outline pencilled, then the mark D frames later
+    # --- the bolts as they come up: a written one is pencilled, then rings D frames later
     for n in range(1, 7):
         at = BOLT_AT[n]
-        scratch(at + 0.03, at + 0.4, 0.06, bolt_pan[n], seed=40 + n)
         if n in WRITTEN:
+            scratch(at + 0.03, at + 0.4, 0.06, bolt_pan[n], seed=40 + n)
             twice(bell, at + DT, n, gain=0.28, pan=bolt_pan[n])
-        else:
-            knock(at + DT, n, 0.3, bolt_pan[n])
+        else:                                                          # a blank has no outline-then-double: the die
+            knock(at + 0.04, n, 0.3, bolt_pan[n])                      # face is simply there, and one dead knock
 
     # --- B3: the heads tilt to look at the second one, D apart
     for k in range(3):

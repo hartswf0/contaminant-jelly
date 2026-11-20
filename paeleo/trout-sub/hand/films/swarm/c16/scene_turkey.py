@@ -1,7 +1,7 @@
 """c16 · scene_turkey · Turkey thinks (board part B, 20.0 to 32.0 s of the film). All from Turkey's SEAT.
 
 B0  0.0 ..  3.0  the pick: green triangle, "Pond mirror", B.; B.'s own triangle pencilled; the button presses; one ripple
-B1  3.0 ..  4.2  bolt 1, Probable: BLANK      die face 1 at 12 o'clock, an empty lit stage through the glass
+B1  3.0 ..  4.2  bolt 1, Probable: BLANK      die face 1 at 12 o'clock, an empty lit stage through the glass (no outline first)
 B2  4.2 ..  5.4  bolt 2, Plausible: BLANK     die face 2 at 2 o'clock, the same empty lit stage
 B3  5.4 .. 12.0  bolt 3, Preposterous: "There is another turkey here."   the answering wing comes up INSIDE the tin,
                  in front of the brass rim; Turkey's head turns to the seat beside him; the camera eases back to
@@ -56,6 +56,7 @@ T_HEAD = 27.25                              # Turkey's head: glass drawing -> se
 T_EASE = (27.5, 28.9)                       # the camera eases back: two backs, one porthole
 T_TWO = 27.0 + Wd.DT                        # the pond's window shows two turkeys, D frames after the wing in here
 OTHER = (318, 424, Wd.SEAT_OTHER[2])       # the other turkey's shoulder pin: nearer the glass than Wd.SEAT_OTHER, so the gauge stays in view
+LIFT = 52                                   # both turkeys sit this much higher at bolt 3, so the low waves clear the caption
 T_TILT = 28.3                               # head 0 tilts to look at the second one; heads 1, 2 follow D, 2 D later
 SOLO = (20.5, 21.5, 22.5, 25.5, 26.5, 27.5)                 # Turkey's wave peaks while he is the only one waving
 DUO = (28.5, 29.5, 30.5)                                    # ... and once there are two: two drops a wave
@@ -115,10 +116,11 @@ def _pick(G, ink):
 
 
 def _blank(G, ink, n, t_in):
-    """An unwritten bolt: its die face on the rim (outline, then its painted double), and nothing through the glass."""
+    """An unwritten bolt: its die face on the rim, and nothing through the glass. A blank has no double: the die
+    face is there, painted and unlit, from the first frame, so it reads for the whole of its second."""
     Wd.empty_stage(ink)
     Wd.cabin(ink, Wd.on_twos(G))
-    Wd.die_at_bolt(ink, n, size=46, lit=False, outline=Wd.arrive(G, t_in) == 1)
+    Wd.die_at_bolt(ink, n, size=46, lit=False, outline=False)
 
 
 def _bolt3(G, ink):
@@ -134,11 +136,13 @@ def _bolt3(G, ink):
         # drop shadow is the contact shadow on the brass and on the gauge. It slides in along the seat as it waves.
         sl = 1 - ease(g, T_OTHER, T_OTHER + 0.9)                # in from the lower left, wing first
         ok = {**Wd.wave_pose(g, energy, WAVE_T0, twin=True), "mirror": True}
-        Wd.turkey_back(ink, OTHER[0] - 230 * sl, OTHER[1] + 90 * sl, OTHER[2], t=g - Wd.DT, shade=0.16, **ok)
-    Wd.turkey_back(ink, Wd.SEAT_TURKEY[0], Wd.SEAT_TURKEY[1], Wd.SEAT_TURKEY[2], t=g, shade=0.16,
+        Wd.turkey_back(ink, OTHER[0] - 230 * sl, OTHER[1] - LIFT + 90 * sl, OTHER[2], t=g - Wd.DT, shade=0.16, **ok)
+    Wd.turkey_back(ink, Wd.SEAT_TURKEY[0], Wd.SEAT_TURKEY[1] - LIFT, Wd.SEAT_TURKEY[2], t=g, shade=0.16,
                    head="seat" if g >= T_HEAD else "glass", **Wd.wave_pose(g, energy, WAVE_T0))
     s = Wd.arrive(G, T_B3)
-    Wd.die_at_bolt(ink, 3, size=46, lit=s == 2, outline=s == 1, t=g)
+    bx, by = Wd.die_at_bolt(ink, 3, size=46, lit=s == 2, outline=s == 1, t=g)
+    if s == 1:                                                  # the same outline gone over once more, so it holds on the brass
+        Wd.die(ink, 3, bx + 1, by + 1, 46, outline=True, color=Wd.DARK)
     u = ease(G, *T_EASE)
     Wd.camera(ink, lerp(CAM_B3[0], W / 2, u), lerp(CAM_B3[1], H / 2, u), lerp(CAM_B3[2], 1.0, u))
 

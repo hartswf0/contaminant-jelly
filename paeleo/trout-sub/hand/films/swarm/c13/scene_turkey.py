@@ -36,6 +36,8 @@ DOME = (480, 400)                  # Turkey's reflection, under the bell's dome
 DOME_PILOT = (480, 385)            # ... where the pilot's last shot left it (B0 eases from there behind the card)
 REFL_H = 230
 BEAK = (DOME[0] + 46, DOME[1] - 62)
+KEEP_OFF = [(DOME[0] + 16, DOME[1] - 62, 56), (480, 205, 44)]       # the bubble is the trout's: never on his beak or the bell
+REFL_A = 0.66                      # he is a reflection on the glass, thinner than the trout outside
 CORD = 70                          # the cord, taken up a little so the knot hangs clear of his crest
 L_LEAD = 140                       # the two trout of the drawing
 L_CROWD = 116                      # the ones that pour in for bolt 2
@@ -137,7 +139,7 @@ def _flash(t, strikes):
 
 
 def _finish(ink, t, n, gauge, tremble, mood, bubble_fn=None, strikes=()):
-    w.turkey_reflection(ink, DOME[0], DOME[1], REFL_H, mood, t, alpha=0.85)
+    w.turkey_reflection(ink, DOME[0], DOME[1], REFL_H, mood, t, alpha=REFL_A)
     if bubble_fn:
         bubble_fn()
     _shiver(ink, t, strikes)
@@ -178,12 +180,12 @@ def _peaks(rel_fn, t0, t1, floor):
     return out
 
 
-def _lead_in(t, t0, tg):
-    """The upper trout, whose turn it is, leaves its drawing place and comes round clockwise, over the top and
-    down behind the bell, to the knot: heading west with its mouth on it."""
+def _lead_in(t, t0, tg, a0=-90.0, r0=132.0, c0=(480, 306)):
+    """The upper trout, whose turn it is, leaves its place (nose up at the left pillar, where the pilot's page left
+    it) and comes round clockwise, over the top and down behind the bell, to the knot: heading west, mouth on it."""
     e = ease(t, t0, tg)
-    c = lerp2((480, 290), (KNOT0[0] + MOUTH * L_LEAD, KNOT0[1] - 90), e)
-    return _circ(c, lerp(72, 90, e), lerp(-42, 180, e))
+    c = lerp2(c0, (KNOT0[0] + MOUTH * L_LEAD, KNOT0[1] - 90), e)
+    return _circ(c, lerp(r0, 90, e), lerp(a0, 180, e))
 
 
 def _hold_heading(t, tg, tr):
@@ -197,8 +199,8 @@ def _knot_at(sw, cl, co, hoist=0.0):
 def _low_in(t, t0, t1):
     """The lower trout goes round under the dome to the waiting place at nine o'clock and stops there."""
     e = ease(t, t0, t1)
-    c = lerp2((480, 290), C, e)
-    return _circ(c, lerp(90, 162, e), lerp(108, WAIT_A, e))
+    c = lerp2((480, 306), C, e)
+    return _circ(c, lerp(132, 162, e), lerp(90, WAIT_A, e))
 
 
 WAIT_A = 258.0                     # the waiting place (nine o'clock), nose up, mouth shut
@@ -210,20 +212,20 @@ T_CARD_IN = (0.0, 0.55)
 T_LOOP = (0.75, 1.55)
 T_PRESS = (1.6, 1.9)
 T_CARD_OUT = (2.15, 2.85)
-T_DISC = (2.3, 2.95)               # the red disc that stayed behind drifts onto the bell
+T_DISC = (2.15, 2.95)               # the red disc that stayed behind drifts onto the bell
 BELL_DISC = (476, 206.5)
 
 
 def _b0(ink, t):
     _stage_back(ink, t)
-    x1, y1 = w.trout_on_circle(ink, (480, 306), 132, 450, L_LEAD + 10, amp=0.0, lid=0.45)
+    w.trout_on_circle(ink, (480, 306), 132, 450, L_LEAD + 10, amp=0.0, lid=0.45)
     settle = ease(t, 0.7, 2.0)                         # behind the card: the cord is taken up, he sinks a little
     w.bell(ink, part="cord", cord_len=lerp(92, CORD, settle))
     _stage_front(ink, t)
     w.bell(ink, part="body", disc="circle" if t >= T_DISC[1] else None)
-    w.trout_on_circle(ink, (480, 306), 132, 270, L_LEAD + 10, amp=0.0, lid=0.45)
-    w.speech_bubble(ink, (x1 - 10, y1 - 92), 0.62, shadow=0.5)
-    w.turkey_reflection(ink, DOME[0], lerp(DOME_PILOT[1], DOME[1], settle), REFL_H, "flap", t, alpha=0.85)
+    x1, y1 = w.trout_on_circle(ink, (480, 306), 132, 270, L_LEAD + 10, amp=0.0, lid=0.45)
+    w.bubble_on(ink, x1, y1, 0.0, L_LEAD + 10, 0.5, keep_off=KEEP_OFF)
+    w.turkey_reflection(ink, DOME[0], lerp(DOME_PILOT[1], DOME[1], settle), REFL_H, "flap", t, alpha=REFL_A)
     w.seat_frame(ink)
     w.gauge(ink, 5.0, tremble=0.4, t=t)
 
@@ -244,12 +246,15 @@ def _b0(ink, t):
             tip = (tip[0] + 260 * lift * lift * math.cos(a), tip[1] - 120 * lift * lift + 200 * lift * lift * math.sin(a))
             w.pencil(ink, tip, 50, lift=lift)
     # the red circle stays behind on the glass as a small disc, then settles on the bell (a clockwise curl)
-    if press > 0.5 and t < T_DISC[1]:
+    # (it comes off the button only as the card leaves, so there is never a second red button on the card)
+    if T_DISC[0] <= t < T_DISC[1]:
         home = _RED_HOME
         f = ease(t, *T_DISC)
         p = lerp2(home, BELL_DISC, f)
         bow = 34 * math.sin(math.pi * f)
-        w.button_disc(ink, "circle", p[0] - bow * 0.5, p[1] - bow, r=lerp(15, 9, f), alpha=ease(t, T_PRESS[1], T_CARD_OUT[0] + 0.1))
+        ink.d.ellipse([p[0] - bow * 0.5 - 7, p[1] - bow + 16, p[0] - bow * 0.5 + 13, p[1] - bow + 26],
+                      fill=(0, 0, 0, int(70 * math.sin(math.pi * f))))                    # it is off the glass: a shadow
+        w.button_disc(ink, "circle", p[0] - bow * 0.5, p[1] - bow, r=lerp(11, 9, f))
 
 
 def _red_home():
@@ -343,7 +348,7 @@ def _b1(ink, t):
     lx, ly, lh, lst = _low1(t)
     fish(ink, lx, ly, lh, L_LEAD, roll=t > T_LOOK1B[0], phase=t * 7, amp=8.0 if t < S1 + 1.35 else 0.0,
          lid=0.45 if t > T_LOOK1B[0] else 0.12)
-    w.speech_bubble(ink, _bubble_tail(x, y, h), 0.5, shadow=0.5)
+    w.bubble_on(ink, x, y, h, L_LEAD, 0.5, keep_off=KEEP_OFF)
     _rings(ink, b["mouth"], t, STRIKES1)
     _grit(ink, t, STRIKES1)
     gasp = STRIKES1[0] < t < STRIKES1[0] + 1.0
@@ -366,8 +371,8 @@ TG2, TR2 = 8.9, 9.3
 T0 = 15.0                          # bolt 3: the first trout halts at twelve
 STEP = (60.0 - GAP) / SLOW         # ... and each next one this much later, clockwise
 T_LEAVE = 15.25                    # the upper trout leaves the ring for the bell
-T_HOLD = 17.75                     # it has the clapper in its mouth
-T_GONE = T_HOLD + 0.7              # the rings are back in the bell
+T_HOLD = 17.2                      # it has the clapper in its mouth
+T_GONE = T_HOLD + 0.6              # the rings are back in the bell
 T_STILL = T_GONE + 0.05            # from here nothing outside moves at all
 
 
@@ -428,6 +433,12 @@ _GOAL = {k: a_lead(T0) - GAP * k + (60.0 - GAP) * (N_FISH - 1 - k) for k in rang
 _TSTOP = {k: T0 + STEP * (N_FISH - 1 - k) for k in range(1, N_FISH)}
 for _k in range(1, N_FISH):
     assert abs((_GOAL[_k] - 60.0 * (N_FISH - 1 - _k) + 180.0) % 360.0 - 180.0) < 1.5, (_k, _GOAL[_k])
+# calm: once halted at its clock place each trout turns on, clockwise, until it lies level
+_LEVEL = {k: (90.0 - (60.0 * (N_FISH - 1 - k) + 90.0)) % 180.0 for k in range(1, N_FISH)}
+
+
+def _level(k, t):
+    return _LEVEL[k] * ease(t, _TSTOP[k] + 0.1, _TSTOP[k] + 0.7)
 
 
 def _wheel_fish(k, t):
@@ -505,7 +516,7 @@ while _AF < _A_LEAVE + 150.0:
 def _lead23(t, knot):
     """(x, y, heading, state) of the upper trout in bolts 2 and 3."""
     if t < TG2:
-        return _lead_in(t, S2 + 0.05, TG2) + ("TURN",)
+        return _lead_in(t, S2 + 0.05, TG2, -42.0, 72.0, (480, 290)) + ("TURN",)
     if t < TR2:
         h = _hold_heading(t, TG2, TR2)
         return _mouth_to_centre(knot, h, L_LEAD) + (h, "RING")
@@ -592,7 +603,7 @@ def _wheel_scene(ink, t, bolt):
             still = ease(t, _TSTOP[k] - 0.15, _TSTOP[k] + 0.5)
             waiting = k == 1 and fa < WAIT_A + 2
             _froth(ink, fx, fy, fh, t, k, q)
-            fish(ink, fx, fy, fh + _thrash(t, k, q), L_LEAD if k == 1 else L_CROWD, roll=not waiting,
+            fish(ink, fx, fy, fh + _thrash(t, k, q) + _level(k, t), L_LEAD if k == 1 else L_CROWD, roll=not waiting,
                  phase=ph + k * 1.3, amp=0.0 if waiting else lerp(8.0, 22.0, q) * (1 - still),
                  lid=0.8 * still if t > S3 else 0.1,
                  eye_roll=(t * 500 + k * 60) if q > 0.5 else None,
@@ -602,21 +613,8 @@ def _wheel_scene(ink, t, bolt):
             _froth(ink, x, y, h, t, 0, q)
         fish(ink, x, y, h + (_thrash(t, 0, q) if st == "CRAZY" else 0.0), L_LEAD, roll=not held, **lkw)
 
-    # "haha verry funny": towed behind the upper trout like a kite, then it settles and lies still
-    if t < TR2:
-        tail = _bubble_tail(x, y, h)
-        ang = 0.0
-    else:
-        lag = 0.16 * q
-        bx, by, bh, _ = _lead23(t - lag, knot)
-        dc = math.hypot(bx - C[0], by - C[1]) or 1.0
-        inward = ((C[0] - bx) / dc * 52, (C[1] - by) / dc * 52)
-        up = _bubble_tail(bx, by, bh)
-        tail = lerp2(up, (bx + inward[0], by + inward[1]), q)
-        if st == "CALM":                                # it settles clear of the bell, over the trout's back
-            tail = lerp2(tail, (642, 262), smooth(ramp(t, T_LEAVE + 0.8, T_HOLD)))
-        ang = 14.0 * math.sin(t * 11.0) * q
-    w.speech_bubble(ink, tail, 0.5, angle=ang, shadow=0.5)
+    # "haha verry funny": tied to the upper trout's mouth wherever it goes, then it lies still
+    w.bubble_on(ink, x, y, h, L_LEAD, 0.5, keep_off=KEEP_OFF)
 
     if bolt == 2:
         mood = "freak" if t < TR2 + 0.25 else "flap"
@@ -629,9 +627,7 @@ def _wheel_scene(ink, t, bolt):
         mood = "flap" if t < T0 else ("freak" if t < T_HOLD else "frozen")
 
         def bub():
-            w.bubbles(ink, BEAK, t, 14.3, n=7, rise=150.0, curl=90.0, size=7.0)
-            w.bubbles(ink, BEAK, t, 17.3, n=7, rise=150.0, curl=90.0, size=7.0, frozen_at=T_STILL)   # they hang where they are
-            w.bubbles(ink, (BEAK[0] + 4, BEAK[1]), t, 19.0, n=1, rise=120.0, curl=60.0, size=7.5)      # his one bubble
+            w.bubbles(ink, BEAK, t, 14.3, n=7, rise=150.0, curl=90.0, size=7.0)      # the last ones; gone before the hold
         _finish(ink, t, 3, _gauge3(t), 1.0 if t > T_HOLD else 0.5, mood, bub, strikes if t < T_HOLD + 0.2 else ())
 
 
