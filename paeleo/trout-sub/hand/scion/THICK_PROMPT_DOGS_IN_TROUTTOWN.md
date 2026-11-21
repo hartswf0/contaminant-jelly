@@ -24,6 +24,7 @@ and sometimes says no. Then the dog goes down again a different way.
 | The dog | Claude. A paper dog. | To bring back the right thing. | It cannot be ordered. It looks, decides, then moves. Ears and tail tell us first. |
 | The pack | Claude's agents. | Each wants one job done. | No two dogs are made the same way: a black cut-out, a wire dog, a wooden toy, a crepe-paper dog, a printed dog. |
 | The peoplefish | The trout of Trouttown: a class, a teacher, a diner, a main street. | To be shown as they really said it. | They talk in bubbles with pictures in them, never words. |
+| The cows | The old way of working. | To get to the water the way they always have. | Single file, one gate, a worn path nobody chose. The lead cow has a crooked horn and a bell. They cannot go under. They are never villains. |
 | The old dog | The critic. | Nothing. It built nothing. | It lies across the sill, half in, half out. It can turn its back. |
 | The water | The line between asking and doing. | | Every crossing is a shot: down through the surface, up through it, shaking off. |
 
@@ -73,6 +74,13 @@ lamp and shakes their head. The dog's ears go down. It does not argue. It turns,
 dogs go under at once, and the old dog on the sill watches every reel that comes up, and turns its back
 on one. That builder goes down again. The last shot: reels stacked on the sill, the dog lying across it
 half in and half out, and under the surface the fish children looking up at the lit door.
+
+**The weave.** The porch stands where the cow path meets the creek, so cows and dogs share every scene.
+The herd goes one at a time; the pack goes all at once; the film lets us see both. In each sequence a cow
+and a dog deal with each other: noses touch as the herd files past; the lead cow watches from the bank
+where she cannot follow; the calf tries to go with the dog and is nosed back; the herding dog turns the
+herd aside to open the way; the lead cow stamps the ice open over the trapped dogs; the cows stand round
+the eleven wet dogs to warm them; at the end she folds down beside the old dog on the sill.
 
 ## 6 · Hard rules
 - **It is a cartoon.** Characters notice, want, try, meet resistance and change. Hold when they think.
