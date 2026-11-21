@@ -915,7 +915,8 @@ def classify(g):
         wedge = 'wedge' in both or 'join' in both
         if 'band' in both:
             res['binding'] += 1
-        elif wedge and ('cleft' in both or 'top_' in both) and g.t >= T['seat'] - 0.05:
+        elif g.t >= T['seat'] - 0.05 and (('shoot' in both and 'cleft' in both) or (wedge and 'top_' in both)
+                                           or ('cleft' in both and 'top_' in both and g.t >= T['heal'][0])):
             res['union'] += 1                     # the wedge in the wood, and the wood closing over it
         elif wedge and 'twig' in both and T['pinch'] <= g.t <= T['free'] + 0.05:
             res['union'] += 1                     # the contour pinching shut through the foot of the shoot: the cut
