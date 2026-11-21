@@ -15,13 +15,13 @@ Play. You sit in a group of three with one printed page. The first person draws 
 
 Judge. Your group swaps pages with another group. You receive a class page and the film made from it. You mark three things: what the film kept, what the film added, and what you cannot tell. Nobody judges their own work.
 
-You do not need drawing skill, an AI account, or a device. You can draw, write, or tell a partner what to write. The presenter reads every instruction aloud, and every instruction is printed in large type. The films have captions and narration. You share with the room only if you choose to. The three classroom rules apply here: blank is okay, wild is good, being stuck is okay too.
+You do not need drawing skill, an AI account, or a device. You can draw, write, or tell a partner what to write. A presenter reads every instruction aloud, and every instruction is printed in large type. The films have captions and narration. You share with the room only if you choose to. The three classroom rules apply here: blank is okay, wild is good, being stuck is okay too.
 
 ## Conference Track
 Track 1: Advancing Learning Through Innovation and AI
 
 ## Session Type
-Concurrent Session, one presenter. Willing to present as a hands-on workshop: Yes.
+Concurrent Session, two presenters. Willing to present as a hands-on workshop: Yes.
 
 ## Takeaways
 1. A one-page game where students write the rules. You get one sheet, three seats, one pass to the left, three kinds of ending, and one die. You leave with the sheet, the numbered slips for all 55 portholes, and a six-minute film that teaches the steps to a class.
@@ -31,7 +31,10 @@ Concurrent Session, one presenter. Willing to present as a hands-on workshop: Ye
 3. Four labels for any AI claim. Label each claim measured, checked by structure, judged by a viewer, or unknown. You also see two ways an AI makes a film. A video model guesses pixels. A language model writes drawing code under stated rules. Use both with students to ask three questions of any AI output. What did it keep? What did it add? Who decided?
 
 ## Session Audience
-Elementary educators. STEAM, STEM, arts, and media specialists. Instructional coaches and curriculum leaders. Museum, library, and after-school educators. Higher education.
+Select: Teacher leaders, Content Specialists, Academic Coaches, Informal Educators, Curriculum and Afterschool Coordinators, Artists, Researchers.
+
+## Presenters
+Lead: Watson Hartsoe, Georgia Institute of Technology. Additional: Amy Hartsoe, Blount County Schools (Tennessee).
 
 ## Uploads
 1. tourkey/one-sheet.pdf, the page participants play.
