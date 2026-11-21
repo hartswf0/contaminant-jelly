@@ -46,6 +46,15 @@ Built here (missing elsewhere):
     which is exactly town.dig_holes(7). _hole() is town's own pit, copied; check() compares the two pictures.
   * a pebble that slides along the rail from the seated hand to its place (porch puts pebbles at the far
     left of the rail, out of a seated arm's reach).
+  * cow_state/_gate_layer: herd.py hands a cow from the hill pass to the strip pass at the START of her turn in
+    the gate, 93 % wide, so she jumps in front of the gate posts. Here she changes pass edge-on (check() found it).
+
+Joins. Local 0 is S2's last frame (s2.py at 30.0: F-TOWN, the dog at (430, 550) with the page, her muzzle on the
+line, the waver under it, three holes, boot, spool, pin). Local 26 is S4's first frame as s4.py draws it at 84.0:
+door 0.62, dusk 0.4, the dog in s4.lead_porch's own sitting pose at (470, 394), porch's plain crouch, the mother
+drinking at x 515, the calf at (408, 391), the lead cow turned this way at x 806 with the second beyond her at
+892, the fourth above the gate, two on the path, S4's felt dog by the step (drawn with s4.felt_dog if s4 can
+be imported). Both were compared as rendered frames, side by side; neither is a pixel match.
 """
 from __future__ import annotations
 
@@ -88,8 +97,21 @@ SILL_Y = 394.0                               # where a dog's feet stand on the s
 STRIP_Y = 388.0                              # where hooves stand on the path strip
 LINE = 400.0                                 # the surface, world y
 TEAL = (24, 120, 128)
-DUSK = 0.2
-DOOR = 0.25
+def dusk_at(t):
+    """Dusk deepens across the film: S2 left it at 0, S4 takes it up at 0.4. porch.py keeps one plate per tenth,
+    so it steps; each step is put under a camera move."""
+    return 0.0 if t < 4.9 else 0.1 if t < 9.7 else 0.2 if t < 17.9 else 0.3 if t < 22.75 else 0.4
+
+
+def door_at(t):
+    """S2 left the door ajar (0.25: the lamp needs its planks to throw the page on); S4 takes it up at 0.62. It
+    swings in a draught while the camera is at the waterline, too slowly to see."""
+    return lerp(0.25, 0.62, ease(t, 9.6, 22.4))
+
+
+def puddles_at(t):
+    """The dry half of the sill gets wet where the dog has stood (S4 begins with these two)."""
+    return [(350, 0.7 * ease(t, T_LAID1, T_LAID1 + 2.0)), (405, 0.5 * ease(t, T_L2, T_L2 + 1.5))]
 WAVER = 2                                    # the fish child S2 left under the cow's nose
 
 
@@ -139,7 +161,7 @@ SHOTS = [   # t0, t1, name, how it begins, why the camera is there
     (9.20, 17.70, "D split", "crane", "the hand on the rail, the cow drinking and the dog digging in one frame: two clocks. It leans in"
                                       " to the line each time the dog comes up, to see what it has, and back as it goes down"),
     (17.70, 21.30, "E calf", "move", "up to the waterline and in: the calf is the event and it happens on the board"),
-    (21.30, 22.30, "F under", "CUT", "cut on the dive: it is already down there; no time to follow it any more"),
+    (21.30, 22.30, "F under", "CUT", "the one cut, on the dive: it is already down there; no time to follow it any more"),
     (22.30, 26.00, "G quiet", "crane", "up with it one last time, then back and still: the queue is still a queue"),
 ]
 
@@ -219,7 +241,7 @@ DAG = [
     ("queue.near", "queue.far", 0, 26, "down the path is nearer: a cow hides the one behind her"),
     ("cow.mother.*", "cow.lead.*", 0, 26, "the meadow is further along the bank than the strip"),
     ("cow.mother.*", "cow.second.*", 14.0, 26, "the meadow is further along the bank than the strip"),
-    ("cow.second.*", "cow.lead.*", 0, 26, "she follows her out; where they pass, the nearer one is the one behind"),
+    ("cow.lead.*", "cow.second.*", 0, 26, "in the meadow the second cow passes behind the lead cow and stands beyond her"),
     ("calf", "cow.mother.body", 0, 26, "the calf walks at her NEAR flank"),
     ("cow.mother.head", "calf", 0, 26, "her head comes down over it (a sublayer: her body stays behind it)"),
     ("cow.lead.head", "shadow.*", 0, 26, "her head hangs over the board (a sublayer: her body is behind the board)"),
@@ -280,6 +302,10 @@ CONTACTS = [   # cel, what it stands on, world y of that contact
     ("calf", "the strip, then the sill boards", None),
     ("cow.*", "the path strip", STRIP_Y),
 ]
+
+
+FELT_PASS = "porch"        # behind the person: while they sit on the step it is hidden by them; when they slide down to
+                           # crouch (23.0) it is found lying where it always was
 
 
 def _match(name, pat):
@@ -437,7 +463,8 @@ X_LAY4 = 470.0                                    # its own place at the waterli
 T_L4 = 23.12
 T_LAID4 = T_L4 + 0.2
 T_SPENT = 23.56                                   # it does not shake. It stands, then it sits.
-T_SIT = 24.0
+T_SIT = 23.82
+HEAR = (24.15, 24.78)                             # the voice reaches it
 
 WADE_OUT, WADE_DEEP = 48.0, 36.0                  # how far past the board's end it wades, and how deep
 DIVES = [(T_D2, 584.0), (T_D3, 580.0), (T_D4, 604.0)]
@@ -915,18 +942,24 @@ def end_pose(t):
     sit = dog.sit(t - T_SIT)
     pant = math.sin(2 * math.pi * 2.6 * t) * (1 - 0.55 * ease(t, 24.6, 25.4))
     p = dog.blend(sit, tired, {"head": 0.9, "ears": 0.75, "tail": 1.0})
-    hear = ease(t, LINE2[0] + 0.3, LINE2[0] + 0.9)                            # the voice: the head comes up a little, no more
-    p["neck"] = -0.72 + 0.2 * hear                                            # it hangs
-    p["head"] = -1.04 + 0.1 * hear
+    p["neck"], p["head"] = -0.72, -1.04                                       # it hangs
     p["pitch"] = sit["pitch"] - 0.15                                          # slumped on its haunches
-    p["arch"] = p.get("arch", 0.0) + 0.02 * pant                              # the flanks going
-    p["cy"] = p["cy"] - 4 + 0.5 * pant
-    p["jaw"] = 0.2 + 0.05 * pant
-    p["tongue"] = 0.8
+    p["cy"] = p["cy"] - 4
+    p["jaw"], p["tongue"] = 0.2 + 0.05 * pant, 0.8
     p["ear"], p["ear_f"] = 0.36, 0.32
     p["tail"], p["wag"] = -0.5, 0.0
-    w = dog.blend(tired, p, ease(t, T_SIT, T_SIT + 0.5))
-    return w
+    # the quiet voice: the head comes up a little, the mouth shuts. Low, not hanging: this is the pose S4 takes up
+    # (s4.lead_porch at 84.0: sitting, ears down, the head hanging a little), so the cut between us is not a jump.
+    hear = ease(t, HEAR[0], HEAR[1])
+    if hear > 0:
+        s9 = dog.sit(9.0)
+        low = dog.blend(s9, dog.ears_down(3.0), {"ears": 0.6, "head": 1.0, "tail": 0.5, "body": 0.3, "legs": 0.0})
+        low["neck"], low["head"] = low["neck"] - 0.12, low["head"] - 0.1
+        p = dog.blend(p, low, hear)
+    breathe = 1.0 - 0.8 * ease(t, 25.2, 25.95)                                # the flanks going, and settling
+    p["arch"] = p.get("arch", 0.0) + 0.02 * pant * breathe
+    p["cy"] = p["cy"] + 0.5 * pant * breathe
+    return dog.blend(tired, p, ease(t, T_SIT, T_SIT + 0.5))
 
 
 def _trot_rate(x0, x1, dur):
@@ -960,14 +993,26 @@ def dog_wet(t):
 # ====================================================================== #
 
 SPOT = [herd.hill_spot(k) for k in range(6)]                 # where the queue waits: 0 just above the gate
-D = herd.d_at
+def D(x):
+    """The distance along herd.PATH at which a cow stands at world x (herd.d_at is 2 px out on the strip)."""
+    d = herd.d_at(x)
+    for _ in range(3):
+        d -= herd.PATH.at(d)["x"] - x
+    return d
+
+
 X_DRINK = 600.0 - herd.reach("second")                        # where a plain cow stands to drink at x = 600
 X_LEAD0 = 600.0 - herd.reach("lead")                          # where S2 left the lead cow
 X_LEAD_TURNED = XB1 + 12 + herd.reach("lead")                 # turned round, chin over where the dog comes up
 X_LEAD_BACK = X_LEAD_TURNED + 40.0                            # she backs a step when it bursts up under her
 T_LEAD_WALK = 4.3
-X_LEAD_MEADOW = 905.0
-X_SECOND_MEADOW = 700.0
+X_LEAD_FAR = 880.0                                            # where she goes to stand when she has drunk
+X_LEAD_MEADOW = 806.0                                         # and where she comes back to, to see the dog (S4 begins with her here)
+T_LEAD_BACK = 21.6
+X_SECOND_MEADOW = 892.0                                       # and the second beyond her
+T_SEC_TURN = 22.95
+X_MOTHER_DRINK = 515.0
+X_CALF_END, Y_CALF_END = 408.0, 391.0                         # S4: pressed to her mother's flank, looking at the dog
 T_LEAD_LOOK = 17.25                                           # in the meadow she turns to see what the splashing is
 X_MOTHER_WAIT = 396.0
 T_CALF_GO = 18.08                                             # the calf leaves its mother's side [76.2]
@@ -984,12 +1029,13 @@ def _walkers():
     if _WK is None:
         P = herd.PATH
         wk = {}
-        wk["lead"] = herd.Walker("lead", P, [(T_LEAD_WALK, D(X_LEAD_BACK)), (11.3, D(X_LEAD_MEADOW)), (40.0, D(X_LEAD_MEADOW))])
-        wk["second"] = herd.Walker("second", P, [(-5.0, SPOT[0]), (4.35, SPOT[0]), (8.75, D(X_DRINK)), (14.55, D(X_DRINK)), (18.5, D(X_SECOND_MEADOW)), (40.0, D(X_SECOND_MEADOW))],
-                                   acts=[(8.8, 14.0, lambda tau: herd.drink(tau + 8.8, clamp(tau / 0.9), "second")),
-                                         (18.9, 40.0, lambda tau: herd.drink(tau + 18.9, clamp(tau / 1.4), "second"))])     # she grazes
+        wk["lead"] = herd.Walker("lead", P, [(T_LEAD_WALK, D(X_LEAD_BACK)), (10.75, D(X_LEAD_FAR)), (40.0, D(X_LEAD_FAR))])
+        rb = herd.Route([(X_LEAD_FAR, porch.meadow_y(X_LEAD_FAR), 1.0), (X_LEAD_MEADOW, porch.meadow_y(X_LEAD_MEADOW), 1.0)])
+        wk["lead2"] = herd.Walker("lead", rb, [(T_LEAD_BACK, 0.0), (T_LEAD_BACK + rb.length / 44.0, rb.length), (40.0, rb.length)])
+        wk["second"] = herd.Walker("second", P, [(-5.0, SPOT[0]), (4.35, SPOT[0]), (8.75, D(X_DRINK)), (14.55, D(X_DRINK)), (22.7, D(X_SECOND_MEADOW)), (40.0, D(X_SECOND_MEADOW))],
+                                   acts=[(8.8, 14.0, lambda tau: herd.drink(tau + 8.8, clamp(tau / 0.9), "second"))])
         wk["mother"] = herd.Walker("mother", P, [(-5.0, SPOT[1]), (4.8, SPOT[1]), (9.8, SPOT[0]), (15.0, SPOT[0]), (18.35, D(X_MOTHER_WAIT)),
-                                               (T_M_ON, D(X_MOTHER_WAIT)), (T_M_DRINK - 0.1, D(X_DRINK)), (40.0, D(X_DRINK))],
+                                               (T_M_ON, D(X_MOTHER_WAIT)), (T_M_DRINK - 0.1, D(X_MOTHER_DRINK)), (40.0, D(X_MOTHER_DRINK))],
                                    acts=[(18.5, T_LICK - 0.1, lambda tau: herd.notice(herd.stand(tau + 18.5, "mother", chew=0, alert=0.35))),
                                          (T_LICK, T_LICK + 0.62, _lick_pose),
                                          (T_M_DRINK, 40.0, lambda tau: herd.drink(tau + T_M_DRINK, clamp(tau / 0.85), "mother"))])
@@ -1037,13 +1083,29 @@ def lead_state(t):
             st["pose"] = herd.blend(_lead_hand(T_LEAD_WALK)["pose"], st["pose"], ease(t, T_LEAD_WALK, T_LEAD_WALK + 0.3), "lead")
         st.update(turn=None, nose_to=None)
         return st
+    if t >= T_LEAD_BACK:
+        # she comes a few steps back along the meadow toward the sill: she wants to see the dog she touched noses with
+        st = wk["lead2"].state(t)
+        seen = ease(t, T_B4 + 0.1, T_B4 + 0.5) * (1 - ease(t, 24.3, 25.0))    # it comes up spent: she stops chewing; then chews again
+        idle = herd.stand(t, "lead", chew=1.0 - seen, alert=0.35 + 0.3 * seen)
+        if seen > 0:
+            idle = herd.notice(idle, 0.6 * seen)
+        w = ease(st["rest"], 0.5, 1.0)
+        pose = dict(st["pose"])
+        for k in ("neck", "head", "jaw", "ear", "eye"):
+            if isinstance(pose.get(k), (int, float)):
+                pose[k] = lerp(pose[k], idle[k], max(w, 0.6))
+        st.update(pose=pose, turn=None, nose_to=None, facing=-1)
+        return st
     if t >= T_LEAD_LOOK:
         st = wk["lead"].state(40.0)
         tu = ease(t, T_LEAD_LOOK + 0.2, T_LEAD_LOOK + 1.1)
         al = ease(t, T_LEAD_LOOK, T_LEAD_LOOK + 0.3)
-        p = herd.stand(t, "lead", chew=1.0 - al * (1 - ease(t, 19.2, 19.8)) - ease(t, 22.7, 23.2), alert=0.5 * al)
-        if t > 22.7:
-            p = herd.notice(p, 0.7 * ease(t, 22.7, 23.2))
+        calf_ = ease(t, 18.9, 19.3) * (1 - ease(t, 20.6, 21.2))   # she watches the calf
+        busy = max(1 - ease(t, T_LEAD_LOOK + 1.2, T_LEAD_LOOK + 1.8), calf_)
+        p = herd.stand(t, "lead", chew=1.0 - al * busy, alert=al * (0.35 + 0.3 * calf_))
+        if busy > 0:
+            p = herd.notice(p, 0.6 * al * calf_)
         p["bell"] = 12.0 * math.sin(2 * math.pi * 2.0 * (t - T_LEAD_LOOK)) * math.exp(-1.4 * max(0.0, t - T_LEAD_LOOK - 0.3)) * al
         st.update(pose=p, turn=tu if tu < 1 else None, facing=1 if tu < 1 else -1, nose_to=None)
         return st
@@ -1117,8 +1179,10 @@ def cow_state(who, t):
     _gate_layer(st)
     if who == "second" and 8.8 <= t <= 14.3:
         st["nose_to"] = (600.0, 401.0)
-    if who == "second" and t >= 18.9:
-        st["nose_to"] = (X_SECOND_MEADOW + 80.0, porch.meadow_y(X_SECOND_MEADOW + 80.0) - 1.0)
+    if who == "second" and t >= T_SEC_TURN:                      # in the meadow she turns round too, and chews
+        tu = ease(t, T_SEC_TURN, T_SEC_TURN + 0.85)
+        st = wk[who].state(40.0)
+        st.update(pose=herd.stand(t, "second"), turn=tu if tu < 1 else None, facing=1 if tu < 1 else -1, nose_to=None)
     if who == "mother":
         if T_LICK - 0.05 <= t <= T_LICK + 0.95:
             c = calf_state(t)
@@ -1183,8 +1247,8 @@ def calf_state(t):
         sniff = herd.with_(herd.stand(t, "calf", chew=0, alert=0.2), neck=38.0, head=6.0, ear=30.0, eye=1.3,
                            nf=sk["nf"], ff=sk["ff"])                 # forefeet in the water, nose down to follow it under
         p = herd.blend(sk, sniff, ease(t, T_CALF_SKID + 0.1, T_CALF_SKID + 0.4), "calf")
-        if tau > 0.3:
-            p = herd.blend(p, herd.calf_nosed(tau), ease(tau, 0.3, 0.5), "calf")
+        if tau > -0.08:                                              # the dog has turned on it: its head goes up
+            p = herd.blend(p, herd.calf_nosed(max(tau, 0.0)), ease(tau, -0.08, 0.22), "calf")
         if tau > 1.0:                                                # the second push: the scramble again
             q = herd.calf_nosed(tau - 0.5)
             p = herd.blend(p, q, bump((tau - 0.95) / 0.5), "calf")
@@ -1213,14 +1277,18 @@ def calf_state(t):
             p = herd.blend(p, herd.stand(t, "calf", chew=0, alert=0.5), after, "calf")
         out.update(x=x, y=y, pose=p, on_sill=y > STRIP_Y + 2.5)
         return out
-    # it goes on at her near flank, and from there it looks at the dog
-    go = ease(t, T_M_ON + 0.1, T_M_DRINK - 0.1)
-    x = lerp(X_CALF_HOME, X_CALF_HOME + 66.0, go)
-    p = herd.step_pose("calf", (x - X_CALF_HOME) / herd.S, rest=1.0 - bump(go) ** 0.5, t=t)
-    look = herd.notice(herd.stand(t, "calf", chew=0, alert=0.15), 1.0)
-    look = herd.with_(look, neck=14.0, head=8.0)                    # down at the dog, which is lower than it is
-    p = herd.blend(p, look, ease(t, T_M_DRINK - 0.3, T_M_DRINK + 0.4), "calf")
-    out.update(x=x, y=STRIP_Y, pose=p)
+    # its mother walks on to the water. It gives her room, a few steps back along the board's edge, and from there,
+    # at her flank, it looks at the dog (where S4 finds it)
+    go = ease(t, T_M_ON + 0.15, T_M_ON + 1.35)
+    x = lerp(X_CALF_HOME, X_CALF_END, go)
+    y = lerp(STRIP_Y, Y_CALF_END, go)
+    p = herd.step_pose("calf", (x - X_CALF_HOME) / herd.S * 1.5, rest=1.0 - bump(go) ** 0.5, t=t)
+    see = ease(t, T_B4 - 0.1, T_B4 + 0.2) * (1 - ease(t, 24.6, 25.3))       # the dog bursts up beside it: ears, eye
+    look = herd.stand(t, "calf", chew=1.0 - see, alert=0.4 + 0.5 * see)
+    if see > 0:
+        look = herd.notice(look, see)
+    p = herd.blend(p, look, ease(t, T_M_ON + 1.2, T_M_ON + 1.6), "calf")
+    out.update(x=x, y=y, pose=p)
     return out
 
 
@@ -1339,10 +1407,11 @@ def person_q(t):
     if LINE2[0] <= t <= LINE2[1] + 0.3:                                   # speaking, low: the head nods on the words
         cur = dict(cur)
         cur["head"] = cur["head"] + 2.5 * math.sin(2 * math.pi * 3.2 * (t - LINE2[0])) * (1 - ease(t, LINE2[1], LINE2[1] + 0.3))
-    if t > LINE2[1]:                                                      # the shoulders drop
-        cur = dict(cur)
-        cur["lean"] = cur["lean"] + 4.0 * ease(t, LINE2[1], LINE2[1] + 0.5)
-        cur["head"] = cur["head"] + 5.0 * ease(t, LINE2[1], LINE2[1] + 0.5)
+    if t > T_CROUCH:                                                      # while speaking the head is up to the dog; after the
+        cur = dict(cur)                                                   # last word the shoulders drop (into porch's own crouch,
+        up = ease(t, T_CROUCH + 0.3, T_CROUCH + 0.8) * (1 - ease(t, LINE2[1] - 0.25, LINE2[1]))    # which is where S4 begins)
+        cur["lean"] = cur["lean"] - 5.0 * up
+        cur["head"] = cur["head"] - 6.0 * up
     return cur
 
 
@@ -1526,7 +1595,8 @@ def _draw_town(alt, t, camB, look, stg_dog=None):
     lv = hole_levels(t)
     for q in sorted(lv, key=lambda q: town.HOLES[q][1]):
         _hole(alt, camB, q, lv[q])
-    town.thing(alt, camB, "boot", BOOT_AT[0], BOOT_AT[1], 8)
+    shove = ease(t, T_DIG_A + 0.05, T_DIG_A + 0.42)                  # the first rake of round two shoves S2's old boot aside
+    town.thing(alt, camB, "boot", BOOT_AT[0] - 34 * shove, BOOT_AT[1] + 3 * shove, 8 - 24 * shove)
     town.thing(alt, camB, "spool", *SPOOL_AT)
     town.thing(alt, camB, "pin", PIN_AT[0], PIN_AT[1], PIN_AT[2])
     if t < T_STRIP:
@@ -1547,6 +1617,25 @@ def _draw_town(alt, t, camB, look, stg_dog=None):
 # ====================================================================== #
 #  8 · A FRAME                                                            #
 # ====================================================================== #
+
+_FELT = []
+
+
+def _felt(ink, oy):
+    """S4's felt dog 'was lying by the step all along' (board, 92.8), ear to the boards. It is S4's own cut-out
+    (s4.felt_dog), at S4's own place, drawn dim, so that it really was there. If s4 cannot be imported it is
+    left out and the cut to S4 shows it arriving."""
+    if not _FELT:
+        try:
+            import s4 as _s4
+            _FELT.append((_s4.felt_dog, _s4.SPOT["felt"]))
+        except Exception:
+            _FELT.append(None)
+    if _FELT[0] is None:
+        return
+    fn, (fx, fy) = _FELT[0]
+    fn(ink, fx, fy - oy, 1.0, 1, lift=0.0, ear=0.0, hop=0.0, dim=0.5)
+
 
 def _rings(t):
     out = []
@@ -1641,7 +1730,8 @@ def draw(t, ink, record=False):
         stg.add("queue.far" if i < len(hill_all) - 1 else "queue.near", "hill",
                 lambda ink_, who=who, st=st: _draw_cow(ink_, who, st, oyi))
 
-    strip_cows.sort(key=lambda it: -it[1]["x"])                      # further along the bank first
+    # further along the bank first; in the meadow the second cow passes BEHIND the lead cow, and stays behind her
+    strip_cows.sort(key=lambda it: (0 if (it[0] == "second" and it[1]["x"] > 640) else 1, -it[1]["x"]))
     for who, st in strip_cows:
         def body(ink_, who=who, st=st):
             a = _draw_cow(ink_, who, st, oyi)
@@ -1678,6 +1768,7 @@ def draw(t, ink, record=False):
             k = ease(t, tb + 0.1, land[1])
             contact_shadow(ink_, land[0], SILL_Y - oyi + 1.5, 20 + 24 * k, 0.75 * k)
     stg.add("shadow.sill", "sill", shadows)
+    stg.add("felt", FELT_PASS, lambda ink_: _felt(ink_, oyi))
 
     ph = page_in_hand(t)
     for k in range(5):
@@ -1736,7 +1827,7 @@ def draw(t, ink, record=False):
                 _silt(ink_, hx, sq_y(hy, oy, sq) + 4, ds["silt"][1] - 0.2, 1.0, seed=int(hx))
             if ds["bits"] and ds["bits"][0]:
                 dog.draw_bits(ink_, ds["bits"][0], ds["bits"][1], sq_y(ds["bits"][2], oy, sq), DS, facing=-1, color=(150, 160, 136))
-            layer, j = _dog_layer(ds, cam, under_tint=0.26)
+            layer, j = _dog_layer(ds, cam, under_tint=0.17)       # it is small down there: it stays the one cream thing
             ink_.img.paste(layer, (0, 0), layer)
             cache["dogj"] = j
         stg.add("swim.dog", "under", swimmer)
@@ -1769,7 +1860,7 @@ def draw(t, ink, record=False):
     def splash(ink_):
         for tb, xb in BREACHES:
             if tb - 0.02 <= t <= tb + 1.2:
-                porch.splash(ink_, t, oyi, xb, t - tb, 1.15 if tb < 20 else 0.7, "out", seed=int(tb * 10))
+                porch.splash(ink_, t, oyi, xb, t - tb, {T_B1: 1.15, T_B2: 1.0, T_B3: 0.8, T_B4: 0.65}[tb], "out", seed=int(tb * 10))
         for td, xd in DIVES:
             if td <= t <= td + 1.2:
                 porch.splash(ink_, t, oyi, xd + 4, t - td, 1.1, "in", seed=int(td * 10))
@@ -1827,8 +1918,9 @@ def draw(t, ink, record=False):
 
     cast = {s: cb(s) for s in ("hill", "strip", "sill", "under", "front")}
     cast["porch"] = porch_pass
-    porch.scene(ink, t, oyi, cast=cast, dusk=DUSK, door=DOOR, q=person_q(t), hand_over_rail=hand_over_rail(t),
-                radio_at="step", radio_on=1.0, pebbles=pebble_string(t), rings=_rings(t))
+    porch.scene(ink, t, oyi, cast=cast, dusk=dusk_at(t), door=door_at(t), q=person_q(t), hand_over_rail=hand_over_rail(t),
+                radio_at="step", radio_on=1.0, pebbles=pebble_string(t), rings=_rings(t),
+                puddles=[pd for pd in puddles_at(t) if pd[1] > 0.02])
 
     # S2 ended looking at the dry world from below (town.back's sky). For the first half second that is still
     # how the strip above the line looks; then it is the bank itself, coming down into frame.
@@ -1877,6 +1969,22 @@ def heard(t, wx):
     return clamp(((wx - x0) / (x1 - x0) - 0.5) * 1.5, -0.9, 0.9)
 
 
+def _one_tap(mix, at, gain=0.12, pan=None):
+    """One tap on the rail (sound.taps is always the four-tap motif; rounds three and four ask with one)."""
+    pan = snd.P_DOOR + 0.1 if pan is None else pan
+    try:
+        snd._put(mix, snd._knock_sig(snd._m("taps", at, 0.2), 236), at, gain, pan)
+    except Exception:                                           # the library changed: the kit's own wooden step
+        mix.step(at, gain=gain, pan=pan, surface="wood")
+
+
+def _slide(mix, t0, t1, pan=None):
+    """A pebble sent along the rail: a small dry scrape, then the click as it stops against the others."""
+    pan = snd.P_DOOR + 0.1 if pan is None else pan
+    snd.card_drag(mix, t0, max(0.2, t1 - t0 - 0.04), gain=0.018, pan=pan)
+    snd.pebble(mix, t1, pan=snd.P_DOOR)
+
+
 def sound(mix, at=0.0):
     """S3's sound into `mix`, local 0 at `at` seconds. Every contact is timed to the frame it lands on in THIS
     picture (the board's rule: the builder's frame wins, the sound moves). Two tempos that never merge: every cow
@@ -1910,16 +2018,16 @@ def sound(mix, at=0.0):
     S.page_slap(mix, A(T_LAID1), pan=heard(T_LAID1, THING_X[0]))
     S.paw_press(mix, A(T_PRESS1), pan=heard(T_PRESS1, THING_X[0]))
     lead = wk["lead"]
-    for (tt, x, y, leg) in lead.hoof_falls(T_LEAD_WALK, 11.5)[::1]:
+    for (tt, x, y, leg) in lead.hoof_falls(T_LEAD_WALK, 10.9)[::1]:
         S.hooves(mix, A(tt), 1, 0.55, "earth", gain=lerp(0.085, 0.04, clamp((tt - T_LEAD_WALK) / 6)), pan=heard(tt, x))
     for hit in lead.bell_hits:
-        if T_LEAD_WALK < hit < 12.0:
+        if T_LEAD_WALK < hit < 11.5:
             S.cowbell(mix, A(hit), gain=lerp(0.05, 0.025, clamp((hit - T_LEAD_WALK) / 6)), pan=heard(hit, 700))
     # ---- asked again
     S.creak(mix, A(4.7), 0.4, pan=S.P_STEP)
     S.paws(mix, A(T_BACK1 + 0.1), 3, 0.22, gain=0.08, pan=heard(5.3, 400))
     S.taps(mix, A(TAPS_1[0]))
-    S.pebble(mix, A(PEBBLES[0][3]))
+    _slide(mix, A(PEBBLES[0][2]), A(PEBBLES[0][3]))
     sec = wk["second"]
     for (tt, x, y, leg) in sec.hoof_falls(4.35, 8.9):
         S.hooves(mix, A(tt), 1, 0.55, "wood" if 330 < x < 360 else "earth", gain=0.075, pan=heard(tt, x))
@@ -1935,10 +2043,10 @@ def sound(mix, at=0.0):
     S.reel_down(mix, A(T_LAID2), gain=0.16, pan=heard(T_LAID2, THING_X[1]))
     S.paw_press(mix, A(T_PRESS2), pan=heard(T_PRESS2, THING_X[1]))
     S.shake(mix, A(T_SH2 + 0.2), T_FREEZE - T_SH2 - 0.2, gain=0.13, pan=heard(T_SH2, X_PAW2))
-    S.taps(mix, A(TAP_2[0]), gain=0.11)                       # NOTE: sound.taps is the four-tap motif; one tap is wanted here
-    S.pebble(mix, A(PEBBLES[1][3]))
-    for (tt, x, y, leg) in sec.hoof_falls(14.5, 18.7):
-        S.hooves(mix, A(tt), 1, 0.55, "earth", gain=lerp(0.075, 0.04, clamp((tt - 14.5) / 5)), pan=heard(tt, x))    # the cow tempo does not change
+    _one_tap(mix, A(TAP_2[0]))
+    _slide(mix, A(PEBBLES[1][2]), A(PEBBLES[1][3]))
+    for (tt, x, y, leg) in sec.hoof_falls(14.5, 22.9):
+        S.hooves(mix, A(tt), 1, 0.55, "earth", gain=lerp(0.075, 0.03, clamp((tt - 14.5) / 6)), pan=heard(tt, x))    # the cow tempo does not change
     S.paws(mix, A(T_GO2 + 0.06), 3, 0.09, gain=0.11, pan=heard(T_GO2, X_PAW2), pan_to=heard(T_D3, 560), wet=True)
     S.plunge(mix, A(T_D3), gain=0.3, pan=heard(T_D3, 580))
     # ---- round three: sooner
@@ -1951,8 +2059,8 @@ def sound(mix, at=0.0):
         S.hooves(mix, A(tt), 1, 0.55, "wood" if 330 < x < 360 else "earth", gain=0.075, pan=heard(tt, x))
     S.calf(mix, A(15.5), 8, 0.22, gain=0.04, pan=heard(16.0, 420), pan_to=heard(17.4, X_CALF_STOP))    # it trots down after her
     # ---- round four, and the calf
-    S.taps(mix, A(TAP_3[0]), gain=0.11)
-    S.pebble(mix, A(PEBBLES[2][3]))
+    _one_tap(mix, A(TAP_3[0]))
+    _slide(mix, A(PEBBLES[2][2]), A(PEBBLES[2][3]))
     S.paws(mix, A(T_TROT3 + 0.03), 5, 0.1, gain=0.1, pan=heard(18.0, X_LAY3), pan_to=heard(18.5, X_END), wet=True)
     S.wade(mix, A(T_WADE), 0.4, 2, pan=heard(T_WADE, X_END + 20))
     S.calf(mix, A(T_CALF_GO + 0.06), 6, 0.125, pan=heard(T_CALF_GO, X_CALF_STOP), pan_to=heard(T_CALF_SKID, X_CALF_SKID))
@@ -1962,8 +2070,8 @@ def sound(mix, at=0.0):
     S.nose_bump(mix, A(T_NUDGE + 1.05), pan=heard(20.1, 530))
     S.calf(mix, A(T_NUDGE + 0.6), 3, 0.14, gain=0.05, pan=heard(19.7, 520))
     S.calf(mix, A(T_CALF_BACK + 0.05), 4, 0.15, gain=0.05, pan=heard(20.3, 500), pan_to=heard(20.8, X_CALF_HOME))
-    S.pebble(mix, A(PEBBLES[3][3]))
-    S.plunge(mix, A(T_D4), gain=0.28, pan=heard(T_D4, 588))
+    _slide(mix, A(PEBBLES[3][2]), A(PEBBLES[3][3]))
+    S.plunge(mix, A(T_D4), gain=0.28, pan=heard(T_D4, 604))
     S.dig(mix, A(T_DIG_D), T_FOUND4 - T_DIG_D, find="ring", gain=0.08, pan=heard(T_DIG_D, HOLE_D[0]), under=True)
     S.breach(mix, A(T_B4), gain=0.26, pan=heard(T_B4, XB4))
     S.paws(mix, A(T_L4), 2, 0.07, gain=0.1, pan=heard(T_L4, X_LAY4), wet=True)
@@ -1977,6 +2085,11 @@ def sound(mix, at=0.0):
     S.creak(mix, A(T_CROUCH + 0.25), 0.5, pan=S.P_STEP)
     S.drinking(mix, A(T_M_DRINK + 0.8), SECONDS - T_M_DRINK - 0.8, gain=0.04)
     S.voice_quiet(mix, A(LINE2[0]))
+    for (tt, x, y, leg) in wk["lead2"].hoof_falls(T_LEAD_BACK, T_LEAD_BACK + 1.9):
+        S.hooves(mix, A(tt), 1, 0.55, "grass", gain=0.04, pan=heard(tt, x))
+    for hit in wk["lead2"].bell_hits:
+        if T_LEAD_BACK < hit < T_LEAD_BACK + 2.6:
+            S.cowbell(mix, A(hit), gain=0.03, pan=heard(hit, 820))             # her bell, coming back
     fo = wk["fourth"]
     for (tt, x, y, leg) in fo.hoof_falls(20.5, 24.3)[::2]:
         S.hooves(mix, A(tt), 1, 0.55, "earth", gain=0.035, pan=heard(tt, x))
@@ -2016,7 +2129,7 @@ def check(verbose=True, pixels=True):
         jump = abs(ca["oy"] - cb["oy"]) + abs(ca["sq"] - cb["sq"]) + 200 * abs(ca["zoom"] - cb["zoom"])
         is_cut = any(a < c <= b + 1e-9 for c in cuts)
         assert jump < 40 or is_cut, ("camera jump", a, jump)
-    say("MEASURED camera: F-TOWN at 58.0, F-PORCH at 84.0 (zoom 1); continuous but for the two declared cuts at %s" % [T0 + c for c in cuts])
+    say("MEASURED camera: F-TOWN at 58.0, F-PORCH at 84.0 (zoom 1); continuous everywhere but at the declared cut %s" % [T0 + c for c in cuts])
     # 2 · the squeeze is continuous and monotonic, and 1:1 above the line and below the zone
     ys = [sq_y(400 + d, SPLIT_OY, SPLIT_SQ) for d in range(-50, 480)]
     assert all(b > a for a, b in zip(ys, ys[1:])) and max(b - a for a, b in zip(ys, ys[1:])) <= 1.0 + 1e-9
@@ -2081,7 +2194,7 @@ def check(verbose=True, pixels=True):
         xs = sorted(cow_state(w, tt)["x"] for w in on_strip)
         for a, b in zip(xs, xs[1:]):
             assert b - a > 150, ("two cows abreast", tt, xs)
-        at_water = [w for w in ("lead", "second", "mother") if cow_state(w, tt)["layer"] == "strip" and abs(cow_state(w, tt)["x"] - X_DRINK) < 30]
+        at_water = [w for w in ("lead", "second", "mother") if cow_state(w, tt)["layer"] == "strip" and abs(cow_state(w, tt)["x"] - X_DRINK) < 40]
         assert len(at_water) <= 1, (tt, at_water)
     ws = _walkers()
     for w in ("second", "mother", "fourth", "fifth", "sixth"):
@@ -2093,7 +2206,7 @@ def check(verbose=True, pixels=True):
                 assert v <= herd.SPEED * max(rel, 0.3) * 1.45 + 2, (w, ta, v, rel)
     e = {w: cow_state(w, SECONDS) for w in ("lead", "second", "mother", "fourth", "fifth", "sixth")}
     ce = calf_state(SECONDS)
-    assert abs(e["mother"]["x"] - X_DRINK) < 3 and e["fourth"]["layer"] == "hill" and abs(e["fourth"]["d"] - SPOT[0]) < 1
+    assert abs(e["mother"]["x"] - X_MOTHER_DRINK) < 3 and e["fourth"]["layer"] == "hill" and abs(e["fourth"]["d"] - SPOT[0]) < 1
     assert e["lead"]["facing"] == -1 and e["lead"]["x"] > 800 and e["second"]["x"] > 690 and ce["layer"] == "strip"
     say("MEASURED herd: never two cows within a cow's length on the strip; one at the water at a time; no cow faster than a walk;"
         " at 84.0 the mother drinks, the calf at her flank, the fourth above the gate, two on the path, two in the meadow")

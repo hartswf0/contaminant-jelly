@@ -250,7 +250,7 @@ SHOTS = [   # t0, t1 (film), name, kind, why the camera is there
     (109.0, 111.0, "E bubble", "insert", "close on the bloodhound and the child: the piece taken back to ask"),
     (111.0, 116.0, "F master", "master", "back to the one frame, then pulled back to the full town with the line on top"),
 ]
-INSERT_CAM = {"D fence": Cam.look(556, 806, 3.1), "E bubble": Cam.look(676, 818, 2.7)}
+INSERT_CAM = {"D fence": Cam.look(556, 806, 3.1), "E bubble": Cam.look(680, 804, 2.7)}
 PUSH_C = (480.0, 440.0)                      # the master's push is about this screen point
 
 
@@ -502,9 +502,9 @@ BODY_H = {"lead": 34, "herder": 18, "digger": 20, "big": 22, "mid": 19, "small":
           "terrier": 18, "felt": 12}
 PLACE = {   # world feet where each lands on the bed, and when (every dog scrabbles as it lands: one hole each)
     "lead": ((331.0, 815.0), 100.35), "herder": ((618.0, 861.0), 100.2), "digger": ((524.0, 818.0), 100.5),
-    "big": ((534.0, 826.0), 100.3), "mid": ((459.0, 826.0), 100.2), "small": ((277.0, 826.0), 100.4),
-    "sheep": ((760.0, 846.0), 100.7), "blood": ((660.0, 846.0), 100.8), "terrier": ((180.0, 846.0), 100.3),
-    "felt": ((736.0, 850.0), 100.6),
+    "big": ((534.0, 826.0), 99.95), "mid": ((459.0, 826.0), 99.85), "small": ((277.0, 826.0), 100.05),
+    "sheep": ((752.0, 846.0), 100.7), "blood": ((660.0, 846.0), 100.8), "terrier": ((180.0, 846.0), 100.3),
+    "felt": ((728.0, 850.0), 100.6),
 }
 LAND_HOLE = {"lead": 24, "blood": 21, "mid": 32, "big": 35, "small": 30, "terrier": 15, "digger": 34, "sheep": 28,
              "felt": 14, "herder": 29}
@@ -697,7 +697,7 @@ def draw_strip_cows(ink, f, oy, anchors=None):
 #  6 · THE PORCH: the person, the lead dog, the arrivals                 #
 # ====================================================================== #
 
-PEB_T = (90.9, 91.9, 92.8, 93.7, 94.6, 95.5, 96.4)       # seven more asks while the pack comes: 5 -> 12
+PEB_T = (90.9, 91.9, 92.8, 93.7, 95.25, 95.75, 96.2)      # seven more asks while the pack comes: 5 -> 12
 PEB_KIND = "wwggw" + "gwggwgg"
 
 
@@ -729,7 +729,8 @@ def lead_porch(f):
     """The lead dog above the water: -> (pose, x, facing, anchor)."""
     if f < 85.5:
         sit = dog.sit(9.0)
-        low = dog.blend(sit, dog.ears_down(3.0), {"ears": 0.55, "head": 0.8, "tail": 0.4, "body": 0.15, "legs": 0.0})
+        low = dog.blend(sit, dog.ears_down(3.0), {"ears": 0.6, "head": 1.0, "tail": 0.5, "body": 0.3, "legs": 0.0})
+        low["neck"], low["head"] = low["neck"] - 0.12, low["head"] - 0.1          # spent: the head hangs
         up = ease(f, 84.25, 85.0)
         p = dog.blend(low, sit, up)
         p = dog.over_shoulder(p, ease(f, 84.7, 85.4))        # the head goes round to the water
@@ -769,8 +770,6 @@ def draw_lead_porch(ink, f, oy):
         return
     p, x, fac, _ = st
     dog.draw_dog(ink, p, x, SILL_Y - oy, scale=DS, facing=fac)
-    if 86.3 < f < 87.2:
-        pass
 
 
 def _kb_swim(ink, fn, name, cam, st, f, **kw):
@@ -1080,7 +1079,7 @@ def pile_spread(f):
 # ====================================================================== #
 
 LINE_Y = 876.0                               # where the row of pieces stands on the gravel, in the foreground at the right
-XC0 = 896.0                                  # the middle of the first piece: it stands against the felt dog
+XC0 = 868.0                                  # the middle of the first piece: it stands against the felt dog
 PS = 0.8                                     # piece scale
 PW = 26.0                                    # one piece, shoulder to shoulder
 GAP = 10.0                                   # how far short of the row a retriever sets a piece down
@@ -1088,10 +1087,10 @@ STOCK = {"small": (238.0, 820.0, -1), "mid": (506.0, 822.0, 1), "big": (590.0, 8
 RET_OFF = {"big": 54.0, "mid": 45.0, "small": 37.0}                                    # body middle to the piece in its mouth
 LAMP_AT = {k: (STOCK[k][0] - STOCK[k][2] * (RET_OFF[k] + 2), 826.0) for k in STOCK}    # where each stands to take one
 LANE = {"big": 866.0, "mid": 880.0, "small": 889.0}                                    # three lanes
-RET_V = {"big": 65.0, "mid": 210.0, "small": 370.0}                                    # three speeds
+RET_V = {"big": 50.0, "mid": 210.0, "small": 335.0}                                    # three speeds
 RET_SET = {"big": 2.5, "mid": 1.7, "small": 1.5}
-T_WORK = 100.6                               # the retrievers leave their lamps (the other jobs begin at 101.0)
-T_TAKE, T_BACK = 106.2, 113.3                # the bloodhound's errand with one piece
+T_WORK = 100.2                               # the retrievers leave their lamps (the other jobs begin at 101.0)
+T_TAKE, T_BACK = 106.6, 113.3                # the bloodhound's errand with one piece
 WDT = 1.0 / 120
 SHEEP_NOSE = 23.0                            # the sheepdog's nose ahead of its middle
 
@@ -1213,7 +1212,7 @@ class Works:
             if sheep["phase"] == "idle":
                 sheep["move"] = not _toward(sheep, home[0], home[1], 70.0 * WDT)
                 if ps and slack > 3.5 and not near and not sheep["move"] and f - sheep["last"] > 0.4 \
-                        and not (T_BACK - 2.2 < f < T_BACK + 1.2):
+                        and not (T_BACK - 2.2 < f < T_BACK + 1.2) and not (f > T_TAKE - 2.1 and self.t_take is None):
                     sheep["phase"], sheep["tau"] = "out", 0.0
             elif sheep["phase"] == "out":
                 if _toward(sheep, out[0], out[1], 110.0 * WDT):
@@ -1509,9 +1508,6 @@ def hole_times():
 
 def holes_dug(f):
     return 8 + sum(1 for a, b in hole_times().values() if f >= b)
-
-
-MURK_STOP = None
 
 
 def murk(ink, cam, f):
@@ -2034,6 +2030,14 @@ def _calf_from_below(ink, f, cam):
 #  9 · THE PICTURE                                                       #
 # ====================================================================== #
 
+_OVERRIDE = {}                               # the proof sheet swaps a track for another damping preset
+
+
+def howl_push(f):
+    """A small push toward the dog while it howls, and out again as the answer starts to come from the edges."""
+    return 1.0 + 0.15 * ease(f, 84.7, 86.3) * (1 - ease(f, 88.45, 89.5))
+
+
 def _rings(f):
     rings = []
     for k, tk in enumerate((T_HOWL + 0.45, T_HOWL + 0.95, T_HOWL + 1.45, T_HOWL + 1.95)):
@@ -2119,7 +2123,7 @@ def _porch_frame(ink, f, oy):
     for tk in PEB_T:
         if tk - 0.5 <= f < tk:
             hold = "pebble"
-    lean = track("reeds").x(f)
+    lean = _OVERRIDE.get("reeds", track("reeds")).x(f)
     door = 0.62 + 0.3 * ease(f, 91.0, 91.5)
     porch.scene(ink, f, oy, cast=dict(hill=hill, strip=strip, porch=on_porch, sill=sill, under=under, front=front),
                 q=q, door=door, hold_a=hold, hand_over_rail=f >= 90.3, radio_on=1.0, pebbles=pebbles_at(f),
@@ -2175,6 +2179,9 @@ def draw(t, ink):
     kind = shot[3]
     if kind == "porch":
         _porch_frame(ink, f, 0)
+        z = howl_push(f)
+        if z > 1.001:
+            porch.push(ink, 505.0, 352.0, z)
     elif kind == "crane":
         _porch_frame(ink, f, crane_oy(f))
     elif kind == "master":
@@ -2233,10 +2240,9 @@ def sound(mix, at=0.0):
     S.creak(mix, A(91.05), 0.5)                                # the door
     S.old_dog_down(mix, A(91.95), 4, gain=0.1, pan=snd.P_DOOR + 0.1)
     for k, tk in enumerate(PEB_T):
-        S.pebble(mix, A(tk), gain=0.08) if "gain" in S.pebble.__code__.co_varnames else S.pebble(mix, A(tk))
+        S.pebble(mix, A(tk))
     # the herder opens the way
     S.patter(mix, A(SWING[0][0]), 1.6, pan=-0.3, pan_to=0.5)
-    S.cowbell(mix, A(T_NOSE + 0.1), gain=0.0)                 # (the mother has no bell: silence where one might be expected)
     S.hooves(mix, A(T_TURN + 0.1), 5, 0.55, "grass", gain=0.1, pan=-0.2, pan_to=0.1)
     S.hooves(mix, A(T_MOTHER + 0.2), 5, 0.5, "wood", gain=0.09, pan=0.1, pan_to=0.4)
     S.calf(mix, A(T_MOTHER + 0.3), 9, 0.15, pan=0.0, pan_to=0.4)
@@ -2244,7 +2250,7 @@ def sound(mix, at=0.0):
     S.card_drag(mix, A(93.1), 0.5, pan=-0.15)                 # the pile shouldered along the board
     # ten dogs in the same four frames
     for nm in PACK:
-        S.plunge(mix, A(t_go(nm) + LEAP * 0.85), 0.6 if nm in ("small", "terrier", "felt") else 0.9, gain=0.2, pan=_pan(ENTRY[nm]))
+        S.plunge(mix, A(t_go(nm) + LEAP * 0.85), 0.6 if nm in ("small", "terrier", "felt") else 0.9, gain=0.1, pan=_pan(ENTRY[nm]))
     S.drip(mix, A(97.5), 2, 0.3, pan=-0.1)                    # on the old dog
     S.drip(mix, A(97.6), 2, 0.3, pan=0.4)                     # on the calf
     for k, nm in enumerate(PACK):
@@ -2262,8 +2268,7 @@ def sound(mix, at=0.0):
         if tl < T1:
             S.set_down(mix, A(tl), gain=0.07, pan=_pan(XC0 - 90))
             if by != "blood":
-                S.pebble(mix, A(tl + SHELL_DELAY), gain=0.05, pan=_pan(XC0), under=True) \
-                    if "under" in S.pebble.__code__.co_varnames else None
+                S.peg_tick(mix, A(tl + SHELL_DELAY), 1, gain=0.05, pan=_pan(XC0))      # a shell sent along the row
     for (tn, d) in w.nudges:
         S.nose_bump(mix, A(tn), gain=0.06, pan=_pan(XC0 - 100))
     for nm, pitch in (("big", 1.0), ("mid", 1.26), ("small", 1.5)):
@@ -2278,7 +2283,7 @@ def sound(mix, at=0.0):
     S.fish_murmur(mix, A(103.0), 2.0, gain=0.02, pan=0.3)
     S.bubbles(mix, A(105.0), 4, 0.6, gain=0.04, pan=0.4)      # the calf's nose in the water, at the very edge
     td = terrier_agenda().find("down")
-    S.pop(mix, A(td.a + 0.5), gain=0.05, pan=_pan(188)) if "gain" in S.pop.__code__.co_varnames else None
+    S.pop(mix, A(td.a + 0.5), pan=_pan(188))
     S.sniff(mix, A(blood_plan()["t_take"] - 1.2), 3, gain=0.05, pan=0.1, under=1500)
     S.bubble_picture(mix, A(T_BUBBLE), 2.0, gain=0.045, pan=0.3)
     S.fish_murmur(mix, A(111.0), 1.5, gain=0.02, pan=0.3)
@@ -2379,6 +2384,64 @@ def check(verbose=True):
 #  12 · ALONE                                                            #
 # ====================================================================== #
 
+def end_state():
+    """Where everything is at film second 116.0, for whoever builds on from here (world coordinates)."""
+    w = works()
+
+    def ag(a):
+        seg, tau, u, x, y = a.at(T1)
+        return dict(x=round(x, 1), y=round(y, 1), doing=seg.kind, facing=seg.facing)
+    return dict(
+        framing="F-TOWN (oy 360), zoom 1.0",
+        lead=ag(lead_agenda()), digger=ag(digger_agenda()), terrier=ag(terrier_agenda()), herder=dict(ag(herder_agenda()), pages=herder_pages(T1)),
+        bloodhound=dict(ag(blood_agenda()), trail=blood_plan()["trail2"]),
+        retrievers={k: dict(x=round(w.retriever(k, T1)[0], 1), y=round(w.retriever(k, T1)[1], 1), doing=w.retriever(k, T1)[2]) for k in ("big", "mid", "small")},
+        sheepdog=dict(x=round(w.sheep(T1)[0], 1), y=round(w.sheep(T1)[1], 1), doing=w.sheep(T1)[2]),
+        felt_dog=dict(x=FELT_AT[0], y=FELT_AT[1], doing="flat at the row's end"),
+        row=dict(y=LINE_Y, piece_scale=PS, xs=[round(piece_x(s_), 1) for _, s_, _ in sorted(w.pieces_at(T1), key=lambda q: q[1])],
+                 shells=[(round(x, 1), y) for x, y, mv in shells_at(T1)]),
+        holes=list(range(8)) + sorted(q for q, (a, b) in hole_times().items() if T1 >= b),
+        making_place=dict(progress=1.0, posts=[(s_.p0[0] + 30, s_.p0[1]) for s_ in digger_agenda().all("build")], pages_laid=pages_laid(T1)),
+        stock={k: (STOCK[k][0], STOCK[k][1], w.stock(k, T1)) for k in STOCK},
+        pebbles=pebbles_at(T1), old_dog=OLD, pile_spread=pile_spread(T1),
+        cows=dict(lead=(LEAD_X, "meadow, looking down into the water"), second=SECOND_X, calf=(664.0, "muzzle on the line at x 660"),
+                  mother=740.0, fourth=round(_cows()["w4"].state(T1)["x"]), fifth=round(_cows()["w5"].state(T1)["x"]),
+                  sixth=round(_cows()["w6"].state(T1)["x"])),
+    )
+
+
+class _Kinematic:
+    """The no-secondary-motion alternative: the reeds copy the howl exactly, with no mass at all."""
+
+    def x(self, f):
+        return howl_env(f)
+
+
+def proof(path):
+    """The SCION's proof view: the same frames under four damping presets, side by side (a diagnostic, not film)."""
+    presets = [("none", None), ("under", 2.2), ("built", MATERIALS["foliage"][2]), ("over", 60.0)]
+    times = [86.45, 86.9, 87.5, 88.05, 88.3, 88.6, 88.9]
+    cw, ch = 300, 150
+    sh = Image.new("RGB", (cw * len(times), ch * len(presets)), (20, 20, 24))
+    keep = MATERIALS["foliage"]
+    for r, (name, c) in enumerate(presets):
+        if c is None:
+            _OVERRIDE["reeds"] = _Kinematic()
+        else:
+            MATERIALS["foliage"] = (keep[0], keep[1], c, keep[3])
+            _OVERRIDE["reeds"] = Track("reeds", "foliage", drive=_reed_force, lo=-0.3, hi=1.6)
+        for k, f in enumerate(times):
+            ink = kit.Ink(f - T0, int(round((f - T0) * FPS)))
+            ink.paper()
+            _porch_frame(ink, f, 0)
+            sh.paste(ink.finish().crop((600, 270, 900, 420)), (k * cw, r * ch))
+    MATERIALS["foliage"] = keep
+    _OVERRIDE.clear()
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    sh.save(path)
+    return path
+
+
 def still(f):
     ink = kit.Ink(f - T0, int(round((f - T0) * FPS)))
     ink.paper()
@@ -2407,6 +2470,13 @@ def main():
     args = sys.argv[1:]
     if args and args[0] == "--check":
         check()
+        return
+    if args and args[0] == "--proof":
+        print(proof(args[1]))
+        return
+    if args and args[0] == "--state":
+        import pprint
+        pprint.pprint(end_state(), width=150)
         return
     if args and args[0] == "--stills":
         out = _HERE.parent.parent / "stills" / "dogs-s4"
