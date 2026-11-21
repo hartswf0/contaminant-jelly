@@ -104,6 +104,13 @@ These are the real numbers of the conversation this film is about. Show them by 
 - The computer restarted once. Eleven dogs stopped once, and they were critics and repairers.
 - The dog has never heard one of its own films.
 
+## 8b · What the dog carried up
+The reels on the sill are real. `scion/WHAT_WE_MADE.md` lists them in order, with what the person and the
+dog saw together: the children's drawings and sentences, the porch dogs, the cows. When a reel is laid on
+the sill, the frame that shows on it is a frame of that real film, in that order. The fish children in
+Trouttown are the class whose pages these were; what they hold up in their bubbles are their own drawings
+(the jaw, the fish and the bell, the bars), redrawn, never the photographs.
+
 ## 9 · How to run it
 Follow the SCION: thesis and bar; the hardest passage first (the old dog turning its back on a reel, and
 the builder going down again); independent critics who built nothing; root-cause repair; every finding
