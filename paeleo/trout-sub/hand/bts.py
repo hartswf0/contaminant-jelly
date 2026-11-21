@@ -151,7 +151,7 @@ def s_critics(before, after):
         if t > 7.0:
             im.paste(before.resize((400, 225), Image.LANCZOS), (30, 190)); d = ImageDraw.Draw(im); d.text((30, 420), "porthole 03, the maker's cut", font=F(16), fill=PAPER)
             d.ellipse((270, 196, 372, 268), outline=RUST, width=4)
-        if t > 9.0: typed(d, (30, 452), "\"" + quote[:33], SERIF(22), PAPER, (t - 9.0) / 1.0); typed(d, (30, 480), " " + quote[34:] + "\"", SERIF(22), PAPER, (t - 10.0) / 1.2)
+        if t > 9.0: typed(d, (30, 452), "\"" + quote[:31], SERIF(22), PAPER, (t - 9.0) / 1.0); typed(d, (30, 480), " " + quote[32:] + "\"", SERIF(22), PAPER, (t - 10.0) / 1.2)
         if t > 14.0:
             im.paste(after.resize((400, 225), Image.LANCZOS), (500, 190)); d = ImageDraw.Draw(im); d.text((500, 420), "after the critic's repair", font=F(16), fill=PAPER)
             d.ellipse((770, 192, 890, 280), outline=TEAL, width=4)
