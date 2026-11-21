@@ -2,7 +2,7 @@
 
 Owner: the sound designer (law 7), "a dog with its ear to the ground, who lays sounds it cannot hear".
 Files: `films/swarm/dogs/sound.py` (the library, the music, the cue sheet), `films/swarm/dogs/sound/*.wav`
-(87 files, 118 MB: every sound alone, the music of each sequence, the whole score and its six slices),
+(86 wav files, 118 MB: every sound alone, the music of each sequence, the whole score and its six slices),
 `films/swarm/dogs/sound/levels.json` (every number below, machine-readable).
 
 **Nobody has heard any of this.** I cannot hear. Every statement here is one of: MEASURED (a number
@@ -40,8 +40,8 @@ its own noise from its name and time, so moving one cue never changes how anothe
 `name(mix, at, ..., gain, pan, under)` and it returns the time the sound ends.
 
 - `at` is where the CONTACT lands. Measured onsets are in the table: every knock, step, splash and
-  ring starts within 2.2 ms of `at`. The soft sounds (breaths, swishes, drags) swell in over 20 to
-  100 ms by design. One sound has a lead-in: `breach` starts its rush 0.25 s BEFORE `at` and breaks
+  ring starts within 2.2 ms of `at`. The shake and the bubbles start within 8 ms, the voices within 16 ms.
+  The soft sounds (breaths, swishes, drags, the held tone) swell in over 20 to 100 ms by design. One sound has a lead-in: `breach` starts its rush 0.25 s BEFORE `at` and breaks
   the surface on `at`.
 - `gain` is the linear peak at centre pan (signals are normalised first). Panned hard, one channel
   rises by up to 3 dB (the kit's constant-power pan).
@@ -164,6 +164,8 @@ it?"). The voice, the taps, the radio, the lamp answering in S2 and the pack's r
 | `silence(mix, a, b)` | declares silence: empties the mix between a and b. Call after what might ring into it and before what should sound inside it | `sound.silence(mix, 118.0, 122.0)` |
 | `duck(mix, a, b, level=0.5)` | turns down what is already in the mix | `sound.duck(mix, 19.4, 20.6, 0.6)` |
 | `beds(mix)`, `music(mix, sequences)`, `sfx(mix, sequences)`, `score(mix)` | the layers | `sound.music(mix, (4, 5))` |
+| `sfx_s1(mix)` … `sfx_s6(mix)` (`sfx_s2`, `sfx_s3`, `sfx_s4`, `sfx_s5` between) | one sequence's cue sheet, at film times; `sfx_s6(mix, look_tone=False)` leaves the held tone out | `sound.sfx_s6(mix)` |
+| `render_all()` | renders and measures everything (what `python3 sound.py` runs) | |
 | `measure(stereo)`, `a_weighted_db(stereo)`, `write_wav(path, stereo)` | what produced the numbers below | |
 
 ## The cows and the dogs in the sound (the weave)
