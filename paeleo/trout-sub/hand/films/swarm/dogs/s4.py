@@ -2261,6 +2261,42 @@ def _rings(f):
     return rings
 
 
+# FINAL REPAIR (law 10). A child watching could not say why the dog needed help: it howled, and dogs came. The cause
+# is now in the picture before the howl. Ten fish children come up to the line all along the creek, each holding its
+# own page up out of the water (their own drawings: town.CHILD_DRAWS). One dog, one mouth, ten pages: it looks along
+# them, and howls. They stay, waving, while the pack gathers, and go down ahead of it when the dogs go.
+ASKERS = (486.0, 392.0, 648.0, 318.0, 716.0, 240.0, 790.0, 168.0, 868.0, 96.0)      # world x, in the order they come up
+ASK_T0, ASK_STEP, ASK_RISE = 84.12, 0.1, 0.62
+ASK_DUCK = 96.25
+
+
+def asker_state(i, f):
+    """(x, y world of the child's middle, how far up 0..1, arm degrees) for asker i."""
+    t0 = ASK_T0 + ASK_STEP * i
+    up = ease(f, t0, t0 + ASK_RISE) * (1 - ease(f, ASK_DUCK + 0.03 * i, ASK_DUCK + 0.03 * i + 0.5))
+    x = ASKERS[i] + 3.0 * math.sin(f * 0.9 + i)
+    y = lerp(600.0, 452.0, up) + 2.5 * math.sin(f * 1.5 + 1.3 * i)
+    wave = 9.0 * math.sin(f * 2.4 + 2.1 * i) * up
+    return x, y, up, lerp(40.0, 150.0, up) + wave
+
+
+def draw_askers(ink, f, cam, part):
+    """part 'fish': the children under the line. part 'pages': what each holds up through it (drawn after the surface)."""
+    if f < ASK_T0 or f > ASK_DUCK + 1.0:
+        return
+    for i in range(len(ASKERS)):
+        x, y, up, arm = asker_state(i, f)
+        if up <= 0.01:
+            continue
+        face = -1 if ASKERS[i] > 440 else 1                   # they all look at the dog
+        target = ink if part == "fish" else kit.Ink(0, 0)
+        r = town.child(target, f, cam, i % 8, x, y, facing=face, tilt=8 * face, arm=arm, look=(450, 370), swim=0.4)
+        if part == "pages":
+            hx, hy = r["hand"]
+            props.page(ink, hx + 3 * face, hy - 13, 0.58, drawing=town.CHILD_DRAWS[i % 8], angle=-6 * face + 4 * math.sin(f * 2.4 + 2.1 * i),
+                       wet=0.5, alpha=clamp(up * 1.6))
+
+
 def _porch_frame(ink, f, oy, ghost=False):
     """Everything while the porch is in frame and, at oy >= TOWN_OY, the master below.
     ghost=True: the place only (light, water, the person, the pile, splashes, drips); the cast is drawn on a
@@ -2307,6 +2343,7 @@ def _porch_frame(ink, f, oy, ghost=False):
             town_cast(ink, f, cam)
             _calf_from_below(ink, f, cam)
         else:
+            draw_askers(ink, f, cam, "fish")
             for nm in PACK:                                     # the moment after the splash, before the crane
                 _draw_swimmer(C(ink), nm, f, cam)
             if not ghost:
@@ -2320,6 +2357,8 @@ def _porch_frame(ink, f, oy, ghost=False):
             town.front(ink, f, cam)
 
     def front(ink, t, oy):
+        if not in_town:
+            draw_askers(ink, f, cam, "pages")
         for nm in PACK:
             tg = t_go(nm) + LEAP * 0.85
             if f >= tg - LEAP:

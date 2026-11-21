@@ -72,7 +72,7 @@ except Exception as _e:                      # pragma: no cover
 
 SECONDS = 28.0
 T0 = 116.0
-T1 = T0 + SECONDS
+T1 = 146.1              # the last STORY second (see story(): the film is 28 s; the story it tells runs a little longer)
 TEAL = (24, 120, 128)
 Cam = town.Cam
 DS = 0.6                                     # the lead dog
@@ -104,12 +104,61 @@ T_PAW = 139.75
 T_LOOK = 139.9          # it looks up at the roof for whoever should look. Nobody. Hold to 140.7
 T_TAKE = 140.7
 T_RISE = 141.0
-T_BREACH = 141.95
-T_SHAKE = 142.45
-T_LAY = 143.2
-T_PLEASED = 143.7
+T_BREACH = 141.95       # up through the line, right under the lead cow's chin
+T_SHOW = 142.45         # it has landed on the wet end of the sill and holds the reel up to her
+T_SNIFF = 142.8         # her muzzle comes down to the reel
+T_LICK = 143.6          # she licks the wet head, against the grain
+T_SHAKE = 144.0         # the biggest shake in the film, all over her
+T_TROT = 144.75         # it goes along the sill to the door with it
+T_LAY = 145.3
+T_PLEASED = 145.75
+T_POP = 124.2           # after the ice: the dog's head comes up through the water at her feet
+T_DUCK = 125.0          # ... and it goes back down to the work
+T_DOWN = 126.5          # at the making place again
 
 FS = 116.55             # where s4's clock stops (its works are simulated to 116.6)
+
+
+# ---- story time and film time (the repair of 21 Nov) ----
+# Every time in this file is a STORY second. The film is 28 s; two cow-and-dog passages were added (the
+# nose in the hole she stamped; the reel shown to her), so the story is 2.1 s longer than the film. The
+# difference is taken out where nothing was being decided: 0.7 s of the frozen wide (frames that are
+# identical by construction), and the rain / "later" passage is run a little faster.
+CUT = (118.05, 118.75)
+FAST = (125.0, 131.3)
+
+
+def _warp():
+    f0 = T0 + (CUT[0] - T0)                        # film second where the cut falls
+    f1 = f0 + (FAST[0] - CUT[1])                   # film second where the fast passage starts
+    f2 = T0 + SECONDS - (T1 - FAST[1])             # ... and ends
+    return f0, f1, f2
+
+
+def story(ff):
+    """Film second (116..144) -> story second (116..T1)."""
+    f0, f1, f2 = _warp()
+    if ff < f0:
+        return ff
+    if ff < f1:
+        return CUT[1] + (ff - f0)
+    if ff < f2:
+        return FAST[0] + (ff - f1) * (FAST[1] - FAST[0]) / (f2 - f1)
+    return FAST[1] + (ff - f2)
+
+
+def film(s):
+    """Story second -> film second (for the sound: every contact is laid where its frame falls)."""
+    f0, f1, f2 = _warp()
+    if s < CUT[0]:
+        return s
+    if s < CUT[1]:
+        return f0
+    if s < FAST[0]:
+        return f0 + (s - CUT[1])
+    if s < FAST[1]:
+        return f1 + (s - FAST[0]) * (f2 - f1) / (FAST[1] - FAST[0])
+    return f2 + (s - FAST[1])
 
 
 def bump(x):
@@ -440,9 +489,35 @@ def row_slots():
     return [865.0 - 26.0 * i for i in range(ROW_N)]
 
 
+ROW_LIFT = 15.0                                   # the place in the row (counted from the right) where the strip leaves the gravel
+
+
+def meander(q):
+    """How far the strip lies off the straight line at place q along it: a loose strip on gravel, not a ruled bar."""
+    return 7.0 * math.sin(q * 0.83) + 3.0 * math.sin(q * 2.1 + 1.0)
+
+
+def row_lean(i):
+    return 0.2 * math.sin(i * 1.7 + 0.5) + 0.08 * math.sin(i * 3.3)
+
+
+def row_haul(f):
+    """Places the whole strip has been hauled along itself toward the dog (it is pulled in by its end)."""
+    taken = float(np.sum(reel_weights(f)))
+    return max(0.0, taken - (ROW_N - 1 - ROW_LIFT))
+
+
+def row_at(i, f):
+    """World (x, y, lean) of piece i while the strip is being wound: it slides along the strip's own line."""
+    q = i + row_haul(f)
+    moving = 1.0 if (T_WIND < f < T_LID and row_haul(f) > 0) else 0.0
+    hop = 2.5 * moving * abs(math.sin(f * 17 + i * 1.3))
+    return 865.0 - 26.0 * q, LINE_Y + meander(q) - hop, row_lean(i) - 0.22 * moving * math.sin(f * 17 + i * 1.3)
+
+
 @lru_cache(maxsize=None)
 def reel_morph():
-    row = [(x, LINE_Y - 13.0) for x in row_slots()]
+    row = [(x, LINE_Y + meander(i) - 13.0) for i, x in enumerate(row_slots())]
     spiral = []
     for i in range(ROW_N):
         o = ROW_N - 1 - i                         # the left end is taken first and lies innermost
@@ -459,8 +534,10 @@ def reel_morph():
         out = np.empty_like(pts)
         for i in range(len(pts)):
             wi = w[i]
-            if wi < 0.5:
-                out[i] = ka_.pts[i] + (m - ka_.pts[i]) * smooth(wi * 2)
+            if wi < 0.5:                          # ... and it leaves the gravel from where the haul has brought it
+                x_, y_, _ = row_at(i, f)
+                src = np.array((x_, y_ - 13.0))
+                out[i] = src + (m - src) * smooth(wi * 2)
             else:
                 out[i] = m + (kb_.pts[i] - m) * smooth(wi * 2 - 1)
         return out
@@ -757,6 +834,8 @@ def draw_crowd_dog(ink, d, f, cam, st=None):
     if where == "roof" and d["eleven"] == 6 and 129.8 < f < 130.7:               # one of them goes cross-eyed and wobbles
         sx += 2.2 * math.sin((f - 129.8) * 19)
     a = draw_make(ink, d["make"], sx, sy, sc, fac, mode, tau, size=d["size"], carry=carry, under=under, pitch=pitch, seed=d["seed"])
+    if where in ("surface", "haul") or (where == "heap" and tau < 1.6):
+        _gasp(ink, a, f, d, fac, sc / BASE_SC[d["make"]])
     if where == "up" and d["make"] == "looker":                                  # its breath: one big bubble, let go
         _breath_bubble(ink, a, tau, sc / BASE_SC["looker"] * 0.5)
     if where == "roof" and f > T_LATER and a and "mouth" in a:                   # cheeks full
@@ -765,6 +844,19 @@ def draw_crowd_dog(ink, d, f, cam, st=None):
         ink.d.ellipse([mx - r + 2 * fac, my - r - 1, mx + r + 2 * fac, my + r - 1], fill=(206, 212, 206, 235) if d["make"] == "looker" else (190, 160, 110, 235),
                       outline=(30, 40, 46, 255))
     return a
+
+
+def _gasp(ink, a, f, d, fac, s):
+    """An open, empty mouth: the tongue out, and a puff of breath in the cold air, again and again."""
+    if not a or "mouth" not in a:
+        return
+    mx, my = a["mouth"]
+    ph = (f * 2.6 + d["k"] * 0.37) % 1.0
+    ink.d.ellipse([mx - 2.6 * s, my - 1.6 * s, mx + 2.6 * s, my + 2.8 * s], fill=(52, 30, 40, 255))
+    ink.d.ellipse([mx - 1.4 * s + fac * 1.5 * s, my + 0.6 * s, mx + 1.4 * s + fac * 1.5 * s, my + 4.6 * s + 1.2 * s * math.sin(ph * 6.28)], fill=(226, 132, 140, 255))
+    r = (2.0 + 5.0 * ph) * s
+    cx, cy = mx + fac * (5.0 + 9.0 * ph) * s, my - (1.0 + 5.0 * ph) * s
+    ink.d.ellipse([cx - r, cy - r * 0.8, cx + r, cy + r * 0.8], fill=(238, 234, 244, int(150 * (1 - ph))))
 
 
 def _breath_bubble(ink, a, tau, s):
@@ -828,7 +920,7 @@ def pack_state(nm, f):
 
     def rising(x, y, carry):
         u = (f - tl) / RISE
-        return dict(x=lerp(x, max(318.0, x - 130.0), u), y=lerp(y - 12, 398.0, smooth(u) * 0.4 + u * 0.6), facing=-1, mode="swim",
+        return dict(x=lerp(x, clamp(x - 110.0, 440.0, 900.0), u), y=lerp(y - 12, 398.0, smooth(u) * 0.4 + u * 0.6), facing=-1, mode="swim",
                     tau=f - tl, carry=carry, pitch=0.95)
     if nm in ("big", "mid", "small"):
         side = S4.STOCK[nm][2]
@@ -953,14 +1045,14 @@ ROW_ADD = [125.7 + 0.37 * i for i in range(ROW_N - 8)]     # when the second pac
 
 
 def row_pieces(f):
-    """[(world x, lean)] of the pieces standing in the row at f (before the lead dog winds them)."""
+    """[(world x, y, lean)] of the pieces standing in the row at f (before the lead dog winds them)."""
     old = start_state()["pieces"]
     slots = row_slots()
     u = ease(f, T_GOON + 0.2, 126.5)                        # the sheepdog walks the first eight shoulder to shoulder
-    out = [(lerp(old[i], slots[i], u), 0.06 * (1 - u) * (1 if i % 2 else -1)) for i in range(8)]
+    out = [(lerp(old[i], slots[i], u), LINE_Y + meander(i) * u, lerp(0.06 * (1 if i % 2 else -1), row_lean(i), u)) for i in range(8)]
     for i, ta in enumerate(ROW_ADD):
         if f >= ta:
-            out.append((slots[8 + i], -0.5 * (1 - ease(f, ta, ta + 0.3))))
+            out.append((slots[8 + i], LINE_Y + meander(8 + i), lerp(-0.5, row_lean(8 + i), ease(f, ta, ta + 0.3))))
     return out
 
 
@@ -979,7 +1071,9 @@ def smudges_at(f):
 SPOOL_AT = (411.0, 808.0)                    # where S2 left the spool, at the foot of the notice board
 MAKE_AT = (538.0, 806.0)                     # where the lead dog stands in the making place
 LAND = (440.0, 394.0)                        # where it stands on the sill at the end (board)
-BREACH_X = 596.0
+SHOW = (510.0, 394.0)                        # the wet end of the sill, under her chin: where it holds the reel up to her
+BREACH_X = 526.0
+POP_NOSE = (672.0, 377.0)                    # where its nose comes out of the water at her feet, after the ice
 
 
 @lru_cache(maxsize=4096)
@@ -1042,28 +1136,53 @@ def lead_state(f):
         y = lerp(by - 34, fy, e)
         p = dog.blend(dog.swim_up(f, steep=0.7), dog.look_up(dog.wait_float(f), 1.0), ease(u, 0.72, 1.0))
         return dict(out, pose=p, x=x, y=y, anchor="body")
-    if f < T_STAMP:                                           # nose to the underside of the ice, and held
-        tq = round(f * FPS) / FPS
-        return dict(out, pose=dog.look_up(dog.wait_float(tq), 1.0), x=fx, y=fy, anchor="body")
-    if f < 123.55:                                            # the stamp: ducks, ears flat; then looks up; the tail starts
+    if f < T_STAMP:                                           # nose to the underside of the ice; she comes down to it; then
+        tq = round(f * FPS) / FPS                             # it wants OUT: it scrabbles at the lid with its forefeet
+        p = dog.look_up(dog.wait_float(tq), 1.0)
+        scr = ease(f, 121.12, 121.25) * (1 - ease(f, 121.85, 121.97))
+        if scr > 0:
+            p = dog.blend(p, dog.look_up(dog.swim_up(f * 2.6, steep=0.95), 1.0), {"legs": scr, "tail": scr, "body": 0.25 * scr})
+            p["_anchor"] = "body"
+        bob = 2.5 * scr * math.sin(f * 31)
+        return dict(out, pose=p, x=fx, y=fy + bob, anchor="body")
+    if f < T_BREAK + 0.15:                                    # the stamp: ducks, ears flat; then looks up; the tail starts
         tau = f - T_STAMP
         duck = 16.0 * (1 - math.exp(-tau * 14)) * (1 - 0.45 * ease(tau, 0.7, 1.4))
         return dict(out, pose=dog.startle(tau), x=fx - 3 * (1 - math.exp(-tau * 14)), y=fy + duck, anchor="body")
     fx2, fy2 = fx - 3, fy + 16.0 * 0.55
-    if f < 125.15:                                            # the ice is gone: back down to the work
-        u = ramp(f, 123.55, 125.15)
+    (pnx, pny), _ = _probe(("float", 0.0, 1.0))
+    px, py = POP_NOSE[0] - pnx, POP_NOSE[1] - pny              # the body point that puts its nose out of the water at her feet
+    if f < T_POP:                                             # the ice is going: it goes after her hooves, under the plates
+        u = ramp(f, T_BREAK + 0.15, T_POP)
+        x = lerp(fx2, px, smooth(clamp(u / 0.8)))
+        y = lerp(fy2, py + 26, smooth(clamp(u / 0.62))) if u < 0.62 else lerp(py + 26, py, ease(u, 0.62, 1.0) ** 0.7)
+        p = dog.blend(dog.startle(1.15), dog.look_up(dog.swim(f * 1.3, effort=1.0), 0.8), ease(u, 0.0, 0.2))
+        p = dog.blend(p, dog.look_up(dog.wait_float(f), 1.0), ease(u, 0.6, 0.9))
+        p["_anchor"] = "body"
+        return dict(out, pose=p, x=x, y=y, anchor="body")
+    if f < T_DUCK:                                            # its head is out, in the hole she made. Noses. Her breath
+        tq = round(f * FPS) / FPS                             # blows its ears back; it pushes up into it; the tail goes
+        puff = ease(f, 124.5, 124.58) * (1 - ease(f, 124.74, 124.9))
+        p = dog.look_up(dog.wait_float(tq), 1.0)
+        p = dog.blend(p, dog.startle(0.12), {"ears": puff})
+        p = dog.blend(p, dog.pleased(f * 1.4), {"tail": ease(f, T_POP + 0.1, T_POP + 0.3)})
+        p["_anchor"] = "body"
+        y = py + 5.0 * puff - 4.0 * bump((f - 124.72) / 0.26) + 1.2 * math.sin(f * 9)
+        return dict(out, pose=p, x=px, y=y, anchor="body", poke=True)
+    if f < T_DOWN:                                            # and back down to the work
+        u = ramp(f, T_DUCK, T_DOWN)
         e = smooth(u)
-        x = lerp(fx2, MAKE_AT[0] + 6, e)
-        y = lerp(fy2, MAKE_AT[1] - 26, e ** 0.9)
-        turn = lerp(1.0, -1.0, ease(f, 123.55, 123.85))
+        x = lerp(px, MAKE_AT[0] + 6, e)
+        y = lerp(py, MAKE_AT[1] - 26, e ** 0.9) + 14.0 * bump(u / 0.12)
+        turn = lerp(1.0, -1.0, ease(f, T_DUCK + 0.1, T_DUCK + 0.4))
         if abs(turn) < 0.3:
             turn = 0.3 if turn > 0 else -0.3
         p = dog.blend(dog.wait_float(f), dog.swim_down(f, steep=0.78), ease(u, 0.05, 0.25))
         p = dog.blend(p, dog.swim(f), ease(u, 0.85, 1.0))
-        return dict(out, pose=p, x=x, y=y, facing=turn, anchor="body")
+        return dict(out, pose=p, x=x, y=y, facing=turn, anchor="body", poke=f < T_DUCK + 0.12)
     mx, my = MAKE_AT
     if f < T_ALONE - 0.4:                                     # at the making place: digging, looking, setting down
-        t = f - 125.15
+        t = f - T_DOWN
         if t < 0.45:
             return dict(out, pose=dog.blend(dog.dig(t), dog.stand(f), ease(t, 0.25, 0.45)), x=mx, y=my, facing=-1)
         cyc = (t - 0.45) % 3.4
@@ -1104,22 +1223,35 @@ def lead_state(f):
         tau = (f - T_TAKE) * 4.2
         p = dog.blend(dog.look_up(dog.watch(0.0), 1.0), dog.take_page(0.35 + tau), ease(f, T_TAKE, T_TAKE + 0.1))
         return dict(out, pose=p, x=xl, y=806.0, carry=_reel_sprite(under=True))
-    if f < T_BREACH:                                          # up, to the left of where it went down
+    if f < T_BREACH:                                          # up, toward the dark shape with the bell that is looking down
         u = ramp(f, T_RISE, T_BREACH)
-        x = lerp(xl + 30, BREACH_X + 44, u / 0.55) if u < 0.55 else lerp(BREACH_X + 44, BREACH_X, (u - 0.55) / 0.45)
+        x = lerp(xl + 30, BREACH_X + 26, u / 0.55) if u < 0.55 else lerp(BREACH_X + 26, BREACH_X, (u - 0.55) / 0.45)
         y = lerp(806.0 - 30, 404.0, smooth(u) * 0.35 + u * 0.65)
         p = dog.blend(dog.carry_page(f, gait="stand"), dog.carry_page(f, gait="swim_up"), ease(u, 0.0, 0.14))
-        return dict(out, pose=dog.holding(p, "reel"), x=x, y=y, facing=lerp(1.0, -1.0, ease(u, 0.5, 0.58)), anchor="body",
-                    carry=_reel_sprite(under=True))
-    if f < T_SHAKE:                                           # the breach
+        return dict(out, pose=dog.holding(p, "reel"), x=x, y=y, facing=1, anchor="body", carry=_reel_sprite(under=True))
+    if f < T_SHOW:                                            # the breach: out, and down on the wet end of the sill, under her chin
         tau = f - T_BREACH
-        dur = T_SHAKE - T_BREACH
-        x, y = dog.burst_path(tau, (BREACH_X, 399.0), LAND, DS, height=96.0, dur=dur)
-        return dict(out, pose=dog.holding(dog.burst(tau, dur=dur), "reel"), x=x, y=y, facing=-1, layer="front", anchor="body", carry=_reel_sprite())
-    if f < T_LAY:                                             # the biggest shake in the film
+        dur = T_SHOW - T_BREACH
+        x, y = dog.burst_path(tau, (BREACH_X, 399.0), SHOW, DS, height=74.0, dur=dur)
+        return dict(out, pose=dog.holding(dog.burst(tau, dur=dur), "reel"), x=x, y=y, facing=1, layer="front", anchor="body", carry=_reel_sprite())
+    if f < T_SHAKE:                                           # it holds the reel up to her: look. She smells it. Higher. She licks its head
+        up = 0.55 + 0.3 * ease(f, T_SNIFF + 0.3, T_SNIFF + 0.6)
+        lick = ease(f, T_LICK, T_LICK + 0.12)
+        p = dog.look_up(dog.stand(f), up * (1 - 0.55 * lick))
+        p = dog.blend(p, dog.pleased(f), {"tail": 1.0 - 0.7 * lick})
+        p = dog.blend(p, dog.ears_down(1.2), {"ears": lick})
+        p = dog.holding(p, "reel")
+        return dict(out, pose=p, x=SHOW[0], y=SHOW[1] + 2.0 * lick, facing=1, layer="sill", carry=_reel_sprite())
+    if f < T_TROT:                                            # the biggest shake in the film, all over her
         tau = f - T_SHAKE
-        return dict(out, pose=dog.holding(dog.shake(tau, dur=T_LAY - T_SHAKE), "reel"), x=LAND[0], y=LAND[1], facing=-1, layer="sill",
-                    carry=_reel_sprite(), bits=dog.shake_drops(tau, n=90, dur=T_LAY - T_SHAKE))
+        dur = T_TROT - T_SHAKE
+        return dict(out, pose=dog.holding(dog.shake(tau, dur=dur), "reel"), x=SHOW[0], y=SHOW[1], facing=1, layer="sill",
+                    carry=_reel_sprite(), bits=dog.shake_drops(tau, n=90, dur=dur))
+    if f < T_LAY:                                             # and along the sill to the door with it
+        u = ramp(f, T_TROT + 0.1, T_LAY)
+        fac = lerp(1.0, -1.0, ease(f, T_TROT, T_TROT + 0.14))
+        return dict(out, pose=dog.carry_reel(f, gait="trot"), x=lerp(SHOW[0], LAND[0], smooth(u) * 0.3 + u * 0.7), y=LAND[1], facing=fac,
+                    layer="sill", carry=_reel_sprite())
     if f < T_PLEASED:                                         # lays it on the sill and noses it along
         tau = (f - T_LAY) * 2.3
         p = dog.lay(min(tau, 0.9))
@@ -1139,14 +1271,17 @@ def _spool_sprite(f):
     return props.part_sprite("spool", mud=0.3, wet=1, weed=0.4, t=f, **props.UNDER)
 
 
-def draw_lead(ink, f, cam, layer):
+def draw_lead(ink, f, cam, layer, big=False, tint=None):
+    """The lead dog if it is in `layer`. A close shot's plate leaves it out; principals() draws it (big=True)."""
     st = lead_state(f)
-    if not st or st["layer"] != layer:
+    if not st or st["layer"] != layer or ("dog" in _SKIP and not big):
         return None
     z = cam.zoom
     sx, sy = cam.xy(st["x"], st["y"])
     under = layer == "under"
     kw = dict(LEAD_UNDER) if under else {}
+    if tint:
+        kw.update(tint)
     if st["anchor"]:
         kw["anchor"] = st["anchor"]
     fac = st["facing"]
@@ -1169,6 +1304,22 @@ def _mouth_cached(fq):
 def lead_mouth(f):
     """World point of the lead dog's mouth (the via-point of the REEL morph)."""
     return _mouth_cached(round(f * FPS) / FPS)
+
+
+@lru_cache(maxsize=4096)
+def _joints_cached(fq):
+    st = lead_state(fq)
+    fac = st["facing"]
+    if abs(fac) < 0.25:
+        fac = 0.25 if fac >= 0 else -0.25
+    j = dog.draw_dog(Image.new("RGB", (W, H)), st["pose"], st["x"], st["y"] - 200, scale=DS, facing=fac, shadow=False,
+                     texture=False, ss=1, **({"anchor": st["anchor"]} if st["anchor"] else {}))
+    return {k: (j[k][0], j[k][1] + 200) for k in ("nose", "mouth", "head", "ear_tip")}
+
+
+def lead_joint(f, name):
+    """World point of one of the lead dog's joints (nose | mouth | head | ear_tip): what the cow puts her muzzle to."""
+    return _joints_cached(round(f * FPS) / FPS)[name]
 
 
 def reel_lay_x(f):
@@ -1196,9 +1347,9 @@ def cows():
     r_pre = herd.Route([(LEAD_SPOT + 2, _my(LEAD_SPOT + 2), 1.0), (EDGE_X, _my(EDGE_X), 1.0)])
     w_pre = herd.Walker("lead", r_pre, [(T0 - 1, 2.0), (T_SKIN, 2.0), (118.0, r_pre.length)])
     ir = herd.ice_route(EDGE_X, COW_ICE_X)
-    w_ice = herd.Walker("lead", ir, [(119.3, 0.0), (120.72, ir.length), (T_BREAK, ir.length), (124.2, 0.0), (125.0, 0.0)], carry=16)
+    w_ice = herd.Walker("lead", ir, [(119.3, 0.0), (120.72, ir.length), (T_BREAK, ir.length), (123.9, 0.0), (125.0, 0.0)], carry=16)
     r_off = herd.Route([(EDGE_X, _my(EDGE_X), 1.0), (REST_X, 388.0, 1.0)])
-    w_off = herd.Walker("lead", r_off, [(124.95, 0.0), (128.6, r_off.length)])
+    w_off = herd.Walker("lead", r_off, [(126.0, 0.0), (129.6, r_off.length)])
     r_in = herd.Route([(REST_X, 388.0, 1.0), (LEFT_END[0], _my(LEFT_END[0]) + 1.0, 1.0)])
     w_in = herd.Walker("lead", r_in, [(133.8, 0.0), (135.1, r_in.length)])
     d5a, d6a = herd.hill_spot(0), herd.hill_spot(1)
@@ -1219,95 +1370,183 @@ def cow_stamp_tau(f):
     return None
 
 
-def lead_cow(ink, f, oy, layer, anchors):
-    """The lead cow all sequence long. Draws her if she is in `layer` (strip | front)."""
+_SKIP = set()                                 # what a close shot leaves out of its plate: "cow", "dog", "ice" (drawn again, big)
+T_COWOFF = 126.0                             # she leaves the edge, back along the bank
+T_HEARD = 141.0                              # the wet eleven are warm; something is coming up: she turns to the water
+
+
+def _wk(w, f, layer, **kw):
+    st = w.state(f)
+    far = clamp((0.62 - st["rel"]) / 0.5) * 0.5
+    return dict(layer=layer, pose=st["pose"], x=st["x"], y=st["y"], s=st["s"], facing=st["facing"], kw=dict(squash=st["squash"], far=far, **kw))
+
+
+def lead_cow_spec(f):
+    """The lead cow all sequence long, as data: dict(layer (strip | front), pose, x, y (world), s, facing, kw for
+    herd.cow with nose_to / reflect in WORLD coordinates, tongue (a world point she licks) or None)."""
     c = cows()
     S = herd.S
-    a = None
+
+    def at(layer, pose, x, y, facing, **kw):
+        return dict(layer=layer, pose=pose, x=x, y=y, s=S, facing=facing, kw=kw)
     if f < 116.45:                                           # as S4 left her: looking down into the water
-        if layer == "strip":
-            a = herd.cow(ink, "lead", herd.look_down(f, 1.0, "lead"), LEAD_SPOT, _my(LEAD_SPOT), S, -1, oy, nose_to=(LEAD_SPOT - herd.reach("lead"), 399.0))
-    elif f < T_SKIN:                                         # her head comes up: the water has gone strange
-        if layer == "strip":
-            p = herd.tween(herd.look_down(f, 1.0, "lead"), herd.stand(f, "lead", chew=0, alert=1), ease(f, 116.45, 116.95), "inout", "lead")
-            a = herd.cow(ink, "lead", p, LEAD_SPOT, _my(LEAD_SPOT), S, -1, oy)
-    elif f < 119.3:                                          # along the edge to where the ice begins; she looks at it
-        if layer == "strip":
-            if f < 118.0:
-                a = c["w_pre"].draw(ink, f, oy)
+        return at("strip", herd.look_down(f, 1.0, "lead"), LEAD_SPOT, _my(LEAD_SPOT), -1, nose_to=(LEAD_SPOT - herd.reach("lead"), 399.0))
+    if f < T_SKIN:                                           # her head comes up: the water has gone strange
+        p = herd.tween(herd.look_down(f, 1.0, "lead"), herd.stand(f, "lead", chew=0, alert=1), ease(f, 116.45, 116.95), "inout", "lead")
+        return at("strip", p, LEAD_SPOT, _my(LEAD_SPOT), -1)
+    if f < 119.3:                                            # along the edge to where the ice begins; she looks at it
+        if f < 118.0:
+            return _wk(c["w_pre"], f, "strip")
+        return at("strip", herd.stand(T_STOP, "lead", chew=0, alert=1), EDGE_X, _my(EDGE_X), -1)
+    if f < 120.72:                                           # out onto the ice: four careful steps, one hoof skating
+        skate = bump((f - 120.12) / 0.34)
+        return _wk(c["w_ice"], f, "front", reflect=402.0, rim=0.15, tilt=-0.06 * skate, nose_to=(NOSE_X + 10, 392.0) if f > 120.3 else None)
+    if f < T_BREAK:
+        tau = cow_stamp_tau(f)
+        nose = (NOSE_X, 399.6)
+        if tau is not None and f < 121.5:                    # head down to the ice over the dog; held
+            p = herd.tween(herd.stand(f, "lead", chew=0, alert=0.3), herd.stamp(tau, "lead"), ease(f, 120.72, 121.0), "inout", "lead")
+        elif tau is not None:
+            p = herd.stamp(tau, "lead")
+        else:
+            t2 = f - T_STAMP                                  # after the first: up again at once, down at 122.6, then she watches
+            if t2 < 0.6:
+                tb = 0.86 + (t2 - 0.08) * (herd.STAMP_HIT - 0.86) / 0.52
+                p = herd.tween(herd.stamp(herd.STAMP_HIT + 0.08, "lead"), herd.stamp(tb, "lead"), ease(t2, 0.08, 0.2), "inout", "lead")
             else:
-                p = herd.stand(T_STOP, "lead", chew=0, alert=1)
-                a = herd.cow(ink, "lead", p, EDGE_X, _my(EDGE_X), S, -1, oy)
-    elif f < 124.95:                                         # on the ice
-        if layer == "front":
-            w = c["w_ice"]
-            if f < 120.72:
-                skate = bump((f - 120.12) / 0.34)
-                a = w.draw(ink, f, oy, reflect=402, rim=0.15, tilt=-0.06 * skate, nose_to=(NOSE_X + 10, 392.0) if f > 120.3 else None)
-            elif f < T_BREAK:
-                tau = cow_stamp_tau(f)
-                nose = (NOSE_X, 399.6)
-                if tau is not None and f < 121.5:            # head down to the ice over the dog; held
-                    p = herd.tween(herd.stand(f, "lead", chew=0, alert=0.3), herd.stamp(tau, "lead"), ease(f, 120.72, 121.0), "inout", "lead")
-                elif tau is not None:
-                    p = herd.stamp(tau, "lead")
-                else:
-                    t2 = f - T_STAMP                          # after the first: up again at once, down at 122.6, then she watches
-                    if t2 < 0.6:
-                        tb = 0.86 + (t2 - 0.08) * (herd.STAMP_HIT - 0.86) / 0.52
-                        p = herd.tween(herd.stamp(herd.STAMP_HIT + 0.08, "lead"), herd.stamp(tb, "lead"), ease(t2, 0.08, 0.2), "inout", "lead")
-                    else:
-                        p = herd.stamp(herd.STAMP_HIT + (t2 - 0.6), "lead")
-                    nose = None
-                a = herd.cow(ink, "lead", p, COW_ICE_X, 401.0, S, -1, oy, nose_to=nose, reflect=402 if f < T_BREAK else None, rim=0.15)
-            elif f < 124.2:                                  # backing off, the plates tipping under each forefoot
-                dip = 3.0 * abs(math.sin((f - T_BREAK) * 8.5))
-                a = w.draw(ink, f, oy + 0, rim=0.15, tilt=0.035 * math.sin((f - T_BREAK) * 8.5))
-            else:                                            # the last forefoot went in to the knee: she shakes it like a cat
-                sh = f - 124.2
-                tau = 1.05 + 0.2 * math.sin(sh * 42) * (1 - ease(sh, 0.35, 0.7))
-                p = herd.tween(herd.stamp(tau, "lead"), herd.stand(f, "lead", chew=0, alert=0.6), ease(sh, 0.5, 0.75), "inout", "lead")
-                a = herd.cow(ink, "lead", p, EDGE_X, _my(EDGE_X), S, -1, oy)
-    elif f < 128.6:                                          # back along the bank, toward the sill end
-        if layer == "strip":
-            a = c["w_off"].draw(ink, f, oy)
-    elif f < 133.8:                                          # she has turned round; she looks down into the water
-        if layer == "strip":
-            turn = ease(f, 128.7, 129.5)
-            p = herd.tween(herd.stand(f, "lead", chew=1), herd.look_down(f, 0.9, "lead"), ease(f, 129.6, 130.6), "slow", "lead")
-            a = herd.cow(ink, "lead", p, REST_X, 388.0, S, -1, oy, turn=turn if turn < 1 else None) if turn < 1 else \
-                herd.cow(ink, "lead", p, REST_X, 388.0, S, 1, oy)
-    elif f < 135.1:                                          # she walks over
-        if layer == "strip":
-            a = c["w_in"].draw(ink, f, oy)
-    else:                                                    # across the wind side of them, head low over them
-        if layer == "strip":
-            x, y = LEFT_END[0], _my(LEFT_END[0]) + 1.0
-            lick = bump((f - 136.2) / 0.9)
-            target = (HEAP[6][0] - 6 + 5 * math.sin((f - 136.2) * 14) * lick, HEAP[6][1] - 13 + 3 * lick)
-            p = herd.tween(herd.stand(f, "lead", chew=0), herd.warm(f, "lead"), ease(f, 135.1, 135.9), "slow", "lead")
-            up = ease(f, 143.25, 143.7)                      # the reel is on the sill: her head comes up
-            turn = ease(f, 142.55, 143.2)                    # ... and she has turned to look that way
-            if f >= 142.4:
-                p = herd.tween(p, herd.stand(f, "lead", chew=0, alert=1), max(up, 0.0 if f < 143.25 else 1.0) if f >= 143.25 else 0.0, "inout", "lead")
-                p = herd.tween(herd.warm(f, "lead"), herd.stand(f, "lead", chew=0, alert=1), ease(f, 142.5, 143.6), "inout", "lead")
-                if turn < 1:
-                    a = herd.cow(ink, "lead", p, x, y, S, 1, oy, turn=turn, rim=0.1)
-                else:
-                    a = herd.cow(ink, "lead", p, x, y, S, -1, oy, rim=0.1)
-            else:
-                a = herd.cow(ink, "lead", p, x, y, S, 1, oy, nose_to=target if f > 135.3 else None, rim=0.1)
-    if a:
-        anchors["lead"] = a
+                p = herd.stamp(herd.STAMP_HIT + (t2 - 0.6), "lead")
+            nose = None
+        return at("front", p, COW_ICE_X, 401.0, -1, nose_to=nose, reflect=402.0, rim=0.15)
+    if f < 123.9:                                            # backing off, hind feet first, the plates tipping under each forefoot
+        return _wk(c["w_ice"], f, "front", rim=0.15, tilt=0.035 * math.sin((f - T_BREAK) * 8.5))
+    if f < T_COWOFF:                                         # on the bank again, fore hooves at the very edge. The dog comes up at her feet
+        x, y = EDGE_X, _my(EDGE_X)
+        nose = lead_joint(clamp(f, T_POP - 0.25, T_DUCK - 0.02), "nose")
+        nose = (nose[0] + 15.0, nose[1] - 1.0)
+        down = ease(f, 123.9, 124.3) * (1 - ease(f, T_DUCK, T_DUCK + 0.5))
+        p = herd.tween(herd.stand(f, "lead", chew=0, alert=0.5), herd.nose_touch(0.9, f, "lead"), down, "inout", "lead")
+        puff = ramp(f, 124.48, 124.9)
+        if 0 < puff < 1:                                     # one long warm breath out, on the wet head
+            p = dict(p)
+            p["_breath"] = puff
+            p["head"] = p.get("head", 0.0) + 3.0 * bump(puff)
+        if f >= T_DUCK:                                      # it has gone under: she looks down after it, as she did at 116
+            watch = ease(f, T_DUCK + 0.3, T_DUCK + 0.8)
+            p = herd.tween(p, herd.look_down(f, 0.85, "lead"), watch, "inout", "lead")
+            nose = (x - herd.reach("lead") + 4, 398.0)
+        p = dict(p)
+        p["_nose"] = max(down, ease(f, T_DUCK + 0.3, T_DUCK + 0.8))
+        return at("strip", p, x, y, -1, nose_to=nose, rim=0.15)
+    if f < 129.6:                                            # back along the bank, toward the sill end
+        return _wk(c["w_off"], f, "strip")
+    if f < 133.8:                                            # she has turned round; she looks down into the water
+        turn = ease(f, 129.7, 130.5)
+        p = herd.tween(herd.stand(f, "lead", chew=1), herd.look_down(f, 0.9, "lead"), ease(f, 130.6, 131.6), "slow", "lead")
+        if turn < 1:
+            return at("strip", p, REST_X, 388.0, -1, turn=turn)
+        return at("strip", p, REST_X, 388.0, 1)
+    if f < 135.1:                                            # she walks over
+        return _wk(c["w_in"], f, "strip")
+    x, y = LEFT_END[0], _my(LEFT_END[0]) + 1.0
+    if f < T_HEARD:                                          # across the wind side of them, head low over them
+        lick = bump((f - 136.2) / 0.9)
+        target = (HEAP[6][0] - 6 + 5 * math.sin((f - 136.2) * 14) * lick, HEAP[6][1] - 13 + 3 * lick)
+        p = herd.tween(herd.stand(f, "lead", chew=0), herd.warm(f, "lead"), ease(f, 135.1, 135.9), "slow", "lead")
+        return at("strip", p, x, y, 1, nose_to=target if f > 135.3 else None, rim=0.1)
+    if f < T_BREACH - 0.2:                                   # her ears go to the water; she turns round to it, away from the heap
+        turn = ease(f, T_HEARD + 0.15, T_HEARD + 0.75)
+        p = herd.tween(herd.warm(f, "lead"), herd.notice(herd.stand(f, "lead", chew=0, alert=0.7)), ease(f, T_HEARD, T_HEARD + 0.3), "inout", "lead")
+        if turn < 1:
+            return at("strip", p, x, y, 1, turn=turn, rim=0.2)
+        return at("strip", p, x, y, -1, rim=0.2)
+    alert = herd.notice(herd.stand(f, "lead", chew=0, alert=0.7))
+    if f < T_SNIFF:                                          # the water breaks under her chin: head up and back, then down to see
+        st = lead_state(f)
+        jerk = ease(f, T_BREACH - 0.05, T_BREACH + 0.1) * (1 - ease(f, T_SHOW - 0.15, T_SHOW + 0.2))
+        p = herd.tween(alert, herd.with_(alert, neck=alert["neck"] - 16.0, head=alert.get("head", 0) + 10.0, ear=-18.0, eye=1.5, dx=-3.0), jerk, "inout", "lead")
+        look = ease(f, T_SHOW - 0.1, T_SNIFF)
+        p = herd.tween(p, herd.smell(0.25, "lead"), look * 0.6, "inout", "lead")
+        p = dict(p)
+        p["_nose"] = 0.45 * look
+        m = lead_joint(max(f, T_SHOW), "mouth")
+        return at("strip", p, x, y, -1, nose_to=(m[0] + 31.0, m[1] + 15.0), rim=0.25)
+    if f < T_LICK:                                           # she smells what it holds up to her, and breathes on it
+        tau = f - T_SNIFF
+        p = herd.tween(herd.tween(alert, herd.smell(0.25, "lead"), 0.6, "inout", "lead"), herd.smell(0.6 + tau * 0.4, "lead"), ease(tau, 0.0, 0.32), "inout", "lead")
+        p = dict(p)
+        p["_nose"] = lerp(0.45, 1.0, ease(tau, 0.0, 0.32))
+        puff = ramp(tau, 0.42, 0.78)
+        if 0 < puff < 1:
+            p["_breath"] = puff
+        m = lead_joint(f, "mouth")
+        return at("strip", p, x, y, -1, nose_to=(m[0] + 31.0, m[1] + 15.0), rim=0.25)
+    if f < T_SHAKE + 0.07:                                   # ... and licks its wet head, once, against the grain
+        tau = f - T_LICK
+        p = dict(herd.smell(0.9, "lead"))
+        p["jaw"] = 9.0
+        p["_nose"] = 1.0
+        m, h = lead_joint(f, "mouth"), lead_joint(f, "head")
+        u = ease(tau, 0.02, 0.36)
+        tgt = (lerp(m[0] + 8.0, h[0] + 8.0, ease(tau, 0.0, 0.14)) - 14.0 * u, lerp(m[1] + 2.0, h[1] - 10.0, ease(tau, 0.0, 0.14)) - 3.0 * u)
+        out = at("strip", p, x, y, -1, nose_to=(m[0] + 22.0, h[1] - 12.0), rim=0.25)
+        out["tongue"] = tgt
+        return out
+    tau = f - T_SHAKE                                        # the shake goes all over her: head up and away, ears back, eyes shut;
+    flinch = herd.with_(alert, neck=alert["neck"] - 22.0, head=alert.get("head", 0) + 22.0, ear=-26.0, eye=0.15, dx=-5.0, pitch=-2.0, jaw=0.5)
+    held = 1 - ease(tau, 0.62, 0.95)                         # she shakes her own head once (the bell); then she looks at it again
+    p = herd.tween(herd.smell(0.9, "lead"), flinch, ease(tau, 0.06, 0.16), "inout", "lead")
+    wag = bump((tau - 0.66) / 0.5)
+    after = herd.stand(f, "lead", chew=ease(f, T_LAY, T_LAY + 0.3), alert=0.85)
+    p = herd.tween(p, after, 1 - held, "inout", "lead")
+    p = dict(p)
+    p["head"] = p.get("head", 0.0) + 13.0 * wag * math.sin((tau - 0.66) * 30)
+    p["ear"] = p.get("ear", 0.0) + 22.0 * wag * math.sin((tau - 0.66) * 30 + 1.0)
+    p["bell"] = 40.0 * wag * math.sin((tau - 0.66) * 22) + 30.0 * math.exp(-tau * 5) * math.sin(tau * 26)
+    return at("strip", p, x, y, -1, rim=0.25)
+
+
+@lru_cache(maxsize=2)
+def _scratch():
+    return Image.new("RGB", (W, H))
+
+
+def lead_cow(ink, f, oy, layer, anchors):
+    """Draw her if she is in `layer` (strip | front). In a close shot's plate she is left out (her anchors are
+    still found, for the steam) and drawn again, big, by principals()."""
+    sp = lead_cow_spec(f)
+    if sp["layer"] != layer:
+        return None
+    tgt = _scratch() if "cow" in _SKIP else ink
+    a = herd.cow(tgt, "lead", sp["pose"], sp["x"], sp["y"], sp["s"], sp["facing"], oy, **sp["kw"])
+    anchors["lead"] = a
+    return a
+
+
+def lead_cow_big(ink, f, cam, only=None):
+    """Her again through a Cam (a close shot): the same pose in the same place, drawn at the shot's own size.
+    only='head' lays her head down again, over the dog she has put it to."""
+    sp = lead_cow_spec(f)
+    z = cam.zoom
+    kw = dict(sp["kw"])
+    if only:
+        kw["only"] = only
+    if kw.get("nose_to") is not None:
+        kw["nose_to"] = cam.xy(*kw["nose_to"])
+    if kw.get("reflect") is not None:
+        kw["reflect"] = cam.xy(0.0, kw["reflect"])[1]
+    x, y = cam.xy(sp["x"], sp["y"])
+    a = herd.cow(ink, "lead", sp["pose"], x, y, sp["s"] * z, sp["facing"], 0, **kw)
+    a["tongue"] = cam.xy(*sp["tongue"]) if sp.get("tongue") else None
     return a
 
 
 def calf_xy(f):
     if f < 119.4:
         return 664.0, 388.5
-    if f < 133.0:                                            # its forefeet on the ice; then back up
-        u = ease(f, 119.4, 120.0) * (1 - ease(f, 123.2, 123.7))
-        return 664.0 - 7 * u, 388.5 + 6.0 * u
+    if f < 133.0:                                            # its forefeet on the ice; the ice cracks: it scrambles back
+        u = ease(f, 119.4, 120.0) * (1 - ease(f, 122.65, 122.95))    # along the bank, out of the way; then comes back to look
+        away = ease(f, 122.7, 123.3) * (1 - ease(f, 125.2, 126.0))
+        return 664.0 - 7 * u - 44.0 * away, 388.5 + 6.0 * u
     return lerp(664.0, 706.0, ease(f, 134.6, 135.8)), lerp(388.5, 392.5, ease(f, 134.6, 135.8))
 
 
@@ -1370,7 +1609,11 @@ def draw_calf(ink, f, oy):
             p = herd.stand(T_STOP, "calf", chew=0, alert=1)
         return herd.cow(ink, "calf", p, x, y, S, -1, oy, nose_to=(x - herd.reach("calf") - 2, 399.5) if f < 117.5 else None)
     if f < 133.0:
-        p = herd.tween(herd.stand(f, "calf", chew=0, alert=1), herd.look_down(f, 0.8, "calf"), ease(f, 119.6, 120.3), "inout", "calf")
+        p = herd.tween(herd.stand(f, "calf", chew=0, alert=1), herd.look_down(f, 0.8, "calf"), ease(f, 119.6, 120.3) * (1 - ease(f, 122.65, 122.85)), "inout", "calf")
+        if 122.7 < f < 126.0:                                 # scrambling back (a trot: it can), then standing well back, ears up
+            mv = bump((f - 122.7) / 0.6) + bump((f - 125.2) / 0.8)
+            if mv > 0.05:
+                p = herd.step_pose("calf", (x - 664.0) / (S * herd._size("calf")), 0.0, 1 - mv, f, 0.0, 1.0, "trot")
         return herd.cow(ink, "calf", p, x, y, S, -1, oy)
     if f < 136.0:
         turn = ease(f, 133.3, 133.9)
@@ -1387,45 +1630,58 @@ def draw_calf(ink, f, oy):
 #  5 · THE PICTURE                                                       #
 # ====================================================================== #
 
-SHOTS = [   # t0, t1 (film), name, why the camera is there
+SHOTS = [   # t0, t1 (STORY seconds), name, why the camera is there
     (116.0, 119.5, "A town, the cold", "F-TOWN: the work, and the cold coming down on it from the top of the frame"),
-    (119.5, 124.5, "B the ice", "F-SPLIT, locked: she above, the dog below, the ice between; a push on the two noses, let go by the stamp"),
-    (124.5, 132.2, "C the rain, and later", "F-TOWN: fifty-one come down through the same line; the light says later; they go up with things"),
-    (132.2, 133.2, "D up with the eleven", "crane up with eleven who have let their breath go"),
-    (133.2, 134.4, "E through the line", "F-SPLIT: heads through the surface; the roof below them empty"),
-    (134.4, 137.0, "F kept warm", "crane up and in on the meadow: the ones who could not go under are the ones who can do this"),
+    (119.5, 125.05, "B the ice, close", "a two-shot across the ice, twice life size: she above, the dog below, the lid between them; "
+                                        "it follows her hooves back to the bank, where its head comes up at her feet"),
+    (125.05, 127.0, "C the rain", "F-TOWN: fifty-one come down through the same line"),
+    (127.0, 132.5, "D later: up with things, and eleven on the roof", "under-water medium over the school: the light says later; each "
+                                                                    "dog that goes up passes close with its thing in its mouth; the eleven only look"),
+    (132.5, 137.0, "E kept warm", "locked on the meadow's edge, the line low in frame: eleven heads come through with nothing, "
+                                  "and the ones who could not go under are the ones who can do this"),
     (137.0, 140.7, "G alone", "medium on the making place: one dog, and the empty roof in the same frame"),
-    (140.7, 142.4, "H up", "pull back, then crane up with the reel through the line"),
-    (142.4, 144.0, "I pleased", "F-PORCH, as wide as the first shot of the film: the reel on the sill, the herd round the eleven"),
+    (140.7, 141.85, "H up", "pull back, then crane up with the reel toward the line"),
+    (141.85, 144.75, "J shown to her", "a two-shot at the wet end of the sill, twice life size, cut in on the splash: nobody "
+                                       "below was left to look at it, so it is held up to her"),
+    (144.75, T1, "K pleased", "F-PORCH, as wide as the first shot of the film: along the sill to the door; the reel laid down"),
 ]
 ALONE_CAM = Cam.look(650.0, 762.0, 1.72)
+LATER_CAM = Cam.look(676.0, 592.0, 1.62)        # the line is just out of the top of it
+T_CUT_E = 132.5                              # the eleven are on their way up: cut to where they will come out
 WARM_OY = 70
+T_CUT_C = 125.05
+T_CUT_J = T_BREACH - 0.1
+
+
+def ice_cam(f):
+    return Cam.look(lerp(652.0, 712.0, ease(f, T_BREAK + 0.1, T_POP - 0.1)), 395.0, 2.0)
+
+
+SHOW_CAM = Cam.look(606.0, 317.0, 2.0)
 
 
 def camera(f):
-    """-> (oy, push (cx, cy, zoom) or None, Cam or None). A Cam means the under-water medium (no porch)."""
+    """-> (oy, push (cx, cy, zoom) or None, Cam or None, close Cam or None). A Cam means the under-water
+    medium (no porch); a close Cam means a soft plate of the whole scene with the two principals drawn big."""
     if f < T_SPLIT:
-        return 360, None, None
-    if f < T_CLEAR:
-        z = 1.0 + 0.34 * ease(f, 120.45, 121.0) * (1 - ease(f, T_STAMP, T_STAMP + 0.22))
-        return 250, (NOSE_X + 20, 150.0, z), None
-    if f < 132.2:
-        return 360, None, None
-    if f < 134.4:
-        return porch.crane(f, 132.2, 133.2, 360, 250), None, None
+        return 360, None, None, None
+    if f < T_CUT_C:
+        return 0, None, None, ice_cam(f)
+    if f < T_LATER:
+        return 360, None, None, None
+    if f < T_CUT_E:
+        return 360, None, LATER_CAM, None
     if f < T_ALONE:
-        u = ease(f, 134.4, 135.5)
-        return lerp(250, WARM_OY, u), (960.0, 354.0, 1.0 + 0.75 * u), None
+        return WARM_OY, (960.0, 354.0, 1.75), None, None
     if f < T_TAKE:
-        return 360, None, ALONE_CAM
+        return 360, None, ALONE_CAM, None
     if f < T_RISE:
-        return 360, None, ALONE_CAM.mix(Cam(oy=360), ease(f, T_TAKE, T_RISE))
-    if f < T_PORCH:
-        return porch.crane(f, T_RISE, T_PORCH, 360, 0), None, None
-    return 0, None, None
-
-
-T_PORCH = 142.4
+        return 360, None, ALONE_CAM.mix(Cam(oy=360), ease(f, T_TAKE, T_RISE)), None
+    if f < T_CUT_J:
+        return porch.crane(f, T_RISE, T_CUT_J + 0.25, 360, 120), None, None, None
+    if f < T_TROT:
+        return 0, None, None, SHOW_CAM
+    return 0, None, None, None
 
 
 def _patched(**repl):
@@ -1507,8 +1763,8 @@ def draw_row(ink, f, cam):
     if f < T_GOON:
         return
     if f <= T_WIND:
-        for x, lean in row_pieces(f):
-            px, py = cam.xy(x, LINE_Y)
+        for x, y, lean in sorted(row_pieces(f), key=lambda q: q[1]):
+            px, py = cam.xy(x, y)
             kb.draw_thing(ink, "piece", px, py, PS * z, angle=lean, **UNDER)
         return
     w = reel_weights(f)
@@ -1520,8 +1776,9 @@ def draw_row(ink, f, cam):
         wi = w[i]
         x, y = pts[i]
         if wi <= 0:
-            px, py = cam.xy(row_slots()[i], LINE_Y)
-            kb.draw_thing(ink, "piece", px, py, PS * z, **UNDER)
+            x_, y_, lean = row_at(i, f)
+            px, py = cam.xy(x_, y_)
+            kb.draw_thing(ink, "piece", px, py, PS * z, angle=lean, **UNDER)
             trail.append((x, y))
         elif wi < 1:
             sc = PS * lerp(1.0, 0.34, ease(wi, 0.25, 1.0))
@@ -1529,6 +1786,10 @@ def draw_row(ink, f, cam):
             kb.draw_thing(ink, "piece", px, py, sc * z, angle=1.3 * math.sin(wi * math.pi) * (1 if i % 2 else -1) + 0.6 * wi, stand=False, **UNDER)
             trail.append((x, y))
     moving = [(pts[i][0], pts[i][1]) for i in range(ROW_N) if 0 < w[i] < 1]
+    rest = [i for i in range(ROW_N) if w[i] <= 0]
+    if moving and rest:                                       # ... and it is still joined to the part lying on the gravel
+        x_, y_, _ = row_at(max(rest), f)
+        moving = [(x_, y_ - 13.0)] + moving
     if len(moving) > 1:                                       # the strip is one thing: a dark line through the pieces in the air
         ink.d.line([cam.xy(*p) for p in moving], fill=(24, 44, 52, 150), width=max(1, int(round(1.4 * z))))
 
@@ -1679,22 +1940,21 @@ def frame(ink, f, oy):
             props.reel(ink, props.REEL_LEAD, reel_lay_x(f), 377 - oy, 0.78, tilt=0.8, paw=True, wet=1)
             props.drips(ink, f, reel_lay_x(f), 384 - oy, T_BREACH, floor=392 - oy, s=0.6)
         j = draw_lead(ink, f, cam, "sill")
-        if T_SHAKE <= f < T_LAY + 0.3:
-            porch.spray(ink, f, oy, LAND[0] - 6, 358, f - T_SHAKE, power=1.7, dur=1.0)
-        if f >= T_SHAKE:
-            porch.drips(ink, f, oy, LAND[0], 366, f - T_SHAKE, wet=1.0, width=40, floor=392)
+        if T_SHAKE <= f < T_TROT + 0.6:                       # the far spray: over her face, and up into the lamp light
+            porch.spray(ink, f, oy, SHOW[0] + 8, 356, f - T_SHAKE, power=1.7, dur=T_TROT - T_SHAKE)
+        if f >= T_SHOW:
+            lst = lead_state(f)
+            porch.drips(ink, f, oy, lst["x"], 366, f - T_SHOW, wet=1.0, width=40, floor=392)
 
     def under_(ink, t, oy):
         under(ink, f, cam, sky=False, porch_oy=oy)
 
     def front(ink, t, oy):
-        draw_ice(ink, f, cam)
+        if "ice" not in _SKIP:
+            draw_ice(ink, f, cam)
         draw_cows(ink, f, oy, "front", anchors)
-        a = anchors.get("lead")
-        if a and T_HOLD - 0.1 <= f < T_STAMP:
-            draw_wound(ink, f, cam, breathe=0.5 + 0.5 * math.sin((f - T_HOLD) * 2 * math.pi / 0.9 - 1.2))
-        elif f >= T_STAMP:
-            draw_wound(ink, f, cam)
+        if "ice" not in _SKIP:
+            wound(ink, f, cam)
         for d in sorted(cr, key=lambda d: d["pad"][1]):
             st = crowd_state(d, f)
             if st and st[0] in ("ice", "surface", "haul"):
@@ -1704,17 +1964,22 @@ def frame(ink, f, oy):
                 porch.splash(ink, f, oy, d["gap"], f - d["t_drop"], 0.6, "in", seed=d["k"])
             if d["eleven"] is not None and d["t_surf"] <= f < d["t_surf"] + 1.0:
                 porch.splash(ink, f, oy, d["surf_x"], f - d["t_surf"], 0.3, "out", seed=d["k"])
-        if 124.0 <= f < 125.0:                                # her forefoot goes in to the knee
-            porch.splash(ink, f, oy, EDGE_X - 44, f - 124.0, 0.9, "in", seed=77)
+        if T_POP - 0.12 <= f < T_POP + 1.0:                   # its head comes up through the water at her feet
+            porch.splash(ink, f, oy, POP_NOSE[0] - 10, f - (T_POP - 0.12), 0.4, "out", seed=77)
+        if T_DUCK <= f < T_DUCK + 1.0:
+            porch.splash(ink, f, oy, POP_NOSE[0] - 10, f - T_DUCK, 0.4, "in", seed=78)
         draw_lead(ink, f, cam, "front")
         if T_BREACH <= f < T_BREACH + 1.1:
-            porch.splash(ink, f, oy, BREACH_X, f - T_BREACH, 1.5, "out", seed=5)
+            porch.splash(ink, f, oy, BREACH_X, f - T_BREACH, 1.25, "out", seed=5)
 
     q, kneeling = person_q(f)
     rings = [porch.ring(d["gap"], d["t_drop"], 0.6) for d in cr if d["t_drop"] <= f < d["t_drop"] + 3]
     rings += [porch.ring(d["surf_x"], d["t_surf"], 0.8) for d in cr if d["eleven"] is not None and d["t_surf"] <= f < d["t_surf"] + 3]
     if f >= T_BREACH:
         rings.append(porch.ring(BREACH_X, T_BREACH, 1.3))
+    if T_POP - 0.1 <= f < T_POP + 3:
+        rings.append(porch.ring(POP_NOSE[0] - 10, T_POP - 0.1, 0.7))
+        rings.append(porch.ring(POP_NOSE[0] - 10, T_DUCK, 0.7))
     hx = hoof_x()
     stamps = []
     if f >= T_STAMP:
@@ -1729,22 +1994,177 @@ def frame(ink, f, oy):
                 cold=cold_at(f))
 
 
+def wound(ink, f, cam):
+    """Her breath's fog on the ice, the star, the crack (the WOUND morph), in any framing."""
+    if T_HOLD - 0.1 <= f < T_STAMP:
+        draw_wound(ink, f, cam, breathe=0.5 + 0.5 * math.sin((f - T_HOLD) * 2 * math.pi / 0.9 - 1.2))
+    elif f >= T_STAMP:
+        draw_wound(ink, f, cam)
+
+
 def medium(ink, f, cam):
     """The under-water medium (the porch is not in it)."""
     under(ink, f, cam, sky=True)
 
 
-def draw(t, ink):
-    """One full 960x540 frame of S5 at local time t (0..28)."""
-    t = clamp(t, 0.0, SECONDS)
-    f = T0 + t
-    oy, push, cam = camera(min(f, T1 - 1e-6))
+def _soft_breath(ink, a, p, z):
+    if a and 0 < p < 1:
+        herd.breath(ink, a["muzzle"][0], a["muzzle"][1], p, a["facing"], 1.5 * z)
+        _redraw(ink)
+
+
+def _tongue(ink, a, z):
+    """Her tongue, from her mouth to the place she licks (a screen point)."""
+    if not a or not a.get("tongue"):
+        return
+    mx, my = a["mouth"]
+    tx, ty = a["tongue"]
+    dx, dy = tx - mx, ty - my
+    n = math.hypot(dx, dy) or 1.0
+    px, py = -dy / n, dx / n
+    w0, w1 = 5.0 * z, 3.6 * z
+    pts = [(mx + px * w0, my + py * w0), (tx + px * w1, ty + py * w1), (tx + dx / n * 3 * z, ty + dy / n * 3 * z),
+           (tx - px * w1, ty - py * w1), (mx - px * w0, my - py * w0)]
+    ink.d.polygon(pts, fill=(214, 128, 138, 255), outline=(92, 40, 56, 255))
+    ink.d.line([(mx, my), (tx, ty)], fill=(170, 86, 100, 255), width=max(1, int(0.8 * z)))
+
+
+def principals(ink, f, cam):
+    """The two a close shot is about, drawn at the shot's own size over its soft plate: the lead cow and the
+    lead dog, and what passes between them (the ice, her breath, her tongue, the reel, the water it shakes off)."""
+    z = cam.zoom
+    line = cam.surface()
+    st = lead_state(f)
+    if f < T_CUT_C:                                           # ---- across the ice ----
+        cold = cold_at(f)
+        tint = dict(tint=kit.mix_color(TEAL, (128, 150, 162), cold), tint_amount=0.3 + 0.2 * cold, shadow=False)
+        j = draw_lead(ink, f, cam, "under", big=True, tint=tint) if st else None
+        draw_ice(ink, f, cam)
+        wound(ink, f, cam)
+        a = lead_cow_big(ink, f, cam)
+        _redraw(ink)
+        if j and T_NOSE - 0.02 <= f < T_STAMP + 0.1:          # a bubble sits against its nose, under the ice
+            nx, ny = j["nose"]
+            r = 4.2 * z * ease(f, T_NOSE - 0.02, T_NOSE + 0.2)
+            ink.d.ellipse([nx - r * 1.5 + 4 * z, ny - r * 0.9 - 2 * z, nx + r * 1.5 + 4 * z, ny + r * 0.5 - 2 * z], fill=(206, 236, 232, 70),
+                          outline=(236, 250, 246, 240), width=max(1, int(1.3 * z)))
+        if j and 121.12 < f < 121.97:                         # its claws on the underside of the lid: short white scores
+            rs = random.Random(int(f * 12))
+            for q in range(5):
+                cx_, cy_ = cam.xy(NOSE_X - 34 + rs.uniform(-16, 20), 400.0 + ICE_TH + 1.0)
+                ink.d.line([(cx_, cy_), (cx_ + rs.uniform(-9, 9) * z, cy_ + rs.uniform(2, 6) * z)], fill=(250, 254, 255, 235), width=max(1, int(z)))
+        if st and st.get("poke"):                             # the head that is out of the water, in the air's own colours
+            lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+            sx, sy = cam.xy(st["x"], st["y"])
+            dog.draw_dog(lay, st["pose"], sx, sy, scale=DS * z, facing=st["facing"], shadow=False, anchor="body")
+            top = lay.crop((0, 0, W, int(line) + 1))
+            ink.img.paste(top, (0, 0), top)
+            _redraw(ink)
+            for q in range(3):                                # the water round its neck
+                rx = (20 + 13 * q + 5 * math.sin(f * 7 + q)) * z
+                cx_ = cam.xy(POP_NOSE[0] - 22, 400.0)[0]
+                ink.d.arc([cx_ - rx, line - 2.2 * z, cx_ + rx, line + 2.6 * z], 0, 360, fill=(226, 246, 244, 200 - 55 * q), width=max(1, int(z)))
+        _soft_breath(ink, a, a.get("breath", 0.0), z)
+        return
+    # ---- the reel shown to her ----
+    a = lead_cow_big(ink, f, cam)
+    _redraw(ink)
+    j = None
+    if st and st["layer"] in ("front", "sill"):
+        j = draw_lead(ink, f, cam, st["layer"], big=True)
+    _tongue(ink, a, z)
+    if a and f >= T_SHAKE + 0.05:                             # drops on her face
+        rs = random.Random(12)
+        fade = 1 - ease(f, T_TROT - 0.15, T_TROT + 0.4)
+        for q in range(9):
+            if f - T_SHAKE > 0.05 + 0.05 * q:
+                ex, ey = a["eye"]
+                mx, my = a["muzzle"]
+                u = rs.random()
+                dx_, dy_ = lerp(ex, mx, u) + rs.uniform(-9, 9) * z, lerp(ey, my, u) + rs.uniform(-7, 7) * z + 9 * z * max(0.0, f - T_SHAKE - 0.4 - 0.03 * q)
+                ink.d.ellipse([dx_ - 1.6 * z, dy_ - 2.2 * z, dx_ + 1.6 * z, dy_ + 2.2 * z], fill=(214, 236, 244, int(235 * fade)))
+    _soft_breath(ink, a, a.get("breath", 0.0), z)
+
+
+def close(ink, f, cam):
+    """A close shot: the whole scene at the board's size as a soft plate (enlarged about the camera), then the
+    two principals drawn again at the shot's own size, sharp. The plate leaves them out."""
+    z = cam.zoom
+    cx, cy = cam.centre()
+    x0, y0 = cx - W / 2 / z, cy - H / 2 / z                   # the world window
+    oy = int(round(clamp(y0 - (H - H / z) / 2, 0, 360)))
+    _SKIP.update(("cow", "dog", "ice"))
+    try:
+        frame(ink, f, oy)
+    finally:
+        _SKIP.clear()
+    box = (x0, y0 - oy, x0 + W / z, y0 - oy + H / z)
+    assert box[0] >= -0.5 and box[1] >= -0.5 and box[2] <= W + 0.5 and box[3] <= H + 0.5, box
+    ink.img = ink.img.resize((W, H), Image.BICUBIC, box=box)
+    _redraw(ink)
+    principals(ink, f, cam)
+
+
+def _flake(d, x, y, r, a):
+    for k in range(3):
+        an = math.pi * k / 3 + 0.3
+        dx, dy = r * math.cos(an), r * math.sin(an)
+        d.line([(x - dx, y - dy), (x + dx, y + dy)], fill=(244, 250, 255, a), width=1 if r < 3.4 else 2)
+
+
+def cold_cue(ink, f, where):
+    """FINAL REPAIR (law 10): the freeze had no cause in the picture ("the pond suddenly turning grey and icy, no snow
+    or cold shown first"). Snow is drawn, by hand, six-armed, no two flakes the same size. where='under': it comes down
+    through the line from the first frame of the sequence, ahead of the grey, and hangs where it is when everything
+    stops. where='air': it goes on falling in the air over the ice, and thins when the ice is broken."""
+    rs = random.Random(51)
+    d = ink.d
+    if where == "under":
+        tw = min(f, T_STOP)
+        for k in range(90):
+            x0, born = rs.uniform(-10, 970), 116.0 + rs.uniform(0.0, 1.7) * rs.uniform(0.3, 1.0)
+            v, r, ph = rs.uniform(95, 190), rs.uniform(2.0, 4.6), rs.uniform(0, 6.28)
+            if tw <= born:
+                continue
+            y = -6 + v * (tw - born)
+            if y > H + 8:
+                continue
+            x = x0 + 9 * math.sin(ph + 1.7 * tw) + 14 * (tw - born)
+            _flake(d, x, y, r, int(225 * (1 - 0.45 * clamp(y / H))))
+        return
+    amt = 1 - ease(f, T_BREAK + 0.3, T_CLEAR)
+    if amt <= 0:
+        return
+    line = 270 + (400 - 395) * 2.0 - 12                     # the ice in this framing (ice_cam): nothing is drawn below it
+    for k in range(60):
+        x0, v, r, ph = rs.uniform(-10, 970), rs.uniform(60, 120), rs.uniform(2.2, 5.0), rs.uniform(0, 6.28)
+        y = (rs.uniform(0, line) + v * (f - T_SPLIT)) % line
+        x = x0 + 10 * math.sin(ph + 1.5 * f) + 10 * (f - T_SPLIT)
+        _flake(d, x % W, y, r, int(215 * amt * clamp((line - y) / 14.0)))
+
+
+def draw_story(f, ink):
+    """One full 960x540 frame at STORY second f (116..T1)."""
+    f = clamp(f, T0, T1)
+    oy, push, cam, near = camera(min(f, T1 - 1e-6))
+    if near is not None:
+        close(ink, f, near)
+        if T_SPLIT <= f < T_CLEAR:
+            cold_cue(ink, f, "air")
+        return
     if cam is not None:
         medium(ink, f, cam)
         return
     frame(ink, f, int(round(oy)))
     if push and push[2] > 1.001:
         porch.push(ink, push[0], push[1], push[2])
+    if f < T_SPLIT:
+        cold_cue(ink, f, "under")
+
+
+def draw(t, ink):
+    """One full 960x540 frame of S5 at local FILM time t (0..28)."""
+    draw_story(story(T0 + clamp(t, 0.0, SECONDS)), ink)
 
 
 # ====================================================================== #
@@ -1760,13 +2180,20 @@ def sound(mix, at=0.0):
     it lands on in THIS picture (the board's rule: the builder's frame wins and the sound moves)."""
     S = snd
 
-    def A(f):
-        return at + (f - T0)
+    def A(f):                                                # story second -> mix second
+        return at + (film(f) - T0)
+
+    def D(a, b):                                             # how long a story passage lasts in the mix
+        return A(b) - A(a)
     cr = crowd()
     c = cows()
     # rooms: below, the split is heard from above (dry, faint), below again, the bank, below, the porch
     S.hush(mix, A(T0) - 0.1, T_STOP - T0 + 0.1, 1.0, 0.2, 0.05)
-    S.music_s5(mix, at)                                      # the round: stops dead with everything else; back at +7
+    # the round (sound.music_s5's two calls, laid on THIS picture's clock): it stops dead with everything else,
+    # comes back with the break in all five voices, thins as the eleven go up, and one voice stops for the hold
+    S.pack_round(mix, A(T0), D(T0, T_STOP), voices=5, enter=0.0)
+    S.pack_round(mix, A(T_BREAK), D(T_BREAK, T_LOOK), voices=5, enter=0.0,
+                 leave={4: A(127.5), 3: A(129.0), 1: A(130.5), 0: A(132.0)})
     S.work(mix, A(116.0), 0.8, voices=7)
     S.work(mix, A(T_COLD), 1.2, voices=4, top=320, level=0.7)   # the cold: the working sound thins from the top
     S.ice_form(mix, A(T_COLD), 1.2)
@@ -1780,15 +2207,18 @@ def sound(mix, at=0.0):
         if k % 3 == 0:
             S.paws(mix, A(d["t_pad"] - 0.3), 2, 0.12, gain=0.012, pan=_pan(d["pad"][0]))
     S.silence(mix, A(T_HOLD), A(T_STAMP), fade=0.01)          # nose to nose: complete
+    S.paws(mix, A(121.15), 6, 0.11, gain=0.02, pan=_pan(NOSE_X))   # ... but for its claws on the underside of the lid
     S.stamp(mix, A(T_STAMP))
     S.stamp(mix, A(T_STAMP2), gain=0.55, bell=False)
     S.ice_crack(mix, A(T_STAMP2 + 0.02))
-    for tf, x, y, leg in c["w_ice"].hoof_falls(T_BREAK, 124.2):
+    for tf, x, y, leg in c["w_ice"].hoof_falls(T_BREAK, 123.9):
         S.hooves(mix, A(tf), 1, 0.4, "ice", gain=0.07, pan=_pan(x))
-    S.splash(mix, A(124.0), pan=0.3)
-    S.above(mix, A(T_SPLIT), T_CLEAR - T_SPLIT, 0.5, 0.05, 0.2)
+    S.breach(mix, A(T_POP - 0.1), 0.5, gain=0.09, pan=_pan(POP_NOSE[0]))   # its head comes up at her feet
+    S.cow_breath(mix, A(124.48), 0.5, gain=0.06, pan=0.4)     # one long breath on the wet head
+    S.splash(mix, A(T_DUCK), gain=0.07, pan=_pan(POP_NOSE[0]))
+    S.above(mix, A(T_SPLIT), D(T_SPLIT, T_CUT_C), 0.5, 0.05, 0.2)
     S.silence(mix, A(T_SPLIT), A(119.52), fade=0.005)
-    S.hush(mix, A(T_BREAK), T_UP + 0.2 - T_BREAK, 1.0, 0.8, 0.3)
+    S.hush(mix, A(T_CUT_C), D(T_CUT_C, T_CUT_E) + 0.2, 1.0, 0.3, 0.3)
     S.work(mix, A(T_GOON), 2.4, voices=7)                     # exactly as it was
     for d in cr:                                              # the second pack, heard from below: a rain of small splashes
         if d["k"] % 3 == 0:
@@ -1798,7 +2228,7 @@ def sound(mix, at=0.0):
             S.land(mix, A(d["t_land"]), gain=0.04, pan=_pan(d["spot"][0]))
     for ta in ROW_ADD:
         S.set_down(mix, A(ta + 0.25), gain=0.05, pan=_pan(700))
-    S.work(mix, A(T_LATER), 4.0, voices=4, level=0.8)         # later: thinning as they leave
+    S.work(mix, A(T_LATER), D(T_LATER, T_OUT), voices=4, level=0.8)   # later: thinning as they leave
     for nm, tl in LEAVE.items():
         S.bubbles(mix, A(tl), 3, 0.8, gain=0.03, pan=_pan(start_state()[nm]["x"]))
     # eleven run out of breath, and are kept warm
@@ -1808,8 +2238,8 @@ def sound(mix, at=0.0):
         S.breath_out(mix, A(d["t_out"]), 0.9, gain=0.07, pan=_pan(d["spot"][0]))
         S.breach(mix, A(d["t_surf"]), 0.7, gain=0.12, pan=_pan(d["surf_x"]))
         S.gasp(mix, A(d["t_surf"] + 0.2), gain=0.06, pan=_pan(d["surf_x"]))
-    S.above(mix, A(T_UP + 0.1), T_ALONE - T_UP - 0.1, 1.0, 0.3, 0.2)
-    S.crickets(mix, A(T_UP + 0.4), T_ALONE - T_UP - 0.5, 1, gain=0.014)
+    S.above(mix, A(T_CUT_E), D(T_CUT_E, T_ALONE), 1.0, 0.3, 0.2)
+    S.crickets(mix, A(T_CUT_E + 0.3), D(T_CUT_E + 0.3, T_ALONE) - 0.1, 1, gain=0.014)
     S.shiver(mix, A(T_UP + 0.9), 3.0, pan=0.5)
     for tf, x, y, leg in c["w_in"].hoof_falls(133.8, 135.1):
         S.hooves(mix, A(tf), 1, 0.55, "grass", gain=0.09, pan=_pan(x))
@@ -1834,12 +2264,15 @@ def sound(mix, at=0.0):
     S.breach(mix, A(T_BREACH), 1.0, gain=0.34, pan=0.2)
     S.above(mix, A(T_BREACH), T1 - T_BREACH, 1.0, 0.05, 0.05)
     S.crickets(mix, A(T_BREACH + 0.3), T1 - T_BREACH - 0.3, 2, gain=0.016)
-    S.paws(mix, A(T_SHAKE - 0.03), 2, 0.07, gain=0.1, pan=snd.P_SILL, wet=True)
-    S.shake(mix, A(T_SHAKE + 0.08), T_LAY - T_SHAKE - 0.1, gain=0.24)
+    S.paws(mix, A(T_SHOW - 0.03), 2, 0.07, gain=0.1, pan=snd.P_SILL, wet=True)      # down on the wet end of the sill
+    S.cow_breath(mix, A(T_SNIFF + 0.4), 0.7, gain=0.06, pan=0.3)                   # she smells the reel
+    S.card_drag(mix, A(T_LICK + 0.03), 0.3, pan=0.2)                               # her tongue, against the grain
+    S.shake(mix, A(T_SHAKE + 0.08), T_TROT - T_SHAKE - 0.1, gain=0.24)
+    S.cowbell(mix, A(T_SHAKE + 0.72), gain=0.05, pan=0.3)                          # she shakes her own head once
+    S.paws(mix, A(T_TROT + 0.1), 5, 0.1, gain=0.08, pan=snd.P_SILL, wet=True)      # along the sill to the door
     S.reel_down(mix, A(T_LAY + 0.62 / 2.3))
-    S.card_drag(mix, A(T_LAY + 0.3), 0.35, pan=snd.P_SILL)    # nosed along the board
-    S.tail(mix, A(T_PLEASED - 0.1), 4)
-    S.cow_breath(mix, A(142.7), 1.3, gain=0.04, pan=0.5)
+    S.card_drag(mix, A(T_LAY + 0.3), 0.3, pan=snd.P_SILL)     # nosed along the board
+    S.tail(mix, A(T_PLEASED - 0.1), 3)
     return mix
 
 
@@ -1848,9 +2281,10 @@ def sound(mix, at=0.0):
 # ====================================================================== #
 
 def _raw(f):
+    """The frame at STORY second f, before grain."""
     ink = kit.Ink(f - T0, int(round((f - T0) * FPS)))
     ink.paper()
-    draw(f - T0, ink)
+    draw_story(f, ink)
     return ink.img.convert("RGB")
 
 
@@ -1909,8 +2343,16 @@ def check(verbose=True, frames=True):
     out["up_with_nothing"] = 11
     out["up_with_a_thing"] = len(cr) - 11 + len(PACK9)
     assert len(row_pieces(T_WIND)) == ROW_N and len(row_pieces(T_GOON)) == 8
+    assert max(abs(row_at(i, T_WIND)[0] - row_slots()[i]) for i in range(ROW_N)) < 1e-6      # the haul starts from where the row stood
     assert len(PEBBLES_1) == 30
     assert abs(s4_clock(T0) - T0) < 1e-9 and abs(s4_clock(T_STOP) - FS) < 1e-9
+    # 3b the film's clock: 28 s of film tell T1 - T0 s of story; what is cut is frozen frames only
+    assert abs(story(T0) - T0) < 1e-9 and abs(story(T0 + SECONDS) - T1) < 1e-9
+    assert all(abs(story(film(q)) - q) < 1e-6 for q in (116.5, 119.0, 124.0, 126.0, 130.0, 135.0, 143.0, 146.0))
+    assert T_STOP <= CUT[0] < CUT[1] <= 118.9, "the cut must fall inside the frozen hold, before the dog's head comes up"
+    assert all(a[1] == b[0] for a, b in zip(SHOTS, SHOTS[1:])) and SHOTS[0][0] == T0 and SHOTS[-1][1] == T1
+    out["story_seconds"] = round(T1 - T0, 2)
+    out["fast_passage_rate"] = round((FAST[1] - FAST[0]) / (film(FAST[1]) - film(FAST[0])), 3)
     # 4 holds, from frames (before grain)
     if frames:
         a, b = np.asarray(_raw(118.2), np.int16), np.asarray(_raw(118.85), np.int16)
@@ -1935,7 +2377,11 @@ def kit_frame(t):
 
 
 def still(f):
-    return kit_frame(f - T0)
+    """The finished frame at STORY second f."""
+    ink = kit.Ink(f - T0, int(round((f - T0) * FPS)))
+    ink.paper()
+    draw_story(f, ink)
+    return ink.finish()
 
 
 def sheet(times, path, cols=4, scale=0.5, crop=None):

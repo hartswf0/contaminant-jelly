@@ -37,7 +37,7 @@ import sys
 from functools import lru_cache
 from pathlib import Path
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 
 _HERE = Path(__file__).resolve().parent
 for _p in (str(_HERE), str(_HERE.parent.parent)):
@@ -76,6 +76,7 @@ SILL_Y = 394.0
 DS = 0.6                                     # lead dog
 RS = 0.42                                    # retrievers, sheepdog
 BIG_S = 0.5                                  # the big wooden retriever in the gate frame
+BIG_REEL = 0.9                               # its can: 43 px across in the wide, a fifth of the frame high in the closer setups
 HS = 0.62                                    # herding dog
 GS = 0.84                                    # wire digger
 OLD_S = 0.78
@@ -83,6 +84,8 @@ OLD_X0, OLD_X1 = 425.0, 405.0                # the old dog's place; where it shi
 PRESENT_X = 541.0                            # where a dog stands on the wet half to hold its reel out
 BREACH_X = 596.0                             # where a dog comes up: just past the sill's end
 LAY_X = 306.0                                # where a passed reel is put on the pile
+CAN_HOME = (252.0, 366.0)                    # the can the person took from the dog, beside the knee
+COW_NEAR = 548.0                             # REPAIR: where the lead cow comes to, behind the dog that was told no
 COW_X0, COW_X1 = 664.0, 636.0                # the lead cow: in the meadow; behind the wet end of the sill
 
 
@@ -219,16 +222,16 @@ def old_machine():
         glance=St(0.3, "look at what is held out"),
         blink=St(0.55, "it is as the child drew it"),
         chin=St(0.25, "pass"),
-        raise_=St(1.45, "this one is wrong; look properly"),
-        long_look=St(1.5, "look at it until it is sure"),
+        raise_=St(1.15, "this one is wrong; look properly"),
+        long_look=St(1.2, "look at it until it is sure"),
         turn_back=St(2.5, "refuse: get up, turn round, lie down with its back to it"),
         back=St(0, "a back"),
         look_over=St(0.5, "it has come again: look over the shoulder"),
         let_pass=St(0.58, "it has changed: make room"),
         passed=St(0, "eyes shut"),
-        rise_turn=St(1.0, "the looking is done; go to the other one who waits"),
-        walk=St(1.25, "to the cow"),
-        lie_down=St(1.0, "down, against her chest"),
+        rise_turn=St(0.8, "the looking is done; go to the other one who waits"),
+        walk=St(1.1, "to the cow"),
+        lie_down=St(0.9, "down, against her chest"),
         beside=St(0, "the two who wait", end=True),
     )
     cow_down = lambda w, f: w.st("cow") in ("fold", "lie") and (w.st("cow") == "lie" or w.since("cow", f) >= 0.45)   # noqa: E731
@@ -284,12 +287,13 @@ def big_machine():
         roll_up=St(1.0, "onto the sill, in front of everybody"),
         proud=St(0, "hold it high: look what I made"),
         told=St(1.2, "a back. Look at it; look at the person; look at the cow. No help."),
-        roll_back=St(0.79, "go down again"),
-        fix=St(1.5, "take out the straight piece; put the child's page in"),
+        nudged=St(1.4, "the cow steps up and noses it back toward the water: go on, again"),
+        roll_back=St(0.8, "go down again"),
+        fix=St(2.6, "take out the straight piece; put the child's page in; take the can up"),
         come_up=St(0.37, "up, with it changed"),
         offer_low=St(0, "hold it out, lower this time"),
         lay=St(0.5, "lay it down"),
-        leave=St(1.8, "roll off to the meadow"),
+        leave=St(1.5, "roll off to the meadow"),
         rest=St(0, "hold still so the calf can sleep", end=True),
     )
     T = [
@@ -297,7 +301,8 @@ def big_machine():
         Tr("breach", "roll_up"), Tr("roll_up", "proud"),
         Tr("proud", "lay", lambda w, f: w.get("passed:big"), prio=2, why="the old dog passed it"),
         Tr("proud", "told", lambda w, f: w.st("old") == "back", prio=1, why="the old dog turned its back"),
-        Tr("told", "roll_back"), Tr("roll_back", "fix"), Tr("fix", "come_up"), Tr("come_up", "offer_low"),
+        Tr("told", "nudged", why="no help from the old dog or the person; it looks up at the cow"),
+        Tr("nudged", "roll_back", why="she pushed it to the edge"), Tr("roll_back", "fix"), Tr("fix", "come_up"), Tr("come_up", "offer_low"),
         Tr("offer_low", "lay", lambda w, f: w.st("old") in ("let_pass", "passed") and w.since("old", f) >= 0.3 - 1e-6,
            why="the old dog made room"),
         Tr("lay", "leave"), Tr("leave", "rest"),
@@ -321,6 +326,7 @@ def cow_machine():
         watch=St(0, "watch the gate; she knows gates", end=True),
         smell=St(1.2, "smell what the dog holds up"),
         still=St(0, "the old dog is looking: stop chewing"),
+        nose=St(1.4, "step up to the stuck one and nose it back to the water, the way she noses the calf"),
         chew=St(0, "it is all right: chew"),
         fold=St(2.0, "it is over: fold down where she stands"),
         lie=St(0, "beside the old dog", end=True),
@@ -334,7 +340,8 @@ def cow_machine():
         Tr("watch", "smell", lambda w, f: w.st("sheep") == "to_cow", prio=2, why="a reel under her chin"),
         Tr("smell", "watch"),
         Tr("watch", "still", lambda w, f: w.st("old") == "long_look", prio=1, why="the old dog's long look"),
-        Tr("still", "chew", lambda w, f: w.st("big") == "told" and w.since("big", f) >= 0.9 - 1e-6, why="the builder looks up at her"),
+        Tr("still", "nose", lambda w, f: w.st("big") == "nudged", why="the builder looks up at her"),
+        Tr("nose", "chew"),
         Tr("chew", "fold", laid, why="the reel is laid"),
         Tr("watch", "fold", laid, why="the reel is laid"),
     ]
@@ -348,7 +355,7 @@ CIRCUMSTANCES = [   # film time, fact, value: what the person does, and when off
     (157.2, "due:herder", True),
     (158.4, "due:digger", True),
     (159.6, "due:sheep", True),
-    (160.6, "due:lead", True),
+    (161.0, "due:lead", True),
     (161.0, "due:big", True),
 ]
 REELS = {   # who carries it up: is it ruled straight (wrong), which real film its lid shows
@@ -356,7 +363,7 @@ REELS = {   # who carries it up: is it ruled straight (wrong), which real film i
     "lead": dict(tidy=False, n=16), "big": dict(tidy=True, n=props.REEL_RETRIEVER),
 }
 ORDER = ("lead", "old", "herder", "digger", "sheep", "big", "cow")
-SHEEP_KW = dict(breach=0.2, to_cow=0.65, walk=0.7, lay=0.3, dive=0.5)
+SHEEP_KW = dict(breach=0.2, to_cow=1.15, walk=0.7, lay=0.3, dive=0.5)
 
 
 def run(circumstances=CIRCUMSTANCES, reels=REELS, f1=T1 + 4.0):
@@ -411,56 +418,71 @@ def after(name, state, f):
 # ====================================================================== #
 
 WIDE = (480.0, 270.0, 1.0)                   # F-PORCH
-MED = (362.0, 336.0, 1.55)                   # the dog, the picture on the door at the left edge, the bubble below
+MED = (362.0, 336.0, 1.55)                   # the dog, the picture on the door at the left edge, the child's page below
 SPLIT = (480.0, 520.0, 1.0)                  # F-SPLIT
 GATE = (470.0, 345.0, 1.5)                   # a little lower and closer: sill at centre, cow tall at the upper right
 LAST = (480.0, 420.0, 1.0)                   # F-LAST
 INSERT = Cam.look(546.0, 768.0, 2.3)         # the making place, where the reel is changed
+CLOSE = {   # the closer setups (world centre x, y, zoom): the cast is drawn again at this size, see _close_frame
+    "no": (318.0, 304.0, 2.25),               # REPAIR: the person (seen from behind the shoulder, never a face), the film, the dog
+    "ears": (432.0, 346.0, 2.5),             # REPAIR: the pushed-back can, the dog 190 px high, the cow's head coming down to it
+    "smell": (588.0, 338.0, 2.2),            # two-shot: the sheepdog and the lead cow; the can held up under her chin
+    "look": (500.0, 345.0, 2.7),             # the old dog's face, the can a fifth of the frame high, the proud dog, her muzzle above
+    "nudge": (572.0, 336.0, 2.3),            # two-shot: the wooden dog and the lead cow
+    "pass": (486.0, 346.0, 2.4),             # the same can, changed, held lower; the old dog over its shoulder
+}
 
-SHOTS = [   # film a, b, name, why the camera is there
-    (144.0, 149.0, "porch", "wide and still: the reel, the lamp, the picture on the door, the bubble below, all in one frame"),
-    (149.0, 150.0, "push", "in to the dog: the next four seconds are its ears"),
-    (150.0, 153.0, "medium", "the tidy picture at the left edge, the dog, the child's bubble under it"),
-    (153.0, 153.7, "pull", "back out: the answer is along the whole bank"),
-    (153.7, 155.0, "porch", "six dogs and a cow share the waterline"),
-    (155.0, 157.0, "crane", "down with the dogs: the line passes, the rest of the pack breaks it"),
-    (157.0, 170.0, "gate", "this is a gate and we look along it; the one who has stood at gates all her life looks too"),
-    (170.0, 171.5, "town", "what it goes down for: the straight piece out, the child's page in"),
-    (171.5, 173.0, "gate", "the same frame, so the only thing that has changed is the reel"),
-    (173.0, 177.0, "last-crane", "down until the line is in the middle: half the frame for the ones it was for"),
-    (177.0, 180.0, "last", "locked"),
-]
+
+@lru_cache(maxsize=None)
+def shots():
+    """film a, b, name, why the camera is there. The cuts fall where the machines put the events."""
+    t_look = when("old", "raise_") + 0.75
+    t_turn = when("old", "turn_back")
+    t_told = when("big", "told") + 0.12
+    t_fix, t_up = when("big", "fix"), when("big", "come_up")
+    return [
+        (144.0, 145.8, "porch", "wide: the reel is taken, the lamp, the door, the herd, all in one frame"),
+        (145.8, 149.3, "no", "REPAIR: close on the two of them. The film goes up to the lamp; the head says no, large enough to read"),
+        (149.3, 152.6, "ears", "REPAIR: the can is pushed back to the dog; its ears, a third of the frame high; the lead cow comes to it"),
+        (152.6, 153.0, "medium", "the dog, and the child's page under the sill that it looks down at"),
+        (153.0, 153.7, "pull", "back out: the answer is along the whole bank"),
+        (153.7, 155.0, "porch", "six dogs and a cow share the waterline"),
+        (155.0, 157.0, "crane", "down with the dogs: the line passes, the rest of the pack breaks it"),
+        (157.0, 159.3, "gate", "this is a gate and we look along it: two reels pass, so the pattern is learned"),
+        (159.3, 161.0, "smell", "the one who has stood at gates all her life wants to know what is in the dog's mouth"),
+        (161.0, t_look, "gate", "the proud one barges up in front of everybody"),
+        (t_look, t_turn, "look", "close enough to see what the old dog is looking at"),
+        (t_turn, t_told, "gate", "wide for the whole body: it gets up, goes round, lies down with its back to the reel"),
+        (t_told, t_fix, "nudge", "nobody helps; then the cow does the one thing a cow knows"),
+        (t_fix, t_up, "town", "what it goes down for: the straight piece out, the child's page in, the can taken up"),
+        (t_up, 175.0, "pass", "close, so the only thing that has changed is the picture on the can"),
+        (175.0, 178.0, "last-crane", "down until the line is in the middle: half the frame for the ones it was for"),
+        (178.0, 180.0, "last", "locked"),
+    ]
 
 
 def shot_at(f):
-    ti, to = when("big", "fix"), when("big", "come_up")      # the cut below is made when the retriever is below
-    if ti <= f < to:
-        return SHOTS[7]
-    if 169.0 < f < ti:
-        return SHOTS[6]
-    if to <= f < 173.0:
-        return SHOTS[8]
-    for s in SHOTS:
-        if s[0] <= f < s[1]:
-            return s
-    return SHOTS[-1]
+    for sh in shots():
+        if sh[0] <= f < sh[1]:
+            return sh
+    return shots()[-1]
 
 
 def camera(f):
-    """(world cx, world cy, zoom) of the frame's centre."""
+    """(world cx, world cy, zoom) of the frame's centre, for the setups that are one drawing of the porch."""
     def mix(a, b, u):
         return tuple(lerp(p, q, u) for p, q in zip(a, b))
-    if f < 149.0:
-        return WIDE
+    if f < 152.6:
+        return WIDE                                           # (145.8 to 152.6 are closer setups, drawn by _close_frame)
     if f < 153.0:
-        return mix(WIDE, MED, ease(f, 149.0, 150.0))
+        return MED
     if f < 155.0:
         return mix(MED, WIDE, ease(f, 153.0, 153.7))
     if f < 157.0:
         return mix(WIDE, SPLIT, ease(f, 155.0, 157.0))
-    if f < 173.0:
+    if f < 175.0:
         return GATE
-    return mix(GATE, LAST, ease(f, 173.0, 177.0))
+    return mix(GATE, LAST, ease(f, 175.0, 178.0))
 
 
 def view(ink, cx, sy, zoom):
@@ -478,6 +500,108 @@ def view(ink, cx, sy, zoom):
 
 def _redraw(ink):
     ink.d = ImageDraw.Draw(ink.img, "RGBA")
+
+
+# A CLOSER SETUP is not a blow-up of the wide frame. The set is drawn once at its own size and pushed in
+# (soft, as a background out of focus should be); the animals and what they carry are then DRAWN AGAIN at
+# the closer size, so their edges are cut as cleanly as in the wide. Everything in part 5 goes on working
+# in the wide frame's pixels; these few functions carry a point or a size across.
+
+class _Zoom:
+    on, cx, cy, z = False, W / 2, H / 2, 1.0
+
+
+ZM = _Zoom()
+
+
+def zx(x):
+    return W / 2 + (x - ZM.cx) * ZM.z if ZM.on else x
+
+
+def zy(y):
+    return H / 2 + (y - ZM.cy) * ZM.z if ZM.on else y
+
+
+def zs():
+    return ZM.z if ZM.on else 1.0
+
+
+def unz(pt):
+    return (ZM.cx + (pt[0] - W / 2) / ZM.z, ZM.cy + (pt[1] - H / 2) / ZM.z) if ZM.on else pt
+
+
+def _is_pt(v):
+    return isinstance(v, tuple) and len(v) == 2 and all(isinstance(c, (int, float)) for c in v)
+
+
+def unz_a(a):
+    """Anchors a cast module returned in the closer frame, carried back to the wide frame's pixels."""
+    if not ZM.on or not isinstance(a, dict):
+        return a
+    out = {}
+    for k, v in a.items():
+        if _is_pt(v):
+            out[k] = unz(v)
+        elif isinstance(v, dict):
+            out[k] = {n: (unz(q) if _is_pt(q) else q) for n, q in v.items()}
+        else:
+            out[k] = v
+    return out
+
+
+FLIP_MIN = 0.62          # a card dog turning is never drawn thinner than this: no edge-on sliver
+
+
+def old_P(action, t=0.0, p=0.0, look=0.0):
+    """The old dog's pose for an action of kennel_a, with its turn kept off the card's edge."""
+    tq = math.floor(t * 8 + 1e-6) / 8
+    P = dict(ka._old_pose(action, tq, p, look))
+    sx = P.get("sx", 1.0)
+    if abs(sx) < FLIP_MIN:
+        P["sx"] = FLIP_MIN if sx >= 0 else -FLIP_MIN
+    return P
+
+
+def OLD(ink, x, y, s, facing=1, action="lie", t=0.0, p=0.0, P=None, **kw):
+    """kennel_a.old_dog, drawn from a pose of ours (so two of its actions can be joined without a jump and its
+    turn never goes edge-on), in whichever frame is being drawn. kennel_a is not edited: its pose function is
+    borrowed for the length of this one call and put back."""
+    if P is None:
+        P = old_P(action, t, p)
+    orig = ka._old_pose
+    ka._old_pose = lambda *a, **k: dict(P)
+    try:
+        a = ka.old_dog(ink, zx(x), zy(y), s * zs(), facing, "swim" if action == "swim" else "lie", t=t, exposure=0, **kw)
+    finally:
+        ka._old_pose = orig
+    return unz_a(a)
+
+
+def DOG(target, pose, x, y, scale=1.0, **kw):
+    return unz_a(dog.draw_dog(target, pose, zx(x), zy(y), scale=scale * zs(), **kw))
+
+
+def RET(target, x, y, action, tau, scale=1.0, **kw):
+    return unz_a(kb.retriever(target, zx(x), zy(y), action, tau, scale=scale * zs(), **kw))
+
+
+def COW(ink, who, pose, x, y, s=None, facing=1, oy=0, nose_to=None, **kw):
+    if not ZM.on:
+        return herd.cow(ink, who, pose, x, y, s, facing, oy, nose_to=nose_to, **kw)
+    nt = (zx(nose_to[0]), zy(nose_to[1] - oy)) if nose_to is not None else None
+    return unz_a(herd.cow(ink, who, pose, zx(x), zy(y - oy), (herd.S if s is None else s) * ZM.z, facing, 0, nose_to=nt, **kw))
+
+
+def BREATH(ink, x, y, p, facing=1, size=1.0):
+    herd.breath(ink, zx(x), zy(y), p, facing, size=size * zs())
+
+
+def DRIPS(ink, f, x, y, t0, width=20.0, floor=None, s=1.0, **kw):
+    props.drips(ink, f, zx(x), zy(y), t0, width=width * zs(), floor=None if floor is None else zy(floor), s=s * zs(), **kw)
+
+
+def REEL(ink, n, x, y, s=1.0, **kw):
+    return props.reel(ink, n, zx(x), zy(y), s * zs(), **kw)
 
 
 def on_layer(ink, fn, rot=0.0, pivot=None, tint=None, amount=0.0, alpha=1.0, split=None):
@@ -502,7 +626,7 @@ def on_layer(ink, fn, rot=0.0, pivot=None, tint=None, amount=0.0, alpha=1.0, spl
         r, g, b, a = lay.split()
         lay = Image.merge("RGBA", (*Image.blend(Image.merge("RGB", (r, g, b)), Image.new("RGB", lay.size, tint), amount).split(), a))
     if split is not None:
-        ly = int(round(split)) - oy_
+        ly = int(round(zy(split))) - oy_
         if ly < lay.size[1]:
             ly = max(0, ly)
             bot = lay.crop((0, ly, lay.size[0], lay.size[1]))
@@ -535,30 +659,42 @@ def teeth_image(tidy):
 
 @lru_cache(maxsize=64)
 def _lid(look, size, paw):
-    """A reel lid we can read from across the creek: a pale disc with the teeth on it, ruled or wobbly."""
+    """The label on a can's lid: the teeth, ruled (on cold white) or as the child drew them (on the child's
+    cream paper, both jaws), in pencil thin enough to read as a drawing when the can is large in frame."""
     S = 4
     n = int(size * S)
     im = Image.new("RGBA", (n, n), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
     tidy = look == "tidy"
-    d.ellipse([1, 1, n - 2, n - 2], fill=(238, 240, 244, 255) if tidy else (246, 232, 198, 255), outline=(52, 44, 58, 255), width=max(2, S))
-    town.picture(im, "jaw_only" if size < 30 else "jaw", n / 2, n / 2, n * 0.74, tidy=tidy,
-                 color=(40, 60, 96) if tidy else (120, 52, 30), width=max(2.0, n * 0.05))
+    d.ellipse([1, 1, n - 2, n - 2], fill=(222, 230, 240, 255) if tidy else (248, 236, 204, 255), outline=(44, 38, 50, 255), width=max(2, S // 2))
+    town.picture(im, "jaw_only" if size < 24 else "jaw", n / 2, n * (0.5 if tidy else 0.47), n * 0.7, tidy=tidy,
+                 color=(36, 54, 96) if tidy else (104, 44, 26), width=max(2.0, n * (0.034 if size >= 40 else 0.05)))
     if paw:
-        props.paw_print(im, n * 0.72, n * 0.76, n / 48.0 * 1.2, angle=-18, wet=0.6)
+        props.paw_print(im, n * 0.76, n * 0.8, n / 48.0 * 0.8, angle=-18, wet=0.6)
     return im.resize((int(size), int(size)), Image.LANCZOS)
 
 
-def my_reel(ink, x, y, s, look, paw=False, tilt=1.0, angle=0.0, under=False, alpha=1.0, wet=0.6, lit=1.0):
+def my_reel(ink, x, y, s, look, paw=False, tilt=1.0, angle=0.0, under=False, alpha=1.0, wet=0.6, lit=1.0, tail=0.0, sway=0.0):
     """A can centred at (x, y). look = a reel number (its real frame on the lid), or 'tidy' / 'wobbly':
-    the two lids the defining passage turns on, drawn large enough to tell apart."""
+    the two lids the defining passage turns on. tail 0..1 = a length of film hanging out of it and
+    swinging (sway): with the metal rim and the wall under the lid it is what makes this a can of film
+    in a mouth and not a disc in the air."""
+    ret = (x, y)
+    is_ink = hasattr(ink, "img")
+    if is_ink:
+        x, y, s = zx(x), zy(y), s * zs()
     kw = dict(tint=TEAL, tint_amount=0.3) if under else {}
+    R = 24.0 * s
+    if tail > 0 and is_ink and alpha >= 1:                    # the film: out of the can's lower edge, down, dripping
+        a = (x + R * 0.55, y + R * 0.7 * tilt)
+        b = (a[0] + R * (0.5 + 0.35 * sway) * tail, a[1] + R * 1.25 * tail)
+        props.film_strip(ink, look if isinstance(look, int) else props.REEL_RETRIEVER, a, b, sag=R * 0.22 * (1 + 0.5 * sway), s=max(0.5, 0.62 * s), lit=0.25)
     if isinstance(look, int):
         props.reel(ink, look, x, y, s, tilt=tilt, angle=angle, paw=paw, wet=wet, alpha=alpha, lit=lit, **kw)
-        return (x, y)
+        return ret
     props.reel(ink, props.REEL_RETRIEVER, x, y, s, tilt=tilt, angle=angle, wet=wet, face=False, alpha=alpha, **kw)
     if tilt > 0.55:
-        d = 2 * 24.0 * s * 0.86
+        d = 2 * R * 0.7
         lid = _lid(look, round(d), bool(paw))
         if tilt < 0.99:
             lid = lid.resize((lid.size[0], max(2, int(lid.size[1] * tilt))), Image.LANCZOS)
@@ -569,11 +705,11 @@ def my_reel(ink, x, y, s, look, paw=False, tilt=1.0, angle=0.0, under=False, alp
             lid = Image.merge("RGBA", (*Image.blend(Image.merge("RGB", (r, g, b)), Image.new("RGB", lid.size, TEAL), 0.25).split(), a))
         if alpha < 1:
             lid.putalpha(lid.getchannel("A").point(lambda v: int(v * alpha)))
-        img = ink.img if hasattr(ink, "img") else ink
+        img = ink.img if is_ink else ink
         img.paste(lid, (int(round(x - lid.size[0] / 2)), int(round(y - lid.size[1] / 2))), lid)
-        if hasattr(ink, "img"):
+        if is_ink:
             _redraw(ink)
-    return (x, y)
+    return ret
 
 
 def big_look(f):
@@ -589,7 +725,7 @@ MAKE_S = dict(herder=HS, digger=GS, big=RS, mid=RS, small=RS, sheep=RS, blood=RS
 def draw_make(ink, make, x, y, f, act="stand", facing=1, k=1.0, carry=None, under=False, rot=0.0, alpha=1.0, look=0.0, split=None):
     """One pack dog of a given make. act: stand | walk | swim. k scales it. rot turns the whole dog
     (radians, nose up when positive for a dog facing right). Returns its screen anchors."""
-    s = MAKE_S[make] * k
+    x, y, s = zx(x), zy(y), MAKE_S[make] * k * zs()
     uw = dict(tint=kb.WATER, tint_amount=0.3, shadow=False) if under else {}
     if make in ("big", "mid", "small", "sheep", "blood", "terrier"):
         name = {"big": "retriever", "mid": "retriever", "small": "retriever", "sheep": "sheepdog", "blood": "bloodhound",
@@ -611,8 +747,8 @@ def draw_make(ink, make, x, y, f, act="stand", facing=1, k=1.0, carry=None, unde
             if rot:
                 a = dict(a)
                 a["mouth"] = rot_pt(a["mouth"], (x, y), rot * facing)
-            return a
-        return go(ink)
+            return unz_a(a)
+        return unz_a(go(ink))
     action = {"stand": "wait", "walk": "walk", "swim": "swim"}[act]
     if make == "herder":
         def go(im):
@@ -629,8 +765,8 @@ def draw_make(ink, make, x, y, f, act="stand", facing=1, k=1.0, carry=None, unde
         if rot:
             a = dict(a)
             a["mouth"] = rot_pt(a["mouth"], (x, y), rot * facing)
-        return a
-    return go(ink)
+        return unz_a(a)
+    return unz_a(go(ink))
 
 
 # ====================================================================== #
@@ -640,7 +776,7 @@ def draw_make(ink, make, x, y, f, act="stand", facing=1, k=1.0, carry=None, unde
 STACK_X = (236.0, 262.0, 289.0, 318.0, 346.0, 374.0)        # six leaning piles, step's foot to the sill's first boards
 STACK_H = (10, 13, 9, 7, 6, 3)                              # 48 cans in the piles
 STACK_LEAN = (1.1, -0.9, 0.8, -1.2, 1.0, -0.6)
-POPUPS = (160.45, 161.25, 161.95, 169.45, 169.85)           # small dogs at the porch edge, a can each, out of the action's line
+POPUPS = (158.05, 161.45, 162.15, 162.85, 167.0)           # small dogs at the porch edge, a can each, out of the action's line
 N_PILED = sum(STACK_H)
 
 
@@ -664,7 +800,7 @@ def ledger():
     late = [p for p in range(6) for _ in range(room[p])]
     random.Random(11).shuffle(late)
     nlate = len(late)
-    times += [170.05 + 1.4 * i / (nlate - 1) for i in range(nlate)]          # the pile jumps while we are below
+    times += [170.9 + 2.4 * i / (nlate - 1) for i in range(nlate)]          # the pile jumps while we are below
     piles = early_pile + late
     paw_idx = {3, 9, 14, 21, 27, 33, 40, 46}                                  # eight more things were written
     out = [(times[i], piles[i], order[i], i in paw_idx) for i in range(N_PILED)]
@@ -701,14 +837,14 @@ def draw_stacks(ink, f, oy):
     _redraw(ink)
     # a can that has just landed sits up for a moment
     for (tl, p, n, paw) in ledger():
-        if 0 <= f - tl < 0.25 and not (170.0 <= tl < 171.5):
+        if 0 <= f - tl < 0.25 and not (170.8 <= tl < 173.4):
             h = sum(1 for e in ledger() if e[1] == p and e[0] <= f)
             props.reel(ink, n, STACK_X[p], 392 - oy - 6 - 4.0 * h - 7 * bump((f - tl) / 0.25), 0.42, tilt=0.6, wet=1)
 
 
 PEBBLES = "wwggwgwggwgg" + "ggwgggwggggwgggwgg" + "gggwggggwgggggwggggwggggwggggwggggwgg"      # 67 asks; 16 white, never two together
 PEB_T = ([153.4, 153.9, 154.3, 154.8, 155.2, 155.6, 156.1, 156.5, 157.5, 158.1, 158.9, 159.5, 160.1, 160.7]
-         + [169.4 + 2.0 * i / 22 for i in range(23)])
+         + [170.9 + 2.4 * i / 22 for i in range(23)])
 PEB_SEEN = (153.4, 154.3, 155.2, 156.1, 158.9, 160.1)       # the ones the hand is seen to set down
 
 
@@ -808,46 +944,59 @@ def draw_old(ink, f, oy, where):
     if (where == "strip") != on_strip:
         return None
     x, y = old_x(f), SILL_Y - oy
-    paper = (182, 178, 170)
-    kw = dict(paper=paper)
+    kw = dict(paper=(182, 178, 170))
+
+    def D(action="lie", p=0.0, dy=0.0, P=None):
+        return OLD(ink, x, y + dy, OLD_S, 1, action, t=f, p=p, P=P, **kw)
+
+    def other_way(P):
+        P = dict(P)
+        P["sx"] = -P["sx"]
+        return P
+
     if st == "lie":
-        return ka.old_dog(ink, x, y, OLD_S, 1, "lie", **kw)
+        return D("lie")
     if st == "shift":
-        return ka.old_dog(ink, x, y - 2 * bump(since / 0.8), OLD_S, 1, "lift_head", p=0.7 * bump(since / 0.8), **kw)
+        return D("lift_head", 0.7 * bump(since / 0.8), dy=-2 * bump(since / 0.8))
     if st == "glance":
-        return ka.old_dog(ink, x, y, OLD_S, 1, "lift_head", p=ease(since, 0.0, 0.3), **kw)
+        return D("lift_head", ease(since, 0.0, 0.3))
     if st == "blink":
-        return ka.old_dog(ink, x, y, OLD_S, 1, "look", p=lerp(0.3, 0.72, since / 0.55), **kw)
+        return D("look", lerp(0.3, 0.72, since / 0.55))
     if st == "chin":
-        return ka.old_dog(ink, x, y, OLD_S, 1, "lift_head", p=1 - ease(since, 0.0, 0.25), **kw)
+        return D("lift_head", 1 - ease(since, 0.0, 0.25))
     if st == "raise_":
-        return ka.old_dog(ink, x, y, OLD_S, 1, "lift_head", p=ease(since, 0.15, 1.38), **kw)
+        return D("lift_head", ease(since, 0.1, 1.08))
     if st == "long_look":
-        return ka.old_dog(ink, x, y, OLD_S, 1, "look", p=0.0, **kw)                   # the hold: nothing moves
+        return D("look", 0.0)                                                         # the hold: nothing of it moves
     if st == "turn_back":
-        return ka.old_dog(ink, x, y, OLD_S, 1, "turn_back", p=clamp(since / 2.5), **kw)
+        return D("turn_back", clamp(since / 2.5))
     if st == "back":
-        return ka.old_dog(ink, x, y, OLD_S, 1, "back", **kw)
+        P = old_P("back")
+        P["bdy"] = P.get("bdy", 0.0) + 0.9 * math.sin((f - when("old", "back")) * 1.5)   # a back that breathes
+        return D(P=P)
     if st == "look_over":
-        return ka.old_dog(ink, x, y, OLD_S, 1, "look_over", p=clamp(since / 0.5), **kw)
+        return D("look_over", clamp(since / 0.5))
     if st == "let_pass":
-        return ka.old_dog(ink, x, y, OLD_S, 1, "let_pass", p=clamp(since / 0.58), **kw)
+        return D("let_pass", clamp(since / 0.58))
     if st == "passed":
-        return ka.old_dog(ink, x, y, OLD_S, 1, "let_pass", p=1.0, **kw)
+        return D("let_pass", 1.0)
     if st == "rise_turn":
-        # it lets its tail down first (a quarter second), then gets up back end first and comes round
-        u = clamp(since / 0.25)
-        if u < 1:
-            on_layer(ink, lambda im: ka.old_dog(im, x, y, OLD_S, 1, "let_pass", p=1.0, **kw), alpha=1 - u)
-            return on_layer(ink, lambda im: ka.old_dog(im, x, y, OLD_S, 1, "turn_round", p=0.0, **kw), alpha=u)
-        return ka.old_dog(ink, x, y, OLD_S, 1, "turn_round", p=0.68 * ease(since, 0.2, 1.0), **kw)
+        # it lets its tail down and gathers itself (no fade: one pose is carried into the next), gets up
+        # back end first and comes round to face the cow
+        u = clamp(since / 0.8)
+        if u < 0.24:
+            P = ka._oblend(old_P("let_pass", p=1.0), other_way(old_P("turn_back", p=0.0)), smooth(u / 0.24))
+            P["sx"] = -1.0
+        else:
+            P = other_way(old_P("turn_back", p=0.68 * ease(u, 0.24, 1.0)))
+        return D(P=P)
     tx = COW_X1 - 106.0                                                                # under her chin, against her chest
     if st == "walk":
-        u = ease(since, 0.0, 1.25)
-        return ka.old_dog(ink, lerp(x, tx, u), lerp(SILL_Y, 389.0, clamp(since / 0.5)) - oy, OLD_S, 1, "walk", t=f, **kw)
+        u = ease(since, 0.0, 1.1)
+        return OLD(ink, lerp(x, tx, u), lerp(SILL_Y, 389.0, clamp(since / 0.5)) - oy, OLD_S, 1, "walk", t=f, **kw)
     if st == "lie_down":
-        return ka.old_dog(ink, tx, 389.0 - oy, OLD_S, 1, "lie_down", p=ease(since, 0.0, 1.0), **kw)
-    return ka.old_dog(ink, tx, 389.0 - oy, OLD_S, 1, "lie", **kw)
+        return OLD(ink, tx, 389.0 - oy, OLD_S, 1, "lie_down", p=ease(since, 0.0, 0.9), **kw)
+    return OLD(ink, tx, 389.0 - oy, OLD_S, 1, "lie", **kw)
 
 
 def old_place(f):
@@ -855,57 +1004,161 @@ def old_place(f):
     return (old_x(f) + 86.0, SILL_Y)
 
 
+NOSE_STEP = 18.0                             # the one step she takes up to the stuck dog, and back as she draws it with her
+NUDGE_PX = 30.0                              # how far her muzzle rolls the wooden dog back along the board
+BACK_OFF = 10.0                              # how far it has already backed away from the old dog's back, looking up at her
+
+
+WEAVE = ("stand", "fold1", "lying", "get_up")   # REPAIR: in these states she used to lie down in the meadow and do nothing.
+# What she does now, read off the same clocks (the person's no at 148.0, the dog's ears at 150.0, its turn at 153.0):
+#   to 148.0    stands where S5 left her, chewing
+#   148.0       the head shakes: she stops chewing, both ears come round
+#   149.0       the dog's tail has stopped: she walks down to it, 2.2 s, and stands behind it on the strip
+#   151.2       her head comes down onto its back; she breathes out on it (151.2 to 152.9)
+#   153.0       the dog turns round under her chin: their noses meet; it goes, and her head comes up after it
+W_NOTICE, W_GO, W_THERE, W_AWAY = 148.0, 149.0, 151.2, 153.75
+
+
+@lru_cache(maxsize=512)
+def lead_pts(f):
+    """World joints of the lead dog on the sill at f (found by drawing it on a scrap sheet)."""
+    scrap = kit.Ink(0.0, 0)
+    was, ZM.on = ZM.on, False
+    try:
+        j = draw_lead(scrap, f, 0, "sill")
+    finally:
+        ZM.on = was
+    return j
+
+
+def weave_u(f):
+    return ease(f, W_GO, W_THERE - 0.15)
+
+
 def cow_xy(f):
     st, since = at("cow", f)
-    if st in ("stand", "fold1", "lying", "get_up"):
-        return COW_X0, porch.meadow_y(COW_X0)
-    if st == "walk":
+    if st in WEAVE:
+        u = weave_u(f)
+        return lerp(COW_X0, COW_NEAR, u), lerp(porch.meadow_y(COW_X0), 388.0, u)
+    if st == "walk":                                          # she gives way to the pack: back along the strip to her drinking place
         u = clamp(since / 2.0)
         u = u * u * (3 - 2 * u) * 0.5 + u * 0.5
-        return lerp(COW_X0, COW_X1, u), lerp(porch.meadow_y(COW_X0), 388.0, u)
+        return lerp(COW_NEAR, COW_X1, u), 388.0
+    if st == "nose":
+        return COW_X1 - NOSE_STEP * (ease(since, 0.0, 0.5) - ease(since, 0.6, 1.15)), 388.0
     return COW_X1, 388.0
+
+
+def cow_target(f, oy):
+    """WORLD point her muzzle goes to: the reel the sheepdog holds up; the wooden dog's chest."""
+    st, since = at("cow", f)
+    if st in WEAVE and f >= W_THERE - 0.4:
+        j = lead_pts(f)
+        if not j:
+            return None
+        back = ((j["withers"][0] + j["hip"][0]) / 2 + 12.0, min(j["withers"][1], j["hip"][1]) - 1.0)
+        if at("lead", f)[0] in ("turn", "look_pack"):        # it has turned round under her chin: nose to nose
+            n = j["nose"]
+            w = ease(f, 152.97, 153.45)
+            return (lerp(back[0], n[0] + 7.0, w), lerp(back[1], n[1] - 3.0, w))
+        return back
+    if st == "nose":                                          # the rim of the can it is holding, on the old dog's side of it
+        cx_, cy_ = big_can_world(f)
+        return (cx_ - 24.0 * BIG_REEL - 3.0, cy_ + 3.0)
+    if st == "smell":
+        rx, ry = sheep_reel_at(f)
+        return (rx - 4, ry - 16)
+    return None
+
+
+@lru_cache(maxsize=256)
+def sheep_reel_at(f):
+    """World point of the can the sheepdog holds up (found by drawing the dog on a scrap sheet)."""
+    scrap = kit.Ink(0.0, 0)
+    was, ZM.on = ZM.on, False
+    try:
+        a = {}
+        draw_passer(scrap, "sheep", f, 0, "sill", a)
+    finally:
+        ZM.on = was
+    return a.get("sheep_reel", (PRESENT_X - 30.0, 352.0))
 
 
 def cow_pose(f):
     st, since = at("cow", f)
-    if st == "stand":
-        return herd.stand(f, "lead", chew=1, alert=0.6)
-    if st == "fold1":
-        return herd.fold_down(clamp(since / 2.0), "lead")
-    if st == "lying":
-        return herd.lie(f, "lead", chew=0 if 149.0 <= f < 153.5 else 1, alert=0.25)
-    if st == "get_up":
-        return herd.get_up(clamp(since / 1.0), "lead")
+    if st in WEAVE:
+        x, _ = cow_xy(f)
+        if f < W_GO:                                          # watching; at the no she stops chewing and her ears come round
+            q = herd.stand(f, "lead", chew=1 - ease(f, W_NOTICE + 0.15, W_NOTICE + 0.45), alert=0.6)
+            return herd.notice(q, ease(f, W_NOTICE + 0.15, W_NOTICE + 0.55))
+        if f < W_THERE - 0.15:                                # down to the dog
+            q = herd.step_pose("lead", (COW_X0 - x) / herd.S, rest=ease(f, W_THERE - 0.6, W_THERE - 0.15), t=f, chew=0)
+            return herd.notice(q, 0.7)
+        # her head on its back: nose_touch's clock (contact 0.75, held, breath at 1.6), held until the dog turns
+        tau = f - (W_THERE - 0.15)
+        tau = tau if tau < 1.5 else (1.5 if f < W_AWAY - 0.35 else 1.5 + (f - (W_AWAY - 0.35)) * 1.6)
+        q = herd.nose_touch(min(tau, 2.6), f, "lead")
+        q["_face"] = 84.0
+        return q
     if st == "walk":
         x, _ = cow_xy(f)
-        return herd.step_pose("lead", (COW_X0 - x) / herd.S, rest=ease(since, 1.55, 2.0), t=f)
+        return herd.notice(herd.step_pose("lead", (COW_X0 - x) / herd.S, rest=ease(since, 1.55, 2.0), t=f), 1 - ease(since, 1.2, 2.0))
     if st == "watch":
         return herd.stand(f, "lead", chew=1, alert=0.25)
     if st == "smell":
         return herd.smell(since * 1.75, "lead")
     if st == "still":
-        return herd.notice(herd.stand(164.0, "lead", chew=0, alert=0.35), 1.0)      # she does not chew; nothing of her moves
+        q = herd.notice(herd.stand(164.0, "lead", chew=0, alert=0.35), 1.0)             # she does not chew
+        ost, osince = at("old", f)
+        if ost == "turn_back":                                                         # ... but she watches it get up and go round:
+            u = clamp(osince / 2.5)                                                    # her head follows, one ear goes back and comes again
+            q["neck"] = q["neck"] + 7.0 * math.sin(math.pi * u) + 3.0 * ease(u, 0.7, 1.0)
+            q["head"] = q["head"] + 6.0 * bump((u - 0.15) / 0.7)
+            q["ear"] = q["ear"] - 26.0 * bump((u - 0.3) / 0.3)
+            q["tail"] = tuple(v + 10.0 * math.sin(osince * 5.0) * bump((u - 0.5) / 0.4) for v in q["tail"])
+        elif ost == "back":                                                            # the dog looks up at her: her head comes down to it
+            ts = after("big", "told", f)
+            q["neck"] = q["neck"] + 3.0 + 10.0 * ease(ts, 0.7, 1.15)
+            q["head"] = q["head"] + 5.0 * ease(ts, 0.75, 1.15)
+        return q
+    if st == "nose":
+        # she stops being a watcher. One step up to it (0..0.5), the head down in front of its chest (contact
+        # at 0.55), one slow shove as she steps back and draws it with her (0.55..1.1), the head lifts away.
+        x, _ = cow_xy(f)
+        tau = since * (0.5 / 0.55) if since < 0.55 else (0.5 + (since - 0.55) * (0.6 / 0.55) if since < 1.1 else 1.3 + (since - 1.1) * (0.7 / 0.3))
+        q = herd.nudge(tau, "lead")
+        q["_face"] = 86.0                                     # the face hangs: the head comes down in front of the dog, not over it
+        moving = clamp(1.6 * (bump(since / 0.5) + bump((since - 0.6) / 0.55)))
+        legs = herd.step_pose("lead", (COW_X0 - x) / herd.S, rest=1.0 - moving, t=f, chew=0)
+        for k in ("nf", "ff", "nh", "fh", "hip", "shoulder"):
+            q[k] = legs[k]
+        q["dy"] = legs["dy"]
+        q["bell"] = legs.get("bell", 0.0) + 14.0 * math.sin(since * 9.0) * math.exp(-1.2 * since)
+        return q
     if st == "chew":
         return herd.stand(f, "lead", chew=1, alert=0.2)
     if st == "fold":
         return herd.fold_down(clamp(since / 2.0), "lead")
     p = herd.lie(f, "lead", chew=1, alert=0.15)
-    return herd.notice(p, 0.8 * ease(f, 175.3, 175.9)) if f > 175.3 else p            # her ears go to the radio
+    return herd.notice(p, 0.8 * ease(f, 177.2, 177.8)) if f > 177.2 else p            # her ears go to the radio
 
 
 def draw_cow(ink, f, oy, anchors, only=None):
     st, since = at("cow", f)
     x, y = cow_xy(f)
-    nose = None
-    if st == "smell" and "sheep_reel" in anchors:
-        rx, ry = anchors["sheep_reel"]
-        nose = (rx - 4, ry + oy - 16)
-    a = herd.cow(ink, "lead", cow_pose(f), x, y, facing=-1, oy=oy, nose_to=nose, only=only, rim=0.22 if x < 700 else None)
+    nose = cow_target(f, oy)
+    a = COW(ink, "lead", cow_pose(f), x, y, facing=-1, oy=oy, nose_to=nose, only=only, rim=0.22 if x < 700 else None)
     anchors["cow"] = a
+    if only:
+        return a
+    if st in WEAVE and 151.95 <= f < 152.5:                   # she breathes out on it
+        BREATH(ink, a["muzzle"][0], a["muzzle"][1], clamp((f - 151.95) / 0.5), a["facing"], size=1.1)
     if st == "smell" and a.get("breath"):
-        herd.breath(ink, a["muzzle"][0], a["muzzle"][1], a["breath"], a["facing"])
-    if st in ("fold", "lie") and since > 1.7 and st == "fold":
-        herd.breath(ink, a["muzzle"][0], a["muzzle"][1], clamp((since - 1.7) / 0.6), a["facing"], size=1.3)
+        BREATH(ink, a["muzzle"][0], a["muzzle"][1], a["breath"], a["facing"])
+    if st == "nose" and 1.0 < since < 1.4:
+        BREATH(ink, a["muzzle"][0], a["muzzle"][1], clamp((since - 1.0) / 0.4), a["facing"], size=1.1)
+    if st == "fold" and since > 1.7:
+        BREATH(ink, a["muzzle"][0], a["muzzle"][1], clamp((since - 1.7) / 0.6), a["facing"], size=1.3)
     return a
 
 
@@ -918,10 +1171,10 @@ def draw_herd(ink, f, oy):
             pose = herd.warm(f, who)
         elif f < t_fold + 2.0:
             pose = herd.fold_down((f - t_fold) / 2.0, who)
-        elif f < 172.0:
+        elif f < 174.5:
             pose = herd.lie(164.0 if still else f, who, chew=0 if still else 1)
         else:
-            pose = herd.tween(herd.lie(f, who, chew=1), herd.sleep(f, who), ease(f, 172.0, 174.0), "inout", who)
+            pose = herd.tween(herd.lie(f, who, chew=1), herd.sleep(f, who), ease(f, 174.5, 176.5), "inout", who)
         a = herd.cow(ink, who, pose, x, y, herd.S * sc, facing, oy, rim=0.0)
         if f < 148.0:
             herd.steam_on(ink, f, a, amount=0.4 * (1 - ease(f, 144.0, 148.0)))
@@ -958,6 +1211,8 @@ def draw_calf(ink, f, oy):
     pose, facing, turn, nose = calf_state(f)
     tr = when("big", "rest", 175.0)
     x = CALF_AT[0] + 22 * ease(f, tr - 0.2, tr + 0.35)       # one step round, to lie against it
+    if turn is not None:                                      # a card calf comes round in one flip, never edge-on
+        turn = min(turn, 0.35) if turn < 0.5 else max(turn, 0.65)
     herd.cow(ink, "calf", pose, x, CALF_AT[1], facing=facing, oy=oy, nose_to=nose, turn=turn, rim=0.55)
 
 
@@ -967,7 +1222,7 @@ LEAD_AT = (398.0, SILL_Y)                    # two steps toward the person as th
 LEAD_EDGE = (548.0, SILL_Y)
 LEAD_ENTRY = 588.0
 LEAD_LINE = (664.0, 425.0)
-LEAD_LINE2 = (692.0, 425.0)
+LEAD_LINE2 = (724.0, 425.0)                 # well back: the wooden one needs the water's edge twice
 LEAD_LAY = (500.0, SILL_Y)
 LEAD_LIE = (462.0, SILL_Y)
 
@@ -1008,18 +1263,20 @@ def draw_lead(ink, f, oy, where):
                 pose = dog.blend(still, down, ease(f - te, 0.0, 0.35))
                 pose["ear"] = lerp(still["ear"], down["ear"], ease(f - te, 0.45, 1.0))          # the torn ear last
                 pose["ear_f"] = lerp(still["ear_f"], down["ear_f"], ease(f - te, 0.05, 0.6))
-                up = ease(f - te, 0.55, 1.0)                 # ... and its eyes go up to the picture on the door
-                pose["head"] += 0.5 * up
-                pose["neck"] += 0.22 * up
+                up = ease(f - te, 0.55, 1.0)                 # ... and its eyes go down to the can that has come back
+                pose["head"] += -0.26 * up
+                pose["neck"] += -0.16 * up
                 if st == "hold":
-                    pose = dog.ears_down(9.0)                # dead still: it looks at the picture on the door
-                    pose["head"] += 0.5
-                    pose["neck"] += 0.22
-                if st == "look_bubble":                      # down through the water at the child's bubble
+                    pose = dog.ears_down(9.0)                # it does not argue: it looks at the can at its feet
+                    pose["head"] += -0.26
+                    pose["neck"] += -0.16
+                    lean = bump((f - 151.75) / 0.9)          # ... and gives a little under the cow's muzzle
+                    pose["head"] += -0.05 * lean
+                if st == "look_bubble":                      # down through the water at the child's page
                     pose = dog.ears_down(9.0)
-                    pose["head"] += lerp(0.5, -0.42, ease(since, 0.0, 0.3))
-                    pose["neck"] += lerp(0.22, -0.3, ease(since, 0.0, 0.3))
-        return dog.draw_dog(ink, pose, lx, y0, scale=DS, facing=-1)
+                    pose["head"] += lerp(-0.26, -0.42, ease(since, 0.0, 0.3))
+                    pose["neck"] += lerp(-0.16, -0.3, ease(since, 0.0, 0.3))
+        return DOG(ink, pose, lx, y0, scale=DS, facing=-1)
     if st == "turn":
         if where != "sill":
             return None
@@ -1028,18 +1285,20 @@ def draw_lead(ink, f, oy, where):
         low["head"] -= 0.42
         low["neck"] -= 0.3
         pose = dog.blend(low, dog.watch(f), ease(since, 0.0, 0.7))
-        return dog.draw_dog(ink, pose, LEAD_AT[0], y0, scale=DS, facing=face if abs(face) > 0.08 else 0.08)
+        if abs(face) < FLIP_MIN:                              # a paper dog comes round in one flip, never edge-on
+            face = FLIP_MIN if face >= 0 else -FLIP_MIN
+        return DOG(ink, pose, LEAD_AT[0], y0 - 3 * bump(since / 0.7), scale=DS, facing=face)
     if st == "look_pack":
         if where != "sill":
             return None
         if since < 0.4:                                       # one short look along the bank
-            return dog.draw_dog(ink, dog.watch(f), LEAD_AT[0], y0, scale=DS, facing=1)
+            return DOG(ink, dog.watch(f), LEAD_AT[0], y0, scale=DS, facing=1)
         u = clamp((since - 0.4) / 0.62)
         x = lerp(LEAD_AT[0], LEAD_EDGE[0], u)
         if u < 1:
-            return dog.draw_dog(ink, dog.trot(since * 1.6), x, y0, scale=DS, facing=1)
+            return DOG(ink, dog.trot(since * 1.6), x, y0, scale=DS, facing=1)
         pose = dog.blend(dog.watch(f), dog.dig(0.05), 0.45)   # gathers itself
-        return dog.draw_dog(ink, pose, x, y0, scale=DS, facing=1)
+        return DOG(ink, pose, x, y0, scale=DS, facing=1)
     if st in ("dive", "under"):
         u = f - when("lead", "dive")
         if u < LEAP:
@@ -1047,13 +1306,13 @@ def draw_lead(ink, f, oy, where):
                 return None
             v = u / LEAP
             x, y = lerp(LEAD_EDGE[0], LEAD_ENTRY, v), lerp(SILL_Y - 26, 398, v * v) - 20 * math.sin(math.pi * v)
-            return dog.draw_dog(ink, dog.swim_down(f * 1.2, steep=0.3 + 0.5 * v), x, y - oy, scale=DS, facing=1, shadow=False)
+            return DOG(ink, dog.swim_down(f * 1.2, steep=0.3 + 0.5 * v), x, y - oy, scale=DS, facing=1, shadow=False)
         if where != "under":
             return None
         x, y, pitch, going = lead_swim(f)
         if going == "down":
-            return dog.draw_dog(ink, dog.swim_down(f, steep=0.72), x, y - oy, scale=DS, facing=1, tint=TEAL, tint_amount=0.3, shadow=False)
-        return dog.draw_dog(ink, dog.holding(dog.carry_page(f, gait="swim_up"), "reel"), x, y - oy, scale=DS, facing=-1, carry=reel(),
+            return DOG(ink, dog.swim_down(f, steep=0.72), x, y - oy, scale=DS, facing=1, tint=TEAL, tint_amount=0.3, shadow=False)
+        return DOG(ink, dog.holding(dog.carry_page(f, gait="swim_up"), "reel"), x, y - oy, scale=DS, facing=-1, carry=reel(),
                             tint=TEAL, tint_amount=0.3, shadow=False)
     if st in ("come_up", "in_line", "step_back", "watch_line"):
         if where != "sill":
@@ -1073,7 +1332,7 @@ def draw_lead(ink, f, oy, where):
             w = ease(after("old", "turn_back", f), 1.2, 2.2) * (1 - ease(after("old", "look_over", f), 0.2, 0.7))
             pose = dog.blend(pose, dog.holding(dog.ears_down(9.0), "reel"), {"ears": 0.75 * w, "tail": 0.5 * w})
         rise = 10 * (1 - ease(since, 0.3, 0.5)) if st == "come_up" else 0
-        return on_layer(ink, lambda im: dog.draw_dog(im, pose, x, LEAD_LINE[1] + rise - oy, scale=DS, facing=-1, carry=reel(), shadow=False),
+        return on_layer(ink, lambda im: DOG(im, pose, x, LEAD_LINE[1] + rise - oy, scale=DS, facing=-1, carry=reel(), shadow=False),
                         split=400 - oy)
     if st == "walk_up":
         if where != "sill":
@@ -1081,23 +1340,23 @@ def draw_lead(ink, f, oy, where):
         u = clamp(since / 1.25)
         x = lerp(LEAD_LINE2[0], LEAD_LAY[0], u)
         y = lerp(LEAD_LINE[1], SILL_Y, clamp((LEAD_LINE2[0] - x) / 70.0))
-        fn = lambda im: dog.draw_dog(im, dog.carry_reel(since, gait="trot"), x, y - oy, scale=DS, facing=-1, carry=reel(), shadow=False)   # noqa: E731
+        fn = lambda im: DOG(im, dog.carry_reel(since, gait="trot"), x, y - oy, scale=DS, facing=-1, carry=reel(), shadow=False)   # noqa: E731
         return on_layer(ink, fn, split=400 - oy) if y > SILL_Y + 1 else fn(ink)
     if st == "lay":
         if where != "sill":
             return None
         pose = dog.lay(since * 1.45)
-        j = dog.draw_dog(ink, pose, LEAD_LAY[0], y0, scale=DS, facing=-1, carry=reel() if pose.get("hold", 0) >= 0.5 else None)
+        j = DOG(ink, pose, LEAD_LAY[0], y0, scale=DS, facing=-1, carry=reel() if pose.get("hold", 0) >= 0.5 else None)
         return j
     if where != "sill":
         return None
     x = lerp(LEAD_LAY[0], LEAD_LIE[0], ease(since, 0.0, 0.45))
     pose = dog.lie(since, rest=1.0, settle=1.0)
-    wag = bump((f - 178.4) / 0.7)
+    wag = bump((f - 178.9) / 0.7)
     if wag:
         pose["tail"] += 0.5 * wag                             # the tail moves once in the water
-        pose["wag"] = 0.6 * math.sin((f - 178.4) * 14) * wag
-    return on_layer(ink, lambda im: dog.draw_dog(im, pose, x, y0, scale=DS, facing=-1), split=None)
+        pose["wag"] = 0.6 * math.sin((f - 178.9) * 14) * wag
+    return on_layer(ink, lambda im: DOG(im, pose, x, y0, scale=DS, facing=-1), split=None)
 
 
 def lead_reel_down(f):
@@ -1126,7 +1385,7 @@ def draw_passer(ink, name, f, oy, where, anchors):
 
     def can(a, dx=0.0, dy=0.0, s=0.56, under=False):
         mx, my = a["mouth"]
-        return my_reel(ink, mx + dx, my + dy, s, reel_n, under=under)
+        return my_reel(ink, mx + dx, my + dy, s, reel_n, under=under, tail=0.8, sway=0.5 * math.sin(f * 2.6 + len(name)))
 
     if st == "under":
         if where != "under" or f < tb - 1.5:
@@ -1214,13 +1473,22 @@ def big_state(f):
             look = 0.22 * ease(since, 0.34, 0.46)
         if since > 0.66:
             look = lerp(0.22, 1.0, ease(since, 0.66, 0.8))
-        if since > 1.05:
-            look = lerp(1.0, 0.0, ease(since, 1.05, 1.2))
-        return (PRESENT_X, SILL_Y, "told", max(0.0, since - 0.25) * 1.2, look, True)
+        back = BACK_OFF * ease(since, 0.78, 1.15)             # ... and as it looks up at her it rolls back from that back, toward her
+        return (PRESENT_X + back, SILL_Y, "told", max(0.0, since - 0.25) * 1.2, look, True)
+    if st == "nudged":
+        # her muzzle comes down in front of its chest (0.55) and it is rolled back along the board on its
+        # own wheels; it ducks from the big head, rocks, and when she lifts away it looks up at her once more
+        push = smooth(clamp((since - 0.55) / 0.55))
+        look = lerp(1.0, 0.5, ease(since, 0.2, 0.5))
+        look += 0.2 * math.sin((since - 0.55) * 16.0) * math.exp(-3.0 * max(0.0, since - 0.55)) * (since > 0.55)
+        look = lerp(look, 0.95, ease(since, 1.12, 1.32))
+        x = PRESENT_X + BACK_OFF + NUDGE_PX * push
+        return (x, SILL_Y - 1.5 * bump((since - 0.55) / 0.3) + 5.0 * clamp((x - 560.0) / 15.0), "told", 2.0, look, True)
     if st == "roll_back":
         u = ease(since, 0.0, 0.62)
-        x = lerp(PRESENT_X, BREACH_X + 8, u)
-        return (x, SILL_Y + 60 * clamp((since - 0.5) / 0.3) ** 2 + (8 if x > 566 else 0) * clamp((x - 566) / 20), "told", 2.0, 0.0, True)
+        x = lerp(PRESENT_X + BACK_OFF + NUDGE_PX, BREACH_X + 12, u)
+        return (x, SILL_Y + 60 * clamp((since - 0.5) / 0.3) ** 2 + 5.0 * clamp((x - 560.0) / 15.0) + 3.0 * clamp((x - 580.0) / 20.0), "told", 2.0,
+                0.95 * (1 - ease(since, 0.0, 0.3)), True)
     if st == "come_up":
         u = ease(since, 0.0, 0.37)
         return (lerp(BREACH_X, PRESENT_X + 4, u), lerp(405.0, SILL_Y, clamp(u * 1.5)), "carry", since, -0.1, True)
@@ -1235,6 +1503,24 @@ def big_state(f):
     if st == "rest":
         return (RET_REST[0], RET_REST[1], "wait", 9.0, 0.0, False)
     return None
+
+
+def big_can(f, mouth):
+    """Centre of the can in the wooden dog's mouth (wide-frame pixels): gripped by the top of its rim, hanging."""
+    return (mouth[0] - 5.0, mouth[1] + 24.0 * BIG_REEL * 0.78)
+
+
+@lru_cache(maxsize=512)
+def big_can_world(f):
+    """WORLD centre of that can (found by drawing the dog on a scrap sheet): what the cow puts her nose to."""
+    scrap = kit.Ink(0.0, 0)
+    was, ZM.on = ZM.on, False
+    try:
+        a = {}
+        draw_big(scrap, f, 0, "sill", a)
+    finally:
+        ZM.on = was
+    return a.get("big_reel", (PRESENT_X - 30.0, 372.0))
 
 
 def draw_big(ink, f, oy, where, anchors):
@@ -1255,22 +1541,30 @@ def draw_big(ink, f, oy, where, anchors):
         kw["arrive"] = 0
     if action == "proud" or action == "walk" or action == "carry":
         tau = f
-    if st == "rest" and abs(f - 178.0) < 0.2:                 # its peg tail ticks once
-        action, tau = "proud", 0.0 + (f - 177.8) * 4
-    go = lambda im: kb.retriever(im, x, y - oy, action, tau, carry="reel" if carrying and action != "surface" else None, **kw)    # noqa: E731
+    if st == "proud":                                         # it watches the old dog get up; the peg slows and stops
+        os_ = after("old", "turn_back", f)
+        if os_ > 0:
+            kw["look"] = 0.2 * ease(os_, 0.3, 1.0) - 0.12 * ease(os_, 1.6, 2.4)
+            if os_ > 1.3:
+                tau = when("old", "turn_back") + 1.3 + (1 - math.exp(-(os_ - 1.3) * 2.2)) / 2.2
+    if st == "rest" and abs(f - 179.3) < 0.2:                 # its peg tail ticks once
+        action, tau = "proud", 0.0 + (f - 179.1) * 4
+    go = lambda im: RET(im, x, y - oy, action, tau, carry="reel" if carrying and action != "surface" else None, thing_scale=0.01, **kw)    # noqa: E731
     wet = y > SILL_Y + 2 or st == "breach"
     a = on_layer(ink, go, split=400 - oy) if wet else go(ink)
     anchors["big"] = a
     if carrying:
         mx, my = a["mouth"]
+        sway = 0.5 * math.sin(f * 2.3) + (0.8 * math.sin((f - when("big", "nudged")) * 14.0) if st == "nudged" and since > 0.55 else 0.0)
         if action == "surface":
-            anchors["big_reel"] = my_reel(ink, mx - 4, my - 12, 0.8, big_look(f), paw=big_look(f) == "wobbly")
+            anchors["big_reel"] = my_reel(ink, mx - 4, my - 12, BIG_REEL, big_look(f), paw=big_look(f) == "wobbly", tilt=0.9)
         else:
-            anchors["big_reel"] = my_reel(ink, mx - 9, my - 1, 0.8, big_look(f), paw=big_look(f) == "wobbly")
+            cxy = big_can(f, (mx, my))
+            anchors["big_reel"] = my_reel(ink, cxy[0], cxy[1], BIG_REEL, big_look(f), paw=big_look(f) == "wobbly", tilt=0.9, tail=1.0, sway=sway)
     if when("big", "proud") <= f < when("big", "roll_back"):
-        props.drips(ink, f, x + 4, y - oy - 30, when("big", "breach") + 0.4, width=46, floor=392 - oy, s=0.7, life=9.0, seed=4)
+        DRIPS(ink, f, x + 4, y - oy - 30, when("big", "breach") + 0.4, width=46, floor=392 - oy, s=0.7, life=9.0, seed=4)
     if st in ("come_up", "offer_low", "lay"):
-        props.drips(ink, f, x + 4, y - oy - 30, when("big", "come_up"), width=46, floor=392 - oy, s=0.7, life=5.0, seed=9)
+        DRIPS(ink, f, x + 4, y - oy - 30, when("big", "come_up"), width=46, floor=392 - oy, s=0.7, life=5.0, seed=9)
     return a
 
 
@@ -1278,43 +1572,47 @@ def draw_two_reels(ink, f, oy, near):
     """The retriever's changed reel and the lead dog's own, on the boards. near 0..1: nudged to our side of the dog."""
     if when("big", "lay") is not None and f >= big_reel_laid(f)[1]:
         pt, tl = big_reel_laid(f)
-        my_reel(ink, pt[0] + 6 * near, pt[1] - oy - 3 * bump((f - tl) / 0.2) + 6 * near, 0.8, "wobbly", paw=True, tilt=lerp(1.0, 0.8, near))
+        my_reel(ink, pt[0] + 6 * near, pt[1] - oy - 3 * bump((f - tl) / 0.2) + 6 * near, BIG_REEL, "wobbly", paw=True, tilt=lerp(1.0, 0.8, near),
+                tail=0.7)
     if after("lead", "lay", f) >= 0.45:
         lx, ly = lead_reel_down(f)
-        props.reel(ink, REELS["lead"]["n"], lx - 4 * near, ly - oy - 14 + 8 * near, 0.6, wet=1, tilt=lerp(1.0, 0.8, near))
+        REEL(ink, REELS["lead"]["n"], lx - 4 * near, ly - oy - 14 + 8 * near, 0.6, wet=1, tilt=lerp(1.0, 0.8, near))
 
 
 def big_reel_laid(f):
     """World point and time of the changed reel on the boards."""
     tl = when("big", "lay")
-    return (old_place(tl)[0], SILL_Y - 16.0), tl + 0.1
+    return (old_place(tl)[0], SILL_Y - 18.0), tl + 0.1
 
 
 # -------------------------------------------------------------- the person ---
 
 def person_q(f):
     keys = [(144.0, "sit"), (144.62, "offer", {"at": (366, 374), "dur": 0.6}), (145.1, "sit", {"dur": 0.4}),
-            (146.0, "hold_up", {"dur": 0.85}), (149.9, "hold_up", {"p": 0.72, "dur": 0.6}), (153.3, "sit", {"dur": 0.5})]
+            (146.0, "hold_up", {"dur": 0.85}), (149.3, "hold_up", {"dur": 0.2}),
+            # REPAIR: the no is finished with the hand. The film comes down; the hand goes to the can beside the knee
+            # and pushes it back along the boards to the dog.
+            (149.85, "offer", {"at": (CAN_HOME[0] + 4, 370), "dur": 0.5}), (150.55, "offer", {"at": (318, 374), "dur": 0.65}),
+            (151.6, "sit", {"dur": 0.8})]
     for tk in PEB_SEEN:
         keys += [(tk, "offer", {"at": (216, 292), "dur": 0.34}), (tk + 0.4, "sit", {"dur": 0.34})]
-    keys += [(173.3, "sit"), (174.0, "offer", {"at": (292, 352), "dur": 0.6}), (174.5, "sit", {"dur": 0.4}),
-             (175.05, "set_radio", {"dur": 0.45}), (175.5, "sit", {"dur": 0.35}), (176.5, "hold_up", {"dur": 0.9})]
+    keys += [(174.9, "sit"), (175.05, "set_radio", {"dur": 0.45}), (175.5, "sit", {"dur": 0.35}), (177.0, "hold_up", {"dur": 0.9})]
     q = porch.act(f, sorted(keys, key=lambda k: k[0]))
-    if 148.0 <= f < 149.0:                                   # no: the head, the shoulders and the film in the hands, twice
-        u = f - 148.0
+    if 148.0 <= f < 149.3:                                   # no: the head, the shoulders and the film in the hands, twice, slowly
+        u = (f - 148.0) / 1.3                                # (REPAIR: 1.3 s and wider, so each of the four extremes is a drawing)
         env = math.sin(math.pi * u) ** 0.5
         sw = math.sin(2 * math.pi * 2 * u) * env
-        q = dict(porch.pose("hold_up", p=1.0, t=f, at=(216 + 11 * sw, 238), at_b=(268 + 11 * sw, 250)))
-        q["lean"] = q["lean"] + 4.5 * sw
-        q["turn"] = q["turn"] + 1.5 * sw
-        q["head"] = q["head"] + 4 * env
+        q = dict(porch.pose("hold_up", p=1.0, t=f, at=(216 + 22 * sw, 238 + 5 * abs(sw)), at_b=(268 + 22 * sw, 250 + 5 * abs(sw))))
+        q["lean"] = q["lean"] + 10.0 * sw
+        q["turn"] = q["turn"] + 1.7 * sw
+        q["head"] = q["head"] + 5 * env + 13.0 * sw
     return q
 
 
 def person_hold(f):
     if 144.62 <= f < 145.1:
         return "reel"
-    if 145.3 <= f < 153.45 or f >= 175.75:
+    if 145.3 <= f < 149.42 or f >= 176.3:
         return "film"
     for tk in PEB_SEEN:
         if tk - 0.34 <= f < tk:
@@ -1325,9 +1623,9 @@ def person_hold(f):
 def thrown(f):
     """(picture, amount) of what the lamp throws on the door planks."""
     if f < 160.0:
-        a = ease(f, 145.75, 146.1) * (1 - 0.4 * ease(f, 149.4, 149.9)) * (1 - ease(f, 153.0, 153.4))
+        a = ease(f, 145.75, 146.1) * (1 - ease(f, 149.3, 149.7))     # the film comes down: the picture goes off the door
         return teeth_image(True), a
-    return teeth_image(False), ease(f, 176.3, 176.9)
+    return teeth_image(False), ease(f, 177.1, 177.7)
 
 
 # ---------------------------------------------------------- the jaw child ---
@@ -1347,13 +1645,18 @@ def kid_state(f):
 
 
 def draw_kid(ink, f, oy):
+    """The jaw child under the sill with its own page held up in its fin: paper, in the water, in its hand.
+    (No bubble here: a picture hanging in the water by itself for eight seconds read as a badge.)"""
     if f > 156.0:
         return
     x, y, grow, pop = kid_state(f)
     cam = Cam(oy=oy)
-    r = town.child(ink, f, cam, 0, x, y, facing=-1, tilt=10 + 60 * ease(f, 154.75, 155.2), arm=95 if grow > 0.2 else 20, look=(105, 300), swim=0.4)
-    if grow > 0 and pop < 1:
-        town.bubble(ink, f, cam, r["mouth"], "jaw", grow=grow, progress=ease(f, 146.2, 147.6), r=30, side=-1, pop=pop, screen=True)
+    up = ease(f, 146.0, 146.9) * (1 - ease(f, 154.6, 154.9))
+    wave = 10 * math.sin(f * 2.2) * up
+    r = town.child(ink, f, cam, 0, x, y, facing=-1, tilt=10 + 60 * ease(f, 154.75, 155.2), arm=lerp(30, 122, up) + wave,
+                   look=(105, 300), swim=0.4)
+    hx, hy = r["hand"]
+    props.page(ink, hx - 10 - 6 * up, hy - 20 * up + 4, 0.5 + 0.38 * up, drawing="jaw", angle=-8 + 0.6 * wave, wet=0.4, tint=TEAL, tint_amount=0.12)
 
 
 # ====================================================================== #
@@ -1486,8 +1789,8 @@ def _rings(f):
             rings.append(porch.ring(x, ts, 0.5 + 0.6 * size))
     if f >= when("lead", "lie", 999):
         rings.append(porch.ring(LEAD_LIE[0] + 62, when("lead", "lie") + 0.9, 0.6))
-        if f >= 178.6:
-            rings.append(porch.ring(LEAD_LIE[0] + 64, 178.6, 0.6))
+        if f >= 179.1:
+            rings.append(porch.ring(LEAD_LIE[0] + 64, 179.1, 0.6))
     if f >= 175.4:                                            # the radio's grille throws rings on the water
         k = 0
         while 175.4 + 1.5 * k <= f:
@@ -1520,31 +1823,72 @@ def draw_last_below(ink, f, cam):
         a = draw_make(ink, d["make"], sx, sy, f + d["ph"], "swim", facing=d["face"], k=d["k"], under=True, alpha=0.8)
         props.lantern(ink, a["mouth"][0], a["mouth"][1], 0.34, f, swing=10 * math.sin(f * 2 + d["ph"]), halo=0.5, seed=d["seed"])
     door = (105, 300)
-    rise = 1 - ease(f, 171.6, 176.2)
+    rise = 1 - ease(f, 173.6, 178.0)
     for k, (x, y) in enumerate(LAST_KIDS):
         yy = y + 190 * rise * (1 + 0.1 * k) + 4 * math.sin(f * 1.3 + k)
         look = (COW_X1 - 70, 350) if k == 5 else door
         r = town.child(ink, f, cam, k, x + 40 * rise, yy, facing=-1 if k != 5 else 1, tilt=38 if k != 5 else 24, look=look, swim=0.5,
-                       arm=20 if k != 5 else 60 + 40 * bump((f - 177.2) / 1.2))
-        if k == 4:                                            # one bubble rising, the tall bars in it
-            g = ease(f, 176.4, 177.3)
-            if g > 0:
-                town.bubble(ink, f, cam, r["mouth"], "bars", grow=g, r=24, side=1, rise=30 * ease(f, 177.3, 180.4), screen=True)
+                       arm=20 if k != 5 else 60 + 40 * bump((f - 178.3) / 1.2))
 
 
-def _porch_frame(ink, f, oy):
+def _principals_strip(ink, f, oy, anchors):
+    draw_cow(ink, f, oy, anchors)
+    draw_old(ink, f, oy, "strip")
+
+
+def can_xy(f):
+    """REPAIR: the can the person took, opened, and pushes back to the dog (world). It slides a little further than the hand."""
+    u = ease(f, 149.85, 150.55)
+    v = ease(f, 150.5, 150.95)
+    return (lerp(CAN_HOME[0], 308.0, u) + 26.0 * v, lerp(CAN_HOME[1], 381.0, u) + 2.0 * v)
+
+
+def _principals_sill(ink, f, oy, anchors):
+    if f >= 145.1:
+        cxw, cyw = can_xy(f)
+        my_reel(ink, cxw, cyw - oy, 0.6, props.REEL_LEAD, paw=True, tilt=0.45 + 0.1 * ease(f, 149.85, 150.55))
+    near = after("lead", "lie", f) >= 0.0                     # once the dog lies down the reels lean against its flank, on our side
+    if not near:
+        draw_two_reels(ink, f, oy, 0.0)
+    for name in ("herder", "digger", "sheep"):
+        if at(name, f)[0] in ("breach", "to_cow"):
+            draw_passer(ink, name, f, oy, "sill", anchors)
+    draw_old(ink, f, oy, "sill")
+    for name in ("herder", "digger", "sheep"):
+        if at(name, f)[0] not in ("breach", "to_cow"):
+            draw_passer(ink, name, f, oy, "sill", anchors)
+    draw_big(ink, f, oy, "sill", anchors)
+    draw_lead(ink, f, oy, "sill")
+    if near:
+        draw_two_reels(ink, f, oy, ease(after("lead", "lie", f), 0.0, 0.5))
+    if at("cow", f)[0] in ("smell", "nose") or 151.0 <= f < 154.1:   # her head again, in front of the dog she is smelling or shoving
+        draw_cow(ink, f, oy, anchors, only="head")
+    if not ZM.on:
+        for name in ("herder", "digger", "sheep"):
+            tb = when(name, "breach")
+            if tb + 0.3 < f < tb + 3.0 and at(name, f)[0] in ("to_cow", "offer", "pass_"):
+                porch.drips(ink, f, oy, PRESENT_X - 6, 366, f - tb - 0.3, wet=0.8, width=36, floor=392)
+    else:
+        for k, name in enumerate(("herder", "digger", "sheep")):
+            tb = when(name, "breach")
+            if tb + 0.3 < f < tb + 3.0 and at(name, f)[0] in ("to_cow", "offer", "pass_"):
+                DRIPS(ink, f, PRESENT_X - 6, 366 - oy, tb + 0.3, width=36, floor=392 - oy, s=0.7, life=3.0, seed=30 + k)
+
+
+def _porch_frame(ink, f, oy, mode="all"):
+    """mode 'all': everybody. mode 'bg': without the ones a closer setup draws again (_principals_*)."""
     cam = Cam(oy=oy)
     anchors = {}
     wtown = 1.0                                               # S5 hands over with the town's water under the porch
-    last = f >= 171.5 and oy > 76
+    last = f >= 173.4 and oy > 76
 
     def hill(ink, t, oy):
         pass
 
     def strip(ink, t, oy):
         draw_herd(ink, f, oy)
-        draw_cow(ink, f, oy, anchors)
-        draw_old(ink, f, oy, "strip")
+        if mode == "all":
+            _principals_strip(ink, f, oy, anchors)
         draw_big(ink, f, oy, "meadow", anchors)
         draw_calf(ink, f, oy)
         draw_heap(ink, f, oy)
@@ -1555,30 +1899,9 @@ def _porch_frame(ink, f, oy):
         draw_stacks(ink, f, oy)
         if f < 144.62:                                        # the reel it was so pleased with, on the sill in front of the person
             props.reel(ink, props.REEL_LEAD, 380, 377 - oy, 0.78, tilt=0.8, paw=True, wet=1)
-        elif f >= 145.1:
-            my_reel(ink, 252, 366 - oy, 0.6, props.REEL_LEAD, paw=True, tilt=0.45)
         draw_six(ink, f, oy, "sill")
-        tl, pt = None, None
-        near = after("lead", "lie", f) >= 0.0                 # once the dog lies down they lean against its flank, on our side
-        if not near:
-            draw_two_reels(ink, f, oy, 0.0)
-        for name in ("herder", "digger", "sheep"):
-            if at(name, f)[0] in ("breach", "to_cow"):
-                draw_passer(ink, name, f, oy, "sill", anchors)
-        draw_old(ink, f, oy, "sill")
-        for name in ("herder", "digger", "sheep"):
-            if at(name, f)[0] not in ("breach", "to_cow"):
-                draw_passer(ink, name, f, oy, "sill", anchors)
-        draw_big(ink, f, oy, "sill", anchors)
-        draw_lead(ink, f, oy, "sill")
-        if near:
-            draw_two_reels(ink, f, oy, ease(after("lead", "lie", f), 0.0, 0.5))
-        if at("cow", f)[0] == "smell":                        # her head again, over the dog she is smelling
-            draw_cow(ink, f, oy, anchors, only="head")
-        for name in ("herder", "digger", "sheep"):
-            tb = when(name, "breach")
-            if tb + 0.3 < f < tb + 3.0 and at(name, f)[0] in ("to_cow", "offer", "pass_"):
-                porch.drips(ink, f, oy, PRESENT_X - 6, 366, f - tb - 0.3, wet=0.8, width=36, floor=392)
+        if mode == "all":
+            _principals_sill(ink, f, oy, anchors)
 
     def under(ink, t, oy):
         if wtown > 0:
@@ -1658,13 +1981,15 @@ def _cell(ink, cam, wx, wy, kind, ang=0.0, alpha=1.0):
 
 
 def _insert_frame(ink, f):
-    cam = INSERT
     t0 = when("big", "fix")
-    u = f - t0
+    ur = f - t0                                               # 0..2.6: the change (0..2.0), then the can taken up (2.0..2.6)
+    u = min(1.5, ur * 0.75)                                   # the change, on the clock it was drawn to
+    go = ease(ur, 2.12, 2.6)
+    cam = Cam.look(546.0 - 10 * go, 768.0 - 26 * go, 2.3 - 0.12 * go)        # the camera starts up after it
     town.back(ink, f, cam, sky=True, night=NIGHT)
     town.street(ink, f, cam, holes=374, smudges=131, taken=(0,))
     town.making_place(ink, cam, 1.0)
-    town.school_class(ink, f, cam, skip=(0,), look=(548, 770))
+    town.school_class(ink, f, cam, skip=(0,), look=(548, 770) if f - when("big", "fix") < 2.12 else (540, 640))
     # the mouthfuls going up behind: small dogs, a can each, toward the lit door
     for i in range(9):
         ph = (u * 0.55 + i * 0.37) % 1.6
@@ -1681,7 +2006,11 @@ def _insert_frame(ink, f):
     pull = ease(u, 0.28, 0.5)
     rx, ry = cam.xy(494.0, 797.0)
     tau = 0.3 + 0.5 * bump(u / 0.56) if u < 0.56 else (0.3 + 0.55 * bump((u - 1.18) / 0.3))
-    a = kb.retriever(ink, rx, ry, "set_down", tau, scale=RS * cam.zoom * 1.0, facing=1, size="big", tint=kb.WATER, tint_amount=0.15)
+    took = ur >= 2.12
+    if ur >= 2.0 and not took:                                # down to the can once more: this time to take it
+        tau = 0.3 + 0.52 * ease(ur, 2.0, 2.12)
+    if not took:
+        a = kb.retriever(ink, rx, ry, "set_down", tau, scale=RS * cam.zoom * 1.0, facing=1, size="big", tint=kb.WATER, tint_amount=0.15)
     for k in range(5):                                        # the strip lies in front of it
         wx = lerp(STRIP_X0 + k * (CELL_W + 1.5), CAN_AT[0] + 6, wind)
         if k == 2:
@@ -1700,10 +2029,6 @@ def _insert_frame(ink, f):
     kx, ky = lerp(690.0, 618.0, arr), lerp(826.0, 800.0, arr) + 2 * math.sin(f * 3)
     placed = ease(u, 0.78, 1.04)
     kid = town.child(ink, f, cam, 0, kx, ky, facing=-1, tilt=16, arm=lerp(70, 118, bump(clamp((u - 0.6) / 0.55))), look=gap, swim=0.6)
-    grow = ease(u, 0.12, 0.5)
-    if grow > 0:
-        town.bubble(ink, f, cam, kid["mouth"], "jaw", grow=grow, progress=ease(u, 0.15, 0.6), r=24, side=-1, rise=4 * u, screen=True,
-                    pop=ease(u, 1.36, 1.5))
     if u >= 0.3 and wind < 1:
         hx, hy = cam.world(*kid["hand"])
         px, py = lerp2((hx - 4, hy), gap, placed)
@@ -1712,110 +2037,55 @@ def _insert_frame(ink, f):
     # the can: open (its lid beside it) until the strip is wound back, then shut, then the print
     cx, cy = cam.xy(*CAN_AT)
     shut = ease(u, 1.26, 1.4)
-    props.reel(ink, props.REEL_RETRIEVER, cx, cy - 3, 1.1, tilt=0.4, face=False, wet=0.3, tint=TEAL, tint_amount=0.2)
-    lx, ly = lerp(cx - 50, cx, shut), lerp(cy - 8, cy - 14, shut) - 30 * bump(shut)
-    my_reel(ink, lx, ly, 1.1, "wobbly" if u > 1.0 else "tidy", paw=u >= 1.42, tilt=lerp(0.62, 0.9, shut), under=True)
+    if not took:
+        props.reel(ink, props.REEL_RETRIEVER, cx, cy - 3, 1.1, tilt=0.4, face=False, wet=0.3, tint=TEAL, tint_amount=0.2)
+        lx, ly = lerp(cx - 50, cx, shut), lerp(cy - 8, cy - 14, shut) - 30 * bump(shut)
+        my_reel(ink, lx, ly, 1.1, "wobbly" if u > 1.0 else "tidy", paw=u >= 1.42, tilt=lerp(0.62, 0.9, shut), under=True)
+    else:
+        # the can in its mouth: it kicks off the planks and swims up toward the bright line, the children's eyes after it
+        v = (ur - 2.12) / 0.48
+        wx, wy = 494.0 + 6.0 * v + 30.0 * v * v, 797.0 - 26.0 - 70.0 * v * v - 16.0 * v
+        sx, sy = cam.xy(wx, wy)
+        a = on_layer(ink, lambda im: kb.retriever(im, sx, sy, "swim", f, scale=RS * cam.zoom, facing=1, size="big", carry="reel",
+                                                  thing_scale=0.01, tint=kb.WATER, tint_amount=0.15, shadow=False),
+                     rot=0.25 + 0.75 * smooth(clamp(v * 1.4)), pivot=(sx, sy))
+        mx, my = rot_pt(a["mouth"], (sx, sy), 0.25 + 0.75 * smooth(clamp(v * 1.4)))
+        my_reel(ink, mx + 6, my + 12, 1.25, "wobbly", paw=True, tilt=0.9, under=True, tail=0.8, sway=math.sin(f * 9))
+        for k in range(5):                                    # the breath it leaves
+            bx, by = cam.xy(wx - 18 + 9 * math.sin(k * 2.4 + f * 3), wy + 14 + 22 * k * v)
+            r = 2.0 + 1.6 * (k % 3)
+            ink.d.ellipse([bx - r, by - r, bx + r, by + r], outline=(214, 240, 240, 190), width=1)
     town.front(ink, f, cam)
     town.grade(ink, cam, night=NIGHT * 0.6)
 
 
 # ====================================================================== #
-#  8 · THE END CREDIT (the board gives S6 ten of the film's 14 words)    #
+#  8 · THE CLOSER SETUPS                                                 #
 # ====================================================================== #
 
-def _arc(cx, cy, r, a0, a1, n=12, ry=None):
-    ry = r if ry is None else ry
-    return [(cx + r * math.cos(lerp(a0, a1, i / n)), cy + ry * math.sin(lerp(a0, a1, i / n))) for i in range(n + 1)]
+CLOSE_BLUR = {"no": 0.45, "ears": 1.0}      # REPAIR: the person is the subject of 'no', so the set is not thrown out of focus
 
 
-_BOWL = _arc(0.42, 0.7, 0.32, -0.5, -0.5 - 2 * math.pi, 14, 0.3)
-_ARCH = [(0.15, 0.62), (0.32, 0.44), (0.56, 0.42), (0.76, 0.58), (0.78, 1.0)]
-_GL = {   # width, strokes; y 0 = ascender top, 0.4 = x-height, 1 = baseline
-    "T": (0.78, [[(0.0, 0.0), (1.0, 0.0)], [(0.5, 0.0), (0.5, 1.0)]]),
-    "C": (0.8, [_arc(0.56, 0.5, 0.52, -0.9, -5.4, 14, 0.5)]),
-    "I": (0.3, [[(0.5, 0.0), (0.5, 1.0)]]),
-    "h": (0.62, [[(0.15, 0.0), (0.15, 1.0)], _ARCH]),
-    "e": (0.62, [[(0.12, 0.72), (0.8, 0.72)] + _arc(0.46, 0.7, 0.34, 0.05, -5.2, 14, 0.3)[1:]]),
-    "d": (0.66, [_BOWL, [(0.76, 0.0), (0.76, 1.0)]]),
-    "o": (0.62, [_arc(0.5, 0.7, 0.36, -1.2, -1.2 - 2 * math.pi, 14, 0.3)]),
-    "g": (0.66, [_BOWL, [(0.76, 0.42), (0.76, 1.2), (0.58, 1.38), (0.26, 1.32)]]),
-    "i": (0.26, [[(0.5, 0.44), (0.5, 1.0)], [(0.5, 0.16), (0.52, 0.2)]]),
-    "s": (0.52, [[(0.84, 0.5), (0.58, 0.4), (0.28, 0.44), (0.18, 0.57), (0.42, 0.69), (0.7, 0.76), (0.82, 0.88), (0.62, 1.0),
-                  (0.34, 1.0), (0.12, 0.9)]]),
-    "l": (0.26, [[(0.5, 0.0), (0.5, 1.0)]]),
-    "a": (0.66, [_BOWL, [(0.76, 0.42), (0.76, 1.0)]]),
-    "u": (0.62, [[(0.15, 0.42), (0.15, 0.8), (0.3, 0.98), (0.52, 1.0), (0.7, 0.88), (0.78, 0.7)], [(0.78, 0.42), (0.78, 1.0)]]),
-    ".": (0.24, [[(0.4, 0.94), (0.44, 0.99)]]),
-    "t": (0.46, [[(0.42, 0.1), (0.42, 0.84), (0.58, 1.0), (0.86, 0.94)], [(0.06, 0.42), (0.84, 0.42)]]),
-    "n": (0.62, [[(0.15, 0.42), (0.15, 1.0)], _ARCH]),
-    "v": (0.6, [[(0.08, 0.42), (0.48, 1.0), (0.88, 0.42)]]),
-    "r": (0.46, [[(0.2, 0.42), (0.2, 1.0)], [(0.2, 0.64), (0.44, 0.46), (0.86, 0.44)]]),
-    "f": (0.44, [[(0.9, 0.08), (0.62, 0.0), (0.42, 0.14), (0.42, 1.0)], [(0.08, 0.42), (0.8, 0.42)]]),
-    "m": (0.96, [[(0.08, 0.42), (0.08, 1.0)], [(0.08, 0.6), (0.2, 0.44), (0.38, 0.44), (0.5, 0.6), (0.5, 1.0)],
-                 [(0.5, 0.6), (0.62, 0.44), (0.8, 0.44), (0.92, 0.6), (0.92, 1.0)]]),
-}
-CREDIT = ("The dog is Claude.", "It has never heard", "this film.")       # 10 words
-CREDIT_BOX = (566.0, 438.0, 916.0, 512.0)
-CREDIT_T = (175.5, 176.9, 178.9, 179.5)                                   # written on from, by; fades from, gone
-
-
-@lru_cache(maxsize=None)
-def credit_strokes():
-    rs = random.Random(8)
-    hgt, gap, lead_ = 19.0, 3.4, 25.0
-    out = []
-    for li, text in enumerate(CREDIT):
-        x = CREDIT_BOX[0] + (0 if li == 0 else 14 * li)
-        y0 = CREDIT_BOX[1] + li * lead_
-        for ch in text:
-            if ch == " ":
-                x += hgt * 0.5
-                continue
-            wd, ss = _GL[ch]
-            dy, rot, sc = rs.uniform(-1.0, 1.0), rs.uniform(-0.05, 0.05), rs.uniform(0.95, 1.05)
-            for s in ss:
-                pts = []
-                for (u, v) in s:
-                    px, py = (u - 0.5) * wd * hgt * sc, (v - 0.5) * hgt * sc
-                    pts.append((x + wd * hgt / 2 + px * math.cos(rot) - py * math.sin(rot),
-                                y0 + hgt / 2 + dy + px * math.sin(rot) + py * math.cos(rot)))
-                out.append(pts)
-            x += wd * hgt + gap
-        assert x <= CREDIT_BOX[2] + 1, (text, x)
-    return out
-
-
-def credit(ink, f):
-    a, b, c, d = CREDIT_T
-    if f < a or f > d:
-        return
-    strokes = credit_strokes()
-    n = len(strokes)
-    out = 1 - ease(f, c, d)
-    sheet = ink.layer()
-    for k, s in enumerate(strokes):
-        on = clamp((f - a - (b - a - 0.14) * k / n) / 0.14)
-        if on <= 0:
-            continue
-        total = sum(math.dist(p, q) for p, q in zip(s, s[1:]))
-        need, run_, pts = total * on, 0.0, [s[0]]
-        for p, q in zip(s, s[1:]):
-            dd = math.dist(p, q)
-            if run_ + dd <= need:
-                pts.append(q)
-                run_ += dd
-            else:
-                u = (need - run_) / max(dd, 1e-6)
-                pts.append((lerp(p[0], q[0], u), lerp(p[1], q[1], u)))
-                break
-        if len(pts) > 1:
-            sheet.line([(x + 1.2, y + 1.6) for x, y in pts], (8, 52, 62), 3.4, amount=0.35, alpha=140)
-            sheet.line(pts, (196, 236, 228), 2.6, amount=0.35)
-    ink.paste(sheet.img, alpha=out)
+def _close_frame(ink, f, cam, blur=1.6):
+    """A closer setup: the set pushed in and left soft behind, the animals and their cans cut again at this size."""
+    cx, cy, z = cam
+    oy = int(round(clamp(cy - H / 2, 0.0, 400.0)))
+    _porch_frame(ink, f, oy, mode="bg")
+    view(ink, cx, cy - oy, z)
+    ink.img = ink.img.filter(ImageFilter.GaussianBlur(blur))
+    _redraw(ink)
+    ZM.on, ZM.cx, ZM.cy, ZM.z = True, cx, cy - oy, z
+    try:
+        anchors = {}
+        _principals_strip(ink, f, oy, anchors)
+        _principals_sill(ink, f, oy, anchors)
+    finally:
+        ZM.on = False
+    return anchors
 
 
 # ====================================================================== #
-#  9 · THE PICTURE                                                       #
+#  9 · THE PICTURE (no lettering anywhere in it)                         #
 # ====================================================================== #
 
 def draw(t, ink):
@@ -1824,14 +2094,17 @@ def draw(t, ink):
     f = T0 + t
     if f >= T1:
         f = T1 - 1e-4
-    if shot_at(f)[2] == "town":
+    name = shot_at(f)[2]
+    if name == "town":
         _insert_frame(ink, f)
+        return
+    if name in CLOSE:
+        _close_frame(ink, f, CLOSE[name], CLOSE_BLUR.get(name, 1.6))
         return
     cx, cy, zoom = camera(f)
     oy = int(round(cy - H / 2))
     _porch_frame(ink, f, oy)
     view(ink, cx, H / 2 + (cy - H / 2 - oy), zoom)
-    credit(ink, f)
 
 
 # ====================================================================== #
@@ -1868,8 +2141,8 @@ def sound(mix, at=0.0):
         S.hush(mix, A(t_in), t_out - t_in, 1.0, 0.02, 0.02)
     if not (F("night", t_out, 0.11, seconds=T1 - t_out, loop=True, start=4.0) and F("creek", t_out, 0.09, seconds=T1 - t_out, loop=True, pan=0.4, start=3.0)):
         S.above(mix, A(t_out), T1 - t_out + 0.1, 1.0, 0.02, 0.2)
-    if not F("under", 174.0, 0.1, seconds=T1 - 174.0, loop=True, start=2.0):
-        S.hush(mix, A(174.0), T1 - 174.0, 0.5, 2.5, 0.2)
+    if not F("under", 176.0, 0.1, seconds=T1 - 176.0, loop=True, start=2.0):
+        S.hush(mix, A(176.0), T1 - 176.0, 0.5, 2.0, 0.2)
     S.music_s6(mix, at)                                       # the radio: two phrases, off with the "no"; back at +31.2, slower
     # 6.1 to the lamp
     S.tail(mix, A(144.3), 4)
@@ -1878,7 +2151,6 @@ def sound(mix, at=0.0):
     S.tail(mix, A(147.5), 4)
     S.tail(mix, A(148.4), 3)                                  # stops mid-pattern at 149.0
     S.voice_no(mix, A(148.2))
-    S.bubble_picture(mix, A(146.0), 0.9, gain=0.02, pan=0.0)
     for who, (x, dy, back, facing, tf) in HERD_SPOT.items():
         if tf:
             S.cow_down(mix, A(tf), gain=0.05, pan=_pan(x), bell=False)
@@ -1925,23 +2197,30 @@ def sound(mix, at=0.0):
     S.breach(mix, A(tb + 0.05), 0.8, gain=0.2)
     S.wheels(mix, A(when("big", "roll_up")), 0.9, 1.0, gain=0.07, pan=0.2, pan_to=S.P_SILL + 0.1)
     tp, tt = when("big", "proud"), when("big", "told")
-    n_tick = int((tt - 0.5 - tp) / 0.25)
+    n_tick = int((when("old", "turn_back") + 1.6 - tp) / 0.25)   # the peg slows and stops as the old dog comes round
     S.peg_tick(mix, A(tp - 0.5), n_tick + 2, 0.25)            # ticking with pride, on alone through the look, stops as the back settles
     S.creak(mix, A(when("old", "turn_back")), 0.5, gain=0.05, pan=S.P_SILL)
     S.old_dog_down(mix, A(when("old", "turn_back") + 0.25), 3, gain=0.1)
     S.drip(mix, A(tt + 0.2), 1)
-    S.chew(mix, A(when("cow", "chew")), 2, pan=0.2)           # she only chews
+    S.wheels(mix, A(tt + 0.78), 0.35, 1.0, gain=0.04, pan=S.P_SILL, pan_to=S.P_SILL + 0.05)   # it backs off from the back
+    tn = when("cow", "nose")                                  # THE WEAVE: she steps up and noses it back to the water
+    S.hooves(mix, A(tn + 0.12), 2, 0.22, "earth", gain=0.09, pan=_pan(COW_X1))
+    S.cowbell(mix, A(tn + 0.2), 2, 0.45, gain=0.05, pan=0.3)
+    S.wheels(mix, A(tn + 0.55), 0.55, 1.0, gain=0.07, pan=S.P_SILL + 0.05, pan_to=0.2)         # the wooden dog rolled back by her muzzle
+    S.hooves(mix, A(tn + 0.7), 2, 0.22, "earth", gain=0.08, pan=_pan(COW_X1))
+    S.cow_breath(mix, A(tn + 1.0), 0.8, pan=0.15)
+    S.chew(mix, A(when("cow", "chew")), 2, pan=0.2)           # and she chews
     tr = when("big", "roll_back")
     S.wheels(mix, A(tr), 0.5, 1.0, gain=0.05, pan=S.P_SILL, pan_to=0.2)
     if not F("splash", tr + 0.62, 0.25, pan=0.2, seconds=0.9):
         S.splash(mix, A(tr + 0.62), gain=0.14)
     # below: the piece out, the bubble, the page in, the lid, the print
-    S.set_down(mix, A(t_in + 0.5), gain=0.07)
-    S.bubble_picture(mix, A(t_in + 0.12), 0.7, gain=0.04)
-    S.page_slap(mix, A(t_in + 1.02), gain=0.04)
-    S.ratchet(mix, A(t_in + 1.08), 0.22, 22, gain=0.04, under=True)
-    S.set_down(mix, A(t_in + 1.38), gain=0.07)
-    S.paw_press(mix, A(t_in + 1.42), under=600)
+    S.set_down(mix, A(t_in + 0.67), gain=0.07)
+    S.page_slap(mix, A(t_in + 1.36), gain=0.04)
+    S.ratchet(mix, A(t_in + 1.44), 0.3, 22, gain=0.04, under=True)
+    S.set_down(mix, A(t_in + 1.84), gain=0.07)
+    S.paw_press(mix, A(t_in + 1.9), under=600)
+    S.set_down(mix, A(t_in + 2.12), gain=0.05)                # the can taken up in its mouth
     S.breach(mix, A(t_out + 0.03), 0.8, gain=0.2)
     S.drip(mix, A(t_out + 0.4), 1)
     S.card_drag(mix, A(when("old", "let_pass")), 0.5)         # the tail pulled aside: room is made
@@ -1955,11 +2234,10 @@ def sound(mix, at=0.0):
     S.paws(mix, A(when("lead", "walk_up") + 0.5), 5, 0.16, gain=0.06, pan=0.2, pan_to=S.P_SILL, wet=True)
     S.reel_down(mix, A(when("lead", "lay") + 0.45), gain=0.12)
     S.paw_press(mix, A(when("lead", "lie") + 0.95), gain=0.06, pan=S.P_SILL)       # a body on boards
-    S.drip(mix, A(178.6), 1, on="water", pan=0.2)             # a tail in water
+    S.drip(mix, A(179.1), 1, on="water", pan=0.2)             # a tail in water
     S.radio_dial(mix, A(175.25), gain=0.02) if hasattr(S, "radio_dial") else None
-    S.fish_murmur(mix, A(176.0), 3.0, gain=0.018, pan=0.2)
-    S.bubble_picture(mix, A(176.6), 1.2, gain=0.015, pan=0.0)
-    S.peg_tick(mix, A(178.0))
+    S.fish_murmur(mix, A(177.0), 2.8, gain=0.018, pan=0.2)
+    S.peg_tick(mix, A(179.3))
     return mix
 
 
@@ -1967,17 +2245,19 @@ def sound(mix, at=0.0):
 #  11 · CHECKS (MEASURED when this runs)                                 #
 # ====================================================================== #
 
-BOARD = [   # who, state, the board's second for it
+BOARD = [   # who, state, the second it falls on. Up to 161.0 these are the board's seconds. After that they are the
+    # repair's (law 10): the long locked gate frame is now five setups, the cow has a turn of her own (nose),
+    # the town insert runs 2.6 s so the can is seen taken, and the last crane starts at 175.0.
     ("lead", "stilled", 149.0), ("lead", "ears_down", 150.0), ("lead", "hold", 151.0), ("lead", "look_bubble", 152.6),
     ("lead", "turn", 153.0), ("lead", "dive", 155.0), ("cow", "get_up", 153.5), ("cow", "walk", 154.5), ("cow", "watch", 156.5),
     ("old", "shift", 156.2), ("herder", "breach", 157.2), ("digger", "breach", 158.4), ("sheep", "breach", 159.6),
-    ("cow", "smell", 159.8), ("big", "breach", 161.0), ("big", "proud", 162.5), ("old", "raise_", 162.5), ("old", "long_look", 164.0),
-    ("old", "turn_back", 165.5), ("old", "back", 168.0), ("big", "told", 168.0), ("cow", "chew", 168.9), ("big", "roll_back", 169.2),
-    ("big", "fix", 170.0), ("big", "come_up", 171.5), ("old", "look_over", 171.9), ("old", "let_pass", 172.4), ("big", "lay", 172.7),
-    ("cow", "fold", 173.0), ("old", "rise_turn", 173.5), ("old", "lie_down", 175.8), ("old", "beside", 176.8), ("cow", "lie", 175.0),
-    ("big", "rest", 175.0), ("lead", "lie", 175.6),
+    ("cow", "smell", 159.8), ("big", "breach", 161.0), ("big", "proud", 162.5), ("old", "raise_", 162.5), ("old", "long_look", 163.7),
+    ("old", "turn_back", 164.9), ("old", "back", 167.4), ("big", "told", 167.4), ("big", "nudged", 168.6), ("cow", "nose", 168.6),
+    ("cow", "chew", 170.0), ("big", "roll_back", 170.0), ("big", "fix", 170.9), ("big", "come_up", 173.5), ("old", "look_over", 173.9),
+    ("old", "let_pass", 174.4), ("big", "lay", 174.75), ("cow", "fold", 175.1), ("old", "rise_turn", 175.55), ("old", "lie_down", 177.5),
+    ("old", "beside", 178.4), ("cow", "lie", 177.1), ("big", "rest", 176.75), ("lead", "lie", 177.55),
 ]
-HOLDS = [(151.0, 152.6, "the lead dog, ears down"), (164.0, 165.5, "the old dog and the reel")]
+HOLDS = [(151.0, 152.6, "the lead dog, ears down"), (163.75, 164.9, "the old dog and the reel")]
 
 
 def _ends(logs):
@@ -2036,13 +2316,26 @@ def check(verbose=True):
         for k, v in logs.items():
             for (fe, s, why) in v:
                 assert not (a + 1e-6 < fe < b - 1e-6), (what, k, s, fe)
-        assert camera(a + 0.01) == camera(b - 0.01)
-    assert all(camera(161.0 + 0.5 * i) == GATE for i in range(18)), "the gate frame moved"
+        assert shot_at(a + 0.01) == shot_at(b - 0.01), (what, "a cut inside a hold")
+    # 7b the gate (157.0 to the town insert) is at least three setups, one of them a two-shot of a dog and the cow
+    names = [sh[2] for sh in shots() if 157.0 <= sh[0] < when("big", "fix")]
+    assert len(names) >= 5 and "smell" in names and "nudge" in names, names
+    assert max(sh[1] - sh[0] for sh in shots() if sh[0] >= 157.0) <= 3.5, "a setup runs too long"
+    # 7c the exchange: the cow's step and shove come before the dog goes down, and move it
+    assert when("cow", "nose") == when("big", "nudged") and when("big", "roll_back") > when("cow", "nose") + 1.0
+    assert big_state(when("big", "roll_back") - DT)[0] - big_state(when("big", "nudged"))[0] >= NUDGE_PX - 1.0
+    assert abs(cow_xy(when("cow", "nose") + 0.55)[0] - COW_X1) >= NOSE_STEP - 1.5, "she did not step"
+    # 7d no card animal is ever drawn edge-on in a turn
+    for i in range(int(SECONDS * FPS)):
+        fq = T0 + i * DT
+        st_, sn_ = at("old", fq)
+        if st_ == "turn_back":
+            assert abs(old_P("turn_back", p=clamp(sn_ / 2.5))["sx"]) >= FLIP_MIN - 1e-6
     # 8 the record, counted from the ledgers
     assert len(PEBBLES) == 67 and PEBBLES.count("w") == 16 and "ww" not in PEBBLES[2:], (len(PEBBLES), PEBBLES.count("w"))
     assert pebbles_at(T0) == 30 and pebbles_at(T1) == 67
     assert cans_at(T0) == 3 and cans_at(T1) == 53, (cans_at(T0), cans_at(T1))
-    assert cans_at(173.0) == 52                              # all but the lead dog's own last one (said in the report)
+    assert cans_at(175.0) == 52                              # all but the lead dog's own last one (said in the report)
     assert len({e[2] for e in ledger()}) == N_PILED
     paws = 1 + 1 + 1 + 1 + sum(1 for e in ledger() if e[3])   # the page, the first reel, the refused reel, the changed reel, eight lids
     assert paws == 12, paws
@@ -2052,12 +2345,12 @@ def check(verbose=True):
     downs = [("lead", when("lead", "dive"), when("lead", "come_up")), ("big", when("big", "roll_back") + 0.62, when("big", "come_up"))]
     for who, d, u in downs:
         assert u is not None and u > d
-    out["crossings"] = "lead down 155.0 up 160.6 with a reel; retriever down 169.8 up 171.5 with it changed; three passers up with reels, down again"
-    # 10 words on screen
-    words = sum(len(line.split()) for line in CREDIT)
-    assert words == 10 and " ".join(CREDIT) == "The dog is Claude. It has never heard this film."
-    credit_strokes()
-    out["words"] = words
+    out["crossings"] = "lead down 155.0 up 161.0 with a reel; retriever down 170.7 up 173.5 with it changed; three passers up with reels, down again"
+    # 10 words on screen: none. This module draws no lettering at all (the end credit that was lettered here is gone).
+    src = Path(__file__).read_text()
+    for banned in ("ink." + "text(", "ink." + "caption(", "ink." + "label(", "ink." + "card(", "town." + "bubble("):
+        assert banned not in src, banned
+    out["words"] = 0
     # 11 the camera never leaves the rendered frame
     for i in range(int(SECONDS * 8)):
         f = T0 + i / 8

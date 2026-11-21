@@ -56,6 +56,7 @@ from kit import clamp, ease, lerp, ramp, smooth  # noqa: E402
 import dog  # noqa: E402
 import herd  # noqa: E402
 import porch  # noqa: E402
+import props  # noqa: E402
 import town  # noqa: E402
 import importlib.util as _ilu  # noqa: E402
 
@@ -515,7 +516,7 @@ def _follow_amount(t):
     return 1.0 if f >= 0.999 else smooth(clamp((f - 0.42) / 0.26))
 
 
-T_COW_DRINK = 10.55                # the lead cow looks away from the dog under her chin and lowers her head to drink
+T_COW_DRINK = 13.2                 # the lead cow looks away from the dog under her chin and lowers her head to drink
 
 
 def _peer_pose(t, tau=10.0):
@@ -826,7 +827,15 @@ def dog_nose(t):
     return _dog_nose_at(int(round(t * FPS)))
 
 
-LEAD_DRINK_X = 600.0 - herd.reach("lead")       # where she stands to drink at x = 600
+# FINAL REPAIR (law 10). She used to drink from the strip BEHIND the dog (her body at x 450..620, the dog at
+# 524 drawn on top of her for thirteen seconds: two animals read as one stacked shape). She now walks on past
+# the end of the board to the bank, turns round there in one flip, and drinks facing the dog: her body is on the
+# bank (x 630..780), the dog on the board (x 480..570), their two heads meet over the water with air between the
+# bodies, and the fish child comes up between their noses.
+COW_WATER_X = 616.0                              # where her muzzle meets the line
+LEAD_DRINK_X = COW_WATER_X + herd.reach("lead") + 2.0   # where she stands, facing left
+LEAD_WALK_PX = 54.0
+TURN_DUR = 0.55
 T_WALK_ON = 5.2                                  # she chews again and walks on (WORLD: cow = passing)
 RIPPLE_T0 = 14.15                                # the radio is on: the second cow's ears, then up the line
 RIPPLE_STEP = 0.1
@@ -852,7 +861,7 @@ def _lead_at_water(tau, t0):
     the line where a dog was."""
     t = t0 + tau
     tr = _trace()
-    t_dog = (tr.t("AWAY") or 9.6) - 0.35                     # the dog is arriving under her chin
+    t_dog = max((tr.t("AWAY") or 9.6) - 0.35, t0 + TURN_DUR - 0.15)   # she has turned round: the dog is there, across the water
     pose = herd.stand(t, "lead", chew=1.0, alert=0.15)
     pose["_nose"] = 0.0
     over = herd.notice(herd.stand(t, "lead", chew=0.0, alert=0.0), 1.0)
@@ -883,7 +892,7 @@ def _walkers():
     n = dog_nose(3.0 + GREET["contact"] + 0.2)
     stop = herd.d_at(n[0] - 8 - herd.reach("lead", n[1] - herd.STRIP_Y, face=78.0))
     d_drink = herd.d_at(LEAD_DRINK_X)
-    t_arr = T_WALK_ON + (d_drink - stop) / 49.0 + 0.5
+    t_arr = T_WALK_ON + (d_drink - stop) / LEAD_WALK_PX + 0.5
     out = {}
     out["lead"] = herd.Walker("lead", herd.PATH,
                               [(0.0, herd.D_GATE - 74), (3.4, stop), (T_WALK_ON, stop), (t_arr, d_drink), (SECONDS + 2, d_drink)],
@@ -927,12 +936,27 @@ def _on_hill(t):
     return list(reversed(out))
 
 
+def lead_turn(t):
+    """None until she is at the bank; then 0..1, the paper-puppet turn (herd.cow's `turn`), kept off the card's edge:
+    she comes round in one flip."""
+    t_arr = _walkers()["lead"].plan.keys[3][0]
+    if t < t_arr:
+        return None
+    u = clamp((t - t_arr) / TURN_DUR)
+    return 0.3 * smooth(u / 0.5) if u < 0.5 else 1.0 - 0.3 * (1 - smooth((u - 0.5) / 0.5))
+
+
+def lead_facing(t):
+    tn = lead_turn(t)
+    return 1 if tn is None or tn < 0.5 else -1
+
+
 @lru_cache(maxsize=None)
 def _lead_muzzle_at(k):
     t = k / FPS
     lead = _walkers()["lead"]
     st = lead.state(t)
-    return herd.anchors("lead", st["pose"], st["x"], st["y"], st["s"], st["facing"])["muzzle"][0]
+    return herd.anchors("lead", st["pose"], st["x"], st["y"], st["s"], lead_facing(t))["muzzle"][0]
 
 
 def lead_muzzle_x(t):
@@ -941,7 +965,7 @@ def lead_muzzle_x(t):
 
 def _lead_pose_xy(t):
     st = _walkers()["lead"].state(t)
-    return st["pose"], st["x"], st["y"], st["s"], st["facing"]
+    return st["pose"], st["x"], st["y"], st["s"], lead_facing(t)
 
 
 @lru_cache(maxsize=None)
@@ -961,15 +985,15 @@ def lead_nose_to(t):
         n = dog_nose(min(max(t, 3.0), T_WALK_ON + 0.3))
         return (n[0] - 9, n[1] - 1)                # her muzzle to the tip of its nose, from behind and above
     if t >= T_UNDER + 0.6:
-        return (600.0, 401.0)                    # the line, exactly where the dog went through
-    water = (600.0, 400.0)
-    if 8.6 < t < T_COW_DRINK + 0.7:              # the dog under her chin: just above its lifted nose
+        return (COW_WATER_X - 8.0, 401.0)        # the line, where the dog went through
+    water = (COW_WATER_X, 400.0)
+    if 8.6 < t < T_COW_DRINK + 0.7:              # the dog across the water from her: her muzzle out to its nose
         n = dog_pts(min(t, T_COW_DRINK))["nose"]
-        over = (n[0] + 7.0, n[1] - 9.0)
+        over = (max(n[0] + 13.0, 596.0), n[1] - 3.0)
         f = ease(t, T_COW_DRINK, T_COW_DRINK + 0.6)
         return (lerp(over[0], water[0], f), lerp(over[1], water[1], f))
     if t > FISH_T1:
-        return (612.0, 400.5)                    # where the fish child went down: as far as a cow can follow
+        return (COW_WATER_X - 2.0, 400.5)        # where the fish child went down: as far as a cow can follow
     return water
 
 
@@ -1202,6 +1226,24 @@ def _lamps(t):
     return ramp(t, 24.5, 27.2)
 
 
+PAGE_OUT = 7.95       # FINAL REPAIR: what the person wants is a thing in the picture. As the hand reaches for the dog
+#                       it is holding a BLANK page (the children's page with nothing drawn on it); the page stays in
+#                       that hand, on the knee, all through the wait. What the dog lays on the sill in S3, and what
+#                       the person holds up to the lamp at 63.6, is the same page with a drawing on it.
+
+
+def blank_page(ink, t, pts):
+    if t < PAGE_OUT or not pts:
+        return
+    hx, hy = pts["hand_a"]
+    grow = ease(t, PAGE_OUT, PAGE_OUT + 0.3)
+    held_out = ease(t, 8.0, 9.2) * (1 - ease(t, 10.5, 11.2))          # shown to the dog: facing us, lifted
+    seated = ease(t, 11.6, 12.6)                                       # then it lies on the knee
+    props.page(ink, hx + 6 + 4 * held_out, hy - 15 * held_out - 5 * (1 - seated) - 3 * seated, 0.72 * grow, blank=True,
+               angle=lerp(lerp(-12.0, 8.0, held_out), -16.0, seated) + 1.5 * math.sin(t * 2.1) * held_out,
+               flat=0.34 * seated)
+
+
 def draw(t, ink):
     """One full frame of S1 at sequence time t (0..28)."""
     t = clamp(t, 0.0, SECONDS)
@@ -1216,8 +1258,8 @@ def draw(t, ink):
     rings = []
     t_arr = wk["lead"].plan.keys[3][0]
     k = 0
-    while T_COW_DRINK + 1.2 + 1.5 * k < min(t, SNORT_T - 0.2):     # her drinking
-        rings.append(porch.ring(602, T_COW_DRINK + 1.2 + 1.5 * k, 0.45))
+    while T_COW_DRINK + 0.9 + 0.7 * k < min(t, SNORT_T - 0.2):     # her drinking
+        rings.append(porch.ring(COW_WATER_X, T_COW_DRINK + 0.9 + 0.7 * k, 0.45))
         k += 1
     for k in range(4):                                             # the fish child's bubbles breaking under her nose
         if t >= SNORT_T - 0.45 + 0.15 * k:
@@ -1244,7 +1286,10 @@ def draw(t, ink):
 
     def strip(ink, t, oy):
         for who in reversed(herd.HERD):
-            a = wk[who].draw(ink, t, oy, layer="strip", nose_to=lead_nose_to(t) if who == "lead" else None)
+            if who == "lead":
+                a = wk[who].draw(ink, t, oy, layer="strip", nose_to=lead_nose_to(t), turn=lead_turn(t))
+            else:
+                a = wk[who].draw(ink, t, oy, layer="strip")
             if a and who == "lead" and T_UNDER <= t < T_UNDER + 2.5:
                 porch.drips(ink, t, oy, a["muzzle"][0], a["muzzle"][1] + oy, t - T_UNDER - 0.1, wet=0.8, width=16, floor=400)
             if a and who == "lead" and SNORT_T <= t < SNORT_T + 2.2:
@@ -1325,7 +1370,7 @@ def draw(t, ink):
     q = person_q(t)
     carrying = t < 14.0
     hold_a = "pebble" if PEBBLE_T - 0.42 <= t < PEBBLE_T else None
-    porch.scene(ink, t, oy,
+    pts = porch.scene(ink, t, oy,
                 cast=dict(hill=hill, strip=strip, sill=sill, under=under_water, front=front),
                 q=q, door=0.62, hold_a=hold_a, hold_b="radio" if carrying else None,
                 hand_over_rail=6.2 <= t < 8.05,
@@ -1333,6 +1378,7 @@ def draw(t, ink):
                 radio_on=ease(t, 14.0, 14.4),
                 pebbles="w" if t >= PEBBLE_T else "",
                 rings=rings)
+    blank_page(ink, t, pts)
     if t > T_TOWN - 0.5:
         # the last half second of the crane: what is above the line gives way to how it looks from below
         ly = int(400 - round(oy)) + 2
@@ -1382,7 +1428,7 @@ def sound(mix, at=0.0):
     # REPAIR: the dog under her chin; she drinks; bubbles; her snort; the fish child; the dog's nose in the water
     S.cow_breath(mix, A + (tr.t("AWAY") or 9.6) + 0.5, 0.9, gain=0.04, pan=0.25)
     S.tail(mix, A + (tr.t("AWAY") or 9.6) + 0.4, 3, 0.43, gain=0.03, pan=0.2)
-    S.drinking(mix, A + T_COW_DRINK + 1.0, SNORT_T - 0.4 - (T_COW_DRINK + 1.0))
+    S.drinking(mix, A + T_COW_DRINK + 0.6, SNORT_T - 0.4 - (T_COW_DRINK + 0.6))
     S.bubbles(mix, A + SNORT_T - 1.2, 5, 0.8, gain=0.04, pan=0.3, under=False)
     S.pop(mix, A + SNORT_T - 0.3, gain=0.05, pan=0.3)
     S.pop(mix, A + SNORT_T - 0.12, gain=0.06, pan=0.3)
