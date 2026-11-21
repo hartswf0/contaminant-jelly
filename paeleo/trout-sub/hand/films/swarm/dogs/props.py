@@ -451,13 +451,13 @@ def _reel_sheet(n, x, y, s, tilt, wet, paw, half, loop, tail, sway, lit, face):
     (ax, ay), (bx, by) = sh.p(-R * 0.94, -ry * 0.94), sh.p(R * 0.94, ry * 0.94)
     sh.d.arc([ax, ay, bx, by], 200, 255, fill=_rgba((255, 255, 250), 210), width=sh.w(max(1.0, 1.3 * s)))
     if paw:
-        _paw(sh, R * 0.36, ry * 0.40, 0.62 * s, 18, (30, 26, 34), 215)
-        _paw(sh, R * 0.36 - 0.5 * s, ry * 0.40 - 0.5 * s * tilt, 0.62 * s, 18, (232, 236, 230), 60)
+        _paw(sh, R * 0.34 + 0.7 * s, ry * 0.36 + 0.7 * s, 0.66 * s, 18, (24, 20, 30), 200)      # a muddy print, pale on the lid
+        _paw(sh, R * 0.34, ry * 0.36, 0.66 * s, 18, (226, 212, 184), 245)
     if wet > 0:
         rs = random.Random(int(n) * 13 + 5)
-        for _ in range(int(3 + 5 * wet)):
-            a, f = rs.uniform(0, TAU), rs.uniform(0.2, 0.92)
-            sh.ell(R * f * math.cos(a), ry * f * math.sin(a), 1.2 * s, 0.9 * s, fill=_rgba((236, 248, 250), 170 * wet))
+        for _ in range(int(2 + 3 * wet)):
+            a, f = rs.uniform(0, TAU), rs.uniform(0.3, 0.92)
+            sh.ell(R * f * math.cos(a), ry * f * math.sin(a), 1.0 * s, 0.7 * s, fill=_rgba((236, 248, 250), 130 * wet))
     return sh
 
 
