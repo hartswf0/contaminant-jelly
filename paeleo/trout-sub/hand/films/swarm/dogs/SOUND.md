@@ -351,3 +351,40 @@ within 60 dB of the peak. dB(A) = the same RMS after the standard A curve. Onset
 - UNKNOWN: whether the pack's round helps or sentimentalises the pack sequence. No critic has reviewed it.
 - Not done: no independent critic has listened; this file passes nothing (law 9). The `sound/` folder
   is 118 MB of uncompressed wav and should not be shipped with the film.
+
+---
+
+## REAL RECORDINGS (added after the sound designer finished): use these first
+
+The person asked for good sound, and everything above is synthesized. `films/swarm/dogs/foley.py` now holds
+real field recordings and foley takes, foraged under open licences (CC0 from Freesound; public domain and
+CC BY / BY-SA from Wikimedia Commons; credits in `films/credits/dogs_freesound.json` and
+`films/credits/dogs_foley.json`, which the end credit must cover).
+
+**Rule for every sequence builder and the editor:** for any dog, cow, water, ice, door, paper or night
+sound, call `foley.play(...)` and do NOT use the synthesized version of the same thing. Keep the
+synthesized library only for what has no recording here (paws on boards, a reel set on wood, the old
+dog's held tone, wordless human voice).
+
+```python
+import foley
+foley.NAMES   # bark bell bubbles calf creek dig door drip frogs howl ice moo night pant paper plunge radio shake sigh splash under whine
+foley.play(mix, "howl", at=85.0, gain=0.7)                              # the one howl
+foley.play(mix, "splash", at=24.2, gain=0.6, take=1)                    # a dog going in
+foley.play(mix, "moo", at=3.0, gain=0.45, pan=-0.3)                     # the lead cow
+foley.play(mix, "bell", at=1.0, seconds=6, gain=0.25)                   # her bell
+foley.play(mix, "night", at=0, seconds=28, gain=0.18, loop=True)        # porch bed: crickets
+foley.play(mix, "creek", at=0, seconds=28, gain=0.16, loop=True)        # porch bed: the creek
+foley.play(mix, "under", at=28, seconds=30, gain=0.3, loop=True)        # Trouttown bed: under water
+foley.play(mix, "dig", at=33.0, seconds=2.5, gain=0.5)                  # digging in gravel
+foley.play(mix, "shake", at=60.5, gain=0.6)                             # shaking off
+foley.play(mix, "ice", at=118.0, seconds=4, gain=0.6)                   # the ice
+```
+
+Above water use the `night` and `creek` beds; below water use `under` and `bubbles`. Cut the bed hard at
+each crossing of the surface: that cut is how a child hears where we are.
+
+**Music.** Real recorded songs from the project's album DEEP SEA VOYAGE are in `../music/*.ogg`
+(decode with ffmpeg to mono 44.1 kHz and add with `mix.add`). The editor should lay one song quietly under
+each act (ducked 8 dB or more under foley and under the three spoken lines) in place of the synthesized
+score, and keep silence where a character thinks. Nobody has heard any of this: measure levels, say so.

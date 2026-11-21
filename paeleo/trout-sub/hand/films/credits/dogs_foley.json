@@ -1,0 +1,134 @@
+[
+ {
+  "key": "bark",
+  "file": "films/swarm/dogs/foley/bark_0.wav",
+  "title": "File:Barking of a dog 2.ogg",
+  "author": "Amada44",
+  "license": "CC BY-SA 3.0",
+  "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+  "source_url": "https://commons.wikimedia.org/wiki/File%3ABarking_of_a_dog_2.ogg",
+  "file_url": "https://upload.wikimedia.org/wikipedia/commons/5/58/Barking_of_a_dog_2.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+  "used_as": "bark"
+ },
+ {
+  "key": "bark",
+  "file": "films/swarm/dogs/foley/bark_1.wav",
+  "title": "File:Barking of a dog.ogg",
+  "author": "Amada44",
+  "license": "CC BY-SA 3.0",
+  "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+  "source_url": "https://commons.wikimedia.org/wiki/File%3ABarking_of_a_dog.ogg",
+  "file_url": "https://upload.wikimedia.org/wikipedia/commons/a/a2/Barking_of_a_dog.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+  "used_as": "bark"
+ },
+ {
+  "key": "howl",
+  "file": "films/swarm/dogs/foley/howl_0.wav",
+  "title": "File:Wolf howls.ogg",
+  "author": "",
+  "license": "Public domain",
+  "license_url": "",
+  "source_url": "https://commons.wikimedia.org/wiki/File%3AWolf_howls.ogg",
+  "file_url": "https://upload.wikimedia.org/wikipedia/commons/8/87/Wolf_howls.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+  "used_as": "howl"
+ },
+ {
+  "key": "moo",
+  "file": "films/swarm/dogs/foley/moo_0.wav",
+  "title": "File:Mudchute cow 1.ogg",
+  "author": "Secretlondon",
+  "license": "CC BY-SA 3.0",
+  "license_url": "http://creativecommons.org/licenses/by-sa/3.0/",
+  "source_url": "https://commons.wikimedia.org/wiki/File%3AMudchute_cow_1.ogg",
+  "file_url": "https://upload.wikimedia.org/wikipedia/commons/4/48/Mudchute_cow_1.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+  "used_as": "moo"
+ },
+ {
+  "key": "moo",
+  "file": "films/swarm/dogs/foley/moo_1.wav",
+  "title": "File:Mudchute cow 1.ogg",
+  "author": "Secretlondon",
+  "license": "CC BY-SA 3.0",
+  "license_url": "http://creativecommons.org/licenses/by-sa/3.0/",
+  "source_url": "https://commons.wikimedia.org/wiki/File%3AMudchute_cow_1.ogg",
+  "file_url": "https://upload.wikimedia.org/wikipedia/commons/4/48/Mudchute_cow_1.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+  "used_as": "moo"
+ },
+ {
+  "key": "splash",
+  "file": "films/swarm/dogs/foley/splash_0.wav",
+  "title": "File:Bathtub water splashes.ogg",
+  "author": "gradha",
+  "license": "Public domain",
+  "license_url": "",
+  "source_url": "https://commons.wikimedia.org/wiki/File%3ABathtub_water_splashes.ogg",
+  "file_url": "https://upload.wikimedia.org/wikipedia/commons/8/83/Bathtub_water_splashes.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+  "used_as": "splash"
+ },
+ {
+  "key": "creek",
+  "file": "films/swarm/dogs/foley/creek_0.wav",
+  "title": "File:River flowing (Gravity Sound).mp3",
+  "author": "Gravity Sound",
+  "license": "CC BY 4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0",
+  "source_url": "https://commons.wikimedia.org/wiki/File%3ARiver_flowing_%28Gravity_Sound%29.mp3",
+  "file_url": "https://upload.wikimedia.org/wikipedia/commons/4/4c/River_flowing_%28Gravity_Sound%29.mp3?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+  "used_as": "creek"
+ },
+ {
+  "key": "door",
+  "file": "films/swarm/dogs/foley/door_0.wav",
+  "title": "File:Door handle creaking.ogg",
+  "author": "stephan",
+  "license": "Public domain",
+  "license_url": "",
+  "source_url": "https://commons.wikimedia.org/wiki/File%3ADoor_handle_creaking.ogg",
+  "file_url": "https://upload.wikimedia.org/wikipedia/commons/7/74/Door_handle_creaking.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+  "used_as": "door"
+ },
+ {
+  "key": "night",
+  "file": "films/swarm/dogs/foley/night_0.wav",
+  "title": "File:Jer-Cricket.ogg",
+  "author": "Man vyi",
+  "license": "Public domain",
+  "license_url": "",
+  "source_url": "https://commons.wikimedia.org/wiki/File%3AJer-Cricket.ogg",
+  "file_url": "https://upload.wikimedia.org/wikipedia/commons/a/a2/Jer-Cricket.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+  "used_as": "night"
+ },
+ {
+  "key": "bubbles",
+  "file": "films/swarm/dogs/foley/bubbles_0.wav",
+  "title": "File:Bathtub water splashes.ogg",
+  "author": "gradha",
+  "license": "Public domain",
+  "license_url": "",
+  "source_url": "https://commons.wikimedia.org/wiki/File%3ABathtub_water_splashes.ogg",
+  "file_url": "https://upload.wikimedia.org/wikipedia/commons/8/83/Bathtub_water_splashes.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+  "used_as": "bubbles"
+ },
+ {
+  "key": "bubbles",
+  "file": "films/swarm/dogs/foley/bubbles_1.wav",
+  "title": "File:Boiling water being poured into a mug for tea.ogg",
+  "author": "cori",
+  "license": "Public domain",
+  "license_url": "",
+  "source_url": "https://commons.wikimedia.org/wiki/File%3ABoiling_water_being_poured_into_a_mug_for_tea.ogg",
+  "file_url": "https://upload.wikimedia.org/wikipedia/commons/6/69/Boiling_water_being_poured_into_a_mug_for_tea.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+  "used_as": "bubbles"
+ },
+ {
+  "key": "wind",
+  "file": "films/swarm/dogs/foley/wind_0.wav",
+  "title": "File:American police siren i.ogg",
+  "author": "lezer",
+  "license": "Public domain",
+  "license_url": "",
+  "source_url": "https://commons.wikimedia.org/wiki/File%3AAmerican_police_siren_i.ogg",
+  "file_url": "https://upload.wikimedia.org/wikipedia/commons/a/ae/American_police_siren_i.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+  "used_as": "wind"
+ }
+]
