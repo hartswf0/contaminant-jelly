@@ -90,36 +90,109 @@ This is the evidence the chapter can stand on, including what did not happen.
 | A child's sentence is | a hope | an invariant |
 | In this project | the 55-porthole film | the hand films, class films, making films |
 
-## Part 3 · Chapter outline
+## Part 3 · The philosophy, and where this stone sits
 
-**Claim.** A SCION prompt is a production constitution: it makes a language model's film something that can
-be checked against a stated rule. The Tourkey Trouttown work shows where that holds (words, order, blanks,
-sources) and where it does not (sound, kindness, whether a struggle shown is true).
+Read against `burning-house` (*The Ledger and the Curtain*, `CLAIMS.md`, the PAE ladder), Tourkey Trouttown is
+not a side project for teachers. It is the next rung of the same ladder, and it is the first rung on which
+somebody other than the maker wrote back.
 
-1. **A page is passed.** Porthole 13: a fish that says "haha verry funny", a friend who writes three endings
-   for a dinner bell, a second friend who writes nothing. Three children, one page, and then a film in
-   which the blank is kept.
-2. **What it means to say a language model makes a film.** The two regimes in the table above. Place this in
-   operative ekphrasis: description that does something, and thick prompting as the way to study it.
-3. **The SCION form.** Its nine sections; its debt to Oulipo (a constraint is a rule another person can
-   check) and to the animation studio (roles, the checker, the exposure sheet). The three sets and the
-   Multiplane Studio prompt as members of one family.
-4. **Case one: a film from a video model.** 55 portholes, feedstock cards, two locked shots each; drift,
-   tracking, the budget. What a description cannot guarantee.
-5. **Case two: films made by hand in code.** The costume failure and the forage-or-handmake rule. Five
-   portholes, each with sources and a review on its page.
-6. **Case three: the children's sentences as invariants.** Five pages, 34 sentences, 45 agents. The sentence
-   never changes; the expansion is all in the picture; blanks stay blank; the die is not thrown.
-7. **Case four: filming the writing.** Hands, a desk, a camera that travels into Turkey's seat and out to the
-   river. The rule that every struggle shown must be on the page, and the fact that this was not verified.
-8. **The loop.** A game that makes films; films that run the game (the classroom film, the teaching cut,
-   the 14:48 film). What a second class would show.
-9. **What the critic cannot do.** Hearing; judging kindness; knowing what a child meant. Where a person has
-   to decide, and how the prompts mark that boundary.
-10. **Limits.** One class, five pages, no measure of learning. Children's work: first initials only, pages
-    never shown. Authorship split between the sheet's designer, the children, the agents and the editor.
-11. **What this adds.** A form for prompts that makes generated film falsifiable; a worked account of which
-    parts of that form survive production; a classroom game whose output is its own instruction.
+**The ladder so far**
+
+| Rung | Who is inside the rules | What was shown |
+|---|---|---|
+| The Threshold | one paper dog | a state name has to become a visible gesture (stillness as refusal) |
+| The Flour Tower | one sack, six formal languages | one score, six lineages, a critic who did not build |
+| VTX-0.1 | two sacks, one lamp | one changed line of intention, 46 causal paths |
+| The Abominable House | four sacks, twelve deeds | four formal accounts that refuse to agree |
+| **Tourkey Trouttown** | **one turkey, a river of trout, and a class of nine-year-olds** | **readers who wrote back: five pages, 34 sentences** |
+
+The meta-essay ends by asking for a world "explicit enough to give a consequential answer" that leaves the
+reader "room to pause the frame, test the rule, check the angle, and write back." In the burning house that
+reader is still hypothetical: claim C13 stands open with no human ballots. In Trouttown the page says
+"Pass your paper left", and three children did. That is the stepping stone: from an instrument that
+invites an answer to one that received it, and then had to decide what to do with the answer.
+
+**Six ideas from the burning house, as they land here**
+
+1. **Against the smooth machine.** The smooth machine erases the joint where a decision happened. This
+   project met it three times. The video model let the porthole drift until a tracker pinned it back. A
+   chat model, shown the children's pages, filled in their blank newspaper lines and then offered "more
+   kid ways" to write them: it smoothed the children. And my own tidied captions smooth their spelling,
+   which is why the making films put "freek out" and "panit" back on the page in pencil.
+2. **Waldemar's split mind, in a fourth grader.** Calvino's programmer is half building an algebra of
+   interchangeable slots and half running "a mental film packed with fades and metamorphoses". The
+   worksheet asks a child to do both at once: fill a form, and picture what a fish sees. The class films
+   show the film half. The making films show both halves in one shot: the page is the ledger, the dive
+   through the drawn ring is the mental film, and the return to the desk is the joint between them.
+3. **The three ALAMO levels are visible in the children's handwriting.**
+   Level 1, recombination: a friend picks one of two printed options and its button.
+   Level 2, mold filling: sentences that carry on from the printed stem ("the trout to run") show a child
+   filling a grammatical mold. Level 3, plot implication, where one scene changes what is possible in
+   the next: the pages barely reach it. Nobody rolled the die, and almost no ending depends on another.
+   The films reach it only because I told the story units that the pilot's first page must colour every
+   later scene. That was the editor's addition, not the children's, and the chapter has to say so.
+4. **Readers that do not commute.** The house sets stage, ledger, minds and insurer side by side because
+   their disagreements show what each cannot see. Trouttown builds the disagreement into the fiction:
+   what Turkey thinks and what the trout think are both right, and the order of the pass matters. "Check
+   the angle" is literal here: the same porthole from the seat and from the river.
+5. **Two kinds of absence.** A blank line is an empirical absence: a child ran out of time or did not
+   know, and nobody can supply that afternoon. The unthrown die, the hands without faces, the pages never
+   shown and the first initials are authored refusals, the same move as four faceless sacks and a drawn
+   curtain. Filling a blank is the one thing the films are forbidden to do, and it is the first thing a
+   smooth machine did.
+6. **The accountable clinamen.** A swerve somebody chooses and answers for. The children's are on the
+   pages: a second jaw drawn outside the ring, an option circled instead of drawn, a button coloured in,
+   "Trying to save a hot Cheeto", "It is not wet". A nine-year-old cannot be asked to defend a swerve, so
+   the adult's duty changes from answering for an exception to keeping it and saying whose it is. My own
+   swerves need a ledger too: dropping the faint "the sub." on porthole 13, choosing tidied captions,
+   making page one govern the endings.
+
+**What this does to the claim.** The earlier version said a SCION prompt makes a film checkable. The
+stronger version: a worldtext is tested when someone who did not make it acts inside it and their
+action has to be carried forward without being smoothed. Games that make films are that test. The
+game produces answers; the film is where the maker shows what was done with them.
+
+**A claims ledger for this rung** (after `burning-house/CLAIMS.md`)
+
+| | Claim | Status | What would settle it |
+|---|---|---|---|
+| T01 | Every caption in the class films is a child's sentence, in order, with blanks kept | measured | none: asserted in code and checked by hand against the transcripts |
+| T02 | Every struggle shown in the making films is on the page | open | re-run the critic units, or check each film against its photographs |
+| T03 | The voices and mix are intelligible | open | no person has listened |
+| T04 | The pilot's page colours the later endings | editor's addition | mark it as such; compare with a cut that does not impose it |
+| T05 | Children took another creature's point of view | open | nothing measured; needs a design and ethics approval |
+| T06 | The films can teach the game to a new class | open | a second class playing from the film alone |
+| T07 | The SCION text adds something the briefs do not | open | one SCION run whole on one page, compared with the brief-driven film |
+| T08 | Transcription is faithful | partly | three readings are marked unsure; a second reader should check the photographs |
+
+## Part 3b · Chapter outline
+
+**Working title.** The House With Children In It: games that make films, films that run games.
+
+**Claim.** A worldtext is tested when a reader who did not make it writes back and the answer has to be
+carried forward unsmoothed. Tourkey Trouttown is that test at the scale of one class. It shows what a
+constitution of prompts can hold fixed (words, order, blanks, sources), what it cannot (sound, kindness,
+truth to a child's struggle), and what the maker added.
+
+1. **A page is passed.** Porthole 13: a fish that says "haha verry funny"; a friend writes three endings
+   for a dinner bell; the next friend writes nothing. Then a film that keeps the nothing.
+2. **Against the smooth machine, again.** The three smoothings above. Friction as the place where a
+   decision shows. Operative ekphrasis and thick prompting as the frame.
+3. **From the burned house to the river.** The ladder; Calvino's twelve deeds become *Trouttown: Twelve
+   Deeds*; what changes when the cast is children and the reader really answers.
+4. **The form of a SCION.** Thesis, primitives, invariants, roles, hard proof, fixture, independent
+   critic, repair. Its debts to Oulipo and to the animation studio. How it reached the agents (Part 2).
+5. **Two ways a language model makes a film.** Description to pixels; instruction to a program. The
+   55-porthole film against the hand films. The costume failure.
+6. **Mold filling in pencil.** The three ALAMO levels read off five pages. Where the children's work
+   stops and the crew's begins.
+7. **The sentence as invariant.** The class films: 34 sentences, blanks kept, the die unthrown.
+8. **The split mind on screen.** The making films: ledger and mental film in one shot; hands without
+   faces as authored refusal; what was not verified.
+9. **Two absences and a ledger.** Blank lines and refused pictures; the claims table; every swerve
+   attributed to its maker.
+10. **The loop.** A game that makes films and films that run the game. The second class as the next stone.
+11. **Limits.** One class, five pages, no measure of learning, no human listener, no consent on record.
 
 ## Part 4 · What the chapter still needs
 
