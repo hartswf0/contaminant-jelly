@@ -245,14 +245,14 @@ MARKERS = [
 ]
 
 INTERVENTIONS = [
-    InterventionFrame('pinch key', T['pinch'], T['free'], 'whole twig -> stub in-betweened directly is a dissolve of the join; '
-                      'an extra key pinches the contour shut first, held 1 frame', 'BASE_TRACK (key PINCH)'),
+    InterventionFrame('pinch key', T['strain'], T['free'], 'whole twig -> stub in-betweened directly is a dissolve of the join; '
+                      'an extra key draws the twig out into a thin neck that shuts, held 1 frame, then snaps back to a stub', 'BASE_TRACK (key PINCH)'),
     InterventionFrame('twig spring', T['cut'], 3.4, 'a keyed stub would just stand; the release is a damped spring', 'twig_bend'),
     InterventionFrame('ground wave', T['land'], T['crash'] + 0.25, 'the carrier is a travelling displacement of the ground run, '
                       'not a key: a key pair would raise and lower the whole ground at once', 'ground_wave'),
     InterventionFrame('bark bulge', T['crash'] - 0.1, T['over'], 'the wave continues up the stump side as a travelling bulge', 'bark_bulge'),
-    InterventionFrame('band draw-on', T['band'][0][0], T['band'][2][1], 'collapsed loop -> full loop in-betweened point for point '
-                      'inflates like a balloon; instead each loop is paid out along its own path', 'draw_on'),
+    InterventionFrame('band throw', T['band'][0][0], T['band'][2][1], 'collapsed loop -> full loop in-betweened point for point '
+                      'inflates like a balloon; instead each loop keeps its thickness and reaches across', 'throw_loop'),
     InterventionFrame('stuck', T['stuck'], T['drop'], 'hand-keyed pushes (squash) and rocking at the mouth of a cleft that is too tight; '
                       'three extra keys OPEN1, OPEN2, OPEN let it give a step per push', 'POSE tracks, BASE_TRACK'),
     InterventionFrame('wilt', T['wait'][0], 9.9, 'the wait is acted by a hand-keyed sag of the shoot, then a recovery past straight', 'POSE tracks'),
@@ -324,13 +324,22 @@ def base_key(name, top='open', hw=1.6, dp=CLEFT_DEPTH, bands=False, squeeze=0.0,
     L['top_R'] = [(hw, RIM), (5.0, RIM + 0.45), (8.5, RIM - 0.25), (11, RIM)]
     L['stump_R'] = list(STUMP_PROFILE[6:])
     L['ground_M'] = [(26, 0), (29.5, -0.8), (32.5, 0.4), (35.5, -0.5), (40, 0.6), (56, 0.2), (70, 0.6), (TWIG_X - 1.3, 0)]
-    tl, tr = {'open': ((-1.0, -TWIG_H), (1.0, -TWIG_H)), 'pinch': ((0.0, -TWIG_H - 0.3), (0.0, -TWIG_H - 0.3)),
-              'stub': ((-1.0, -TWIG_H - 0.5), (1.0, -TWIG_H + 1.0))}[top]
     cx = lambda h: TWIG_X + 0.9 * math.sin(h / TWIG_H * 2.6)          # the twig is not ruled
-    L['twig_L'] = [(cx(h) - lerp(1.3, 1.0, h / TWIG_H), -h) for h in np.linspace(0, TWIG_H - 2, 8)] + [(cx(TWIG_H) + tl[0], tl[1])]
-    down = [(cx(h) + lerp(1.3, 1.0, h / TWIG_H), -h) for h in np.linspace(TWIG_H - 2, 0, 12)]
+    if top == 'pinch':
+        # the neck: the last 7 units drawn out thin and 1.4 longer, shut at the top. This is the cut, in a line.
+        Ht = TWIG_H + 1.4
+        wd = lambda h: lerp(1.3, 1.0, min(1.0, h / TWIG_H)) * (1 - 0.9 * smooth((h - (TWIG_H - 7.0)) / 7.6))
+        hs = list(np.linspace(0, TWIG_H - 7.5, 6)) + list(np.linspace(TWIG_H - 6.5, Ht - 0.4, 8))
+        tl = tr = (cx(TWIG_H), -Ht)
+    else:
+        wd = lambda h: lerp(1.3, 1.0, h / TWIG_H)
+        hs = list(np.linspace(0, TWIG_H - 2, 8))
+        tl, tr = {'open': ((cx(TWIG_H) - 1.0, -TWIG_H), (cx(TWIG_H) + 1.0, -TWIG_H)),
+                  'stub': ((cx(TWIG_H) - 1.0, -TWIG_H - 0.5), (cx(TWIG_H) + 1.0, -TWIG_H + 1.0))}[top]
+    L['twig_L'] = [(cx(h) - wd(h), -h) for h in hs] + [tl]
+    down = [(cx(h) + wd(h), -h) for h in sorted(set(hs) | {17.5, 11.0}, reverse=True)]
     spur = [(cx(15) + 1.15, -15.0), (cx(15) + 4.2, -19.5), (cx(15) + 5.4, -22.6), (cx(15) + 4.9, -19.2), (cx(15) + 1.2, -13.4)]
-    L['twig_R'] = [(cx(TWIG_H) + tr[0], tr[1])] + [p for p in down if -p[1] > 15.2] + spur + [p for p in down if -p[1] < 13.2]
+    L['twig_R'] = [tr] + [q for q in down if -q[1] > 15.2] + spur + [q for q in down if -q[1] < 13.2]
     L['ground_R'] = [(TWIG_X + 1.3, 0), (100, 0.6), (122, 0.1), (140, 0.8)]
     key = KeyContour.from_runs(name, BASE_SCHEMA, L)
     if squeeze:
@@ -354,7 +363,7 @@ BASE_KEYS = dict(
     HEALED=base_key('HEALED', 'stub', hw=1.0, dp=0.0, bands=True, squeeze=1.0, split=1.0),
 )
 BASE_TRACK = [  # (t, key, ease into it): the registered morph sequence of the base
-    (0.0, 'WHOLE'), (T['pinch'], 'WHOLE'), (T['cut'] - 0.04, 'PINCH', 'in'), (T['cut'], 'PINCH'), (T['free'] + 0.04, 'STUB', 'out'),
+    (0.0, 'WHOLE'), (T['strain'], 'WHOLE'), (T['cut'] - 0.04, 'PINCH', 'in'), (T['cut'], 'PINCH'), (T['free'] + 0.04, 'STUB', 'out'),
     (PUSH[0], 'STUB'), (PUSH[0] + 0.07, 'OPEN1', 'out'), (PUSH[1], 'OPEN1'), (PUSH[1] + 0.07, 'OPEN2', 'out'),
     (PUSH[2], 'OPEN2'), (PUSH[2] + 0.07, 'OPEN', 'out'), (T['seat'], 'OPEN'), (T['grip'], 'GRIP', 'in'),
     (T['band'][0][0], 'GRIP'), (T['band'][0][0] + 0.01, 'BOUND', 'hold'), (T['tight'][0], 'BOUND'), (T['tight'][1], 'TIGHT', 'out'),
@@ -495,8 +504,8 @@ def twig_bend(t):
 
 
 POSE = dict(   # the shoot's pose once it is free: lean in degrees (+ = to the right), squash, and droop
-    lean=Pacing('lean', [(T['cut'], -22), (T['land'], -40, 'lin'), (T['land'] + 0.08, -52, 'out'), (2.30, -6, 'smooth'),
-                         (T['rest'], 7, 'smooth'), (2.75, 19, 'smooth'), (3.6, 12), (4.24, 10), (T['crash'] + 0.07, -13, 'out'),
+    lean=Pacing('lean', [(T['cut'], -22), (T['land'], -40, 'lin'), (T['land'] + 0.08, -52, 'out'), (2.30, -4, 'smooth'),
+                         (T['rest'], 3, 'smooth'), (2.78, 19, 'smooth'), (3.6, 12), (4.24, 10), (T['crash'] + 0.07, -13, 'out'),
                          (4.50, 34, 'smooth'), (T['corner'], 40), (T['slip'], 50, 'smooth'), (T['over'], 24, 'smooth'),
                          (5.46, 12), (5.56, 14), (T['edge'], -10, 'out'), (T['stuck'], -2),
                          (PUSH[0], 6, 'lin'), (5.98, -7, 'lin'), (PUSH[1], 7, 'lin'), (6.14, -7, 'lin'), (PUSH[2], 6, 'lin'),
@@ -507,10 +516,10 @@ POSE = dict(   # the shoot's pose once it is free: lean in degrees (+ = to the r
                              (T['stuck'], 1), (PUSH[0], 0.88, 'in'), (5.98, 1.02), (PUSH[1], 0.87, 'in'), (6.14, 1.02), (PUSH[2], 0.87, 'in'),
                              (T['drop'], 1.0), (T['seat'], 1.07, 'in'),
                              (6.5, 0.95, 'out'), (6.62, 1.0), (T['tight'][0], 1), (T['tight'][1] - 0.05, 1.04, 'out'),
-                             (T['tight'][1] + 0.12, 1), (9.0, 0.97), (9.22, 0.97), (9.62, 1.03), (9.9, 1)]),
-    droop=Pacing('droop', [(T['wait'][0] + 0.1, 0), (9.0, 3.4), (9.22, 3.4), (9.64, -0.8), (9.92, 0)]),
+                             (T['tight'][1] + 0.12, 1), (9.0, 0.95), (9.22, 0.95), (9.62, 1.03), (9.9, 1)]),
+    droop=Pacing('droop', [(T['wait'][0] + 0.1, 0), (9.0, 5.2), (9.22, 5.2), (9.64, -1.0), (9.92, 0)]),
 )
-WEDGE = Pacing('wedge', [(T['pinch'], 0), (T['cut'] - 0.04, 1, 'in'), (T['heal'][0], 1), (T['heal'][1], 0, 'smooth')])
+WEDGE = Pacing('wedge', [(T['strain'] + 0.15, 0), (T['cut'] - 0.04, 1, 'in'), (T['heal'][0], 1), (T['heal'][1], 0, 'smooth')])
 STEM = Pacing('stem', [(9.5, 0), (10.25, 1, 'smooth'), (11.15, 2, 'smooth')])     # bare -> spear height -> full height
 
 
@@ -529,23 +538,18 @@ def leaf_open(k, t):
 
 def band_progress(k, t):
     a, b = T['band'][k]
-    return smooth(clamp((t - a) / (b - a)))
+    return EASES['over'](clamp((t - a) / (b - a)))
 
 
-def draw_on(run, p):
-    """InterventionFrame 'band draw-on': a run paid out along its own path. p = 0 all points on the first one,
-    p = 1 the run as drawn. In between the line goes out as far as p and comes back ALONG ITSELF to where it
-    started (a retrace: the pencil going back over its own mark), so the line stays one line and no chord is
-    drawn across the loop. (Point for point, a loop growing from a dot inflates like a balloon; this one is thrown.)"""
-    n = len(run)
-    u = np.linspace(0, 1, n)
-    ur = max(p, 0.8)
-    g = np.where(u <= p, u, np.where(u <= ur, p, p * (1 - u) / max(1e-9, 1 - ur)))
-    j = g * (n - 1)
-    lo = np.floor(j).astype(int)
-    hi = np.minimum(lo + 1, n - 1)
-    f = (j - lo)[:, None]
-    return run[lo] * (1 - f) + run[hi] * f
+def throw_loop(run, p):
+    """InterventionFrame 'band throw': a closed loop of the line thrown across what it binds. p = 0 the loop is
+    shut on its first point, p = 1 the run as drawn. It keeps its thickness and only reaches further, so it reads
+    as a strap going across. (In-betweened point for point from a dot, the same loop inflates like a balloon.)"""
+    a = run[0]
+    out = run.copy()
+    out[:, 0] = a[0] + (run[:, 0] - a[0]) * p
+    out[:, 1] = a[1] + (run[:, 1] - a[1]) * min(1.0, p * 5.0)
+    return out
 
 
 def ground_wave(t):
@@ -554,12 +558,12 @@ def ground_wave(t):
     if t < T['land'] or t > T['crash'] + 0.25:
         return None
     if t < T['rest']:
-        x = lerp(TWIG_X - 1.3, 73.0, EASES['out'](clamp((t - T['land']) / 0.28)))
+        x = lerp(TWIG_X - 1.3, 69.0, EASES['out'](clamp((t - T['land']) / 0.3)))
         amp = Pacing('dip', [(T['land'], 0), (T['land'] + 0.07, -1.5, 'out'), (2.3, 0.6), (T['rest'], 2.2)]).at(t)
         return x, amp, 6.0
     u = clamp((t - T['rest']) / (T['crash'] - T['rest']))
-    x = 73.0 - 46.3 * u ** 1.45
-    amp = Pacing('swell', [(T['rest'], 2.2), (3.3, 6.2), (4.1, 5.4), (T['crash'], 4.2), (T['crash'] + 0.25, 0, 'out')]).at(t)
+    x = 69.0 - 42.3 * u ** 1.45
+    amp = Pacing('swell', [(T['rest'], 2.2), (3.2, 7.6), (4.1, 6.4), (T['crash'], 4.6), (T['crash'] + 0.25, 0, 'out')]).at(t)
     return x, amp, 6.5
 
 
@@ -593,11 +597,11 @@ def base_at(t):
     A, B = BASE_KEYS[a[1]], BASE_KEYS[b[1]]
     P = A.pts + (B.pts - A.pts) * u
     R = A.runs
-    # binding: paid out, never inflated
+    # binding: thrown across, never inflated
     for k, r in enumerate(BAND_RUNS):
         i0, i1 = R[r]
         src = P[i0:i1] if (a[1] in ('BOUND', 'TIGHT', 'HEALED') and b[1] in ('BOUND', 'TIGHT', 'HEALED')) else BASE_KEYS['BOUND'].pts[i0:i1]
-        P[i0:i1] = draw_on(src, band_progress(k, t))
+        P[i0:i1] = throw_loop(src, band_progress(k, t))
     # the twig leans, strains, and springs back
     bend = twig_bend(t)
     for r in ('twig_L', 'twig_R'):
@@ -772,6 +776,18 @@ def _waver(n, rng, amount, every=7):
     return np.stack([np.interp(u, np.arange(m), kx), np.interp(u, np.arange(m), ky)], 1)
 
 
+_press = {}
+
+
+def _pressure(n):
+    """Pressure of the hand along a line of n points, 0..1. Fixed per point (it belongs to the drawing, not the frame)."""
+    if n not in _press:
+        rs = np.random.RandomState(n)
+        k = rs.uniform(0, 1, n // 40 + 3)
+        _press[n] = np.interp(np.arange(n) / 40.0, np.arange(len(k)), k)
+    return _press[n]
+
+
 def draw_line(ink, pts, heavy=None, width=2.3, heavy_width=3.1, color=GRAPHITE, waver=0.55, strength=1.0):
     """Draw one polyline as a pencil line on ink (a kit.Ink): graphite laid over the paper's tooth, with a
     fainter first pass under it, wavering with the film's boil. `heavy` = a slice drawn with more pressure."""
@@ -783,7 +799,11 @@ def draw_line(ink, pts, heavy=None, width=2.3, heavy_width=3.1, color=GRAPHITE, 
     ghost = pts + _waver(n, ink.rng, waver * 1.5)
     main = pts + _waver(n, ink.rng, waver)
     d.line([tuple(p) for p in ghost * SS], fill=88, width=max(1, int(round(width * SS * 0.55))), joint='curve')
-    d.line([tuple(p) for p in main * SS], fill=205, width=max(1, int(round(width * SS))), joint='curve')
+    press = _pressure(n)
+    step = 10
+    for a in range(0, n - 1, step):                    # the hand's pressure wanders slowly along the line
+        seg = main[a:a + step + 1] * SS
+        d.line([tuple(p) for p in seg], fill=int(150 + 75 * press[a]), width=max(1, int(round(width * SS))), joint='curve')
     if heavy is not None:
         d.line([tuple(p) for p in main[heavy] * SS], fill=240, width=max(1, int(round(heavy_width * SS))), joint='curve')
     layer = layer.filter(ImageFilter.GaussianBlur(0.9)).resize((ink.w, ink.h), Image.LANCZOS)
@@ -918,7 +938,7 @@ def classify(g):
         elif g.t >= T['seat'] - 0.05 and (('shoot' in both and 'cleft' in both) or (wedge and 'top_' in both)
                                            or ('cleft' in both and 'top_' in both and g.t >= T['heal'][0])):
             res['union'] += 1                     # the wedge in the wood, and the wood closing over it
-        elif wedge and 'twig' in both and T['pinch'] <= g.t <= T['free'] + 0.05:
+        elif wedge and 'twig' in both and T['strain'] <= g.t <= T['free'] + 0.05:
             res['union'] += 1                     # the contour pinching shut through the foot of the shoot: the cut
         else:
             res['unintended'].append((a, b))
