@@ -616,6 +616,15 @@ def _ret_prim(action, t, o):
         P["jaw"] = 0.14 + 0.42 * abs(math.sin(TAU * 1.5 * t)) * math.exp(-0.45 * max(0.0, t))
         P["spin"] = -3.0 * t
         P["hold"] = 0.0
+    elif action == "warm":                   # wet on the bank beside a cow: rattles with cold, then stops and leans on her
+        w = o.get("warm", 4.0)
+        k = 1 - ease(t, 0.3 * w, w)
+        shv = math.sin(TAU * 11 * t) * k
+        P["X"] = 0.9 * shv + 7.0 * o.get("cow", 1) * ease(t, 0.2 * w, 0.7 * w)
+        P["pitch"] = 0.012 * shv
+        P["head"] = lerp(0.10, -0.42, k)
+        P["neck"] = lerp(0.0, -0.30, k)
+        P["tail"] = _TAIL0 + 0.85 * k + 0.2 * math.tanh(5 * math.sin(TAU * 2.5 * t)) * bell(t, w, w + 0.3, w + 1.5, w + 1.8)
     P["head"] += look
     if not carry:
         P["hold"] = 0.0
@@ -843,6 +852,15 @@ def _shp_prim(action, t, o):
         low = bell(t, 0.36, 0.72, 1.2, 1.6)
         P["tx"], P["ty"], P["pitch"] = 9.0 * low, -9.0 * low, -0.20 * low
         P["head"] = -1.05 * low + 0.22 * bell(t, 1.6, 1.8, 2.3, 2.6)       # then it tips its head: is that straight?
+    elif action == "warm":
+        w = o.get("warm", 4.0)
+        k = 1 - ease(t, 0.3 * w, w)
+        shv = math.sin(TAU * 11 * t) * k
+        stride, liftv = 14.0, 4.0
+        P["X"] = 7.0 * o.get("cow", 1) * ease(t, 0.2 * w, 0.7 * w)
+        P["tx"], P["ty"] = 2.2 * shv, -7.0 * k
+        P["head"] = -0.55 * k
+        P["tail"] = 2.45 + 1.2 * k
     c = P["X"] / stride + o.get("phase", 0.0)
     P["ty"] += 1.8 * math.cos(2 * TAU * c) if action in ("walk", "carry", "run_line", "run") else 0.0
     P["feet"] = [_foot(c, _SHP_PHASE[i], duty, stride, liftv, _SHP_REST[i]) for i in range(4)]
@@ -1295,6 +1313,18 @@ def _hnd_shape(action, t, o, trail=None):
     elif action == "wait":
         w = smooth(t / 0.8) if o.get("sit", True) else 0.0
         pts = tween(_HND_STAND, _HND_SIT, w)
+    elif action == "warm":
+        w = o.get("warm", 4.0)
+        k = 1 - ease(t, 0.3 * w, w)
+        cold = _hk(sh=(28.0, 72.0), hp=(-32.0, 70.0), H=(56.0, 80.0), ha=-0.45, tail=3.9,
+                   fn=(30.0, 0.0), ff=(24.0, 0.0), hn=(-34.0, 0.0), hf=(-26.0, 0.0))
+        cold2 = dict(cold, sh=(29.8, 72.7), H=(58.0, 80.8), hp=(-30.4, 70.0))
+        A = tween(cold, cold2, 0.5 + 0.5 * math.sin(TAU * 11 * t))
+        if k >= 1:
+            pts = A
+        else:
+            B = _hound_key(_HND_SIT)
+            pts = [lerp2(p, q, 1 - k) for p, q in zip(A, B)]
     elif action == "swim":
         info.update(anchor="body", water=1, X=o.get("speed", HND_SPEED["swim"]) * t)
         pts = cycle(t * 1.1, 4, lambda i: _hnd_swim_key(i, o.get("pitch", 0.0), 0.32 if carry else 0.0))
@@ -1572,6 +1602,15 @@ def _ter_pose(action, t, o):
             p["jaw"] = -0.30
         p["ear"] = 0.5 * bell(t, 1.4, 1.5, 1.6, 1.75)                    # one ear flick, then nothing
         p["y"] = _ground_root(p) - 1.5 * w
+    elif action == "warm":
+        w = o.get("warm", 4.0)
+        k = 1 - ease(t, 0.3 * w, w)
+        s_ = (1 if int(round(t * 12)) % 2 else -1) * k
+        cold = dict(a=0.05, neck=-0.35, head=-0.25, tail=2.0, ear=-0.5, fnu=0.12, ffu=0.12, hnu=-0.12, hfu=-0.12)
+        p = {key: cold.get(key, 0.0) * k + _TER_SIT.get(key, 0.0) * (1 - k) for key in set(cold) | set(_TER_SIT)}
+        p["a"] += 0.035 * s_
+        p["x"] = 0.8 * s_
+        p["y"] = _ground_root(p) - 1.5 * (1 - k)
     elif action == "dive":
         info["clip"] = True
         stand_y = _ground_root({})
@@ -1731,10 +1770,10 @@ def terrier(target, x, y, action="walk", t=0.0, scale=1.0, facing=1, carry=None,
 UNIT = {"retriever": 1.25, "sheepdog": 1.45, "bloodhound": 1.15, "terrier": 1.0}
 DOGS = {"retriever": retriever, "sheepdog": sheepdog, "bloodhound": bloodhound, "terrier": terrier}
 ACTIONS = {
-    "retriever": ("walk", "carry", "wait", "set_down", "proud", "told", "swim", "breath_out", "surface"),
-    "sheepdog": ("walk", "run_line", "nudge", "wait", "carry", "swim", "breath_out", "surface"),
-    "bloodhound": ("walk", "nose_down", "follow", "carry", "wait", "swim", "breath_out", "surface"),
-    "terrier": ("walk", "carry", "wait", "dive", "come_up", "swim", "breath_out", "surface"),
+    "retriever": ("walk", "carry", "wait", "set_down", "proud", "told", "warm", "swim", "breath_out", "surface"),
+    "sheepdog": ("walk", "run_line", "nudge", "wait", "carry", "warm", "swim", "breath_out", "surface"),
+    "bloodhound": ("walk", "nose_down", "follow", "carry", "wait", "warm", "swim", "breath_out", "surface"),
+    "terrier": ("walk", "carry", "wait", "dive", "come_up", "warm", "swim", "breath_out", "surface"),
 }
 DURATION = {("retriever", "set_down"): 2.5, ("retriever", "told"): 1.2, ("retriever", "wait"): 1.6,
             ("sheepdog", "nudge"): 2.6, ("sheepdog", "wait"): 1.8,
@@ -1742,6 +1781,7 @@ DURATION = {("retriever", "set_down"): 2.5, ("retriever", "told"): 1.2, ("retrie
             ("terrier", "dive"): 1.6, ("terrier", "come_up"): 2.2, ("terrier", "wait"): 0.5}
 for _d in DOGS:
     DURATION[(_d, "breath_out")] = 2.0
+    DURATION[(_d, "warm")] = 4.0
 
 
 def draw(dog, target, x, y, action="walk", t=0.0, **kw):
@@ -1780,13 +1820,13 @@ def _bg(w, h, kind):
 _SHEET = {
     "retriever": [("walk", 0.55, {}), ("carry", 0.5, dict(carry="piece")), ("wait", 0.2, {}), ("set_down", 0.95, dict(carry="piece")),
                   ("proud", 0.4, dict(carry="reel")), ("told", 1.2, dict(carry="reel")), ("swim", 0.6, dict(carry="piece")),
-                  ("breath_out", 1.1, {}), ("surface", 0.3, {})],
+                  ("breath_out", 1.1, {}), ("surface", 0.3, {}), ("warm", 0.4, {})],
     "sheepdog": [("walk", 0.5, {}), ("run_line", 0.5, {}), ("nudge", 0.95, {}), ("wait", 0.16, {}), ("carry", 0.5, dict(carry="reel")),
-                 ("swim", 0.6, {}), ("breath_out", 1.1, {}), ("surface", 0.3, {})],
+                 ("swim", 0.6, {}), ("breath_out", 1.1, {}), ("surface", 0.3, {}), ("warm", 0.4, {})],
     "bloodhound": [("walk", 0.5, {}), ("nose_down", 1.3, {}), ("follow", 0.6, dict(_trail=True)), ("carry", 0.5, dict(carry="piece")),
-                   ("wait", 1.0, {}), ("swim", 0.6, {}), ("breath_out", 0.5, {}), ("surface", 0.3, {})],
+                   ("wait", 1.0, {}), ("swim", 0.6, {}), ("breath_out", 0.5, {}), ("surface", 0.3, {}), ("warm", 0.4, {})],
     "terrier": [("walk", 0.4, {}), ("carry", 0.4, dict(carry="fix")), ("wait", 1.0, dict(sit=True)), ("dive", 0.85, {}),
-                ("come_up", 0.72, dict(carry="fix")), ("swim", 0.6, {}), ("breath_out", 1.1, {}), ("surface", 0.3, {})],
+                ("come_up", 0.72, dict(carry="fix")), ("swim", 0.6, {}), ("breath_out", 1.1, {}), ("surface", 0.3, {}), ("warm", 0.4, {})],
 }
 _WET = ("swim", "breath_out", "dive", "come_up", "nudge", "follow", "nose_down")
 
@@ -1837,12 +1877,12 @@ def _sheet(path=None):
     rows = []
     for dog, cells in _SHEET.items():
         for sil in (False, True):
-            row = Image.new("RGB", (cw * 9, ch), (236, 230, 218))
+            row = Image.new("RGB", (cw * 10, ch), (236, 230, 218))
             for i, (action, t, opts) in enumerate(cells):
                 sc = 0.8 if dog != "terrier" else 1.0
                 row.paste(_cell(dog, action, t, opts, cw, ch, sil, sc, "%s · %s" % (dog, action)), (i * cw, 0))
             rows.append(row)
-    sheet = Image.new("RGB", (cw * 9, ch * len(rows)))
+    sheet = Image.new("RGB", (cw * 10, ch * len(rows)), (236, 230, 218))
     for i, r in enumerate(rows):
         sheet.paste(r, (0, i * ch))
     path = path or (HERE / "kennel_b_sheet.png")
@@ -1856,6 +1896,50 @@ def _filmstrip(name, dog, action, times, opts=None, cw=250, ch=190, scale=0.8):
     for i, t in enumerate(times):
         img.paste(_cell(dog, action, t, opts, cw, ch, False, scale, "%s %.2fs" % (action, t)), (i * cw, 0))
     p = HERE / ("kennel_b_strip_%s.png" % name)
+    img.save(p)
+    return p
+
+
+def _standin_cow(img, x, y, s=1.0, facing=-1, head=0.0):
+    """A flat stand-in cow for scale only (hooves at y, middle at x). The film's cows are the cow builder's."""
+    d = ImageDraw.Draw(img, "RGBA")
+    f = facing
+    hide, patch, dark = (150, 96, 70), (236, 226, 208), (60, 40, 38)
+    for lx in (-78, -58, 52, 72):
+        d.rectangle([x + f * lx * s - 7 * s, y - 80 * s, x + f * lx * s + 7 * s, y], fill=dark if lx in (-58, 52) else hide)
+    d.ellipse([x - 100 * s, y - 170 * s, x + 100 * s, y - 62 * s], fill=hide)
+    d.ellipse([x - 40 * s, y - 160 * s, x + 30 * s, y - 100 * s], fill=patch)
+    hx, hy = x + f * 118 * s, y - (118 - 60 * head) * s
+    d.polygon([(x + f * 70 * s, y - 160 * s), (x + f * 96 * s, y - 100 * s), (hx, hy + 14 * s), (hx, hy - 30 * s)], fill=hide)
+    d.ellipse([hx - 26 * s, hy - 34 * s, hx + 26 * s, hy + 34 * s], fill=hide)
+    d.ellipse([hx + f * 6 * s - 15 * s, hy + 10 * s, hx + f * 6 * s + 15 * s, hy + 36 * s], fill=(214, 170, 160))
+    d.line([(hx - f * 10 * s, hy - 30 * s), (hx - f * 22 * s, hy - 50 * s), (hx - f * 6 * s, hy - 60 * s)], fill=patch, width=max(2, int(5 * s)))
+    d.line([(hx + f * 10 * s, hy - 30 * s), (hx + f * 20 * s, hy - 52 * s)], fill=patch, width=max(2, int(5 * s)))
+    d.ellipse([hx - f * 8 * s - 3 * s, hy - 10 * s, hx - f * 8 * s + 3 * s, hy - 4 * s], fill=dark)
+    d.ellipse([hx - f * 24 * s - 7 * s, hy + 34 * s, hx - f * 24 * s + 7 * s, hy + 50 * s], fill=(206, 170, 86))
+    return (hx + f * 8 * s, hy + 30 * s)
+
+
+def _cow_strip():
+    """The eleven who ran out of breath, on the bank, with the cows round them (S5): three film-size frames."""
+    W_, H_ = 960, 400
+    times = (0.3, 2.4, 5.2)
+    img = Image.new("RGB", (W_, H_ * len(times)))
+    for i, t in enumerate(times):
+        fr = _bg(W_, H_, "dusk")
+        d = ImageDraw.Draw(fr)
+        gy = 330
+        d.rectangle([0, gy, W_, H_], fill=(86, 74, 78))
+        _standin_cow(fr, 150, gy - 6, 0.95, 1, head=0.6)
+        _standin_cow(fr, 800, gy - 6, 1.0, -1, head=0.75)
+        _standin_cow(fr, 470, gy - 14, 0.9, -1, head=0.2)
+        places = [("bloodhound", 300, gy + 12, 1, 0.62, 1), ("terrier", 420, gy + 30, 1, 0.9, -1),
+                  ("sheepdog", 560, gy + 18, 1, 0.62, 1), ("retriever", 668, gy + 34, 1, 0.6, 1)]
+        for dog, x, y, f, sc, cow in places:
+            x += f * sc * travel(dog, "warm", t, cow=cow)
+            DOGS[dog](fr, x, y, "warm", t, scale=sc, facing=f, cow=cow)
+        img.paste(fr, (0, i * H_))
+    p = HERE / "kennel_b_strip_cows.png"
     img.save(p)
     return p
 
@@ -1949,3 +2033,5 @@ if __name__ == "__main__":
                  ("comeup", "terrier", "come_up", [0.0, 0.3, 0.42, 0.72, 1.0, 1.2, 1.4, 2.0], dict(carry="fix")),
                  ("breath", "bloodhound", "breath_out", [0.0, 0.3, 0.5, 0.62, 0.9, 1.3, 1.9], {})]:
         print("strip ->", _filmstrip(*args))
+    print("strip ->", _filmstrip("warm", "terrier", "warm", [0.2, 1.2, 2.2, 3.0, 4.0, 5.0], {}, scale=1.0))
+    print("strip ->", _cow_strip())

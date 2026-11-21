@@ -138,7 +138,8 @@ def _fringe(a, b, n, depth):
 # 1 · THE HERDING DOG · black articulated shadow puppet
 # =============================================================================
 
-HERDER_ACTIONS = ("wait", "walk", "circle", "gather", "carry", "swim", "turn", "slide")
+HERDER_ACTIONS = ("wait", "walk", "circle", "gather", "carry", "swim", "turn", "slide",
+                  "flank", "creep", "eye", "down")      # the last four are for the cows
 
 # Joint-angle limits in degrees (a pinned card joint cannot go further than its
 # neighbours allow). Relative to the parent piece.
@@ -275,6 +276,56 @@ def _herder_pose(action, t, p, look=0.0, pages=0):
         P["tail2"] = 184 + 5 * math.sin(2 * math.pi * ph)
         P["paddle"] = ph
         P["jaw"] = 6 if pages else 0
+    elif action == "flank":
+        # swinging wide round the herd: flat out, a gallop, everything streaming behind
+        ph = t * 2.6
+        g = math.sin(2 * math.pi * ph)
+        P["hip"] = (-26, -31 - 2.2 * g)
+        P["torso"] = 2.5 * math.cos(2 * math.pi * ph)
+        P["neck"] = -20 + 4 * g
+        P["head"] = 3
+        P["ear"] = -46
+        P["tail1"] = 172
+        P["tail2"] = 181 + 5 * g
+        P["paws"] = [_gait_foot(ph, 0.00, 0.34, 28, 11, 29), _gait_foot(ph, 0.10, 0.34, 28, 11, 35),
+                     _gait_foot(ph, 0.52, 0.34, 28, 11, -31), _gait_foot(ph, 0.62, 0.34, 28, 11, -24)]
+    elif action == "creep":
+        # the stalk toward a cow: belly low, head dead level, one slow paw at a time
+        ph = t * 0.7
+        P["hip"] = (-25, -26)
+        P["torso"] = 5
+        P["neck"] = -7
+        P["head"] = 3
+        P["ear"] = 24
+        P["tail1"] = 170
+        P["tail2"] = 178
+        P["paws"] = [_gait_foot(ph, 0.25, 0.8, 13, 4, 31), _gait_foot(ph, 0.75, 0.8, 13, 4, 36),
+                     _gait_foot(ph, 0.0, 0.8, 13, 4, -30), _gait_foot(ph, 0.5, 0.8, 13, 4, -23)]
+    elif action == "eye":
+        # "the eye": the collie drops, freezes with one fore paw off the ground and
+        # stares the cow down. Nothing moves once it is down; that is the point.
+        u = smooth(ramp(clamp(p), 0.0, 0.5))
+        P["hip"] = (-25, lerp(-38.5, -24.5, u))
+        P["torso"] = lerp(-4, 6, u)
+        P["neck"] = lerp(-52, -5, u)
+        P["head"] = lerp(6, 2, u)
+        P["ear"] = lerp(8, 26, u)
+        P["tail1"] = lerp(118, 171, u)
+        P["tail2"] = lerp(146, 179, u)
+        pl = smooth(ramp(clamp(p), 0.35, 0.75))
+        P["paws"] = [(lerp(25, 31, u) + 15 * pl, -12.0 * pl), (lerp(30, 33, u), 0),
+                     (lerp(-29, -34, u), 0), (lerp(-23, -20, u), 0)]
+    elif action == "down":
+        # lies flat to let the herd go by, head up, watching every one of them
+        u = smooth(clamp(p))
+        P["hip"] = (-26, lerp(-38.5, -17.5, u))
+        P["torso"] = lerp(-4, 1.5, u)
+        P["neck"] = lerp(-52, -44, u)
+        P["head"] = lerp(6, 4, u)
+        P["ear"] = lerp(8, 14, u)
+        P["tail1"] = lerp(118, 174, u)
+        P["tail2"] = lerp(146, 184, u)
+        P["paws"] = [(lerp(25, 57, u), -1.5 * u), (lerp(30, 60, u), -1.5 * u), (lerp(-29, -12, u), 0), (lerp(-23, -5, u), 0)]
     else:
         raise ValueError("herding_dog: unknown action %r (use one of %s)" % (action, ", ".join(HERDER_ACTIONS)))
     if look:
@@ -405,6 +456,9 @@ def herding_dog(ink, x, y, s=1.0, facing=1, action="wait", t=0.0, p=0.0, look=0.
     take a page, tuck it under the chin), carry (walk with `pages` flat pages), swim,
     turn (p: the flat card turns over, edge-on halfway), slide (p: comes off the ground
     like a shadow leaving a wall).
+    With the cows: flank (t: the wide flat-out swing round the herd), creep (t: the low
+    stalk toward a cow), eye (p: drops and freezes, one fore paw lifted, staring the cow
+    down), down (p: lies flat, head up, to let the herd go by).
     pages   how many pages it already holds (gather adds one at p >= 0.42).
     Returns anchors; "reach" is where the next page must be offered during gather.
     """
@@ -474,11 +528,36 @@ def herd_circle(cx, cy, rx, ry, t, period=6.0, start=0.0):
     return x, y, facing, behind, size
 
 
+def herd_swing(x0, y0, x1, y1, p, wide=90.0, creep_from=0.82):
+    """The herding dog's wide swing from (x0, y0) round the herd to (x1, y1), p 0..1.
+    It never runs AT the cows: it bulges `wide` px toward the viewer (negative: behind
+    them), fast in the middle, and comes in on the last stretch at a creep.
+    Returns (x, y, facing, size, action) for herding_dog; finish with action "eye"."""
+    p = clamp(p)
+    u = smooth(p) if p < creep_from else lerp(smooth(creep_from), 1.0, (p - creep_from) / (1 - creep_from))
+    dx, dy = x1 - x0, y1 - y0
+    L = math.hypot(dx, dy) or 1.0
+    cx, cy = (x0 + x1) / 2, (y0 + y1) / 2 + 2 * wide
+
+    def at(v):
+        return ((1 - v) ** 2 * x0 + 2 * v * (1 - v) * cx + v * v * x1,
+                (1 - v) ** 2 * y0 + 2 * v * (1 - v) * cy + v * v * y1)
+
+    x, y = at(u)
+    xa, _ = at(min(1.0, u + 0.02))
+    xb, _ = at(max(0.0, u - 0.02))
+    facing = 1 if (xa - xb if abs(xa - xb) > 1e-6 else dx) >= 0 else -1
+    size = 1.0 + 0.0012 * (y - (y0 + y1) / 2)
+    action = "walk" if p < 0.06 else ("flank" if p < creep_from else "creep")
+    return x, y, facing, size, action
+
+
 # =============================================================================
 # 2 · THE DIGGER · a wire dog drawn by constraints
 # =============================================================================
 
-DIGGER_ACTIONS = ("wait", "walk", "swim", "dig", "heave", "build", "unbend")
+DIGGER_ACTIONS = ("wait", "walk", "swim", "dig", "heave", "build", "unbend",
+                  "nose_up", "flinch")                 # the last two are for the cows
 DIGGER_TOLERANCE = 0.01      # declared: no wire may be more than 1 % off its length
 
 _W_NAMES = ("S", "M", "R", "C", "B", "H", "Z", "J", "E1", "P1", "E2", "P2", "K1", "Q1", "K2", "Q2")
@@ -587,6 +666,27 @@ def _digger_handles(action, t, p, look=0.0):
         Hd["paws"] = [(41, -h - 1 - 10 * lift), (lerp(44, 30.5, rest), lerp(-h - 1 - 10 * lift, 0, rest)), (-28, 0), (-21, 0)]
         Hd["tail"] = (-120, 12 * math.sin(2 * math.pi * t * 3))
         Hd["ear"] = 10
+    elif action == "nose_up":
+        # a cow lowers her muzzle to this dog she can see through: it stretches its
+        # nose up to hers, one fore paw off the ground, and holds there
+        u = smooth(ramp(clamp(p), 0.0, 0.6))
+        Hd["R"] = (-25 - 2 * u, -38 + 3 * u)
+        Hd["S"] = (24 - 3 * u, -38 - 5 * u)
+        Hd["Z"] = (lerp(56, 52, u), lerp(-50, -71, u))
+        Hd["paws"] = [(25 + 4 * u, -9 * smooth(ramp(clamp(p), 0.3, 0.7))), (30.5, 0), (-28, 0), (-22, 0)]
+        Hd["tail"] = (lerp(-128, -112, u), 13 * math.sin(2 * math.pi * 2.2 * t) * u)
+        Hd["ear"] = 16 * u
+    elif action == "flinch":
+        # a hoof comes down on the ice overhead: the whole drawing ducks, then looks up
+        p = clamp(p)
+        e = ramp(p, 0.0, 0.12) * (1 - smooth(ramp(p, 0.45, 1.0)))
+        up = smooth(ramp(p, 0.5, 1.0))
+        Hd["R"] = (-25 - 2 * e, -38 + 10 * e)
+        Hd["S"] = (24 - 4 * e, -38 + 12 * e)
+        q = _rot((32, -12), -55 * up)
+        Hd["Z"] = (lerp(56, 46, e) * (1 - up) + (24 + q[0]) * up, lerp(-50, -27, e) * (1 - up) + (-38 + q[1]) * up)
+        Hd["tail"] = (lerp(-128, -196, e), 0.0)
+        Hd["ear"] = -55 * e + 10 * up
     elif action == "unbend":
         pass
     else:
@@ -713,6 +813,8 @@ def digger(ink, x, y, s=1.0, facing=1, action="wait", t=0.0, p=0.0, look=0.0,
     thrown back), heave (p: grips something in the bed, leans back, strains, it comes
     out), build (p: three blows drive a post in, then one paw holds it down), unbend
     (p: a single reed of wire unbends into the dog).
+    With the cows: nose_up (p: stretches its nose up to a cow's lowered muzzle and
+    holds), flinch (p: ducks when a hoof comes down on the ice overhead, then looks up).
     post    in build, draw the post (False: draw your own at anchors["post"]).
     spray   in dig, draw the thrown gravel.
     Returns anchors plus "residual" (worst wire-length error, as a fraction) and
@@ -831,7 +933,9 @@ def digger(ink, x, y, s=1.0, facing=1, action="wait", t=0.0, p=0.0, look=0.0,
 # =============================================================================
 
 OLD_DOG_ACTIONS = ("lie", "lift_head", "look", "turn_back", "back", "look_over", "let_pass", "turn_round",
-                   "rise", "lie_down", "wait", "walk", "swim")
+                   "rise", "lie_down", "wait", "walk", "swim",
+                   "greet", "make_room", "beside")           # the last three are for the lead cow
+OLD_DOG_STATES = ("lie", "back", "passed")
 
 SOURCE = {
     "title": "File:Bewicks-newfoundland.jpg",
@@ -979,9 +1083,59 @@ def _old_rise(u):
     return _oblend(_OLD_SIT, dict(_OLD_STAND, head=-4.0), smooth((u - 0.55) / 0.45))
 
 
-def _old_pose(action, t, p, look=0.0):
+def _old_state(state):
+    """The three ways it can be lying when the cow comes: as it began ("lie"), with its
+    back turned ("back"), or after it has let a reel pass ("passed")."""
+    if state == "lie":
+        return dict(_OLD_LIE)
+    if state == "back":
+        return dict(_OLD_LIE, sx=-1.0)
+    if state == "passed":
+        return _old_pose("let_pass", 0.0, 1.0)
+    raise ValueError("old_dog: unknown state %r (use one of %s)" % (state, ", ".join(OLD_DOG_STATES)))
+
+
+_ROOM = 44.0     # scan pixels the old dog shuffles along the sill to make room
+
+
+def _old_pose(action, t, p, look=0.0, state="lie", cow=1):
     p = clamp(p)
-    if action == "lie":
+    if action in ("greet", "make_room", "beside"):
+        P = _old_state(state)
+        tail0, tdy0 = P["tail"], P["tdy"]
+        # scan +x runs from the nose to the tail: make room AWAY from the cow
+        away = _ROOM * (1.0 if cow >= 0 else -1.0)
+        if action == "greet":
+            # one eye opens, the head comes up and goes round to her, the tail thumps
+            # the boards twice, and the head goes down again. That is a welcome.
+            P["eye"] = 1.0 if 0.06 <= p < 0.97 else 0.0
+            up = smooth(ramp(p, 0.08, 0.3)) * (1 - smooth(ramp(p, 0.8, 0.97)))
+            P["head"] = lerp(-30.0, 9.0, up)
+            if cow < 0:      # she is at its tail end: it looks over its shoulder
+                P["hflip"] = math.cos(math.pi * smooth(ramp(p, 0.26, 0.4)) * (1 - smooth(ramp(p, 0.72, 0.84))))
+            v = ramp(p, 0.42, 0.72)
+            thump = abs(math.sin(2 * math.pi * v)) if 0 < v < 1 else 0.0
+            P["tail"] = tail0 - 24 * thump
+            P["tdy"] = tdy0 - 10 * thump
+        elif action == "make_room":
+            # head up, then two shuffles along the boards, one end at a time
+            up = smooth(ramp(p, 0.0, 0.18)) * (1 - smooth(ramp(p, 0.84, 1.0)))
+            P["head"] = lerp(-30.0, 6.0, up)
+            P["eye"] = 1.0 if p < 0.95 else 0.0
+            a, b = ramp(p, 0.2, 0.46), ramp(p, 0.52, 0.78)
+            P["bdx"] += away * 0.5 * (smooth(a) + smooth(b))
+            hop = math.sin(math.pi * a) * (a < 1) + math.sin(math.pi * b) * (b < 1)
+            P["bdy"] -= 5.0 * hop
+            P["brot"] = 2.5 * (math.sin(math.pi * a) - math.sin(math.pi * b)) * (1 if cow >= 0 else -1)
+        else:
+            # "beside": moved over and settled against her. A slow breath; when she
+            # shifts (p, a one-shot) its eye opens, finds her, and closes again.
+            P["bdx"] += away
+            P["bdy"] += 1.6 * math.sin(2 * math.pi * t / 4.2)
+            P["head"] = -30.0 + 2.0 * math.sin(2 * math.pi * t / 4.2 - 0.7)
+            P["eye"] = 1.0 if 0.2 < p < 0.8 else 0.0
+            P["head"] += 7.0 * smooth(ramp(p, 0.2, 0.4)) * (1 - smooth(ramp(p, 0.6, 0.8)))
+    elif action == "lie":
         P = dict(_OLD_LIE)
     elif action == "lift_head":
         P = dict(_OLD_LIE, head=lerp(-30, 12, smooth(p)))
@@ -1092,7 +1246,8 @@ def _old_mats(P):
 
 
 def old_dog(ink, x, y, s=1.0, facing=1, action="lie", t=0.0, p=0.0, look=0.0,
-            paper=(186, 182, 174), ink_color=(34, 32, 38), verso=False, eye=None, exposure=8):
+            paper=(186, 182, 174), ink_color=(34, 32, 38), verso=False, eye=None, exposure=8,
+            state="lie", cow=1):
     """The old dog: Bewick's engraved Newfoundland, cut out and hinged.
 
     actions: lie (chin on its paws, across a sill), lift_head (p), look (p: the long
@@ -1102,6 +1257,11 @@ def old_dog(ink, x, y, s=1.0, facing=1, action="lie", t=0.0, p=0.0, look=0.0,
     look over its shoulder), let_pass (p: tail lifted off the place, hindquarters
     tucked aside, head down, eyes closed), turn_round (p: turn_back undone), rise (p),
     lie_down (p), wait (standing), walk (t), swim (t).
+    With the lead cow, who folds down beside it: greet (p: one eye opens, head up and
+    round to her, two tail thumps, head down), make_room (p: shuffles along the sill
+    away from her in two goes), beside (t breathing; p: its eye opens on her and
+    closes), all three from `state` ("lie", "back", or "passed" = after let_pass) with
+    `cow` = +1 when she is at its nose end, -1 at its tail end.
     `facing` is the way it faces BEFORE it turns: turn_back, back, look_over and
     let_pass draw it the other way round by themselves.
     paper / ink_color   the card and the printing ink. Dim them for dusk.
@@ -1110,7 +1270,7 @@ def old_dog(ink, x, y, s=1.0, facing=1, action="lie", t=0.0, p=0.0, look=0.0,
     Returns anchors; "place" is the spot behind it where a reel would be laid.
     """
     tq = math.floor(t * exposure + 1e-6) / exposure if exposure else t
-    P = _old_pose(action, tq, p, look)
+    P = _old_pose(action, tq, p, look, state, cow)
     if eye is not None:
         P["eye"] = eye
     pcs = _pieces()
@@ -1184,6 +1344,10 @@ def old_dog(ink, x, y, s=1.0, facing=1, action="lie", t=0.0, p=0.0, look=0.0,
            "turned": turned, "foraged": pcs["_foraged"]}
     tl = S("tail", (455, 40))
     out["place"] = (tl[0], y)
+    # where the lead cow's near side should come to when she folds down next to it
+    nose_side = bool(mirror)          # the print faces left; mirrored, its nose end is on the right
+    right = (cow >= 0) == nose_side
+    out["beside"] = (out["bbox"][2] if right else out["bbox"][0], y)
     return out
 
 
@@ -1300,7 +1464,7 @@ def sheets(out_dir=None):
     def H(action, tspan=1.0, **kw):
         def fn(ink, cx, gy, k, n):
             u = k / (n - 1)
-            herding_dog(ink, cx, gy - (40 if action == "swim" else 0), 1.25, 1 if k < n // 2 or action in ("gather", "turn", "slide") else -1,
+            herding_dog(ink, cx, gy - (40 if action == "swim" else 0), 1.25, 1 if k < n // 2 or action in ("gather", "turn", "slide", "eye", "down") else -1,
                         action, t=u * tspan, p=u, **kw)
         return fn
 
@@ -1308,19 +1472,20 @@ def sheets(out_dir=None):
         ("wait", H("wait", 3.2)), ("wait look=45", H("wait", 1, look=45)), ("walk", H("walk", 0.62)),
         ("circle", H("circle", 0.42)), ("gather p", H("gather", 1, pages=2)), ("carry 5", H("carry", 0.7, pages=5)),
         ("swim", H("swim", 0.7)), ("swim+page", H("swim", 0.7, pages=1)), ("turn p", H("turn")), ("slide p", H("slide")),
+        ("flank", H("flank", 0.34)), ("creep", H("creep", 1.25)), ("eye p", H("eye")), ("down p", H("down")),
     ], out_dir))
 
     def D(action, tspan=1.0, **kw):
         def fn(ink, cx, gy, k, n):
             u = k / (n - 1)
-            digger(ink, cx - 8, gy - (40 if action == "swim" else 0), 1.25, 1 if k < n // 2 or action in ("heave", "build", "unbend", "dig") else -1,
+            digger(ink, cx - 8, gy - (40 if action == "swim" else 0), 1.25, 1 if k < n // 2 or action in ("heave", "build", "unbend", "dig", "nose_up", "flinch") else -1,
                    action, t=u * tspan, p=u, **kw)
         return fn
 
     made.append(_sheet("digger", [
         ("wait", D("wait")), ("wait look=45", D("wait", look=45)), ("walk", D("walk", 0.65)), ("swim", D("swim", 0.62)),
         ("dig", D("dig", 0.33)), ("dig (later)", D("dig", 2.0)), ("heave p", D("heave", 0.4)), ("build p", D("build", 1.0)),
-        ("unbend p", D("unbend")),
+        ("unbend p", D("unbend")), ("nose_up p", D("nose_up", 0.5)), ("flinch p", D("flinch")),
     ], out_dir))
 
     def O(action, tspan=1.0, sc=0.62, **kw):
@@ -1335,8 +1500,112 @@ def sheets(out_dir=None):
         ("back", O("back")), ("look_over p", O("look_over")), ("let_pass p", O("let_pass")),
         ("turn_round p", O("turn_round")), ("rise p", O("rise")), ("wait", O("wait")), ("walk", O("walk", 1.25)),
         ("swim", O("swim", 1.0)), ("turn_back verso", O("turn_back", verso=True)),
+        ("greet cow=+1", O("greet")), ("greet cow=-1", O("greet", cow=-1)),
+        ("greet passed -1", O("greet", state="passed", cow=-1)),
+        ("make_room", O("make_room")), ("make_room passed", O("make_room", state="passed", cow=-1)),
+        ("beside p", O("beside", 4.2)),
     ], out_dir, cell=(232, 124)))
+    made.append(cow_strip(out_dir))
     return made
+
+
+def _standin_cow(d, x, y, s=1.0, facing=1, fold=0.0, head=0.0, color=(120, 96, 86), calf=False):
+    """A flat stand-in cow for judging the dogs against (NOT the film's cow: the cow
+    builder owns her). Crooked left horn and a bell so the lead cow is not mistaken."""
+    f = 1 if facing >= 0 else -1
+    k = s * (0.55 if calf else 1.0)
+    leg = 46 * (1 - fold)
+    by = y - leg * k
+
+    def P(px, py):
+        return (x + f * k * px, by + k * py)
+
+    col = tuple(color) + (255,)
+    d.polygon([P(-70, -52), P(58, -56), P(72, -40), P(66, -4), P(-66, 0), P(-78, -30)], fill=col)
+    for lx in (-58, -44, 44, 58):
+        d.polygon([P(lx - 6, -6), P(lx + 6, -6), P(lx + 5, leg), P(lx - 5, leg)], fill=col)
+    hx, hy = 78, -52 + head
+    d.polygon([P(60, -54), P(hx + 4, hy - 12), P(hx + 34, hy + 6), P(hx + 30, hy + 20), P(hx + 6, hy + 14), P(62, -28)], fill=col)
+    if not calf:
+        d.line([P(hx + 2, hy - 10), P(hx - 2, hy - 26), P(hx + 8, hy - 34)], fill=(226, 214, 190, 255), width=max(2, int(4 * k)))
+        d.line([P(hx + 8, hy - 10), P(hx + 16, hy - 24), P(hx + 10, hy - 30), P(hx + 20, hy - 34)], fill=(226, 214, 190, 255), width=max(2, int(4 * k)))
+        bx, byy = P(68, -22)
+        d.ellipse([bx - 5 * k, byy, bx + 5 * k, byy + 11 * k], fill=(214, 168, 70, 255))
+    d.line([P(-76, -40), P(-86, -8)], fill=col, width=max(2, int(4 * k)))
+    return P(hx + 32, hy + 14)      # her muzzle
+
+
+def cow_strip(out_dir=None):
+    """Five moments where one of these dogs deals with a cow, at film size (960x540
+    each, two rows), with a stand-in cow. For judging scale and read only."""
+    from kit import Ink
+    out_dir = Path(out_dir) if out_dir else _HERE
+    W, Hh = 960, 540
+    sheet = Image.new("RGB", (W * 3, Hh * 2))
+    shots = []
+
+    def porch(ink):
+        ink.img = _sheet_ground(W, Hh, split=False)
+        a = np.asarray(_sheet_ground(W, Hh, split=True))[:, :W // 2][:, :1]
+        ink.img = Image.fromarray(np.repeat(a, W, axis=1))
+        ink.d = ImageDraw.Draw(ink.img, "RGBA")
+        ink.d.rectangle([0, 394, W, Hh], fill=(52, 44, 60, 255))
+        ink.d.rectangle([560, 400, W, Hh], fill=(40, 104, 112, 255))
+        ink.d.line([(560, 400), (W, 400)], fill=(210, 240, 236, 255), width=2)
+
+    def water(ink, ice=False):
+        a = np.asarray(_sheet_ground(W, Hh, split=True))[:, W // 2:][:, :1]
+        ink.img = Image.fromarray(np.repeat(a, W, axis=1))
+        ink.d = ImageDraw.Draw(ink.img, "RGBA")
+        ink.d.rectangle([0, 0, W, 120], fill=(70, 58, 104, 255))
+        ink.d.rectangle([0, 116, W, 124], fill=(226, 240, 244, 255) if ice else (210, 240, 236, 255))
+        ink.d.rectangle([0, 470, W, Hh], fill=(34, 62, 66, 255))
+
+    # 1 · S4: the swing, three exposures of one run, and the herd on its path
+    ink = Ink(0, 0, (W, Hh), boil=0); porch(ink)
+    for i in range(3):
+        _standin_cow(ink.d, 330 + 150 * i, 394, 0.9, 1, head=10 if i == 2 else 0)
+    for p in (0.2, 0.5, 0.74):
+        x, y, fc, size, act = herd_swing(140, 400, 800, 396, p, wide=58)
+        herding_dog(ink, x, y, 0.9 * size, fc, act, t=p * 2.0)
+    shots.append(ink.img)
+    # 2 · S4: the eye. The lead cow has stopped and is turning her head away
+    ink = Ink(0, 0, (W, Hh), boil=0); porch(ink)
+    _standin_cow(ink.d, 420, 394, 0.9, 1, head=16)
+    _standin_cow(ink.d, 250, 394, 0.9, 1)
+    _standin_cow(ink.d, 110, 394, 0.9, 1, calf=True)
+    herding_dog(ink, 610, 394, 0.9, -1, "eye", p=1.0)
+    shots.append(ink.img)
+    # 3 · S3/S4: down, while they file past
+    ink = Ink(0, 0, (W, Hh), boil=0); porch(ink)
+    _standin_cow(ink.d, 300, 386, 0.9, 1)
+    _standin_cow(ink.d, 520, 386, 0.9, 1)
+    herding_dog(ink, 420, 430, 0.9, -1, "down", p=1.0)
+    digger(ink, 700, 394, 0.9, -1, "wait")
+    shots.append(ink.img)
+    # 4 · the wire dog and a lowered muzzle
+    ink = Ink(0, 0, (W, Hh), boil=0); porch(ink)
+    mz = _standin_cow(ink.d, 360, 394, 0.9, 1, head=34)
+    digger(ink, mz[0] + 0.9 * 43 - 2, 394, 0.9, -1, "nose_up", p=1.0, t=0.3)
+    shots.append(ink.img)
+    # 5 · S5: under the ice, the stamp overhead
+    ink = Ink(0, 0, (W, Hh), boil=0); water(ink, ice=True)
+    _standin_cow(ink.d, 470, 116, 0.9, 1, head=30)
+    digger(ink, 330, 470, 0.9, 1, "flinch", p=0.14)
+    digger(ink, 520, 470, 0.9, -1, "flinch", p=1.0)
+    herding_dog(ink, 690, 300, 0.9, -1, "swim", t=0.2, look=40)
+    old_dog(ink, 170, 300, 0.7, 1, "swim", t=0.2, look=20)
+    shots.append(ink.img)
+    # 6 · S6: she folds down beside the old dog on the sill
+    ink = Ink(0, 0, (W, Hh), boil=0); porch(ink)
+    a = old_dog(ink, 425, 394, 0.78, 1, "greet", p=0.5, state="passed", cow=-1)
+    _standin_cow(ink.d, a["beside"][0] + 0.9 * 112, 394, 0.9, -1, fold=0.9, head=22)
+    shots.append(ink.img)
+    for i, im in enumerate(shots):
+        sheet.paste(im, ((i % 3) * W, (i // 3) * Hh))
+    path = out_dir / "kennel_a_strip_cows.png"
+    sheet.save(path)
+    return path
 
 
 if __name__ == "__main__":

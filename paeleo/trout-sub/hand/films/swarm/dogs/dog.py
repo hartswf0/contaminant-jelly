@@ -36,7 +36,7 @@ TAU = 2 * math.pi
 
 # ------------------------------------------------------------------ colours ---
 COLORS = {
-    "coat": (216, 160, 98), "coat_far": (166, 116, 70), "chest": (245, 230, 202),
+    "coat": (232, 196, 142), "coat_far": (182, 144, 98), "chest": (250, 240, 218),
     "ear": (112, 68, 38), "ear_far": (88, 54, 31), "collar": (212, 42, 30),
     "tag": (214, 176, 84), "nose": (36, 23, 15), "eye": (30, 20, 14),
     "tongue": (226, 112, 118), "brad": (206, 170, 86), "glint": (255, 250, 232),
@@ -139,8 +139,8 @@ BUILD = {
 _RIB = [(0, 21), (22, 25), (44, 25), (58, 17), (67, 3), (63, -13), (49, -27), (30, -31), (12, -26), (-2, -17)]
 _PELVIS = [(-20, 22), (-44, 24), (-62, 17), (-71, 3), (-67, -12), (-52, -19), (-34, -15), (-22, -10)]
 _CHEST = [(59, 7), (67, 2), (63, -13), (50, -26), (40, -28), (46, -13), (53, -2)]
-_MUZZLE = [(16, 13), (30, 11), (44, 8), (55, 6), (60, 2), (58, -4), (40, -5), (22, -6), (12, -3)]
-_JAW = [(-5, 2), (10, 1), (30, 0.5), (35, -2), (31, -6), (12, -8), (-3, -7)]
+_MUZZLE = [(14, 15), (27, 13.5), (38, 11.5), (47, 10.5), (52.5, 8.5), (54.5, 3), (52, -3.5), (40, -5), (22, -6), (12, -3)]
+_JAW = [(-5, 2), (10, 1), (26, 0.5), (30.5, -2), (27.5, -6.5), (12, -9.5), (-3, -8.5)]
 _EAR_WHOLE = [(-3, 0), (0, -8), (12, -10), (27, -6), (40, 0), (26, 5), (11, 8), (0, 7)]
 # the torn ear: the tip is gone and a bite is out of the trailing edge
 _EAR_TORN = [(-3, 0), (0, -8), (12, -10), (25, -8), (31, -6.5), (25, -2), (30, 2.5), (19, 2.2), (15, 7.5), (0, 7)]
@@ -340,16 +340,16 @@ def solve(pose, carry=None, build=None):
     part("ear_far", ear_pts(_EAR_WHOLE, (15, 14), P["ear_f"] + 0.13, 51), "ear_far")
     if P["jaw"] > 0.2 and P["tongue"] > 0.05:
         tl = 9 + 13 * clamp(P["tongue"])
-        part("tongue", [jw((16, 1)), jw((30, 2)), jw((30 + tl * 0.6, 1 - tl * 0.5)), jw((28 + tl * 0.4, -2 - tl * 0.6)), jw((18, -2))], "tongue", False)
+        part("tongue", [jw((14, 1)), jw((26, 2)), jw((26 + tl * 0.6, 1 - tl * 0.5)), jw((24 + tl * 0.4, -2 - tl * 0.6)), jw((16, -2))], "tongue", False)
     part("jaw", _cut([jw(q) for q in _JAW], 0.4, 43), "coat")
-    mouth = ((hd((40, -5))[0] + jw((27, 0))[0]) / 2, (hd((40, -5))[1] + jw((27, 0))[1]) / 2)
+    mouth = ((hd((38, -5))[0] + jw((24, 0))[0]) / 2, (hd((38, -5))[1] + jw((24, 0))[1]) / 2)
     J["mouth"] = mouth
     J["head_angle"] = ha if sx > 0 else math.pi - ha
     if carry in ("page", "part", "reel") and P["hold"] >= 0.5:
         _carried(part, carry, mouth, P, sx)
-    part("skull", [hd(q) for q in _ellipse(10, 3, 18.5, 16, 16, 31, 0.04)], "coat")
+    part("skull", [hd(q) for q in _ellipse(10, 4, 19.5, 17.5, 16, 31, 0.04)], "coat")
     part("muzzle", _cut([hd(q) for q in _MUZZLE], 0.5, 41), "coat")
-    part("nose", [hd(q) for q in _ellipse(57.5, 2.0, 4.8, 4.0, 10, 3, 0.0)], "nose", False)
+    part("nose", [hd(q) for q in _ellipse(52.5, 5.0, 5.2, 4.4, 10, 3, 0.0)], "nose", False)
     part("ear", ear_pts(_EAR_TORN, (5, 12), P["ear"], 53), "ear")
     ey = clamp(P["eye"], 0, 1.4)
     if ey > 0.25:
@@ -357,7 +357,7 @@ def solve(pose, carry=None, build=None):
         part("glint", [hd(q) for q in _ellipse(27.2, 9.3, 1.0, 1.0, 6, 2, 0.0)], "glint", False)
     else:
         part("eye", [hd((22.5, 8.6)), hd((29.5, 8.6)), hd((29.5, 7.2)), hd((22.5, 7.2))], "eye", False)
-    J["nose"], J["eye"], J["ear_tip"] = hd((60, 2)), hd((26, 8)), ear_pts(_EAR_TORN, (5, 12), P["ear"], 53)[4]
+    J["nose"], J["eye"], J["ear_tip"] = hd((56, 4)), hd((26, 8)), ear_pts(_EAR_TORN, (5, 12), P["ear"], 53)[4]
     J["withers"] = rib((46, 25))
     J["brads"] = [S, H, J["fn.elbow"], J["hn.knee"], J["fn.wrist"], J["hn.hock"], N, hd((5, 12)), T, hd(jp)]
     return {"parts": parts, "joints": J}
@@ -1169,6 +1169,125 @@ def tired(t=0.0):
     return p
 
 
+# ------------------------------------------------- dealing with the cows ---
+# The cows are bigger, slower and older than the dog, and never its enemy. The
+# dog meets them as it meets everything: it looks, decides, then moves.
+_reach_cache = {}
+
+
+def _reach_for(height):
+    """Neck and head angles that put the nose `height` units above the ground."""
+    key = round(height)
+    if key not in _reach_cache:
+        lo, hi = -0.9, 1.3
+        for _ in range(14):
+            m = (lo + hi) / 2
+            y = solve(_base(cx=6.0, neck=0.74 + 0.50 * m, head=0.06 + 0.62 * m))["joints"]["nose"][1]
+            lo, hi = (m, hi) if y < key else (lo, m)
+        _reach_cache[key] = (0.74 + 0.50 * lo, 0.06 + 0.62 * lo)
+    return _reach_cache[key]
+
+
+def nose_touch(t=0.0, height=150.0, hold=0.8):
+    """Touches noses with a cow as she files past. The near ear turns to her
+    first and the tail starts, low and slow; the dog takes its weight forward
+    and stretches its nose up to `height` units above the ground (where her
+    lowered muzzle is: draw_dog(...)['nose'] is the meeting point, reached at
+    0.75 s); both hold still, the dog's nostrils working; then it draws back,
+    the ears prick, and it watches her go. Ends at 1.75 + hold."""
+    reach = ease_back(clamp((t - 0.22) / 0.53))
+    back = ease(t, 0.95 + hold, 1.6 + hold)
+    on = reach * (1 - back)
+    sniff = ease(t, 0.75, 0.85) * (1 - ease(t, 0.75 + hold, 0.9 + hold))
+    nk, hd = _reach_for(height)
+    p = _base(cx=lerp(-3.0, 6.0, on), cy=84 - 1.0 * on, pitch=0.035 * on * clamp((height - 110) / 40, -1, 1))
+    p["neck"] = lerp(0.84, nk, on)
+    p["head"] = lerp(0.0, hd, on) + 0.022 * math.sin(TAU * 4.5 * t) * sniff
+    p["ear"] = lerp(0.72, 1.0, ease(t, 0.0, 0.14)) - 0.30 * on + 0.45 * ease(t, 1.2 + hold, 1.45 + hold)
+    p["ear_f"] = lerp(0.72, 0.9, ease(t, 0.06, 0.22)) - 0.25 * on + 0.45 * ease(t, 1.25 + hold, 1.5 + hold)
+    p["eye"] = 1.0 - 0.35 * sniff
+    p["tail"] = lerp(0.15, 0.05, ease(t, 0.05, 0.3)) + 0.3 * back
+    p["curl"] = 0.3
+    p["wag"] = 0.34 * math.sin(TAU * 1.1 * t) * ease(t, 0.08, 0.4)
+    p["fnx"] = 42 + 9 * ease(t, 0.25, 0.5) * (1 - back)            # one forefoot goes with the weight
+    p["fny"] = 7 * bump((t - 0.25) / 0.25) + 6 * bump((t - 1.0 - hold) / 0.3)
+    return _breathe(p, t, 0.5 * (1 - sniff))
+
+
+def nudge(t=0.0, pushes=2):
+    """Noses the calf back into line. Head down level with the calf's
+    shoulder, ears forward; then each push is the whole dog: the hind feet
+    stay, the body goes forward behind the nose and the head scoops up at the
+    end of it (0.55 s, then every 0.5 s). No teeth, mouth shut. Afterwards
+    it stands and watches the calf go, one ear cocked. draw_dog(...)['nose']
+    is where the calf is touched. Ends at 0.55 + 0.5 * pushes + 0.6."""
+    low = ease_back(clamp((t - 0.1) / 0.38))
+    end = 0.45 + 0.5 * pushes
+    done = ease(t, end, end + 0.55)
+    push = sum(bump((t - 0.4 - 0.5 * i) / 0.44) for i in range(pushes))
+    lift = sum(bump((t - 0.56 - 0.5 * i) / 0.3) for i in range(pushes))
+    on = low * (1 - done)
+    p = _base(cx=(4 + 15 * push) * on, cy=84 - (7 + 2.5 * push) * on, pitch=(-0.10 - 0.035 * push) * on, arch=0.05 * on)
+    p["neck"] = lerp(0.78, 0.16 + 0.20 * lift, on) + 0.10 * done
+    p["head"] = lerp(-0.06, -0.10 + 0.30 * lift, on)
+    p["ear"] = lerp(0.72, 1.12, ease(t, 0.0, 0.13)) - 0.5 * bump((t - end - 0.5) / 0.3)
+    p["ear_f"] = lerp(0.72, 1.16, ease(t, 0.03, 0.17))
+    p["tail"] = lerp(0.15, 0.32, ease(t, 0.0, 0.25))
+    p["curl"] = 0.2
+    p["wag"] = 0.12 * push
+    for leg in ("fn", "ff"):                                      # the forefeet give ground to the push
+        p[leg + "x"] = _REST[leg] + 7 * on + 5 * push * on
+    p["fny"] = 5 * bump((t - 0.12) / 0.26)
+    return p
+
+
+def look_up(pose, amount=1.0):
+    """Modifier: looks up at something much taller than itself (the lead cow
+    on the bank, or her hooves on the ice overhead). The ears tip back as the
+    head goes up. amount 0..1."""
+    p = dict(pose)
+    a = smooth(clamp(amount))
+    p["neck"] = lerp(p["neck"], 1.12, a)
+    p["head"] = lerp(p["head"], 0.62, a)
+    p["ear"] = lerp(p["ear"], 0.52, a)
+    p["ear_f"] = lerp(p["ear_f"], 0.56, a)
+    p["eye"] = lerp(p.get("eye", 1.0), 1.15, a)
+    return p
+
+
+def startle(t=0.0, floating=True):
+    """The stamp overhead and the ice cracking. Ears flat and the body ducked
+    inside three frames (the legs snatch in), a held beat with wide eyes, then
+    the head comes up to see what did it and the tail starts: it was her.
+    floating=True starts and ends in wait_float (under the ice), False on
+    four feet."""
+    duck = ease(t, 0.0, 0.1) * (1 - ease(t, 0.5, 1.05))
+    up = ease_back(clamp((t - 0.55) / 0.5))
+    if floating:
+        p = wait_float(t)
+        p["arch"] += 0.30 * duck
+        p["pitch"] -= 0.12 * duck
+        for leg in LEGS:
+            p[leg + "x"] *= 1 - 0.38 * duck
+            p[leg + "y"] = lerp(p[leg + "y"], -16.0, 0.6 * duck)
+        p["neck"] = lerp(0.75, 0.22, duck) + 0.22 * up
+        p["head"] = lerp(0.55, 0.0, duck) + 0.12 * up
+    else:
+        p = _base(cy=84 - 15 * duck, arch=0.16 * duck, cx=-5 * duck)
+        for leg, s in (("fn", 1), ("ff", 1), ("hn", -1), ("hf", -1)):
+            p[leg + "x"] = _REST[leg] + 6 * s * duck
+        p["neck"] = lerp(0.78, 0.25, duck) + 0.34 * up
+        p["head"] = lerp(-0.06, -0.2, duck) + 0.68 * up
+    p["ear"] = lerp(0.6, 0.0, ease(t, 0.0, 0.06)) + 0.95 * ease(t, 0.6, 0.85)
+    p["ear_f"] = lerp(0.6, 0.0, ease(t, 0.0, 0.08)) + 1.0 * ease(t, 0.66, 0.9)
+    p["eye"] = 1.0 + 0.35 * duck
+    p["tail"] = lerp(0.1, -0.8, duck) + 0.45 * ease(t, 0.9, 1.3)
+    p["curl"] = 0.3
+    p["wag"] = 0.5 * math.sin(TAU * 2.6 * t) * ease(t, 1.0, 1.4)
+    return p
+
+
+
 _GAITS.update({"walk": walk, "trot": trot, "wade": wade, "stand": stand, "swim": swim,
                "swim_up": swim_up, "swim_down": swim_down, "sit": sit, "watch": watch})
 
@@ -1179,10 +1298,12 @@ PERFORMANCES = {
     "carry_page": carry_page, "carry_part": carry_part, "carry_reel": carry_reel, "burst": burst,
     "shake": shake, "howl": howl, "ears_down": ears_down, "turn_back": turn_back,
     "look_back": look_back, "lay": lay, "pleased": pleased, "paw_press": paw_press, "tired": tired,
+    "nose_touch": nose_touch, "nudge": nudge, "startle": startle,
 }
 # natural length in seconds of the one-shots (cycles and holds have none)
 DURATION = {"sit": 1.0, "lie": 2.2, "nose_page": 3.0, "take_page": 1.8, "burst": 1.1, "shake": 1.5,
-            "howl": 3.0, "ears_down": 1.1, "turn_back": 1.8, "look_back": 2.2, "lay": 1.4, "paw_press": 1.5}
+            "howl": 3.0, "ears_down": 1.1, "turn_back": 1.8, "look_back": 2.2, "lay": 1.4, "paw_press": 1.5,
+            "nose_touch": 2.55, "nudge": 2.05, "startle": 1.5}
 
 
 def perform(name, t=0.0, **kw):
@@ -1541,6 +1662,10 @@ def _sheet():
         ("look_back", look_back(0.9), None, "dusk"), ("lay", lay(0.5), "reel", "dusk"), ("pleased", pleased(0.25), None, "dusk"),
         ("paw_press", paw_press(0.7), None, "dusk"), ("tired", tired(0.2), None, "dusk"), ("wait_float", wait_float(0.4), None, "water"),
         ("turn_back lie", turn_back(2.6, down="lie"), None, "dusk"),
+        ("nose_touch (cow)", nose_touch(1.1), None, "dusk"), ("nudge (calf)", nudge(0.62), None, "dusk"),
+        ("look_up (cow on bank)", look_up(sit(3.0)), None, "dusk"), ("startle (the stamp)", startle(0.2), None, "water"),
+        ("swim (level)", swim(0.2), None, "water"), ("carry_page trot", carry_page(0.12, gait="trot"), "page", "dusk"),
+        ("over_shoulder walk", over_shoulder(walk(0.3), 1.0), None, "dusk"),
     ]
     cols, cw, ch = 7, 250, 190
     rows = (len(shots) + cols - 1) // cols
@@ -1607,4 +1732,6 @@ if __name__ == "__main__":
     print(_strip("howl", howl, [0.0, 0.3, 0.55, 0.9, 1.6, 2.5, 3.0]))
     print(_strip("burst", burst, [0.0, 0.2, 0.4, 0.6, 0.78, 0.86, 0.95, 1.1], scale=0.6, cell=(230, 220)))
     print(_strip("no", lambda t: ears_down(t) if t < 5 else turn_back(t - 5), [0.0, 0.2, 0.5, 1.2, 5.3, 5.6, 5.75, 6.2, 7.0]))
+    print(_strip("cow", lambda t: nose_touch(t) if t < 5 else nudge(t - 5), [0.0, 0.2, 0.45, 0.8, 1.9, 2.4, 5.2, 5.5, 5.62, 5.9, 6.12, 6.9]))
+    print(_strip("startle", startle, [0.0, 0.08, 0.3, 0.7, 1.0, 1.4], kind="water", scale=0.7))
     print(_strip("sitlie", lambda t: sit(t) if t < 5 else lie(t - 5), [0.0, 0.4, 0.7, 1.2, 5.3, 5.6, 5.9, 6.4, 8.0], scale=0.7))

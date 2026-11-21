@@ -7,7 +7,7 @@ the joints. Descended from `paeleo/threshold` (`stage.js` puppet, `machine.js` m
 say so first.
 
 Look before you use it: `dog_sheet.png` (every performance, colour over silhouette) and
-`dog_strip_walk / trot / dig / swim / shake / howl / burst / no / sitlie.png`.
+`dog_strip_walk / trot / dig / swim / shake / howl / burst / no / sitlie / cow / startle.png`.
 Regenerate with `python3 films/swarm/dogs/dog.py` (also runs the self-test).
 
 ```python
@@ -87,6 +87,24 @@ Underwater: `tint=(24, 120, 128), tint_amount=0.35, shadow=False`. Far dogs: `si
 | `paw_press(t)` | Lifts the near forepaw and presses it on a thing 30 units ahead, weight behind it (down at 0.45 s), holds, takes it back. 1.5 s. | | `j = dog.draw_dog(ink, dog.paw_press(t), x, y); print_at = j["fn.paw"]` |
 | `tired(t)` | Legs apart, head hanging, panting with the tongue out, ribs working; the tail does nothing. | | `dog.tired(t)` |
 
+## Dealing with the cows
+
+The cows are the old way of working: bigger, slower, never villains. The dog treats them as it treats
+everything: it looks, decides, then moves. One of these belongs in every sequence.
+
+| Function | What the dog does | Options | Example |
+|---|---|---|---|
+| `nose_touch(t)` | Touches noses with the lead cow as she files past (S1). Near ear turns to her and the tail starts, low and slow; weight and one forefoot go forward; the nose stretches up to `height` units above the ground (reached at 0.75 s) and both hold still, nostrils working; then it draws back, ears prick, and it watches her go. Ends at `1.75 + hold`. The nose can reach 86 to 184 units; beyond that it stops at its limit. | `height=150` (where her lowered muzzle is, in dog units above the dog's ground), `hold=0.8` | `j = dog.draw_dog(ink, dog.nose_touch(t - 3.0, height=160), x, y, s, facing=1); cow_muzzle_goes_to = j["nose"]` |
+| `nudge(t)` | Noses the calf back into line (S3). Head down level with the calf's shoulder, ears forward, mouth shut; each push is the whole dog going forward behind its nose with the hind feet planted, and the head scoops up at the end of it (first contact 0.55 s, then every 0.5 s); afterwards it stands and watches the calf go, one ear cocked. Ends at `1.05 + 0.5 * pushes`. Move the calf with the nose: `j["nose"]`. | `pushes=2` | `j = dog.draw_dog(ink, dog.nudge(t - 77.0), x, y, s, facing=-1); calf_rump_x = j["nose"][0]` |
+| `look_up(pose, amount)` | Modifier: looks up at something much taller (the lead cow on the bank, her hooves on the ice). Ears tip back as the head goes up. Works on ground and swimming poses. | `amount` 0..1 | `dog.look_up(dog.sit(9), 1.0)`, `dog.look_up(dog.swim(t), 0.7)` |
+| `startle(t)` | The stamp overhead and the ice cracking (S5). Ears flat and body ducked inside three frames, legs snatched in; a held beat, eyes wide; then the head comes up to see what did it and the tail starts: it was her. 1.5 s. | `floating=True` (starts and ends in `wait_float`), `False` on four feet | `dog.draw_dog(ink, dog.startle(t - 122.0), x, y, s, tint=(24,120,128), tint_amount=0.35, shadow=False)` |
+
+Other cow beats use what is already here: watching the herd file past is `watch(t)`; waiting with a cow
+looking down from the bank is `look_up(swim(t), a)`; passing the queue going down is `wade(t)` or
+`carry_part(t)` with `over_shoulder(pose, a)` for a glance at the calf; the last shot beside the folded cow
+is `lie(t)`. For a cow much taller than the dog, give `nose_touch` the height of her lowered muzzle in dog
+units: `(dog_ground_y - cow_muzzle_y) / scale`.
+
 Helpers: `travel(name, t, rate=None)` distance in dog units for `walk`, `trot`, `wade`, `back_away`
 (negative) so that `x = x0 + facing * scale * travel(name, t)` keeps planted feet planted;
 `shake_drops(t, n=54, seed=3, dur=1.5)` and `dig_spray(t, rate=None, seed=5, water=False)` return
@@ -157,8 +175,14 @@ more slowly.
 - MEASURED (`_selftest`, run on every `python3 dog.py`): bone lengths hold to 1e-6 in every performance; a
   planted walking foot slips less than 0.01 units against `travel`; the machine retreats under call and
   reach, never approaches while pressed, and reaches `lie_down` once the person sits and waits.
+- Second pass (after the cows were written into every sequence): the muzzle was recut shorter and deeper
+  with a forehead stop and a blunt nose, because the first cut read as a beak in silhouette; the coat was
+  lightened from kraft tan to cream, as the board requires of the one cream dog; `nose_touch`, `nudge`,
+  `look_up` and `startle` were added. The pose API and every earlier function are unchanged.
 - JUDGED by the builder from stills only (pose sheet and strips, colour and silhouette). Not watched at
   speed, not reviewed by an independent critic. Weakest reads: `lie` with the chin down merges into one
   low shape in silhouette (the ears still show); `back_away` hind legs overlap; the tear in the ear is
   clear at scale 0.8 and up, below that the two ears read as one ragged crest.
-- UNKNOWN: how the easing feels in motion at 24 fps.
+- UNKNOWN: how the easing feels in motion at 24 fps; whether `nose_touch` and `nudge` meet the cow builder's
+  cow and calf at the right heights (no cow module existed in this folder when these were drawn; the heights
+  are arguments for that reason).

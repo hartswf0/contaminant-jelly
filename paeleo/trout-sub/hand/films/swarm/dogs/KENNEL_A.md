@@ -1,7 +1,9 @@
 # KENNEL A · three pack dogs, three ways of making
 
 Module: `films/swarm/dogs/kennel_a.py`. Sheets (every dog, every action, on dusk and on creek teal):
-`kennel_a_sheet_herder.png`, `kennel_a_sheet_digger.png`, `kennel_a_sheet_old_dog.png` in this folder.
+`kennel_a_sheet_herder.png`, `kennel_a_sheet_digger.png`, `kennel_a_sheet_old_dog.png` in this folder, and
+`kennel_a_strip_cows.png`: six film-size frames of these dogs dealing with a cow (the cow in it is a flat
+stand-in drawn by `_standin_cow`, for scale only; the film's cows belong to the cow builder).
 Re-make them and run the numeric checks with `python3 films/swarm/dogs/kennel_a.py`
 (`--check` for the checks alone).
 
@@ -47,7 +49,16 @@ through, exposed on twos (12 poses a second, `exposure=`). No inner drawing: con
 | `turn` | `p` | the flat card turns over, edge-on halfway (for passing the fence sideways, or turning round) | `ka.herding_dog(ink, 560, 440, 0.9, 1, "turn", p=p)` |
 | `slide` | `p` | comes up off the ground like a shadow leaving a wall (arrival, 89.2) | `ka.herding_dog(ink, 150, 392, 0.9, 1, "slide", p=p)` |
 
+| `flank` | `t` | WITH THE COWS: the wide flat-out swing round the herd, a gallop, ears and tail streaming | `x, y, f, size, act = ka.herd_swing(140, 400, 800, 396, p, wide=58); ka.herding_dog(ink, x, y, 0.9 * size, f, act, t=t)` |
+| `creep` | `t` | the low stalk toward a cow, head dead level, one slow paw at a time | `ka.herding_dog(ink, x, 394, 0.9, -1, "creep", t=t)` |
+| `eye` | `p` | "the eye": drops (0..0.5), one fore paw comes off the ground (0.35..0.75), then nothing moves; it stares the lead cow down until she turns | `ka.herding_dog(ink, 610, 394, 0.9, -1, "eye", p=ramp(t, 92.0, 92.6))` |
+| `down` | `p` | lies flat, head up, and lets the herd file by (S3, the bank in S4, S6) | `ka.herding_dog(ink, 420, 430, 0.9, -1, "down", p=p)` |
+
 Extra anchors: `reach` (where the next page must be offered), `chest`, `paws`, `pages` (count held).
+`herd_swing(x0, y0, x1, y1, p, wide=90, creep_from=0.82)` returns `(x, y, facing, size, action)`: the path
+from where the dog starts to the spot in front of the lead cow, bulging `wide` px toward the viewer (negative:
+behind the herd). It never runs at the cows. The action it returns is `walk`, then `flank`, then `creep`;
+follow it with `eye`, and turn the lead cow's head while the dog holds still.
 `herd_circle(cx, cy, rx, ry, t, period=6.0, start=0.0)` returns `(x, y, facing, behind, size)`; draw the
 dog before the fish class when `behind` is True.
 
@@ -69,6 +80,9 @@ through it. No boil: it is ruled, not hand-drawn.
 | `heave` | `p` (and `t` for the tremble) | grips something in the bed (0..0.2), leans back and strains (0.2..0.75), it comes out and is held high (0.75..1) | `a = ka.digger(ink, 520, 440, 0.9, 1, "heave", t=t, p=p)`; draw the thing at `a["mouth"]`, rooted at `a["grip"]` while `a["out"] == 0` |
 | `build` | `p` | rears and drives a post in with three blows (p = 0.22, 0.47, 0.72), then one paw holds it | `a = ka.digger(ink, 500, 440, 0.9, 1, "build", t=t, p=p)`; `post=False` to draw your own at `a["post"]` (top) and `a["post_foot"]` |
 | `unbend` | `p` | one reed of wire unbends into the dog (arrival, 91.0) | `ka.digger(ink, 820, 394, 0.9, -1, "unbend", p=p)` |
+
+| `nose_up` | `p` (`t` wags the tail) | WITH THE COWS: a cow lowers her muzzle to the dog she can see through; it stretches its nose up to hers, one fore paw off the ground, and holds. The nose reaches about 71 units (64 px at `s=0.9`) above the ground | `a = ka.digger(ink, mx + 39, 394, 0.9, -1, "nose_up", t=t, p=p)`; bring her muzzle to `a["nose"]` |
+| `flinch` | `p` | a hoof comes down on the ice overhead (S5): ducks flat, tail under, ears back (peak p = 0.12), then looks up at it (0.5..1) | `ka.digger(ink, 520, 470, 0.9, -1, "flinch", p=ramp(t, 124.0, 125.0))` |
 
 Extra anchors: `paws`, `residual` (worst wire-length error as a fraction), `solved`
 (`residual <= DIGGER_TOLERANCE`, 1 %). `unbend` is a declared exception: mid-way the wire is not at length.
@@ -102,6 +116,15 @@ other way round by themselves, about the same `x`.
 | `walk` | `t` | stiff slow walk, legs swinging on their pins | `ka.old_dog(ink, x, 392, 0.78, 1, "walk", t=t)` |
 | `swim` | `t` | paddles | `ka.old_dog(ink, x, y, 0.78, 1, "swim", t=t)` |
 
+| `greet` | `p` | WITH THE LEAD COW: one eye opens (0.06), the head comes up and, if she is at its tail end, goes round over its shoulder to her (0.26..0.4); two tail thumps on the boards (0.42..0.72); head down, eye shut (0.8..1) | `a = ka.old_dog(ink, 425, 394, 0.78, 1, "greet", p=p, state="passed", cow=-1)` |
+| `make_room` | `p` | head up, then two shuffles along the sill away from her, one end at a time (0.2..0.46, 0.52..0.78); ends about 19 px * `s` further from her | `ka.old_dog(ink, 425, 394, 0.78, 1, "make_room", p=p, state="passed", cow=-1)` |
+| `beside` | `t`, `p` | the hold after `make_room`: a slow breath (4.2 s); `p` is a one-shot in which its eye opens on her (0.2..0.8) and closes | `ka.old_dog(ink, 425, 394, 0.78, 1, "beside", t=t, state="passed", cow=-1)` |
+
+The three cow actions take `state` = how it is lying when she comes (`"lie"`, `"back"`, or `"passed"` = the
+end of `let_pass`, which is where 6.5 leaves it) and `cow` = `+1` when she folds down at its nose end, `-1`
+at its tail end. Every call returns `a["beside"]`: the ground point at the dog's edge on her side. Fold her
+down with her near edge there.
+
 Options: `paper` and `ink_color` are the card and the printing ink (dim both for dusk; frost = lighter
 paper). `eye=0` forces the eye shut. `verso=True` shows the unprinted side of the card when its back is
 turned (a kept branch, not the default: it reads as a blank dog, see the last row of the sheet).
@@ -120,11 +143,22 @@ elif t < 172.4: ka.old_dog(ink, X, Y, S, 1, "look_over", p=ramp(t, 171.9, 172.4)
 else:           ka.old_dog(ink, X, Y, S, 1, "let_pass", p=ramp(t, 172.4, 173.0))
 ```
 
+## The cows, sequence by sequence (what these three dogs do about them)
+
+| Seq | Moment | Calls |
+|---|---|---|
+| S3 | the herd waits at the gate while the lead dog goes up and down (the pack is not here yet) | none from this kennel |
+| S4 | the herder turns the herd off the path so the way to the water stands open | `herd_swing` with `flank` then `creep`, then `eye` held until the lead cow turns her head; then `walk` behind them |
+| S4 | cows on the bank watch the pack go under | `digger "nose_up"` to a lowered muzzle just before the dive (the calf sees through the wire dog); `herder "down"` at the waterline for a beat |
+| S5 | the lead cow walks out on the ice and stamps | every dog `look=40..55` up at her hooves; `digger "flinch"` on the stamp; old dog `"swim"` or `"lie"` with `look=20` |
+| S6 | she folds down beside the old dog | `old_dog "greet"`, `"make_room"`, `"beside"` with `state="passed"` |
+
 ## Evidence
 
 MEASURED (by `selfcheck()`, run on this revision):
-- herder: no joint leaves its limits in any action; every planted paw reaches its contact (worst miss 0.0 units).
-- digger: worst wire-length residual 0.078 % (tolerance 1 %); pinned paws drift 0.0.
+- herder: no joint leaves its limits in any action (the four cow actions included); every planted paw reaches its contact (worst miss 0.0 units).
+- digger: worst wire-length residual 0.78 % (tolerance 1 %), in `nose_up` at full stretch; 0.078 % in the
+  other actions; pinned paws drift 0.0.
 - old dog: at rest the hinge matrices are the identity and the cut pieces reproduce the scan inside the
   dog (mean absolute difference 0.59 grey levels of 255 over 53,551 pixels; the difference is the shaded
   cut edge).
@@ -137,7 +171,17 @@ JUDGED, by the builder only, from stills (the three sheets, enlarged crops, and 
 black-silhouette version). No playback was watched and no independent critic has looked. In stills the
 three read as three makes and the old dog is the largest and lowest shape.
 
+Second pass (after the cows were written into every sequence): nine actions and `herd_swing` were added,
+the sheets re-made and looked at, and three things found in the stills were fixed: the herder's `down` had its
+belly and fore legs through the ground; `nose_up` folded the head back on itself; `beside` pointed to the wrong
+side of the dog whenever its head was turned.
+
 UNKNOWN / weak, for the critic:
+- The cow actions were judged against a stand-in cow of guessed size (about 150 px long, 90 px tall at film
+  scale). The real cow's muzzle height, and whether she can lower it to 64 px, are not known here.
+- `eye` and `creep` have nearly the same silhouette as `circle`; in a still they differ only by the lifted
+  paw. The difference is meant to be stillness, which only playback can show.
+- `greet` with `cow=-1` flips the head piece, like `look_over`; same risk of a pop.
 - No motion has been watched. The herder's twos, the old dog's 8 poses a second in `walk` and `swim`, and
   the dig rhythm are untested at speed.
 - The old dog's blink and closed eye are about 2 px at `s=0.78`; they will only read in a closer framing.
