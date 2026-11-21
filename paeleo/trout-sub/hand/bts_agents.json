@@ -1,0 +1,148 @@
+[
+ {
+  "label": "make:p01",
+  "tools": 84,
+  "by": {
+   "Bash": 53,
+   "Read": 29,
+   "Write": 1,
+   "StructuredOutput": 1
+  },
+  "renders": 2,
+  "stills": 9,
+  "forage": 14,
+  "start": "2026-11-19T19:53:47.730Z",
+  "end": "2026-11-19T21:44:13.317Z"
+ },
+ {
+  "label": "make:p03",
+  "tools": 52,
+  "by": {
+   "Bash": 35,
+   "Read": 15,
+   "Write": 1,
+   "StructuredOutput": 1
+  },
+  "renders": 1,
+  "stills": 7,
+  "forage": 6,
+  "start": "2026-11-19T19:53:48.721Z",
+  "end": "2026-11-19T20:29:00.405Z"
+ },
+ {
+  "label": "make:p14",
+  "tools": 76,
+  "by": {
+   "Bash": 50,
+   "Read": 24,
+   "Write": 1,
+   "StructuredOutput": 1
+  },
+  "renders": 4,
+  "stills": 10,
+  "forage": 11,
+  "start": "2026-11-19T20:29:01.668Z",
+  "end": "2026-11-19T21:22:33.485Z"
+ },
+ {
+  "label": "make:p35",
+  "tools": 103,
+  "by": {
+   "Bash": 73,
+   "Read": 25,
+   "ToolSearch": 1,
+   "TaskStop": 2,
+   "Write": 1,
+   "StructuredOutput": 1
+  },
+  "renders": 3,
+  "stills": 17,
+  "forage": 24,
+  "start": "2026-11-19T21:22:33.558Z",
+  "end": "2026-11-19T22:24:17.963Z"
+ },
+ {
+  "label": "make:p44",
+  "tools": 52,
+  "by": {
+   "Bash": 35,
+   "Read": 16,
+   "StructuredOutput": 1
+  },
+  "renders": 1,
+  "stills": 8,
+  "forage": 6,
+  "start": "2026-11-19T21:44:13.445Z",
+  "end": "2026-11-19T22:15:49.383Z"
+ },
+ {
+  "label": "critic:p03",
+  "tools": 19,
+  "by": {
+   "Bash": 10,
+   "Read": 8,
+   "StructuredOutput": 1
+  },
+  "renders": 1,
+  "stills": 4,
+  "forage": 0,
+  "start": "2026-11-19T22:15:49.709Z",
+  "end": "2026-11-19T22:21:37.594Z"
+ },
+ {
+  "label": "critic:p14",
+  "tools": 23,
+  "by": {
+   "Bash": 16,
+   "Read": 6,
+   "StructuredOutput": 1
+  },
+  "renders": 1,
+  "stills": 7,
+  "forage": 0,
+  "start": "2026-11-19T22:21:37.687Z",
+  "end": "2026-11-19T22:29:08.708Z"
+ },
+ {
+  "label": "critic:p01",
+  "tools": 21,
+  "by": {
+   "Bash": 12,
+   "Read": 8,
+   "StructuredOutput": 1
+  },
+  "renders": 0,
+  "stills": 4,
+  "forage": 0,
+  "start": "2026-11-19T22:24:18.076Z",
+  "end": "2026-11-19T22:30:47.042Z"
+ },
+ {
+  "label": "critic:p44",
+  "tools": 22,
+  "by": {
+   "Bash": 11,
+   "Read": 10,
+   "StructuredOutput": 1
+  },
+  "renders": 1,
+  "stills": 4,
+  "forage": 2,
+  "start": "2026-11-19T22:29:08.865Z",
+  "end": "2026-11-19T22:33:00.028Z"
+ },
+ {
+  "label": "critic:p35",
+  "tools": 19,
+  "by": {
+   "Bash": 10,
+   "Read": 8,
+   "StructuredOutput": 1
+  },
+  "renders": 1,
+  "stills": 4,
+  "forage": 0,
+  "start": "2026-11-19T22:30:47.172Z",
+  "end": "2026-11-19T22:36:26.827Z"
+ }
+]
