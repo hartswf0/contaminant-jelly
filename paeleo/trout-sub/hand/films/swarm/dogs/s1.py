@@ -12,7 +12,22 @@ persistent place on the sill. What the authors control is the WORLD (the cow com
 calls, reaches, sits, turns the radio on). The dog's evening comes out of running the machine over that
 world, and `check()` runs it again over three other evenings in which it must NOT go into the water.
 
-Staging is the board's (`board.md`, S1). Sets and cast are imported, never edited:
+REPAIRED (law 10) after an independent critic who saw only the picture found that the dog was "not a character
+with a want": one good nose touch, then 13.5 s planted while the cow drank with her head hidden, then a dive "for
+no shown reason". Cause: between 8 and 21 s the WORLD held nothing for the dog to perceive except the absence of
+a hand, so its machine could only stand; and the cow, once drinking, had no states left at all. Repair, in this
+file only: the WORLD now has a cow who shows the dog the water and a fish child who comes up to the line, and the
+machine has the states to answer them (SIT, RECOIL, CREEP, PEER, ASK_COW). What a stranger now sees after the
+touch: the hand comes and the dog backs in under the lead cow's chin, and she puts her head down over it; the
+person sits and so does the dog, beside her as she drinks; bubbles burst under her nose, she throws her head up
+snorting, the dog springs back, then creeps to the edge to see; a fish child with a satchel comes up under its
+nose, looks at it, waves and dives; the dog looks round at the person (who does not reach), up at the cow (whose
+nose has followed the fish to the line and stopped), and goes after it. Also repaired: the second cow no longer
+stands on the gate; no lettering; the swim is one line with rolls while the body is upright, not mirror flips.
+NOT repaired, because the shared contract forbids it in S1 and says so: only one dog is in this sequence (the pack
+comes at 84 s), and the dog does not come back up with anything before 28 s (it rises with the page at 56.5).
+
+Staging is the board's (`board.md`, S1) except as above. Sets and cast are imported, never edited:
 porch.py (set, person), herd.py (cows), dog.py (lead dog), town.py (Trouttown), sound.py (sound library).
 
 Run alone:  python3 films/swarm/dogs/s1.py            -> assets/films/dogs-s1.mp4
@@ -67,18 +82,23 @@ TEAL = (24, 120, 128)
 # A list of (time, {circumstance: value}). The person and the cow are performed from the same table
 # (see `person_q` and `_walkers`), so the dog's machine and the picture read one evening.
 
+SNORT_T = 15.0                    # REPAIR: the cow shows the dog that something is under the water
+FISH_T0, FISH_T1 = 16.5, 17.9     # REPAIR: what the dog sees there, and follows
+
 WORLD = [
-    (0.0, dict(cow="coming", voice="none", hand="none", posture="stand", radio=0)),
+    (0.0, dict(cow="coming", voice="none", hand="none", posture="stand", radio=0, water="still")),
     (3.0, dict(cow="level")),              # the lead cow has come level with the dog and lowered her head
     (5.2, dict(cow="passing")),            # she chews again and walks on
     (6.2, dict(voice="call")),             # Line 1, with four taps on the rail
-    (8.6, dict(cow="drinking")),
     (7.6, dict(voice="none")),
     (8.0, dict(hand="reach")),             # the hand comes
     (10.5, dict(hand="none")),             # the hand drops
     (11.0, dict(posture="sitting")),
     (12.5, dict(posture="sit")),           # seated on the step
     (14.0, dict(radio=1)),                 # the radio is on; now the person only waits
+    (SNORT_T, dict(cow="snort")),          # bubbles burst under the drinking cow's nose: she throws her head up
+    (FISH_T0, dict(water="fish")),         # a fish child has come up to the line, under the dog's nose
+    (FISH_T1, dict(water="gone")),         # it waves, turns, and goes down
 ]
 
 REACH_T0, REACH_T1 = 8.0, 9.2              # the hand travels over these seconds (the person's `reach` key)
@@ -190,19 +210,29 @@ STATES = {
     "LISTEN":       ("to hear the voice without giving it the body",                 0.0),
     "GLANCE":       ("to see what is coming up behind",                              0.25),
     "YIELD":        ("to keep exactly the distance it had",                          0.0),
-    "AWAY":         ("to show it was not fetched",                                   1.0),
-    "WEIGH_WATER":  ("to look at where it could go",                                 1.5),
-    "WEIGH_PERSON": ("to see whether it is being made to",                           1.3),
-    "WEIGH_AGAIN":  ("to look once more, now that nobody is making it",              1.2),
-    "RESOLVE":      ("nothing: it is deciding",                                      1.0),
+    "AWAY":         ("to show it was not fetched (it has backed in under the cow's chin)", 1.0),
+    "SIT":          ("to wait beside the cow while she drinks",                      1.0),
+    "RECOIL":       ("to get away from whatever made the cow throw her head up",     0.42),
+    "CREEP":        ("to see what it was",                                           0.0),
+    "PEER":         ("to see what is under the water",                               1.0),
+    "WEIGH_PERSON": ("to see whether it is being made to",                           1.25),
+    "ASK_COW":      ("to see whether she is going after it",                         0.7),
+    "RESOLVE":      ("nothing: it is deciding",                                      0.6),
     "LIFT":         ("to go",                                                        0.5),
     "GO":           ("to reach the wet end of the board",                            0.0),
     "WADE":         ("to get in up to the chest",                                    0.37),
     "UNDER":        ("to go down",                                                   1e9),
 }
 
-COMFORT = 212.0        # px from the hand to the middle of the dog that the dog keeps
-WALK_PX = 63.0         # px a second, walking along the sill to the wet end
+COMFORT = 262.0        # px from the hand to the middle of the dog that the dog keeps (REPAIR: was 212; the
+                       # retreat was 40 px inside a camera push and read as standing still; now it is 54 px,
+                       # it starts while the hand is still coming, and it ends under the lead cow's chin)
+SIT_X = 524.0          # ... which is as far as the dry-ish board goes with four feet on it
+WALK_PX = 61.0         # px a second, walking along the sill to the wet end
+RECOIL_PX = 22.0       # how far it springs back from the cow's snort
+CREEP_PX = 44.0        # px a second, coming back low to look
+PEER_X = 528.0         # where it stands to look down into the water
+BACK_PX = 18.0         # the two steps it takes back toward the door when it looks round at the person
 WADE_PX = 95.0
 PRESSURE_UP = dict(call=0.35, reach=0.9)
 PRESSURE_DOWN = 0.22
@@ -219,14 +249,15 @@ def _quiet(w):
 
 # Guards, highest priority first. A transition marked interrupt=True may break an action window.
 # (from states, to, guard(m, w), priority, interrupt, why)
-DRY = ("WATCH", "GREET", "LISTEN", "GLANCE", "AWAY", "WEIGH_WATER", "WEIGH_PERSON", "WEIGH_AGAIN", "RESOLVE", "LIFT", "GO")
+DRY = ("WATCH", "GREET", "LISTEN", "GLANCE", "AWAY", "SIT", "RECOIL", "CREEP", "PEER", "WEIGH_PERSON", "ASK_COW",
+       "RESOLVE", "LIFT", "GO")
 TRANSITIONS = [
-    (DRY, "YIELD", lambda m, w: _too_close(m, w), 9, True,
+    (DRY, "YIELD", lambda m, w: _too_close(m, w) and m["x"] < SIT_X - 0.01, 9, True,
      "a hand is nearer than it allows: it moves off, and no further than the hand came"),
-    (("WATCH", "LISTEN", "AWAY", "WEIGH_WATER", "WEIGH_PERSON", "WEIGH_AGAIN", "RESOLVE", "LIFT"), "GLANCE",
-     lambda m, w: w["hand"] == "reach" and w["hand_since"] >= 0.3 and m["state"] != "GLANCE" and not m["glanced"], 8, True,
+    (("WATCH", "LISTEN", "AWAY", "SIT", "PEER", "WEIGH_PERSON", "ASK_COW", "RESOLVE", "LIFT"), "GLANCE",
+     lambda m, w: w["hand"] == "reach" and w["hand_since"] >= 0.15 and m["state"] != "GLANCE" and not m["glanced"], 8, True,
      "something is coming from behind: one look"),
-    (("YIELD",), "AWAY", lambda m, w: not _too_close(m, w) and m["still"] >= 0.2, 7, False,
+    (("YIELD",), "AWAY", lambda m, w: (not _too_close(m, w) or m["x"] >= SIT_X - 0.01) and m["still"] >= 0.2, 7, False,
      "the hand has stopped; so has the dog; it looks elsewhere"),
     (("GLANCE",), "AWAY", lambda m, w: w["hand"] == "none", 6, False, "the hand went away by itself"),
     (("WATCH",), "GREET", lambda m, w: w["cow"] == "level" and m["pressure"] < 0.3, 6, False,
@@ -236,13 +267,18 @@ TRANSITIONS = [
      "a voice: one ear goes to it, the body does not"),
     (("LISTEN",), "WATCH", lambda m, w: w["voice"] != "call" and w["voice_off"] >= 0.2, 5, False, "the voice stopped"),
     (("AWAY",), "WATCH", lambda m, w: w["hand"] == "none" and m["pressure"] < 0.8, 4, False, "nobody is reaching"),
-    (("WATCH",), "WEIGH_WATER", lambda m, w: m["quiet"] >= QUIET_NEEDED and m["pressure"] < 0.15, 3, False,
-     "nobody has asked anything of it for a while"),
-    (("WEIGH_WATER",), "WEIGH_PERSON", lambda m, w: True, 2, False, "is it being made to?"),
-    (("WEIGH_PERSON",), "WEIGH_AGAIN", lambda m, w: _quiet(w), 2, False, "the person did not reach"),
+    (("WATCH", "SIT", "PEER"), "RECOIL", lambda m, w: w["cow"] == "snort" and w["cow_since"] < 0.3, 6, True,
+     "the cow beside it has thrown her head up at something in the water"),
+    (("RECOIL",), "CREEP", lambda m, w: True, 2, False, "nothing came out: what was it?"),
+    (("CREEP",), "PEER", lambda m, w: m["x"] >= PEER_X - 0.01, 2, False, "it is at the edge, over the place"),
+    (("WATCH",), "SIT", lambda m, w: w["posture"] != "stand" and w["hand"] == "none" and m["pressure"] < 0.75
+     and w["cow"] != "snort", 3, False, "the person has sat down: so does it, by the cow"),
+    (("PEER",), "WEIGH_PERSON", lambda m, w: w["water"] == "gone" and m["quiet"] >= QUIET_NEEDED and m["pressure"] < 0.15,
+     3, False, "the fish child looked at it, waved, and went down: may it follow?"),
+    (("WEIGH_PERSON",), "ASK_COW", lambda m, w: _quiet(w), 2, False, "the person did not reach"),
     (("WEIGH_PERSON",), "WATCH", lambda m, w: not _quiet(w), 1, False, "the person moved: not now"),
-    (("WEIGH_AGAIN",), "RESOLVE", lambda m, w: _quiet(w), 2, False, "still nobody is making it"),
-    (("WEIGH_AGAIN",), "WATCH", lambda m, w: not _quiet(w), 1, False, "not now"),
+    (("ASK_COW",), "RESOLVE", lambda m, w: _quiet(w), 2, False, "she only looks down: she cannot go"),
+    (("ASK_COW",), "WATCH", lambda m, w: not _quiet(w), 1, False, "not now"),
     (("RESOLVE",), "LIFT", lambda m, w: _quiet(w), 2, False, "it has decided"),
     (("RESOLVE",), "WATCH", lambda m, w: not _quiet(w), 1, False, "not now"),
     (("LIFT",), "GO", lambda m, w: True, 2, False, "it goes"),
@@ -264,6 +300,7 @@ def run_mind(world=WORLD, T=SECONDS, x0=SPOT_X):
         w["hand_since"] = _since(t, world, "hand", "reach")
         w["voice_since"] = _since(t, world, "voice", "call")
         w["voice_off"] = _since(t, world, "voice", "none")
+        w["cow_since"] = _since(t, world, "cow", "snort")
         # memory
         up = (PRESSURE_UP["reach"] if w["hand"] == "reach" else 0.0) + (PRESSURE_UP["call"] if w["voice"] == "call" else 0.0)
         m["pressure"] = clamp(m["pressure"] + (up if up else -PRESSURE_DOWN) * DT)
@@ -286,7 +323,15 @@ def run_mind(world=WORLD, T=SECONDS, x0=SPOT_X):
         x_before = m["x"]
         if m["state"] == "YIELD" and w["hand_x"] is not None:
             want = w["hand_x"] + COMFORT
-            m["x"] = min(max(m["x"], min(want, m["x"] + 85.0 * DT)), SILL_END - 8)     # a walk, never a jump
+            m["x"] = min(max(m["x"], min(want, m["x"] + 85.0 * DT)), SIT_X)            # a walk, never a jump
+        elif m["state"] == "RECOIL":
+            if m["since"] < 0.3:
+                m["x"] = max(SPOT_X, m["x"] - RECOIL_PX / 0.3 * DT)                   # a spring, back the way it came
+        elif m["state"] == "CREEP":
+            m["x"] = min(PEER_X, m["x"] + CREEP_PX * DT)
+        elif m["state"] == "WEIGH_PERSON":
+            if 0.1 <= m["since"] < 0.75:
+                m["x"] = max(SPOT_X, m["x"] - BACK_PX / 0.65 * DT)                    # two steps back, toward the door
         elif m["state"] == "GO":
             m["x"] = min(SILL_END, m["x"] + WALK_PX * DT)
         elif m["state"] == "WADE":
@@ -353,50 +398,64 @@ def _trace():
 
 
 def check(verbose=True):
-    """MEASURED. The machine against the board, and against three evenings in which it must refuse."""
+    """MEASURED. The machine against this sequence's clock, and against four evenings in which it must refuse."""
     tr = Trace(run_mind())
-    board = dict(GREET=3.0, WEIGH_WATER=15.5, WEIGH_PERSON=17.0, WEIGH_AGAIN=18.3, RESOLVE=19.5, LIFT=20.5,
-                 GO=21.0, WADE=21.6, UNDER=22.0)
+    clock = dict(GREET=3.0, RECOIL=SNORT_T, WEIGH_PERSON=FISH_T1, LIFT=20.5, GO=21.0, WADE=21.6, UNDER=22.0)
     out = []
-    for s, want in board.items():
+    for s, want in clock.items():
         got = tr.t(s)
         assert got is not None and abs(got - want) <= 1.5 * DT, (s, got, want)
-        out.append(f"{s} entered at {got:.3f} (board {want})")
+        out.append(f"{s} entered at {got:.3f} (wanted {want})")
+    out.append("states: " + " ".join(f"{s}@{tt:.2f}" for tt, s in tr.enters))
     ty = tr.t("YIELD")
     assert ty is not None and REACH_T0 < ty < REACH_T1 + 0.2, ty
     # the retreat is as far as the hand intruded, and the distance is kept
     hx_end = hand_x(REACH_T1 + 0.5)
     moved = tr.x(10.4) - SPOT_X
-    intruded = hx_end + COMFORT - SPOT_X
+    intruded = min(hx_end + COMFORT, SIT_X) - SPOT_X
     assert abs(moved - intruded) < 1.0, (moved, intruded)
+    assert moved > 50.0, moved                                # far enough to be SEEN to back off
     worst = min(f["x"] - hand_x(f["t"]) for f in tr.frames if hand_x(f["t"]) is not None)
-    assert worst > COMFORT - 20.0, worst                     # the hand is quicker than a walk: it gets this near, no nearer
+    assert worst > 200.0, worst                              # the hand is quicker than a walk: this near, no nearer
     out.append(f"hand intruded {intruded:.1f} px, dog moved {moved:.1f} px; closest {worst:.1f} px (keeps {COMFORT})")
-    # no state is absorbing by accident, and all are reachable in some evening below
+    # REPAIR (the critic's primary gap): after the touch the dog's feet are never still for more than 3 s
+    still, worst_still, t_w = 0.0, 0.0, 0.0
+    for f0, f1 in zip(tr.frames, tr.frames[1:]):
+        if f1["t"] < 5.4 or f1["t"] > 22.0:
+            continue
+        moving = abs(f1["x"] - f0["x"]) > 1e-6 or (f1["state"] == "SIT" and f1["since"] < 1.0) \
+            or (f0["state"] == "SIT" and f1["state"] != "SIT")
+        still = 0.0 if moving else still + DT
+        if still > worst_still:
+            worst_still, t_w = still, f1["t"]
+    assert worst_still <= 3.35, (worst_still, t_w)          # 5.4-8.7: head follows the cow, looks round at the voice, at the hand
+    out.append(f"longest stretch with the feet planted after the touch: {worst_still:.2f} s (ending {t_w:.2f})")
     seen = {s for _, s in tr.enters}
-    # it never goes toward the hand
-    xs = [f["x"] for f in tr.frames]
-    assert all(b >= a - 1e-9 for a, b in zip(xs, xs[1:])), "the dog moved toward the door"
     # evening 2: the person never sits down. The dog must not go.
     w2 = [e for e in WORLD if e[0] < 10.9]
     t2 = Trace(run_mind(w2))
-    assert t2.t("UNDER") is None and t2.t("WEIGH_WATER") is None
-    out.append("never sits: the dog never considers the water")
-    # evening 3: the person reaches again while the dog is looking back at them. The dog must refuse.
+    assert t2.t("UNDER") is None and t2.t("PEER") is None
+    out.append("never sits: the dog never looks into the water")
+    # evening 3: the person reaches again while the dog is looking at the fish. The dog must refuse.
     w3 = WORLD + [(17.4, dict(hand="reach")), (19.0, dict(hand="none"))]
     t3 = Trace(run_mind(w3))
-    assert t3.t("UNDER") is None or t3.t("UNDER") > 22.0 + 2.0, t3.t("UNDER")
+    assert t3.t("UNDER") is None, t3.t("UNDER")
     assert t3.t("GLANCE", 1) is not None or t3.t("YIELD", 1) is not None
     seen |= {s for _, s in t3.enters}
-    out.append(f"reaches again at 17.4: goes under at {t3.t('UNDER')} (not at 22.0); states {[s for _, s in t3.enters if _ > 17]}")
+    out.append(f"reaches again at 17.4: does not go; states {[s for _, s in t3.enters if _ > 17]}")
     # evening 4: the person keeps calling from the step. The dog listens and never goes.
-    w4 = WORLD + [(15.0, dict(voice="call")), (27.0, dict(voice="none"))]
+    w4 = WORLD + [(15.3, dict(voice="call")), (27.0, dict(voice="none"))]
     t4 = Trace(run_mind(w4))
     assert t4.t("UNDER") is None
     seen |= {s for _, s in t4.enters}
-    out.append("keeps calling: the dog listens and stays")
+    out.append("keeps calling: the dog stays")
+    # evening 5: nothing comes up under the water. The dog has no reason, and does not go.
+    w5 = [e for e in WORLD if "water" not in e[1] or e[0] == 0.0]
+    t5 = Trace(run_mind(w5))
+    assert t5.t("UNDER") is None and t5.t("PEER") is not None
+    out.append("no fish child comes up: the dog looks, and stays")
     assert seen == set(STATES), set(STATES) - seen
-    out.append(f"all {len(STATES)} states reached; x never decreases")
+    out.append(f"all {len(STATES)} states reached")
     if verbose:
         for line in out:
             print("  check:", line)
@@ -456,6 +515,35 @@ def _follow_amount(t):
     return 1.0 if f >= 0.999 else smooth(clamp((f - 0.42) / 0.26))
 
 
+T_COW_DRINK = 10.55                # the lead cow looks away from the dog under her chin and lowers her head to drink
+
+
+def _peer_pose(t, tau=10.0):
+    """PEER: at the edge, head right down to the water, both ears forward. When the fish child comes up under
+    its nose the tail starts; they hold nose to nose with the line between them (as the cow and the dog did);
+    the fish waves; when it dives the nose goes after it, into the water, as far as a dry dog can."""
+    dn = dog.ease_back(clamp(tau / 0.4))
+    p = dog.watch(t, alert=1.0)
+    p["cx"] = lerp(p["cx"], 7.0, dn)
+    p["cy"] = p["cy"] - 7.0 * dn
+    p["pitch"] = p.get("pitch", 0.0) - 0.09 * dn
+    p["neck"] = lerp(p["neck"], -0.36, dn)
+    p["head"] = lerp(p["head"], -0.66, dn)
+    p["ear"], p["ear_f"] = 1.15, 1.15
+    p["tail"], p["curl"] = 0.35, 0.3
+    seen = ease(t, FISH_T0 - 0.55, FISH_T0 - 0.15)            # it sees it coming up
+    p["neck"] += 0.16 * seen * (1 - ease(t, FISH_T0 - 0.1, FISH_T0 + 0.3))      # the head comes up a breath: oh
+    p["wag"] = 0.42 * seen * math.sin(2 * math.pi * 1.7 * t)
+    p["tail"] = lerp(p["tail"], 0.55, seen)
+    held = ease(t, FISH_T0, FISH_T0 + 0.3)
+    p["head"] += 0.014 * held * math.sin(2 * math.pi * 3.2 * t)                 # nostrils working
+    after = ease(t, FISH_T1 - 0.25, FISH_T1 + 0.05)            # it dives: the nose goes down after it
+    p["neck"] -= 0.14 * after
+    p["cy"] -= 3.0 * after
+    p["pitch"] -= 0.04 * after
+    return p
+
+
 def _state_pose(state, t, tr, t_in):
     """The pose a state holds at time t (t_in = when the state was entered)."""
     tau = t - t_in
@@ -464,6 +552,11 @@ def _state_pose(state, t, tr, t_in):
     if state == "LISTEN":
         p = _watch_pose(t, tr)               # still watching her go, or the water
         p["ear"] = 0.12                      # the torn ear goes back to the voice; the far ear and the body do not
+        # REPAIR: ... then one look round at who is talking, and away again. It heard. It does not come.
+        a = dog.ease_back(clamp((tau - 0.3) / 0.3)) * (1 - ease(tau, 0.95, 1.3))
+        if a > 0:
+            p = dog.over_shoulder(p, 0.85 * a)
+            p["ear"], p["ear_f"] = lerp(0.12, 0.8, a), lerp(p["ear_f"], 0.85, a)
         return p
     if state == "GLANCE":
         p = dog.over_shoulder(dog.watch(t), dog.ease_back(clamp(tau / 0.24)))     # right round: it looks at the hand
@@ -476,20 +569,60 @@ def _state_pose(state, t, tr, t_in):
         p["ear"], p["ear_f"] = 0.35, 0.6
         return dog.over_shoulder(p, 1 - ease(tau, 0.02, 0.26))                    # and away again: it does not watch it come
     if state == "AWAY":
+        # it has backed in under the lead cow's chin. Her head comes down over it; it looks up at her (not at the
+        # hand), tail going low and slow as it did when they met; when she turns to the water it watches her drink.
         ph = (tr.x(t) - tr.x(tr.t("YIELD") or t_in)) / (dog.STRIDE["walk"] * DOG_S)
-        p = dog.blend(dog.walk(phase=ph), dog.stand(t), ease(tau, 0.0, 0.4))
-        p = _water_look(p, 0.8 * ease(tau, 0.05, 0.5))
-        p["ear"], p["ear_f"] = 0.62, 0.7
-        p["tail"], p["curl"] = 0.16, 0.2
+        p = dog.blend(dog.walk(phase=ph), dog.stand(t), ease(tau, 0.0, 0.35))
+        up = ease(tau, 0.1, 0.5) * (1 - ease(t, T_COW_DRINK - 0.1, T_COW_DRINK + 0.5))
+        p = dog.look_up(p, 0.85 * up)
+        p = _water_look(p, 0.7 * ease(t, T_COW_DRINK + 0.1, T_COW_DRINK + 0.7))
+        p["ear"], p["ear_f"] = lerp(0.62, 0.5, up), lerp(0.7, 0.56, up)
+        p["tail"], p["curl"] = 0.12, 0.25
+        p["wag"] = 0.32 * math.sin(2 * math.pi * 1.15 * tau) * ease(tau, 0.3, 0.7)
         return p
-    if state == "WEIGH_WATER" or state == "WEIGH_AGAIN":
-        p = _water_look(dog.watch(t, alert=1.0), ease(tau, 0.0, 0.55))
-        p["ear"], p["ear_f"] = 1.0, 1.05
+    if state == "SIT":
+        # the person sits; so does the dog, beside the drinking cow. It looks round when the radio is set down
+        # and both ears go up when it comes on; it is still looking that way when she throws her head up.
+        p = dog.sit(tau, settle=0.95)
+        back = ease(t, 13.1, 13.6) * (1 - ease(t, SNORT_T - 0.45, SNORT_T - 0.15))
+        p = dog.over_shoulder(p, 0.9 * back)
+        on = ease(t, 14.0, 14.25)
+        p["ear"], p["ear_f"] = lerp(p["ear"], 1.1, on * back), lerp(p["ear_f"], 1.1, on * back)
+        p["wag"] = 0.25 * math.sin(2 * math.pi * 1.4 * t) * ease(t, 14.1, 14.5) * back      # the tail sweeps the board
+        # ... then the cow's drinking: the head goes to her muzzle and the bubbles coming up at it
+        p = _water_look(p, 0.5 * ease(t, SNORT_T - 0.4, SNORT_T - 0.1))
         return p
+    if state == "RECOIL":
+        # the whole dog at once: up off its haunches and back, ears flat, legs snatched in (dog.startle, on four feet)
+        p = dog.startle(tau * 1.25, floating=False)
+        p["tail"] = min(p["tail"], 0.1)
+        return p
+    if state == "CREEP":
+        # back to the edge, low, neck out, nose first: it wants to know
+        ph = (tr.x(t) - tr.x(t_in)) / (dog.STRIDE["walk"] * DOG_S)
+        p = dog.walk(phase=ph)
+        low = ease(tau, 0.0, 0.25)
+        p["cy"] -= 9.0 * low
+        p["pitch"] = p.get("pitch", 0.0) - 0.05 * low
+        p["neck"], p["head"] = lerp(p["neck"], 0.30, low), lerp(p["head"], -0.28, low)
+        p["ear"], p["ear_f"] = 1.15, 1.15
+        p["tail"], p["curl"], p["wag"] = 0.2, 0.2, 0.0
+        return p
+    if state == "PEER":
+        return _peer_pose(t, tau)
     if state == "WEIGH_PERSON":
-        a = ease(tau, 0.12, 0.6)
-        p = dog.over_shoulder(dog.watch(t), a)
+        # it wants to go after the fish child. It takes two steps back toward the door and looks round: is anyone
+        # going to make it, or stop it? The person keeps still.
+        ph = (tr.x(t) - tr.x(t_in)) / (dog.STRIDE["walk"] * DOG_S)
+        p = dog.blend(dog.walk(phase=ph), dog.watch(t), ease(tau, 0.7, 0.95))
+        p = dog.over_shoulder(p, dog.ease_back(clamp((tau - 0.05) / 0.35)))
         p["ear"], p["ear_f"] = 0.9, 0.95
+        p["tail"], p["curl"] = 0.3, 0.3
+        return p
+    if state == "ASK_COW":
+        # ... then up at the cow, whose nose has gone down to the line where the fish child was, and stopped there
+        p = dog.look_up(dog.watch(t, alert=1.0), 0.7 * ease(tau, 0.05, 0.35))
+        p["ear"], p["ear_f"] = 0.8, 0.85
         return p
     if state == "RESOLVE":
         p = _water_look(dog.watch(0.0, alert=1.0), 1.0)          # t frozen: nothing breathes, nothing flicks
@@ -535,6 +668,11 @@ def _watch_pose(t, tr):
         p = dog.watch(t)
         p["wag"] = 0.2 * math.sin(2 * math.pi * 1.15 * t) * (1 - ease(t, 6.4, 7.2))
         return p
+    if t > T_COW_DRINK + 0.7:
+        return _water_look(dog.watch(t), 0.7)
+    if t < 3.0:                                     # the bell knocks the gate post behind it (1.6): one look round
+        a = dog.ease_back(clamp((t - 1.65) / 0.3)) * (1 - ease(t, 2.4, 2.8))
+        return dog.over_shoulder(dog.watch(t), 0.7 * a) if a > 0 else dog.watch(t)
     return dog.watch(t)
 
 
@@ -553,7 +691,9 @@ def dog_pose(t):
     # the state before, carried on for a moment, so the change runs through the body in order
     t_prev_in = max(tt for tt, s in tr.enters if tt < t_in - 1e-9)
     old = _state_pose(prev, t, tr, t_prev_in)
-    quick = state in ("YIELD", "GLANCE")
+    quick = state in ("YIELD", "GLANCE", "RECOIL")
+    if state == "RECOIL":
+        return dog.blend(old, cur, ease(tau, 0.0, 0.09))
     k = 0.55 if quick else 1.0
     w = dict(ears=ease(tau, 0.0, 0.12 * k), tail=ease(tau, 0.02, 0.22 * k), head=ease(tau, 0.04, 0.34 * k),
              body=ease(tau, 0.08, 0.42 * k), legs=ease(tau, 0.08, 0.42 * k))
@@ -563,21 +703,31 @@ def dog_pose(t):
 # ---- under water: the first crossing and the look at the town ------------------------------------------
 
 T_UNDER = 22.0
-# (time, world x, world y, facing, pitch): the middle of the dog's body
+# (time, world x, world y, facing, pitch): the middle of the dog's body.
+# REPAIR: the critic saw a rigid cut-out sliding left, then right, with two mirror flips in level mid-water. The
+# way down is now one continuous line with the body pointing where it goes: down beside the cow's muzzle until it
+# is nose-down, where it rolls (a dog turns under water by rolling; the paper flips while it is vertical, so no
+# level mirror turn is ever seen); a long pull to the left over the lamps as they come on; a rear up on its tail to
+# look at the lit town, where it rolls again; and it tips over forward, nose down and right, into S2.
 SWIM_KEYS = [
     (22.00, 590.0, 398.0, 1.0, -0.95),
     (22.35, 600.0, 428.0, 1.0, -1.05),
-    (22.80, 609.0, 462.0, 1.0, -0.95),
-    (23.50, 614.0, 496.0, 1.0, -0.50),
-    (24.10, 606.0, 510.0, 1.0, -0.20),
-    (24.60, 582.0, 514.0, -1.0, -0.05),     # it turns to the first lamp coming on, at the left
-    (25.60, 470.0, 510.0, -1.0, -0.05),
-    (26.40, 350.0, 498.0, -1.0, 0.0),
-    (26.90, 282.0, 490.0, -1.0, 0.05),
-    (27.35, 266.0, 494.0, 1.0, -0.35),      # the lights have run past it to the right: it turns after them
+    (22.80, 609.0, 462.0, 1.0, -1.05),
+    (23.40, 616.0, 498.0, 1.0, -1.30),
+    (23.90, 616.0, 524.0, 1.0, -1.52),      # straight down: it rolls here
+    (24.35, 600.0, 544.0, -1.0, -0.95),
+    (24.90, 556.0, 554.0, -1.0, -0.30),
+    (25.70, 466.0, 546.0, -1.0, -0.02),
+    (26.20, 388.0, 534.0, -1.0, 0.10),
+    (26.60, 326.0, 518.0, -1.0, 0.60),      # it pulls up ...
+    (26.92, 288.0, 504.0, -1.0, 1.42),      # ... onto its tail, looking at all of it; it rolls here
+    (27.30, 277.0, 503.0, 1.0, 0.95),
+    (27.65, 283.0, 511.0, 1.0, 0.10),       # and tips over forward, after the lights
     (28.00, 300.0, 530.0, 1.0, -0.72),      # the boundary frame: screen (300, 170), nose down and right, as S2 begins
     (28.60, 372.0, 612.0, 1.0, -0.72),
 ]
+FLIPS = ((23.93, 1.0, -1.0), (26.99, -1.0, 1.0))      # (when, from, to): each while the body is upright
+FLIP_DUR = 0.2
 
 
 def _hermite(keys, t, col):
@@ -600,22 +750,30 @@ def _hermite(keys, t, col):
     return keys[-1][col]
 
 
+def _swim_phase(t):
+    return (t - T_UNDER) * dog.RATE["swim"]
+
+
 def swim_state(t):
     """(x, y, facing, pitch) of the swimming dog at t (world)."""
     x = _hermite(SWIM_KEYS, t, 1)
     y = _hermite(SWIM_KEYS, t, 2)
-    # facing flips like the paper cut-out it is, over 0.5 s centred on the key where the sign changes
-    fac, pitch = SWIM_KEYS[0][3], SWIM_KEYS[0][4]
-    for a, b in zip(SWIM_KEYS, SWIM_KEYS[1:]):
-        if a[0] <= t:
-            u = clamp((t - a[0]) / (b[0] - a[0]))
-            pitch = lerp(a[4], b[4], smooth(u))
-            if a[3] == b[3]:
-                fac = a[3]
-            else:
-                fac = lerp(a[3], b[3], smooth(u))
+    pitch = _hermite(SWIM_KEYS, t, 4)
+    fac = FLIPS[0][1]
+    for tf, a, b in FLIPS:
+        if t >= tf - FLIP_DUR / 2:
+            fac = lerp(a, b, smooth(clamp((t - (tf - FLIP_DUR / 2)) / FLIP_DUR)))
     if abs(fac) < 0.12:
         fac = 0.12 if fac >= 0 else -0.12
+    # the legs drive it: it goes forward in pulls, one for each forepaw, and sags between them
+    k = ease(t, 22.9, 23.4) * (1 - ease(t, 26.6, 27.0))
+    if k > 0:
+        ph = _swim_phase(t)
+        pull = math.sin(2 * math.pi * 2 * (ph - 0.08))
+        s = 1.0 if fac >= 0 else -1.0
+        hx, hy = s * math.cos(pitch), -math.sin(pitch)
+        x += k * (5.5 * pull * hx + 1.5 * math.cos(2 * math.pi * 2 * ph) * hy)
+        y += k * (5.5 * pull * hy - 1.5 * math.cos(2 * math.pi * 2 * ph) * hx)
     return x, y, fac, pitch
 
 
@@ -624,12 +782,20 @@ def swim_pose(t):
     tau = t - T_UNDER
     if tau < 1.6:
         p = dog.swim_down(tau, steep=-pitch)
-        q = dog.swim(tau, pitch=pitch)
+        q = dog.swim(tau, pitch=pitch, effort=1.25)
         p = dog.blend(p, q, ease(tau, 1.0, 1.6))
     else:
-        p = dog.swim(tau, pitch=pitch, effort=0.8)
+        p = dog.swim(tau, pitch=pitch, effort=1.25)
+    # the body bends: the back works with every pull, and it curls into each turn (nose first, rump after)
+    ph = _swim_phase(t)
+    turn = clamp((_hermite(SWIM_KEYS, t + 0.06, 4) - _hermite(SWIM_KEYS, t - 0.06, 4)) / 0.12 / 3.0, -1.0, 1.0)
+    k = ease(t, 22.6, 23.2) * (1 - ease(t, 27.4, 27.8))
+    p["arch"] = p.get("arch", 0.0) + k * (0.15 * math.sin(2 * math.pi * 2 * (ph - 0.2)) - 0.30 * turn)
+    p["neck"] = p["neck"] + k * 0.22 * turn
+    p["head"] = p["head"] + k * 0.20 * turn
+    p["tail"] = p["tail"] - k * 0.35 * turn
     # wonder: under the lamps it looks down at them; the head hangs to see
-    look = ease(t, 24.3, 25.0) * (1 - ease(t, 26.9, 27.3))
+    look = ease(t, 24.6, 25.2) * (1 - ease(t, 26.2, 26.6))
     p["head"] = p["head"] - 0.32 * look
     p["neck"] = p["neck"] - 0.12 * look
     # ... and then it goes down to them: S2's first drawing is dog.swim_down(0.4, steep=0.72)
@@ -662,8 +828,8 @@ def dog_nose(t):
 
 LEAD_DRINK_X = 600.0 - herd.reach("lead")       # where she stands to drink at x = 600
 T_WALK_ON = 5.2                                  # she chews again and walks on (WORLD: cow = passing)
-RIPPLE_T0 = 14.6                                 # the radio is on: the second cow's ears, then up the line
-RIPPLE_STEP = 0.14
+RIPPLE_T0 = 14.15                                # the radio is on: the second cow's ears, then up the line
+RIPPLE_STEP = 0.1
 # where each waits on the path once the line has closed up (d along herd.PATH; 299 is the gate)
 QUEUE = ("second", "mother", "calf", "fourth", "fifth", "sixth")
 # d along herd.PATH (0 the crest, 322 the gate) where each cow stands:
@@ -672,23 +838,43 @@ QUEUE = ("second", "mother", "calf", "fourth", "fifth", "sixth")
 #   SPOTS once the line has closed up: the second with her head in the gate, over the step and the radio.
 HOLD1 = dict(second=104.0, mother=66.0, calf=38.0, fourth=14.0, fifth=0.0, sixth=0.0)
 HOLD2 = dict(second=175.0, mother=112.0, calf=72.0, fourth=40.0, fifth=12.0, sixth=0.0)
-SPOTS = dict(second=264.0, mother=160.0, calf=100.0, fourth=58.0, fifth=22.0, sixth=0.0)
+# REPAIR: the second cow stood at d = 264, where the path is narrower than she is and her fore hooves hung in
+# front of the gate posts: she read as standing ON the fence. She now waits at 214, all four feet on the path.
+SPOTS = dict(second=214.0, mother=148.0, calf=96.0, fourth=58.0, fifth=22.0, sixth=0.0)
 
 
 def _lead_at_water(tau, t0):
-    """The lead cow once she is at the drinking place: drinks; when the dog goes under beside her muzzle
-    she throws her head up, stares at the rings, and brings her nose down to the line where it went."""
+    """The lead cow once she is at the drinking place. REPAIR: she no longer drinks with her head down and hidden
+    for twelve seconds. In order: the dog backs in under her chin, so she puts her head down over it and looks at
+    it (they have met); she drinks; bubbles burst under her nose and she throws her head up, snorting; she stares
+    down at the fish child with the dog; when it dives her nose follows it to the line and stops there, because
+    she is a cow; when the dog goes through beside her muzzle she throws her head up again, and brings it down to
+    the line where a dog was."""
     t = t0 + tau
-    d = herd.drink(t, clamp(tau / 1.2))
-    if t < T_UNDER:
-        if 19.4 < t < 20.6:                      # the second in which the dog decides, she is still too
-            d = herd.drink(19.4, 1.0)
-        return d
+    tr = _trace()
+    t_dog = (tr.t("AWAY") or 9.6) - 0.35                     # the dog is arriving under her chin
+    pose = herd.stand(t, "lead", chew=1.0, alert=0.15)
+    pose["_nose"] = 0.0
+    over = herd.notice(herd.stand(t, "lead", chew=0.0, alert=0.0), 1.0)
+    over.update(pitch=2.5, dy=1.0, shoulder=3.0, neck=50.0, head=-6.0, ear=30.0, eye=1.2, _nose=1.0, _face=62.0)
+    over["head"] += 1.0 * math.sin(2 * math.pi * 3.0 * t) * ease(t, t_dog + 0.6, t_dog + 0.8)       # nostrils
+    pose = herd.tween(pose, over, (t - t_dog) / 0.6, "inout")
+    d = herd.drink(t, clamp((t - T_COW_DRINK) / 1.1))
+    d["_nose"] = 1.0
+    pose = herd.tween(pose, d, (t - T_COW_DRINK) / 0.5, "inout")
     up = herd.notice(herd.stand(t, "lead", chew=0.0, alert=1.0), 1.0)
     up["_nose"] = 0.0
+    pose = herd.tween(pose, up, (t - SNORT_T) / 0.2, "snap")
+    look = herd.tween(up, herd.look_down(t, 1.0), 0.22, "linear")       # head still high and clear of the dog's: she stares
+    look["_nose"] = 0.0
+    pose = herd.tween(pose, look, (t - (SNORT_T + 1.0)) / 0.9, "slow")
+    down = herd.look_down(t if not 19.9 < t < 20.6 else 19.9, 1.0)       # the second the dog decides, she is still too
+    down["_nose"] = 1.0
+    pose = herd.tween(pose, down, (t - (FISH_T1 + 0.1)) / 1.0, "slow")
+    if t < T_UNDER:
+        return pose
     if t < T_UNDER + 0.6:
-        return herd.tween(d, up, (t - T_UNDER) / 0.22, "snap")
-    down = herd.look_down(t, 1.0)
+        return herd.tween(pose, up, (t - T_UNDER) / 0.22, "snap")
     return herd.tween(up, down, (t - (T_UNDER + 0.6)) / 0.8, "slow")
 
 
@@ -758,6 +944,17 @@ def _lead_pose_xy(t):
     return st["pose"], st["x"], st["y"], st["s"], st["facing"]
 
 
+@lru_cache(maxsize=None)
+def _dog_pts_at(k):
+    """The dry-land dog's joints (world) at frame k, from the dog as it is really drawn."""
+    t = k / FPS
+    return dog.draw_dog(Image.new("RGB", (W, H)), dog_pose(t), _trace().x(t), SILL_Y, scale=DOG_S, facing=1, shadow=False)
+
+
+def dog_pts(t):
+    return _dog_pts_at(int(round(t * FPS)))
+
+
 def lead_nose_to(t):
     """The world point the lead cow's muzzle goes to."""
     if t < T_WALK_ON + 0.3:
@@ -765,7 +962,15 @@ def lead_nose_to(t):
         return (n[0] - 9, n[1] - 1)                # her muzzle to the tip of its nose, from behind and above
     if t >= T_UNDER + 0.6:
         return (600.0, 401.0)                    # the line, exactly where the dog went through
-    return (600.0, 400.0)
+    water = (600.0, 400.0)
+    if 8.6 < t < T_COW_DRINK + 0.7:              # the dog under her chin: just above its lifted nose
+        n = dog_pts(min(t, T_COW_DRINK))["nose"]
+        over = (n[0] + 7.0, n[1] - 9.0)
+        f = ease(t, T_COW_DRINK, T_COW_DRINK + 0.6)
+        return (lerp(over[0], water[0], f), lerp(over[1], water[1], f))
+    if t > FISH_T1:
+        return (612.0, 400.5)                    # where the fish child went down: as far as a cow can follow
+    return water
 
 
 # ====================================================================== #
@@ -776,22 +981,32 @@ def lead_nose_to(t):
 #   3.0-5.4   a small push on the two noses (the WEAVE beat is a foot high in the wide).
 #   7.9-10.9  a medium on the hand and the dog: the hand comes, the dog goes exactly as far.
 #   10.9-15.5 the wide again: the sitting, the radio, and the ears going up the hill need the hill.
-#   15.5-21.0 the medium on the dog: the one decision we watch at length; we need the ears.
-#   21.0-21.6 back to the wide for the walk to the water; 22.0-24.0 the crane down, because the dog goes.
+#   14.7-18.1 down and in on the end of the board: the cow's snort, the dog's look, the fish child under the line.
+#   18.1-20.9 back and left: the dog looks round, and the person it looks at is in the frame, not reaching.
+#   20.9-21.6 back to the wide for the walk to the water; 22.0-24.0 the crane down, because the dog goes.
 
 def camera(t):
-    """(oy, zoom, cx, cy): crane offset, and a push about a screen point."""
+    """(oy, zoom, cx, cy): crane offset, and a push about a screen point.
+    REPAIR: the third move used to be a long push on a dog that was standing still. It is now two set-ups with
+    reasons: (c1) 14.7-18.1 down and in on the end of the board, the two heads and the water under them, because
+    that is where the cow has just shown the dog something, and the frame dips so that what is under the line is
+    in the picture; (c2) 18.1-20.9 back and left as the dog looks round, so that the person it is looking at (and
+    their hands, which do not move) is in the frame with it."""
     oy = porch.crane(t, 22.0, 24.0, porch.F_PORCH, porch.F_TOWN)
     z, cx, cy = 1.0, 480.0, 300.0
     a = ease(t, 2.9, 3.7) * (1 - ease(t, 5.3, 6.1))
     if a > 0:
         z, cx, cy = 1 + 0.42 * a, 430.0, 372.0
-    b = ease(t, 7.9, 8.7) * (1 - ease(t, 10.5, 11.2))
+    b = ease(t, 7.9, 8.7) * (1 - ease(t, 10.9, 11.6))
     if b > 0:
-        z, cx, cy = 1 + 0.5 * b, 400.0, 372.0
-    c = ease(t, 15.5, 16.8) * (1 - ease(t, 21.0, 21.6))
-    if c > 0:
-        z, cx, cy = 1 + 0.72 * c, 470.0, 395.0
+        z, cx, cy = 1 + 0.5 * b, 420.0, 372.0
+    c1 = ease(t, 14.7, 15.7) * (1 - ease(t, 18.1, 18.9))
+    c2 = ease(t, 18.1, 18.9) * (1 - ease(t, 20.9, 21.6))
+    if c1 + c2 > 0:
+        z = 1 + 0.78 * c1 + 0.42 * c2
+        cx = (575.0 * c1 + 430.0 * c2) / (c1 + c2)
+        cy = (400.0 * c1 + 392.0 * c2) / (c1 + c2)
+        oy += 58.0 * c1 + 18.0 * c2
     return oy, z, cx, cy
 
 
@@ -853,9 +1068,13 @@ def _title_strokes():
     return out
 
 
+TITLE_ON = False     # REPAIR: the independent critic's condition is that no lettering appears in this sequence at
+                     # any time. The lettering code is kept so the director can put the four words elsewhere.
+
+
 def title(ink, t):
     """THE DOGS OF TROUTTOWN, written on in the violet sky 0.8-1.4, there to 3.2, gone by 3.8."""
-    if t < 0.8 or t > 3.8:
+    if not TITLE_ON or t < 0.8 or t > 3.8:
         return
     strokes = _title_strokes()
     n = len(strokes)
@@ -907,6 +1126,54 @@ def _split_dog(ink, pose, x, y, line_y, facing=1, deep=0.0):
 
 T_TOWN = 24.0                                    # the crane has arrived at F-TOWN
 
+# ---- REPAIR: what the dog sees under the water (the reason it goes) -------------------------------------
+# One of Trouttown's children (the one with the yellow satchel, who in S2 swims up under the cow's nose and waves)
+# comes up to the line under the dog's nose, looks at it, waves, turns over and goes down. No bubble, no picture:
+# those are S2's. Here it is only a small somebody from below who has seen the dog, and whom the dog wants to follow.
+FISH_X = 597.0                                   # under the dog's nose when it peers (measured in `check_fish`)
+FISH_SEED = 2
+FISH_TOP = 461.0                                 # world y of its tail when its head is just under the line
+FISH_RISE = 0.95
+FISH_LEN = 62                                    # px: a child (town.FISH_LEN child = 54, times 0.92..1.1)
+
+
+def fish_state(t):
+    """(x, tail y, tilt, arm, swim) of the fish child at t, or None when it is out of sight."""
+    t0 = FISH_T0 - FISH_RISE
+    if t < t0 or t > FISH_T1 + 1.3:
+        return None
+    up = 1 - (1 - clamp((t - t0) / FISH_RISE)) ** 2.2                     # it comes up fast and slows under the line
+    x = FISH_X + 16 * (1 - up) + 1.5 * math.sin(2.3 * t)
+    y = lerp(FISH_TOP + 150, FISH_TOP, up) + 1.5 * math.sin(3.1 * t)
+    tilt = lerp(10.0, -16.0, ease(t, FISH_T0 - 0.3, FISH_T0 + 0.1))          # it leans back to look up
+    wave = ease(t, FISH_T0 + 0.35, FISH_T0 + 0.55) * (1 - ease(t, FISH_T1 - 0.3, FISH_T1 - 0.1))
+    arm = lerp(16.0, 138.0 + 30.0 * math.sin(2 * math.pi * 2.6 * (t - FISH_T0)), wave)
+    swim = lerp(1.0, 0.25, up)
+    go = t - (FISH_T1 - 0.2)
+    if go > 0:                                                               # over, and down
+        tilt = lerp(tilt, 158.0, smooth(clamp(go / 0.45)))
+        g = clamp(go / 1.5)
+        x += 46.0 * g ** 1.4
+        y += 190.0 * g ** 1.7
+        swim = 1.0
+    return x, y, tilt, arm, swim
+
+
+def _fish_child(ink, t, oy):
+    fs = fish_state(t)
+    if fs is None:
+        # ... its bubbles come up first, under the drinking cow's nose
+        porch.bubbles(ink, t, oy, (602, 520), SNORT_T - 1.25, SNORT_T - 0.5, rate=9.0, seed=5, size=1.15)
+        return None
+    x, y, tilt, arm, swim = fs
+    porch.bubbles(ink, t, oy, (602, 520), SNORT_T - 1.25, SNORT_T - 0.5, rate=9.0, seed=5, size=1.15)
+    n = dog_pts(min(t, FISH_T1 + 0.3))["nose"]
+    a = town.fish(ink, t, town.Cam(oy=oy), x, y, "child", seed=FISH_SEED, length=FISH_LEN, facing=-1, tilt=tilt, arm=arm,
+                  look=(n[0], n[1]), swim=swim, lid=1.0 if abs(t - (FISH_T0 + 0.22)) < 0.06 else 0.0)
+    if t > FISH_T1 - 0.1:
+        porch.bubbles(ink, t, oy, (x - 4, y - 40), FISH_T1 - 0.1, FISH_T1 + 0.9, rate=9.0, seed=8, size=0.8)
+    return a
+
 
 def _trail(ink, t, oy):
     """The bubble trail down from the line at x = 590 to the dog, as the boundary frame has it (and as S2
@@ -949,9 +1216,18 @@ def draw(t, ink):
     rings = []
     t_arr = wk["lead"].plan.keys[3][0]
     k = 0
-    while t_arr + 1.0 + 1.9 * k < min(t, T_UNDER):
-        rings.append(porch.ring(602, t_arr + 1.0 + 1.9 * k, 0.45))
+    while T_COW_DRINK + 1.2 + 1.5 * k < min(t, SNORT_T - 0.2):     # her drinking
+        rings.append(porch.ring(602, T_COW_DRINK + 1.2 + 1.5 * k, 0.45))
         k += 1
+    for k in range(4):                                             # the fish child's bubbles breaking under her nose
+        if t >= SNORT_T - 0.45 + 0.15 * k:
+            rings.append(porch.ring(598 + 5 * k, SNORT_T - 0.45 + 0.15 * k, 0.3 + 0.12 * k))
+    if t >= FISH_T0 - 0.1:
+        rings.append(porch.ring(FISH_X, FISH_T0 - 0.1, 0.4))       # the fish child's head comes up to the line
+    if t >= FISH_T1 + 0.1:
+        rings.append(porch.ring(FISH_X - 6, FISH_T1 + 0.1, 0.55))  # the dog's nose goes in after it
+    if t >= FISH_T1 + 1.0 and t < T_UNDER:
+        rings.append(porch.ring(612, FISH_T1 + 1.0, 0.4))          # the cow's muzzle comes down to the line
     if t >= tr.t("WADE"):
         rings.append(porch.ring(tr.x(tr.t("WADE")) + 30, tr.t("WADE") + 0.1, 0.6))
     if under:
@@ -971,6 +1247,10 @@ def draw(t, ink):
             a = wk[who].draw(ink, t, oy, layer="strip", nose_to=lead_nose_to(t) if who == "lead" else None)
             if a and who == "lead" and T_UNDER <= t < T_UNDER + 2.5:
                 porch.drips(ink, t, oy, a["muzzle"][0], a["muzzle"][1] + oy, t - T_UNDER - 0.1, wet=0.8, width=16, floor=400)
+            if a and who == "lead" and SNORT_T <= t < SNORT_T + 2.2:
+                porch.drips(ink, t, oy, a["muzzle"][0], a["muzzle"][1] + oy, t - SNORT_T - 0.05, wet=0.9, width=16, floor=400)
+                if t < SNORT_T + 0.7:                                # she snorts the water out of her nose
+                    herd.breath(ink, a["muzzle"][0] + 4, a["muzzle"][1] + 2, clamp((t - SNORT_T - 0.08) / 0.5), 1, size=1.2)
 
     def sill(ink, t, oy):
         if st in ("WADE", "UNDER"):
@@ -991,7 +1271,7 @@ def draw(t, ink):
         _trail(ink, t, oy)
         deep = clamp((y - 400) / 60.0)
         pose = swim_pose(t)
-        if y < 430 and abs(fac) > 0.99:
+        if y < 430 and t < 23.0:
             # the moment of going through: head and shoulders already under, the rump and tail still in the air
             layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
             dog.draw_dog(layer, pose, x, y - oy, scale=DOG_S, facing=1, shadow=False)
@@ -1009,7 +1289,9 @@ def draw(t, ink):
                          shadow=False)
 
     def under_water(ink, t, oy):
-        if oy > 20:
+        if not under:
+            _fish_child(ink, t, oy)
+        if under and oy > 20:
             cam = town.Cam(oy=oy)
             lv = _lamps(t)
             town.back(ink, t, cam, lamps=lv, sky=False)
@@ -1021,7 +1303,7 @@ def draw(t, ink):
             _split_dog(ink, dog_pose(t), tr.x(t), y - oy, 400 - oy, deep=tau / 0.4)
         elif under:
             swimmer(ink, t, oy)
-        if oy > 20:
+        if under and oy > 20:
             town.front(ink, t, town.Cam(oy=oy))
 
     def front(ink, t, oy):
@@ -1081,7 +1363,7 @@ def sound(mix, at=0.0):
     S.above(mix, A + 0.0 - 0.1, 22.6 + 0.2, 1.0, 0.2, 0.2)
     S.hush(mix, A + 22.6 - 0.1, SECONDS - 22.6 + 0.2, 1.0, 0.2, 0.2)
     S.crickets(mix, A + 0.5, 21.9, 3)
-    S.duck(mix, A + 19.4, A + 20.6, 0.6, 0.15)
+    S.duck(mix, A + 19.9, A + 20.6, 0.6, 0.15)
     # the radio and the town's lamps (music_s1 takes its own start time)
     S.music_s1(mix, A)
     # the file: hooves from the lead cow's own footfalls, the bell from her own pendulum
@@ -1097,8 +1379,24 @@ def sound(mix, at=0.0):
     S.cowbell(mix, A + 1.6, gain=0.07, pan=S.P_GATE, hard=True)           # against the gate post
     S.collar(mix, A + 3.6, 2, gain=0.04, pan=0.0)                         # the dog's head coming up to hers
     S.cow_breath(mix, A + 3.0 + herd.NOSE_TOUCH["breath"], 1.5, pan=0.1)  # one long breath out, onto the dog
-    S.drinking(mix, A + t_arr + 1.0, 19.3 - (t_arr + 1.0))
-    S.drinking(mix, A + 20.7, 1.2)
+    # REPAIR: the dog under her chin; she drinks; bubbles; her snort; the fish child; the dog's nose in the water
+    S.cow_breath(mix, A + (tr.t("AWAY") or 9.6) + 0.5, 0.9, gain=0.04, pan=0.25)
+    S.tail(mix, A + (tr.t("AWAY") or 9.6) + 0.4, 3, 0.43, gain=0.03, pan=0.2)
+    S.drinking(mix, A + T_COW_DRINK + 1.0, SNORT_T - 0.4 - (T_COW_DRINK + 1.0))
+    S.bubbles(mix, A + SNORT_T - 1.2, 5, 0.8, gain=0.04, pan=0.3, under=False)
+    S.pop(mix, A + SNORT_T - 0.3, gain=0.05, pan=0.3)
+    S.pop(mix, A + SNORT_T - 0.12, gain=0.06, pan=0.3)
+    S.cow_breath(mix, A + SNORT_T + 0.05, 0.6, gain=0.09, pan=0.3)
+    S.cowbell(mix, A + SNORT_T + 0.08, 2, 0.22, gain=0.08, pan=0.3, hard=True)
+    S.drip(mix, A + SNORT_T + 0.4, 3, 0.3, on="water")
+    S.paws(mix, A + SNORT_T + 0.04, 2, 0.1, gain=0.13, pan=0.2)                 # the dog springing back
+    S.collar(mix, A + SNORT_T + 0.06, 2, gain=0.05, pan=0.2)
+    S.paws(mix, A + tr.t("CREEP") + 0.1, 3, 0.2, gain=0.07, pan=0.2, pan_to=0.3, wet=True)
+    S.sniff(mix, A + FISH_T0 + 0.25, 3, gain=0.05, pan=0.3)
+    S.tail(mix, A + FISH_T0 - 0.3, 4, 0.29, gain=0.03, pan=0.2)
+    S.drip(mix, A + FISH_T1 + 0.12, 1, 0.3, on="water")                         # its nose goes in after the fish child
+    S.bubbles(mix, A + FISH_T1, 3, 0.7, gain=0.03, pan=0.3, under=False)
+    S.paws(mix, A + tr.t("WEIGH_PERSON") + 0.15, 2, 0.3, gain=0.08, pan=0.15, pan_to=0.05)
     # second cow comes down to the gate and stops
     sec = wk["second"]
     for (tt, x, y, leg) in sec.hoof_falls(5.0, 8.2)[::2]:
@@ -1110,7 +1408,7 @@ def sound(mix, at=0.0):
     # the reach; the dog goes exactly as far
     ty = tr.t("YIELD")
     S.creak(mix, A + 8.1, 0.4)
-    S.paws(mix, A + ty + 0.1, 3, 0.26, gain=0.12, pan=-0.1, pan_to=0.05)
+    S.paws(mix, A + ty + 0.1, 4, 0.2, gain=0.12, pan=-0.1, pan_to=0.2)
     S.collar(mix, A + ty + 0.15, 2, gain=0.04, pan=-0.05)
     # sits; the radio on the step
     S.creak(mix, A + 11.6)
@@ -1163,8 +1461,8 @@ def main():
         sets = {
             "a_file": [0.0, 0.9, 1.6, 2.4, 3.0, 3.4, 3.75, 4.2, 4.6, 5.0, 5.6, 6.2],
             "b_reach": [6.4, 6.9, 7.4, 7.8, 8.2, 8.6, 9.0, 9.4, 10.0, 10.5, 11.0, 11.8],
-            "c_radio": [12.5, 13.2, 14.0, 14.4, 14.7, 15.0, 15.4, 15.8, 16.4, 17.0, 17.6, 18.2],
-            "d_decide": [18.6, 19.2, 19.5, 20.0, 20.5, 20.8, 21.0, 21.3, 21.6, 21.8, 21.95, 22.0],
+            "c_radio": [12.5, 13.2, 14.0, 14.4, 14.7, 14.95, 15.1, 15.4, 15.8, 16.4, 17.0, 17.6],
+            "d_decide": [17.9, 18.3, 18.8, 19.3, 19.7, 20.2, 20.8, 21.0, 21.3, 21.6, 21.8, 21.95],
             "e_cross": [22.1, 22.25, 22.4, 22.6, 22.9, 23.2, 23.4, 23.7, 24.0, 24.5, 25.0, 25.5],
             "f_town": [26.0, 26.5, 27.0, 27.3, 27.6, 28.0],
         }

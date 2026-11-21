@@ -18,10 +18,18 @@ it also asserts that no two pieces of the strip ever overlap, that the integrato
 half the step, and the board's counts and boundary positions. What can only be judged by looking is in
 the builder's report, not here.
 
-Staging is the board's (films/swarm/dogs/board.md, S4): F-PORCH locked wide for the howl, the
-arrivals and the herder opening the way; ten dogs into the water in the same four frames; a crane
-down through the line; then the town, one master with a slow push so that "at the same time" is one
-frame, two inserts, and the pull back. Times in this file are FILM seconds unless a name says local.
+Staging: the board's (films/swarm/dogs/board.md, S4) events, re-cut after an independent critic found two
+locked wide shots in which nobody could be read (law 10 repair). No wide shot now runs longer than 3.4 s
+(SHOTS). Above the water the close shots are made by _close_frame: the F-PORCH frame without its cast,
+enlarged, and every cow and dog drawn again through a PCam at full sharpness. Three things were added to
+the action because the picture needed them:
+  * the herder first goes straight for the water, where the mother cow is drinking; she noses it back
+    (mother_pose, herder_porch 91.0 to 92.78); THEN it looks up the hill and swings wide;
+  * the pack no longer enters in four frames: the lead goes, the others pour after it, the wooden ones
+    roll off the edge, and the terrier will not jump until the calf noses it in (LAG, T_PUSH);
+  * the lead takes the first part it digs up to the surface at the calf's feet, and the calf smells it
+    (lead_agenda 'rise' / 'show' / 'sink', _lead_up, calf_state), before it lays it at the board.
+Times in this file are FILM seconds unless a name says local.
 
 Exposes SECONDS, draw(t, ink), sound(mix, at).
 """
@@ -183,7 +191,8 @@ T_HOWL = 86.0                                # dog.howl(f - T_HOWL): muzzle up b
 T_PEEL = 91.6                                # the bloodhound peels up off the boards
 T_FELT = 92.8                                # the felt dog lifts its head
 T_GO = 97.0                                  # ten dogs go
-T_LINE = 98.3                                # the bright line passes the camera
+T_LINE = 99.1                                # the bright line passes the camera
+T_CRANE = (98.45, 99.85)                     # the crane down, after the last dog is in
 
 
 def howl_env(f):
@@ -242,16 +251,53 @@ def track(name):
 #  2 · THE CAMERA (data)                                                 #
 # ====================================================================== #
 
-SHOTS = [   # t0, t1 (film), name, kind, why the camera is there
-    (84.0, 97.5, "A porch", "porch", "locked wide: the answer to the howl comes from the edges of the frame"),
-    (97.5, 99.5, "B crane", "crane", "down through the line with ten bubble trails: the pack crosses together"),
-    (99.5, 107.0, "C master", "master", "one frame holds every job: 'at the same time' can only be shown in one frame"),
-    (107.0, 109.0, "D fence", "insert", "close on the herder at the gate: the pages are carried flat, not folded"),
-    (109.0, 111.0, "E bubble", "insert", "close on the bloodhound and the child: the piece taken back to ask"),
-    (111.0, 116.0, "F master", "master", "back to the one frame, then pulled back to the full town with the line on top"),
+class PCam:
+    """The porch seen closer. screen = (world - (x0, y0)) * zoom. PCam(1, 0, oy) is porch.scene's own framing."""
+
+    def __init__(self, zoom=1.0, x0=0.0, y0=0.0):
+        self.zoom, self.x0, self.y0 = float(zoom), float(x0), float(y0)
+        self.oy = self.y0
+
+    @staticmethod
+    def look(wx, wy, zoom):
+        """Centred on world (wx, wy), kept inside the F-PORCH frame (the backdrop is that frame, enlarged)."""
+        return PCam(zoom, clamp(wx - W / 2 / zoom, 0, W - W / zoom), clamp(wy - H / 2 / zoom, 0, H - H / zoom))
+
+    def mix(self, o, u):
+        return PCam(lerp(self.zoom, o.zoom, u), lerp(self.x0, o.x0, u), lerp(self.y0, o.y0, u))
+
+    def xy(self, wx, wy, depth=1.0):
+        return ((wx - self.x0) * self.zoom, (wy - self.y0) * self.zoom)
+
+
+TOWN_OY = 404.0                              # the master below: the bright line is just off the top of frame
+
+SHOTS = [   # t0, t1 (film), name, kind, camera at t0, camera at t1, why the camera is there
+    (84.0, 85.4, "A porch", "porch", None, None, "wide, S3's last frame: the tired dog lifts its head and turns it to the water"),
+    (85.4, 89.0, "B howl", "pclose", PCam.look(528, 340, 2.0), PCam.look(540, 332, 2.25),
+     "on the dog and the mother cow: the howl, and her head coming up dripping to it"),
+    (89.0, 91.0, "C edges", "porch", None, None, "wide: the answer to the howl comes from the edges of the frame"),
+    (91.0, 92.9, "D blocked", "pclose", PCam.look(575, 366, 2.9), PCam.look(585, 366, 3.0),
+     "the herder goes for the water; the mother is drinking there and noses it back; it looks up the hill"),
+    (92.9, 94.35, "E swing", "porch", None, None, "wide: the swing is as wide as the hill"),
+    (94.35, 96.3, "F eye", "pclose", PCam.look(286, 342, 2.9), PCam.look(296, 342, 2.9),
+     "under the fourth cow's chin: the eye, and she steps off the path"),
+    (96.3, 97.45, "G go", "porch", None, None, "wide: the way stands open; the line looks at the lead; they go"),
+    (97.45, T_CRANE[0], "H edge", "pclose", PCam.look(688, 366, 3.0), PCam.look(694, 370, 3.0),
+     "the terrier will not jump; the calf, at the very edge, noses it in"),
+    (T_CRANE[0], T_CRANE[1], "I crane", "crane", None, None, "down through the line with the bubble trails"),
+    (T_CRANE[1], 101.2, "J land", "master", (1.0, 480.0, 540.0), (1.1, 480.0, 540.0), "wide: ten dogs come down onto the bed and fan out"),
+    (101.2, 102.5, "K dig", "town", Cam.look(392, 800, 2.5), Cam.look(400, 792, 2.5), "the lead digs and comes up with a part"),
+    (102.5, 104.1, "L pages", "town", Cam.look(596, 826, 2.5), Cam.look(586, 826, 2.6),
+     "the herder among the class: a child hands it a page"),
+    (104.1, 106.0, "M calf", "pclose", PCam.look(626, 372, 2.7), PCam.look(630, 372, 2.8),
+     "above: the lead comes up at the calf's feet with the part in its mouth; the calf smells it"),
+    (106.0, 107.5, "N row", "town", Cam.look(742, 858, 2.3), Cam.look(760, 858, 2.3), "retrievers set pieces down; the sheepdog walks them into a line"),
+    (107.5, 109.0, "O fence", "town", Cam.look(556, 806, 3.1), Cam.look(556, 806, 3.1), "the herder at the gate: pages carried flat, not folded"),
+    (109.0, 111.0, "P bubble", "town", Cam.look(680, 804, 2.7), Cam.look(680, 804, 2.7), "the bloodhound and the child: the piece taken back to ask"),
+    (111.0, 112.6, "Q holes", "town", Cam.look(400, 846, 2.4), Cam.look(420, 846, 2.4), "three who dig: the terrier, the digger, the lead"),
+    (112.6, 116.0, "R wide", "master", (1.38, 560.0, 500.0), (1.0, 480.0, 540.0), "pulled back to the whole pack working, the line coming in on top"),
 ]
-INSERT_CAM = {"D fence": Cam.look(556, 806, 3.1), "E bubble": Cam.look(680, 804, 2.7)}
-PUSH_C = (480.0, 440.0)                      # the master's push is about this screen point
 
 
 def shot_at(f):
@@ -261,13 +307,17 @@ def shot_at(f):
     return SHOTS[-1]
 
 
+def shot_u(shot, f):
+    return ease(f, shot[0], shot[1])
+
+
 def crane_oy(f):
-    return porch.crane(f, 97.5, 99.5, porch.F_PORCH, porch.F_TOWN)
+    return porch.crane(f, T_CRANE[0], T_CRANE[1], porch.F_PORCH, TOWN_OY)
 
 
-def master_zoom(f):
-    """A very slow push while every job runs (5% by 107, 10% by 113), then the pull back to the full town."""
-    return 1.0 + 0.10 * ramp(f, 101.0, 113.0) * (1 - ease(f, 113.0, 115.4))
+def master_oy(f):
+    """The master sits just under the line; at the very end it rises to F-TOWN, where S5 begins."""
+    return lerp(TOWN_OY, porch.F_TOWN, ease(f, 113.4, 115.6))
 
 
 # ====================================================================== #
@@ -495,8 +545,13 @@ SPOT = {
     "digger": (704.0, 389.0), "sheep": (752.0, 387.0),
 }
 ENTRY = {"mid": 128.0, "big": 180.0, "small": 226.0, "felt": 262.0, "herder": 318.0,
-         "lead": 588.0, "terrier": 644.0, "digger": 708.0, "sheep": 762.0, "blood": 884.0}
-LAG = {"lead": 0, "herder": 1, "sheep": 1, "small": 1, "terrier": 2, "big": 2, "blood": 2, "digger": 3, "mid": 3, "felt": 3}   # frames after 97.0
+         "lead": 588.0, "terrier": 724.0, "digger": 708.0, "sheep": 762.0, "blood": 884.0}
+# frames after 97.0. The lead goes and the pack pours in after it, not in one frame: the wooden ones roll off the
+# edge last, the felt dog (which hears nothing) notices late, and the terrier will not jump at all until the calf
+# noses it in.
+LAG = {"lead": 0, "herder": 2, "sheep": 3, "blood": 4, "big": 5, "digger": 6, "mid": 8, "small": 11, "felt": 14, "terrier": 25}
+TERRIER_EDGE = 704.0                         # where the terrier stands once the calf has skidded into its place
+T_PUSH = T_GO + 25 / FPS - 0.1               # the calf's muzzle arrives on the terrier's rump
 LEAP = 0.30                                  # seconds in the air
 BODY_H = {"lead": 34, "herder": 18, "digger": 20, "big": 22, "mid": 19, "small": 15, "sheep": 24, "blood": 24,
           "terrier": 18, "felt": 12}
@@ -521,13 +576,16 @@ def dive(name, f):
     if f < tg:
         return None
     sx, sy = SPOT[name]
+    if name == "terrier":
+        sx = TERRIER_EDGE + 14.0
     ex = ENTRY[name]
     (px, py), ta = PLACE[name]
     hb = BODY_H[name]
     if f < tg + LEAP:
         u = (f - tg) / LEAP
         x = lerp(sx, ex, u ** 0.9)
-        y = lerp(sy - hb, 406.0, u * u) - 30 * math.sin(math.pi * min(1.0, u * 1.15)) * (1 - 0.4 * u)
+        hop = {"small": 4.0, "mid": 10.0, "big": 14.0, "terrier": 12.0, "felt": 20.0}.get(name, 30.0)   # wheels roll off; the pushed one tips
+        y = lerp(sy - hb, 406.0, u * u) - hop * math.sin(math.pi * min(1.0, u * 1.15)) * (1 - 0.4 * u)
         return dict(phase="air", x=x, y=y, facing=1, pitch=lerp(0.35, -1.0, u), u=u)
     if f >= ta:
         return dict(phase=None, x=px, y=py, facing=1, pitch=0.0, u=1.0)
@@ -570,7 +628,7 @@ def mouth_world(name, f):
 T_YIELD = 94.4                               # the herder's eye is on the fourth cow; the hold runs to 95.0
 T_TURN = 95.0                                # she steps off the pale path
 T_MOTHER = 94.7                              # the mother follows the herd
-T_NOSE = 93.12                               # the herder goes under the mother's nose
+T_NOSE = 92.9                                # the herder goes round under the mother's nose
 LEAD_X, SECOND_X = 806.0, 892.0
 CALF_X = 408.0                               # pressed to her mother's near flank, clear of the dog
 
@@ -617,10 +675,31 @@ def fourth_spot():
     return st["x"], st["y"], st["s"]
 
 
-def draw_hill_cows(ink, f, oy):
+def _cowc(ink, cam, who, pose, x, y, s, facing, nose_to=None, **kw):
+    """herd.cow through a camera (world x, y, nose_to). Returns her anchors in screen pixels."""
+    sx, sy = cam.xy(x, y)
+    nt = cam.xy(*nose_to) if nose_to is not None else None
+    kw.setdefault("rim", herd.rim_at(x))
+    return herd.cow(ink, who, pose, sx, sy, s * cam.zoom, facing, 0, nose_to=nt, **kw)
+
+
+def _walkc(ink, cam, wk, f, layer=None, nose_to=None, **kw):
+    """herd.Walker.draw through a camera."""
+    st = wk.state(f)
+    if layer is not None and st['layer'] != layer:
+        return None
+    far = clamp((0.62 - st['rel']) / 0.5) * 0.5
+    a = _cowc(ink, cam, wk.who, st['pose'], st['x'], st['y'], st['s'], st['facing'], nose_to=nose_to,
+              squash=st['squash'], far=far, **kw)
+    a.update(x=st['x'], y=st['y'], d=st['d'], layer=st['layer'], rest=st['rest'])
+    return a
+
+
+def draw_hill_cows(ink, f, oy, cam=None):
+    cam = cam or PCam(1.0, 0.0, oy)
     c = _cows()
-    c["w6"].draw(ink, f, oy, layer="hill")
-    c["w5"].draw(ink, f, oy, layer="hill")
+    _walkc(ink, cam, c["w6"], f, layer="hill")
+    _walkc(ink, cam, c["w5"], f, layer="hill")
     if f < T_TURN:
         x, y, s = fourth_spot()
         if f < T_YIELD:
@@ -630,9 +709,33 @@ def draw_hill_cows(ink, f, oy):
                 p = herd.tween(p, herd.look_down(f, 0.7, "fourth"), smooth(notice), "inout", "fourth")
         else:
             p = herd.yield_to(f - T_YIELD, "fourth")
-        herd.cow(ink, "fourth", p, x, y, s, -1, oy)
+        _cowc(ink, cam, "fourth", p, x, y, s, -1)
     else:
-        c["w4"].draw(ink, f, oy, layer="hill")
+        _walkc(ink, cam, c["w4"], f, layer="hill")
+
+
+# ---- the mother will not be hurried: the herder goes for the water she is drinking at, and is nosed back ----
+T_RUN = 91.0                                 # the herder leaves the step for the water
+T_MEET = 91.7                                # it is under her chin
+T_SHOVE = (91.82, 92.3)                      # the flat of her muzzle on its chest; it gives way
+HERD_AT = (566.0, 395.0)                     # where it meant to go in
+HERD_BACK = 46.0                             # how far she moves it
+
+
+def shove(f):
+    """How far the herder has been pushed back: 0..1."""
+    return smooth(ramp(f, T_SHOVE[0], T_SHOVE[1]))
+
+
+def herder_blocked_x(f):
+    return HERD_AT[0] - HERD_BACK * shove(f)
+
+
+# ---- the lead comes up at the calf's feet with what it dug (film seconds) ----
+T_RISE = 104.14                              # its head breaks the line
+T_SHOW = (104.14, 105.7)
+SHOW_AT = (588.0, 421.0)                     # the lead's body middle while it floats there (world)
+GEAR_AT = (616.0, 397.0)                     # roughly where the part hangs from its mouth (world)
 
 
 def calf_state(f):
@@ -647,49 +750,94 @@ def calf_state(f):
     x, y = 664.0, 388.5
     ts = T_MOTHER + 1.75
     if f < ts + 0.7:
-        return herd.calf_skid(ramp(f, ts, ts + 0.7)), x, y, 1, ease(f, ts + 0.25, ts + 0.6), 1.0
-    wet = bump((f - 97.22) / 0.5)
-    p = herd.stand(f, "calf", chew=0, alert=1.0 - 0.6 * ease(f, 98.2, 99.2))
-    if f > 98.0:
-        p = herd.tween(p, herd.look_down(f, 1.0, "calf"), ease(f, 98.0, 99.3), "slow", "calf")
+        return herd.calf_skid(ramp(f, ts, ts + 0.7)), x, y, 1, None, 1.0
+    wet = bump((f - (t_go("terrier") + LEAP + 0.02)) / 0.5)
+    p = herd.stand(f, "calf", chew=0, alert=1.0 - 0.6 * ease(f, 99.0, 100.0))
+    if f < T_PUSH + 1.0:                                       # the terrier will not go: head down, one shove
+        tau = f - (T_PUSH - 0.5)
+        if tau > 0:
+            p = herd.tween(p, herd.nudge(tau, "calf"), ease(tau, 0.0, 0.2) * (1 - ease(tau, 1.05, 1.5)), "inout", "calf")
+    if f < 98.95:                                              # it watched the terrier go; then it turns to the water
+        return p, x, y, 1, (ease(f, 98.55, 98.95) if f > 98.55 else None), 1.0 - 0.07 * wet
+    if f > 98.95:
+        p = herd.tween(p, herd.look_down(f, 1.0, "calf"), ease(f, 98.95, 99.8) * (1 - ease(f, T_RISE - 0.1, T_RISE + 0.05)), "slow", "calf")
+    if f > T_RISE - 0.1:
+        # a dog's head comes up out of the water under its nose: head thrown up, a step back; then it comes back
+        # down to smell what the dog is holding, breathes on it, and watches it go
+        jump = ease(f, T_RISE - 0.05, T_RISE + 0.12) * (1 - ease(f, T_RISE + 0.45, T_RISE + 0.8))
+        p = herd.tween(p, herd.calf_skid(0.0), 0.8 * jump, "inout", "calf")
+        x += 9.0 * ease(f, T_RISE, T_RISE + 0.2) * (1 - ease(f, T_RISE + 0.5, T_RISE + 0.9))
+        sm = ease(f, T_RISE + 0.5, T_RISE + 0.75) * (1 - ease(f, T_SHOW[1] + 0.1, T_SHOW[1] + 0.5))
+        if sm > 0:
+            p = herd.tween(p, herd.smell(f - (T_RISE + 0.5), "calf"), sm, "inout", "calf")
+        after = ease(f, T_SHOW[1] + 0.2, T_SHOW[1] + 0.9)
+        if after > 0:
+            p = herd.tween(p, herd.look_down(f, 1.0, "calf"), after, "slow", "calf")
     return p, x, y, -1, None, 1.0 - 0.07 * wet
 
 
-def draw_strip_cows(ink, f, oy, anchors=None):
+def calf_nose_to(f, x):
+    if T_PUSH - 0.5 < f < T_PUSH + 1.0:
+        return (TERRIER_EDGE - 12.0 + 12.0 * ease(f, T_PUSH, T_PUSH + 0.12), SPOT["terrier"][1] - 15.0)
+    if T_RISE + 0.5 <= f < T_SHOW[1] + 0.2:
+        return GEAR_AT
+    if f > 98.95:
+        return (x - herd.reach("calf") - 2, 399.5)
+    return None
+
+
+def mother_pose(f):
+    """Before she leaves: drinking; head up for the howl; and she will not give up her place to a dog."""
+    up = max(_alert(f), ease(f, T_NOSE, T_NOSE + 0.22))
+    p = herd.drink(f, 1.0, "mother")
+    nose = (600.0, 400.0)
+    start = bump((f - (T_MEET - 0.5)) / 0.62)                  # something black is coming fast: her head comes up
+    if start > 0.001:
+        p = herd.tween(p, herd.stand(f, "mother", chew=0, alert=1), 0.9 * smooth(start), "inout", "mother")
+        if start > 0.3:
+            nose = None
+    w = ease(f, T_MEET - 0.05, T_SHOVE[0]) * (1 - ease(f, T_SHOVE[1] + 0.25, T_SHOVE[1] + 0.55))
+    if w > 0.001 and up < 0.5:                                 # and down onto its chest, and across
+        p = herd.tween(p, herd.nudge(f - (T_SHOVE[0] - 0.5), "mother"), w, "inout", "mother")
+        hx = herder_blocked_x(f)
+        nose = (lerp(600.0, hx + 24.0, w), lerp(400.0, 380.0, w))
+    if up > 0.001:
+        p = herd.tween(p, herd.stand(f, "mother", chew=0, alert=1), up, "inout", "mother")
+        if up >= 0.5:
+            nose = None
+    return p, nose
+
+
+def draw_strip_cows(ink, f, oy, anchors=None, cam=None):
+    cam = cam or PCam(1.0, 0.0, oy)
     c = _cows()
     anchors = anchors if anchors is not None else {}
     # the second cow, far right
     p = herd.stand(f, "second", chew=0 if _alert(f) > 0.05 else 1, alert=_alert(f))
     if f > 97.9:
         p = herd.tween(p, herd.look_down(f, 1.0, "second"), ease(f, 97.9, 99.2), "slow", "second")
-    herd.cow(ink, "second", p, SECOND_X, porch.meadow_y(SECOND_X), herd.S, -1, oy)
+    _cowc(ink, cam, "second", p, SECOND_X, porch.meadow_y(SECOND_X), herd.S, -1)
     # the fourth, once she is off the hill face
     if f >= T_TURN:
-        c["w4"].draw(ink, f, oy, layer="strip")
+        _walkc(ink, cam, c["w4"], f, layer="strip")
     # the lead cow (a Walker so that her bell is the herd's own pendulum, driven by her throat)
     nose = None
     if 90.9 <= f < 93.4:
         nose = (SPOT["sheep"][0] - 14, SPOT["sheep"][1] - 44)
     elif f > 97.8:
         nose = (LEAD_X - herd.reach("lead"), 399.0)
-    anchors["lead"] = c["wl"].draw(ink, f, oy, nose_to=nose)
+    anchors["lead"] = _walkc(ink, cam, c["wl"], f, nose_to=nose)
     # the mother
     if f < T_MOTHER:
-        up = max(_alert(f), ease(f, T_NOSE, T_NOSE + 0.22))
-        drink = herd.drink(f, 1.0, "mother")
-        if up > 0.001:
-            p = herd.tween(drink, herd.stand(f, "mother", chew=0, alert=1), up, "inout", "mother")
-            a = herd.cow(ink, "mother", p, 515.0, 388.0, herd.S, 1, oy, nose_to=(600, 400) if up < 0.5 else None)
-        else:
-            a = herd.cow(ink, "mother", drink, 515.0, 388.0, herd.S, 1, oy, nose_to=(600, 400))
+        p, nose = mother_pose(f)
+        a = _cowc(ink, cam, "mother", p, 515.0, 388.0, herd.S, 1, nose_to=nose)
     else:
-        a = c["wm"].draw(ink, f, oy)
+        a = _walkc(ink, cam, c["wm"], f)
     anchors["mother"] = a
     # the calf
     p, x, y, fac, turn, sq = calf_state(f)
-    nose = (x - herd.reach("calf") - 2, 399.5) if f > 98.0 else None
     kw = dict(turn=turn) if turn is not None else {}
-    anchors["calf"] = herd.cow(ink, "calf", p, x, y, herd.S, fac, oy, nose_to=nose, squash=sq, **kw)
+    anchors["calf"] = _cowc(ink, cam, "calf", p, x, y, herd.S, fac, nose_to=calf_nose_to(f, x), squash=sq, **kw)
     return anchors
 
 
@@ -764,12 +912,14 @@ def lead_porch(f):
     return None
 
 
-def draw_lead_porch(ink, f, oy):
+def draw_lead_porch(ink, f, oy, cam=None):
     st = lead_porch(f)
     if st is None:
         return
     p, x, fac, _ = st
-    dog.draw_dog(ink, p, x, SILL_Y - oy, scale=DS, facing=fac)
+    cam = cam or PCam(1.0, 0.0, oy)
+    sx, sy = cam.xy(x, SILL_Y)
+    dog.draw_dog(ink, p, sx, sy, scale=DS * cam.zoom, facing=fac)
 
 
 def _kb_swim(ink, fn, name, cam, st, f, **kw):
@@ -915,7 +1065,18 @@ def draw_terrier_porch(ink, f, cam, where):
             sx, sy = cam.xy(x, y)
             # the hole it came out of stays in the bank
             ink.d.ellipse([hx - 9 * z, hy - 3 * z, hx + 9 * z, hy + 3 * z], fill=(20, 14, 26, 255))
-            kb.terrier(ink, sx, sy, "wait", f - 94.4, scale=TS * z, facing=1 if f < 96.3 else -1)
+            fac = 1 if (f < 96.3 or f > T_GO + 0.25) else -1     # it looks at the lead; then at the water, alone
+            x = lerp(x, TERRIER_EDGE, ease(f, 96.15, 96.6))      # the calf is coming at a trot: out of its way
+            sx, sy = cam.xy(x, y)
+            if f > T_GO:
+                # the others have gone. Up to the edge, a look down, back a step; up again; and the calf settles it
+                edge = 7.0 * bump((f - T_GO - 0.2) / 0.45) + 9.0 * ease(f, T_PUSH - 0.35, T_PUSH - 0.1)
+                peer = -0.5 * max(bump((f - T_GO - 0.2) / 0.45), ease(f, T_PUSH - 0.35, T_PUSH - 0.1))
+                shoved = ease(f, T_PUSH, T_PUSH + 0.1)
+                sx, sy = cam.xy(x + edge + 5.0 * shoved, y)
+                kb.terrier(ink, sx, sy, "wait", f - 94.4, scale=TS * z, facing=fac, look=peer + 0.9 * shoved, rot=-0.25 * shoved)
+            else:
+                kb.terrier(ink, sx, sy, "wait", f - 94.4, scale=TS * z, facing=fac)
         return
     if (dv["phase"] == "air" and where == "front") or (dv["phase"] == "swim" and where == "under"):
         sx, sy = cam.xy(dv["x"], dv["y"])
@@ -980,7 +1141,7 @@ def _sky(x, up=0.0):
 
 SWING = [   # film time, world x, y, layer: out to the right under the mother's nose, up the bank, along the skyline
             # behind the last cow of the queue (the outrun), and down the dark hill face to the head of the line
-    (92.78, 300.0, 393.5, "sill"), (93.2, 590.0, 396.0, "sill"), (93.32, 650.0, 386.0, "strip"), (93.46, 700.0, 340.0, "hill"),
+    (92.78, HERD_AT[0] - HERD_BACK, 394.5, "sill"), (92.98, 596.0, 396.0, "sill"), (93.2, 650.0, 386.0, "strip"), (93.42, 700.0, 340.0, "hill"),
     (93.62, 668.0, _sky(668.0), "hill"), (93.74, 610.0, _sky(610.0), "hill"), (93.88, 520.0, _sky(520.0), "hill"),
     (94.02, 420.0, _sky(420.0), "hill"), (94.14, 330.0, _sky(330.0), "hill"), (94.26, 268.0, 300.0, "hill"),
     (94.4, 252.0, 372.0, "sill"),
@@ -994,12 +1155,25 @@ def herder_porch(f):
         return None
     if f < 89.95:
         return dict(x=188.0, y=392.0, s=HS, facing=1, action="slide", p=ramp(f, 89.2, 89.95), layer="sill")
-    if f < 91.25:
-        u = ramp(f, 89.95, 91.25)
-        return dict(x=lerp(188.0, 300.0, u), y=lerp(392.0, 393.5, u), s=HS, facing=1, action="walk", t=f, layer="sill")
-    if f < SWING[0][0]:
+    if f < 90.6:
+        u = ramp(f, 89.95, 90.6)
+        return dict(x=lerp(188.0, 300.0, u), y=lerp(392.0, 393.5, u), s=HS, facing=1, action="walk", t=f * 1.6, layer="sill")
+    if f < T_RUN:
         return dict(x=300.0, y=393.5, s=HS, facing=1, action="wait", t=f, layer="sill",
-                    look=16 * ease(f, 92.4, 92.6))             # one look along the blocked line
+                    look=16 * ease(f, 90.7, 90.9))             # one look along the blocked line
+    if f < T_MEET:                                             # straight for the water, low and fast
+        u = ramp(f, T_RUN, T_MEET)
+        u = 1 - (1 - u) ** 1.6
+        return dict(x=lerp(300.0, HERD_AT[0], u), y=lerp(393.5, HERD_AT[1], u), s=HS, facing=1,
+                    action="flank" if u < 0.86 else "creep", t=f, layer="sill")
+    if f < SWING[0][0]:
+        # under her chin. Her muzzle comes down on its chest and moves it back; it gives way low, then stands,
+        # looks up at her (she has gone back to drinking), and looks up the hill at the queue: round, then.
+        x = herder_blocked_x(f)
+        if f < T_SHOVE[1] + 0.12:
+            return dict(x=x, y=HERD_AT[1], s=HS, facing=1, action="eye", p=ramp(f, T_MEET, T_SHOVE[0] + 0.1), layer="sill", look=0.0)
+        up = ease(f, T_SHOVE[1] + 0.12, T_SHOVE[1] + 0.3)
+        return dict(x=x, y=HERD_AT[1] - 0.5, s=HS, facing=1, action="wait", t=f, layer="sill", look=45 * up)
     if f < 94.4:
         for (ta, xa, ya, la), (tb, xb, yb, lb) in zip(SWING, SWING[1:]):
             if ta <= f < tb:
@@ -1060,13 +1234,15 @@ def old_dog_state(f):
     return X, Y, "lie", f, 0.0, "sill"
 
 
-def draw_old_dog(ink, f, oy, where):
+def draw_old_dog(ink, f, oy, where, cam=None):
     st = old_dog_state(f)
     if not st or st[5] != where:
         return
     x, y, act, t, p, _ = st
     eye = 0 if 97.2 < f < 97.55 else None
-    ka.old_dog(ink, x, y - oy, OLD[2], 1, act, t=t, p=p, eye=eye)
+    cam = cam or PCam(1.0, 0.0, oy)
+    sx, sy = cam.xy(x, y)
+    ka.old_dog(ink, sx, sy, OLD[2] * cam.zoom, 1, act, t=t, p=p, eye=eye)
 
 
 def pile_spread(f):
@@ -1332,15 +1508,18 @@ def lead_agenda():
     A = Agenda(ta, (px, py), 135.0)
     A.do("land", 0.6, hole=24)
     A.go(_hole_at(39, off)).do("dig", 1.2, hole=39, face=1, find=True)           # digs: a part
-    A.go((352.0, 812.0), kind="carry", speed=70.0).do("lay", 1.2, face=1)        # carries it to the foot of the board
-    A.go((331.0, 829.0)).do("nose", 2.4, face=1, page=4)                         # looks
-    A.go(_hole_at(12, off)).do("dig", 1.1, hole=12, face=1)
-    A.go((360.0, 829.0)).do("nose", 2.2, face=1, page=5)
-    A.go(_hole_at(19, off)).do("dig", 1.0, hole=19, face=1)
-    A.go(_hole_at(27, off)).do("dig", 1.0, hole=27, face=1, find=True)
+    d = math.hypot(SHOW_AT[0] - A.pos[0], SHOW_AT[1] - A.pos[1])
+    A.go(SHOW_AT, kind="rise", speed=d / (T_RISE - A.t), face=1)                 # up with it: each thing dug is shown above
+    A.until(T_SHOW[1], "show", face=1)                                           # head out of the water at the calf's feet
+    A.go((352.0, 812.0), kind="sink", speed=d / 1.45).do("lay", 1.2, face=1)     # and down, to the foot of the board
+    A.go(_hole_at(12, off)).do("dig", 0.9, hole=12, face=1)
+    A.go((331.0, 829.0)).do("nose", 1.0, face=1, page=4)                         # looks
+    A.go(_hole_at(19, off)).do("dig", 0.9, hole=19, face=1)
+    A.go(_hole_at(27, off)).do("dig", 0.9, hole=27, face=1, find=True)
     A.go((356.0, 813.0), kind="carry", speed=70.0).do("lay", 1.2, face=1)
     A.go((303.0, 829.0))
-    A.until(114.35, "wait", face=1)
+    assert A.t < 115.5, A.t
+    A.until(115.37, "wait", face=1)
     A.until(T1 + 2, "nose", face=1, page=3)
     return A
 
@@ -1656,6 +1835,9 @@ def _lead_town(ink, f, cam):
     elif kind == "carry":
         pose = dog.carry_part(f, gait="trot")
         carry = props.part_sprite("gear", t=f, **props.UNDER)
+    elif kind in ("rise", "show", "sink"):
+        pose, carry = lead_float(f, seg, tau, u)
+        return dog.draw_dog(ink, pose, sx, sy, scale=DS * z, facing=seg.facing, carry=carry, **LEAD_UNDER)
     elif kind == "lay":
         pose = dog.lay(tau)
         carry = props.part_sprite("gear", t=f, **props.UNDER) if tau < 0.62 else None
@@ -1665,6 +1847,30 @@ def _lead_town(ink, f, cam):
         pose = dog.stand(f)
     j = dog.draw_dog(ink, pose, sx, sy, scale=DS * z, facing=seg.facing, carry=carry, **LEAD_UNDER)
     return j
+
+
+def lead_float(f, seg, tau, u):
+    """The lead on its way up with the part, holding it out of the water, and on its way down again."""
+    carry = props.part_sprite("gear", t=f, **props.UNDER)
+    if seg.kind == "rise":
+        pose = dog.holding(dog.swim_up(f, steep=0.8), "part")
+        pose = dog.blend(pose, dog.holding(dog.look_up(dog.wait_float(f, pitch=0.5), 0.6), "part"), ease(u, 0.8, 1.0))
+    elif seg.kind == "show":
+        hold_up = ease(tau, 0.45, 0.8)                           # the calf's nose is coming down: it holds it higher
+        pose = dog.holding(dog.look_up(dog.wait_float(f, pitch=0.5 + 0.12 * hold_up), 0.6 + 0.4 * hold_up), "part")
+        pose = dog.blend(pose, dog.holding(dog.swim_down(f, steep=0.5), "part"), ease(f, seg.b - 0.22, seg.b))
+    else:
+        pose = dog.holding(dog.swim_down(f, steep=0.7), "part")
+        pose = dog.blend(pose, dog.carry_part(f, gait="trot"), ease(u, 0.85, 1.0))
+    return pose, carry
+
+
+def lead_at_surface(f):
+    """-> (seg, tau, u, x, y) while the lead is up at the line with the part, else None."""
+    seg, tau, u, x, y = lead_agenda().at(f)
+    if seg.kind in ("rise", "show", "sink") and y < 520.0:
+        return seg, tau, u, x, y
+    return None
 
 
 def _parts_laid(ink, f, cam):
@@ -2033,16 +2239,16 @@ def _calf_from_below(ink, f, cam):
 _OVERRIDE = {}                               # the proof sheet swaps a track for another damping preset
 
 
-def howl_push(f):
-    """A small push toward the dog while it howls, and out again as the answer starts to come from the edges."""
-    return 1.0 + 0.15 * ease(f, 84.7, 86.3) * (1 - ease(f, 88.45, 89.5))
-
-
 def _rings(f):
     rings = []
     for k, tk in enumerate((T_HOWL + 0.45, T_HOWL + 0.95, T_HOWL + 1.45, T_HOWL + 1.95)):
         if f >= tk:
             rings.append(porch.ring(560, tk, 4.0 - 0.3 * k))
+    if f >= T_RISE:                                              # the lead's head through the line, and gone again
+        rings.append(porch.ring(SHOW_AT[0] + 18, T_RISE, 1.3))
+        rings.append(porch.ring(SHOW_AT[0] + 22, T_RISE + 0.35, 0.8))
+    if f >= T_SHOW[1]:
+        rings.append(porch.ring(SHOW_AT[0] + 18, T_SHOW[1], 1.0))
     k = 0
     while T0 - 3 + 1.9 * k < min(f, T_HOWL + 0.2):               # the mother drinking
         rings.append(porch.ring(602, T0 - 3 + 1.9 * k, 0.45))
@@ -2055,44 +2261,45 @@ def _rings(f):
     return rings
 
 
-def _porch_frame(ink, f, oy):
-    """Everything while the porch is in frame (84.0 to 99.5, the crane included) and, at oy 360, the master."""
+def _porch_frame(ink, f, oy, ghost=False):
+    """Everything while the porch is in frame and, at oy >= TOWN_OY, the master below.
+    ghost=True: the place only (light, water, the person, the pile, splashes, drips); the cast is drawn on a
+    scratch sheet so that every anchor is still worked out. A close shot enlarges that and draws the cast sharp."""
     anchors = {}
     cam = Cam(oy=oy)
     in_town = oy > 20
+    scratch = kit.Ink(0, 0) if ghost else None
+
+    def C(ink):
+        return scratch if ghost else ink
 
     def hill(ink, t, oy):
-        draw_hill_cows(ink, f, oy)
-        draw_herder_porch(ink, f, cam, "hill")
+        draw_hill_cows(C(ink), f, oy)
+        draw_herder_porch(C(ink), f, cam, "hill")
 
     def strip(ink, t, oy):
-        draw_strip_cows(ink, f, oy, anchors)
-        draw_herder_porch(ink, f, cam, "strip")
+        draw_strip_cows(C(ink), f, oy, anchors)
+        draw_herder_porch(C(ink), f, cam, "strip")
         if f < 99.8:
-            draw_blood(ink, f, cam, "strip")
+            draw_blood(C(ink), f, cam, "strip")
         a = anchors.get("mother")
         if a and T_HOWL + 0.3 < f < T_HOWL + 3.0:               # her muzzle comes up dripping
             porch.drips(ink, f, oy, a["muzzle"][0], a["muzzle"][1] + oy, f - T_HOWL - 0.35, wet=0.9, width=14, floor=400)
 
     def on_porch(ink, t, oy):
-        draw_old_dog(ink, f, oy, "porch")
+        draw_old_dog(C(ink), f, oy, "porch")
 
     def sill(ink, t, oy):
         props.pile(ink, f, 312, 392 - oy, 5, s=0.6, born=[62.2, 71.5, 75.5, 80.8, 80.9], edge=404 - oy, floor=400 - oy,
                    spread=pile_spread(f))
-        draw_old_dog(ink, f, oy, "sill")
+        draw_old_dog(C(ink), f, oy, "sill")
         if f < 99.8:
-            draw_felt_porch(ink, f, cam, "sill")
-            for nm in ("mid", "big", "small"):
-                draw_retriever(ink, nm, f, cam, "sill")
-            draw_herder_porch(ink, f, cam, "sill")
-            draw_lead_porch(ink, f, oy)
-            draw_terrier_porch(ink, f, cam, "sill")
-            draw_digger_porch(ink, f, cam, "sill")
-            draw_sheep(ink, f, cam, "sill")
+            _sill_dogs(C(ink), f, cam)
         if 97.1 < f < 99.0:                                     # wet through: the old dog, and the calf at the edge
             porch.drips(ink, f, oy, OLD[0] + 20, OLD[1] - 30, f - 97.15, wet=1.0, width=70, floor=392)
-            porch.drips(ink, f, oy, 650, 352, f - 97.2, wet=0.8, width=30, floor=388)
+        tw = t_go("terrier") + LEAP
+        if tw < f < tw + 1.6:
+            porch.drips(ink, f, oy, 650, 352, f - tw, wet=0.8, width=30, floor=388)
 
     def under(ink, t, oy):
         if in_town:
@@ -2101,7 +2308,9 @@ def _porch_frame(ink, f, oy):
             _calf_from_below(ink, f, cam)
         else:
             for nm in PACK:                                     # the moment after the splash, before the crane
-                _draw_swimmer(ink, nm, f, cam)
+                _draw_swimmer(C(ink), nm, f, cam)
+            if not ghost:
+                _lead_up(ink, f, PCam(1.0, 0.0, oy))
         if f < 101.2:
             for q, nm in enumerate(PACK):
                 tg = t_go(nm) + LEAP
@@ -2114,9 +2323,13 @@ def _porch_frame(ink, f, oy):
         for nm in PACK:
             tg = t_go(nm) + LEAP * 0.85
             if f >= tg - LEAP:
-                _draw_air(ink, nm, f, cam)
+                _draw_air(C(ink), nm, f, cam)
             if tg <= f < tg + 1.2:
                 porch.splash(ink, f, oy, ENTRY[nm], f - tg, 1.2 if nm in ("lead", "big", "sheep", "blood") else 0.9, "in", seed=PACK.index(nm))
+        if T_RISE <= f < T_RISE + 1.0:
+            porch.splash(ink, f, oy, SHOW_AT[0] + 18, f - T_RISE, 0.8, "out", seed=31)
+        if T_SHOW[1] - 0.05 <= f < T_SHOW[1] + 1.0:
+            porch.splash(ink, f, oy, SHOW_AT[0] + 18, f - T_SHOW[1] + 0.05, 0.7, "in", seed=32)
 
     q = person_q(f)
     hold = None
@@ -2129,6 +2342,73 @@ def _porch_frame(ink, f, oy):
                 q=q, door=door, hold_a=hold, hand_over_rail=f >= 90.3, radio_on=1.0, pebbles=pebbles_at(f),
                 rings=_rings(f), reed_lean=clamp(lean, 0.0, 1.3), moth_scatter=clamp(track("moths").x(f), 0.0, 1.0),
                 puddles=[(350, 0.7), (405, 0.5)], dusk=0.4)
+
+
+def _sill_dogs(ink, f, cam):
+    draw_felt_porch(ink, f, cam, "sill")
+    for nm in ("mid", "big", "small"):
+        draw_retriever(ink, nm, f, cam, "sill")
+    draw_herder_porch(ink, f, cam, "sill")
+    draw_lead_porch(ink, f, cam.oy, cam)
+    draw_terrier_porch(ink, f, cam, "sill")
+    draw_digger_porch(ink, f, cam, "sill")
+    draw_sheep(ink, f, cam, "sill")
+
+
+def _lead_up(ink, f, cam):
+    """The lead at the line with the part, seen from above the water: what is under the line is in the water's
+    colour, and its head and the part are in the air."""
+    st = lead_at_surface(f)
+    if not st:
+        return None
+    seg, tau, u, x, y = st
+    pose, carry = lead_float(f, seg, tau, u)
+    sx, sy = cam.xy(x, y)
+    z = cam.zoom
+    ly = int(round(cam.xy(0, 401.5)[1]))
+    wet = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    dog.draw_dog(wet, pose, sx, sy, scale=DS * z, facing=seg.facing, carry=carry, **LEAD_UNDER)
+    dry = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    j = dog.draw_dog(dry, pose, sx, sy, scale=DS * z, facing=seg.facing, shadow=False,
+                     carry=props.part_sprite("gear", t=f, wet=1.0))
+    if ly > 0:
+        wet.paste(dry.crop((0, 0, W, min(H, ly))), (0, 0))
+        m = wet.getchannel("A").point(lambda v: int(v * 0.8))   # under the line it is seen through water
+        low = Image.new("L", (W, H), 0)
+        low.paste(m.crop((0, min(H, ly), W, H)), (0, min(H, ly)))
+        low.paste(wet.getchannel("A").crop((0, 0, W, min(H, ly))), (0, 0))
+        wet.putalpha(low)
+    ink.img.paste(wet, (0, 0), wet)
+    _redraw(ink)
+    if ly > 0 and T_RISE - 0.1 < f < T_SHOW[1] + 0.2:           # the line closes round its neck
+        bb = dry.crop((0, max(0, ly - 3), W, min(H, ly + 3))).getbbox()
+        if bb:
+            ink.d.line([(bb[0] - 9 * z, ly), (bb[2] + 9 * z, ly)], fill=(214, 240, 232, 230), width=max(1, int(1.6 * z)))
+    return j
+
+
+def _close_frame(ink, f, cam):
+    """A close shot above the water: the F-PORCH frame without its cast, enlarged (the place, soft, behind), and
+    then every cow and dog drawn again through the camera at full sharpness."""
+    _porch_frame(ink, f, 0, ghost=True)
+    z = cam.zoom
+    ink.img = ink.img.resize((W, H), Image.BICUBIC, box=(cam.x0, cam.y0, cam.x0 + W / z, cam.y0 + H / z))
+    _redraw(ink)
+    draw_hill_cows(ink, f, 0, cam)
+    draw_herder_porch(ink, f, cam, "hill")
+    draw_strip_cows(ink, f, 0, None, cam)
+    draw_herder_porch(ink, f, cam, "strip")
+    if f < 99.8:
+        draw_blood(ink, f, cam, "strip")
+    for where in ("porch", "sill"):
+        draw_old_dog(ink, f, 0, where, cam)
+    if f < 99.8:
+        _sill_dogs(ink, f, cam)
+    _lead_up(ink, f, cam)
+    for nm in PACK:
+        if f >= t_go(nm) + LEAP * 0.85 - LEAP:
+            _draw_air(ink, nm, f, cam)
+        _draw_swimmer(ink, nm, f, cam)
 
 
 def _draw_air(ink, nm, f, cam):
@@ -2177,20 +2457,20 @@ def draw(t, ink):
     f = T0 + t
     shot = shot_at(min(f, T1 - 1e-6))
     kind = shot[3]
+    u = shot_u(shot, f)
     if kind == "porch":
         _porch_frame(ink, f, 0)
-        z = howl_push(f)
-        if z > 1.001:
-            porch.push(ink, 505.0, 352.0, z)
+    elif kind == "pclose":
+        _close_frame(ink, f, shot[4].mix(shot[5], u))
     elif kind == "crane":
         _porch_frame(ink, f, crane_oy(f))
     elif kind == "master":
-        _porch_frame(ink, f, porch.F_TOWN)
-        z = master_zoom(f)
+        _porch_frame(ink, f, master_oy(f))
+        z, cx, cy = (lerp(a, b, u) for a, b in zip(shot[4], shot[5]))
         if z > 1.001:
-            porch.push(ink, PUSH_C[0], PUSH_C[1], z)
+            porch.push(ink, cx, cy, z)
     else:
-        _insert_frame(ink, f, INSERT_CAM[shot[2]])
+        _insert_frame(ink, f, shot[4].mix(shot[5], u))
 
 
 # ====================================================================== #
@@ -2242,7 +2522,9 @@ def sound(mix, at=0.0):
     for k, tk in enumerate(PEB_T):
         S.pebble(mix, A(tk))
     # the herder opens the way
-    S.patter(mix, A(SWING[0][0]), 1.6, pan=-0.3, pan_to=0.5)
+    S.patter(mix, A(T_RUN), T_MEET - T_RUN, pan=-0.4, pan_to=0.15)   # straight for the water
+    S.nose_bump(mix, A(T_SHOVE[0]), gain=0.08, pan=0.15)             # the mother's muzzle on its chest
+    S.patter(mix, A(SWING[0][0]), 1.6, pan=0.1, pan_to=0.5)
     S.hooves(mix, A(T_TURN + 0.1), 5, 0.55, "grass", gain=0.1, pan=-0.2, pan_to=0.1)
     S.hooves(mix, A(T_MOTHER + 0.2), 5, 0.5, "wood", gain=0.09, pan=0.1, pan_to=0.4)
     S.calf(mix, A(T_MOTHER + 0.3), 9, 0.15, pan=0.0, pan_to=0.4)
@@ -2252,7 +2534,12 @@ def sound(mix, at=0.0):
     for nm in PACK:
         S.plunge(mix, A(t_go(nm) + LEAP * 0.85), 0.6 if nm in ("small", "terrier", "felt") else 0.9, gain=0.1, pan=_pan(ENTRY[nm]))
     S.drip(mix, A(97.5), 2, 0.3, pan=-0.1)                    # on the old dog
-    S.drip(mix, A(97.6), 2, 0.3, pan=0.4)                     # on the calf
+    S.nose_bump(mix, A(T_PUSH), gain=0.07, pan=0.45)           # the calf's nose on the terrier
+    S.drip(mix, A(t_go("terrier") + LEAP + 0.15), 2, 0.3, pan=0.45)   # on the calf
+    S.plunge(mix, A(T_RISE), 0.5, gain=0.07, pan=_pan(SHOW_AT[0]))    # the lead's head through the line with the part
+    S.drip(mix, A(T_RISE + 0.2), 4, 0.3, pan=0.2, on="water")
+    S.sniff(mix, A(T_RISE + 0.9), 2, gain=0.05, pan=0.3)              # the calf smells it
+    S.plunge(mix, A(T_SHOW[1]), 0.5, gain=0.06, pan=_pan(SHOW_AT[0]))
     for k, nm in enumerate(PACK):
         S.bubbles(mix, A(T_LINE + 0.1 + 0.05 * k), 3, 1.6, gain=0.03, pan=_pan(ENTRY[nm]))
     # down on the bed
@@ -2355,7 +2642,11 @@ def check(verbose=True):
     # 5 the board's counts
     assert len(PACK) == 10 and len(set(ENTRY.values())) == 10
     goes = [t_go(n) for n in PACK]
-    assert max(goes) - min(goes) <= 3.0 / FPS + 1e-9          # the same four frames
+    quick = sorted(goes)[:7]
+    assert quick[-1] - quick[0] <= 8.0 / FPS + 1e-9           # seven pour in after the lead inside a third of a second
+    assert max(goes) - min(goes) >= 0.9                       # and the last one has to be pushed
+    assert max(s_[1] - s_[0] for s_ in SHOTS if s_[3] in ("porch", "master")) <= 4.0   # no wide shot outstays its welcome
+    assert all(a[1] == b[0] for a, b in zip(SHOTS, SHOTS[1:])) and SHOTS[0][0] == T0 and SHOTS[-1][1] == T1
     out["dive_frames"] = sorted(set(int(round((g - T_GO) * FPS)) for g in goes))
     ht = hole_times()
     assert sorted(ht) == list(range(8, 40)), sorted(ht)

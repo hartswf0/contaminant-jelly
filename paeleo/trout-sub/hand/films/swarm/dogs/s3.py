@@ -49,6 +49,19 @@ Built here (missing elsewhere):
   * cow_state/_gate_layer: herd.py hands a cow from the hill pass to the strip pass at the START of her turn in
     the gate, 93 % wide, so she jumps in front of the gate posts. Here she changes pass edge-on (check() found it).
 
+REPAIR (law 10), after an independent critic who saw only the picture. Sections 1 to 8 are the SCORE: the first
+builder's continuous take, kept whole (check() still measures it). The film is now CUT from it (section 8c, EDL):
+  * nothing is thrown on the door any more (the pale panel of pencil strokes read as a counter over the picture);
+  * four closer cameras on the score (_close: the board's cels drawn again at the closer size, the set out of focus
+    behind and in front of them): the page in the hands at the lamp, the first reel, the calf and the dog and the
+    mother's tongue, the strip and the flange;
+  * two new shots under water (section 8b) in place of the score's digs for rounds three and four: the reel is
+    stuck, the dog's teeth slip, it thinks, it heaves and the reel comes apart (so: half a reel); then the fish
+    child who watched holds up the side that stayed, and the dog needs one rake, for the torn film (so: a strip and
+    a flange). The dive that goes wrong changes the next one;
+  * the drinking cow jerks her head up inside three frames when the dog bursts out under her muzzle (cow_state).
+check() times are score seconds; screen_of() gives where the cut shows them. The sound goes through screen_of().
+
 Joins. Local 0 is S2's last frame (s2.py at 30.0: F-TOWN, the dog at (430, 550) with the page, her muzzle on the
 line, the waver under it, three holes, boot, spool, pin). Local 26 is S4's first frame as s4.py draws it at 84.0:
 door 0.62, dusk 0.4, the dog in s4.lead_porch's own sitting pose at (470, 394), porch's plain crouch, the mother
@@ -338,6 +351,26 @@ def topo(names, t):
     return out
 
 
+class View:
+    """How a cel gets from the world to the picture. The plain view is the board's: screen = world, shifted up by
+    y0 (the crane's offset). A CLOSE view (z > 1) looks at the world rectangle that starts at (x0, y0) and is
+    W/z by H/z: a cel drawn through it is drawn again at z times the size, as sharp as it is in the wide shot
+    (a closer camera, not an enlargement)."""
+
+    def __init__(self, z=1.0, x0=0.0, y0=0.0):
+        self.z, self.x0, self.y0 = float(z), float(x0), float(y0)
+        self.hi = abs(self.z - 1.0) > 1e-6
+
+    def X(self, x):
+        return (x - self.x0) * self.z
+
+    def Y(self, y):
+        return (y - self.y0) * self.z
+
+    def box(self):
+        return (self.x0, self.y0, self.x0 + W / self.z, self.y0 + H / self.z)
+
+
 class Stage:
     """The compositor for one frame. add() a named cel to a pass; play() draws a pass in DAG order. With
     record=True each cel is drawn a second time alone on a clear sheet and its alpha kept in .mattes."""
@@ -345,24 +378,26 @@ class Stage:
     def __init__(self, t, record=False):
         self.t, self.record = t, record
         self.cels = []
+        self.V = View()            # the view cels are drawn through when play() is given none
         self.order = []            # (slot, name) as drawn
         self.mattes = {}
 
     def add(self, name, slot, fn):
         self.cels.append((name, slot, fn))
 
-    def play(self, slot, ink, clip=None):
-        items = [c for c in self.cels if c[1] == slot]
+    def play(self, slot, ink, clip=None, V=None, skip=()):
+        V = V or self.V
+        items = [c for c in self.cels if c[1] == slot and not any(_match(c[0], pat) for pat in skip)]
         for i in topo([c[0] for c in items], self.t):
             name, _, fn = items[i]
-            fn(ink)
+            fn(ink, V)
             ink.d = ImageDraw.Draw(ink.img, "RGBA")
             self.order.append((slot, name))
             if self.record:
                 lay = kit.Ink(self.t, int(round(self.t * FPS)))
                 lay.img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
                 lay.d = ImageDraw.Draw(lay.img, "RGBA")
-                fn(lay)
+                fn(lay, V)
                 a = lay.img.getchannel("A")
                 if clip is not None:                    # the dry_world holdout on everything in the under pass
                     a.paste(0, (0, 0, W, int(clip)))
@@ -454,6 +489,7 @@ T_TURN4 = 21.05
 T_D4 = 21.3                                       # under [79.2]
 
 # ---- round four: a strip and a loose flange (hole 4)
+TUG_GONE, GIVE_T = 16.5, 21.3                     # score seconds: the reel has come apart by; the dog is back down for the rest at
 HOLE_D = town.hole_xy(4)                          # (638, 853)
 T_STRIP = 21.74                                   # takes up the strip on the way: its mouth is already full
 T_DIG_D = 21.8
@@ -1179,6 +1215,19 @@ def cow_state(who, t):
     _gate_layer(st)
     if who == "second" and 8.8 <= t <= 14.3:
         st["nose_to"] = (600.0, 401.0)
+        # the dog bursts up through her drink (T_B2): inside three frames her head is up out of it, eyes wide, ears
+        # back, water falling off her chin. She looks at the wet dog; then she puts her nose back down and goes on
+        # drinking: her tempo is not the dog's. (The first cut had her head stay down through the splash.)
+        k = ramp(t, T_B2 + 0.02, T_B2 + 0.13) * (1 - ease(t, T_B2 + 0.62, T_B2 + 1.12))
+        if k > 0:
+            up = herd.with_(herd.stand(t, "second", chew=0, alert=1.0), eye=1.75, ear=-24.0, neck=-26.0 - 6.0 * bump((t - T_B2) / 0.3), head=16.0,
+                            jaw=3.0)
+            look = herd.with_(herd.stand(t, "second", chew=0, alert=0.8), eye=1.4, ear=30.0, neck=-6.0, head=12.0)     # at the dog, on the board
+            up = herd.tween(up, look, ramp(t, T_B2 + 0.3, T_B2 + 0.55), "inout", "second")
+            pose = herd.tween(st["pose"], up, k, "out", "second")
+            pose = dict(pose)
+            pose["_nose"] = 1.0 - k
+            st["pose"] = pose
     if who == "second" and t >= T_SEC_TURN:                      # in the meadow she turns round too, and chews
         tu = ease(t, T_SEC_TURN, T_SEC_TURN + 0.85)
         st = wk[who].state(40.0)
@@ -1293,6 +1342,7 @@ def calf_state(t):
 
 
 def _draw_cow(ink, who, st, oy, only=None, shadow=0.45):
+    """`oy` is the crane's offset (a number), or a View: through a close view she is drawn again at its size."""
     kw = {}
     if st.get("turn") is not None:
         kw["turn"] = st["turn"]
@@ -1302,6 +1352,15 @@ def _draw_cow(ink, who, st, oy, only=None, shadow=0.45):
     far = clamp((0.62 - rel) / 0.5) * 0.5
     if who == "calf" and rel > 0.95:
         kw["rim"] = 1.0                                   # the lamp finds the calf: it has to read against its mother
+    if isinstance(oy, View):
+        V = oy
+        if not V.hi:
+            oy = int(V.y0)
+        else:
+            nt = st.get("nose_to")
+            kw.setdefault("rim", herd.rim_at(st["x"]))
+            return herd.cow(ink, who, st["pose"], V.X(st["x"]), V.Y(st["y"]), st["s"] * V.z, st["facing"], 0,
+                            nose_to=(V.X(nt[0]), V.Y(nt[1])) if nt else None, far=far, only=only, shadow=shadow, **kw)
     return herd.cow(ink, who, st["pose"], st["x"], st["y"], st["s"], st["facing"], oy,
                     nose_to=st.get("nose_to"), far=far, only=only, shadow=shadow, **kw)
 
@@ -1441,20 +1500,6 @@ def page_in_hand(t):
     return x, y, lerp(0.72, 0.12, up), lerp(-6.0, -14.0, up)
 
 
-def thrown_amount(t):
-    return ease(t, T_UPAT - 0.1, T_UPAT + 0.12) * (1 - ease(t, T_DOWNFROM - 0.02, T_DOWNFROM + 0.18))
-
-
-@lru_cache(maxsize=None)
-def _thrown_image():
-    """What the lamp throws through the child's page: the page's own drawing, the wobbly teeth and the second
-    jaw, large. Dark pencil on light, for props.thrown_frame."""
-    w, h = 320, 180
-    im = Image.new("RGB", (w, h), (246, 240, 226))
-    town.picture(im, "jaw", w / 2, h / 2 + 2, 168, color=(40, 36, 44), width=4)
-    return im
-
-
 # ====================================================================== #
 #  6 · THE THINGS ON THE SILL                                             #
 # ====================================================================== #
@@ -1470,7 +1515,12 @@ def pile_count(t):
 
 def _pile_item(ink, t, oy, k):
     """One thing of the pile, drawn exactly as props.pile draws it (same calls, same numbers), so that the paw
-    print can come when the paw does and the page can be lifted out. check() compares the two at the end."""
+    print can come when the paw does and the page can be lifted out. check() compares the two at the end.
+    `oy` is the crane's offset, or a View (a close view draws the thing again, larger and as sharp)."""
+    if isinstance(oy, View) and oy.hi:
+        return _pile_item_hi(ink, t, oy, k)
+    if isinstance(oy, View):
+        oy = int(oy.y0)
     kind, arg, pw, dx, lift, ang = props.PILE[k]
     s = DS
     x, y = PILE_X, 392.0 - oy
@@ -1502,11 +1552,47 @@ def _pile_item(ink, t, oy, k):
         props.drips(ink, t, px, EDGE_Y - oy, LAID[k] + 0.25, width=22 * s, floor=FLOOR_Y - oy, s=max(0.6, s), seed=k, heavy=0.8)
 
 
+def _pile_item_hi(ink, t, V, k):
+    """_pile_item through a close view: the same thing in the same place, drawn at the view's size."""
+    kind, arg, pw, dx, lift, ang = props.PILE[k]
+    s, z = DS, V.z
+    born = LAID[k]
+    if k == 0 and t >= T_BACKAT:
+        born = T_BACKAT
+    age = t - born
+    if age < 0:
+        return
+    set_ = 1 - clamp(age / 0.32)
+    drop = -7 * s * set_ * set_
+    wage = t - LAID[k]
+    w = 1.0 if wage < 4 else max(0.45, 1 - (wage - 4) / 20)
+    paw = PAWED[k] is not None and t >= PAWED[k]
+    px = V.X(PILE_X + dx * s)
+    if kind == "page":
+        py = V.Y(392.0 - 6.0 * s - lift * s + drop)
+        props.page(ink, px, py, s * z, drawing=arg, flat=0.72, angle=ang, wet=w * 0.6, paw=paw)
+    elif kind in ("reel", "half"):
+        py = V.Y(392.0 - 15.5 * s - lift * s + drop)
+        props.reel(ink, arg, px, py, s * z, tilt=0.62, angle=ang, wet=w, paw=paw, half=kind == "half", loop=0.8, lit=1.0)
+    else:
+        py = V.Y(392.0 - (5.0 if kind in ("strip", "crank") else 8.0) * s - lift * s + drop)
+        sh = props._part_sheet(kind, px, py, s * 0.9 * z, ang, 0.6, w, 0.0, t)
+        if kind in ("flange", "gear"):
+            sh.squash(0.55)
+        sh.lay(ink, 1.0)
+    if wage < 4.2:
+        props.drips(ink, t, px, V.Y(EDGE_Y), LAID[k] + 0.25, width=22 * s * z, floor=V.Y(FLOOR_Y), s=max(0.6, s) * z, seed=k, heavy=0.8)
+
+
 def _pile_puddle(ink, t, oy):
     n = pile_count(t)
     if n <= 0:
         return
     last_x = max(props.PILE[k][3] for k in range(n)) * DS
+    if isinstance(oy, View):
+        V = oy
+        props.puddle(ink, V.X(PILE_X + last_x / 2), V.Y(392.0 + 1.5), (last_x + 60 * DS) * V.z, level=0.45 + 0.55 * n / len(props.PILE), t=t)
+        return
     props.puddle(ink, PILE_X + last_x / 2, 392.0 - oy + 1.5, last_x + 60 * DS, level=0.45 + 0.55 * n / len(props.PILE), t=t)
 
 
@@ -1599,9 +1685,11 @@ def _draw_town(alt, t, camB, look, stg_dog=None):
     town.thing(alt, camB, "boot", BOOT_AT[0] - 34 * shove, BOOT_AT[1] + 3 * shove, 8 - 24 * shove)
     town.thing(alt, camB, "spool", *SPOOL_AT)
     town.thing(alt, camB, "pin", PIN_AT[0], PIN_AT[1], PIN_AT[2])
-    if t < T_STRIP:
+    if TUG_GONE <= t < GIVE_T:                                       # what the tug left: the torn film, and the side still in the gravel
         sx, sy = camB.xy(*STRIP_LIES)
         props.part(alt, sx, sy, DS, "strip", angle=-8, mud=0.8, wet=0, weed=0.5, t=t, **props.UNDER)
+        sx, sy = camB.xy(HOLE_C[0] - 4.0, HOLE_C[1] - 7.0)
+        props.part(alt, sx, sy, DS * 1.62, "flange", angle=20, mud=0.5, wet=0, weed=0.0, t=t, **props.UNDER)
     town.townsfolk(alt, t, camB, look=look)
     wx, wy, wt, wa, home = _waver(t)
     lean = 8.0 - 16.0 * (1 - ease(t, 1.8, 3.2))                      # S2 left them leaning back to look up
@@ -1700,15 +1788,102 @@ def _dog_layer(st, cam, under_tint=0.0):
     return layer, j
 
 
-def draw(t, ink, record=False):
-    """One full 960x540 frame of S3 at local time t (0..26). record=True returns the Stage with every cel's
-    matte (for check()); the picture is the same either way."""
+@lru_cache(maxsize=None)
+def carry_sprite_at(kind, s):
+    """carry_sprite drawn at dog scale s (for a close view: drawn at that size, not enlarged)."""
+    if kind == "page":
+        return props.page_sprite("jaw", s=s, flat=0.42, wet=0.5)
+    if kind == "reel":
+        return props.reel_sprite(props.REEL_FIRST, s=s, tilt=0.8, wet=1)
+    if kind == "half":
+        return props.reel_sprite(props.REEL_HALF, s=s, tilt=0.8, half=True, loop=1.0, wet=1)
+    if kind == "strip":
+        return props.part_sprite("strip", s=s, weed=0.6)
+    if kind == "both":
+        a = props.part_sprite("strip", s=s, weed=0.4)
+        b = props.part_sprite("flange", s=s, weed=0.0, angle=24)
+        im = Image.new("RGBA", (a.width, a.height + int(16 * s)), (0, 0, 0, 0))
+        im.paste(b, (int(-14 * s), int(12 * s)), b)
+        im.paste(a, (int(6 * s), 0), a)
+        return im
+    raise ValueError(kind)
+
+
+def _close(ink, t, stg, V, sharp_strip, cast, scene_kw, drip=None):
+    """A CLOSER CAMERA on the board (not an enlargement of the wide frame). The set is the first builder's
+    plates and cannot be drawn larger, so it is the out-of-focus part of the shot: the wide frame's set, enlarged.
+    What the shot is about is in focus: every cel of the board pass (the dog, what it lays down, the calf, a cow's
+    head over them) and, with sharp_strip, every cow on the strip, is drawn again through V at V.z times the
+    size. The set keeps its depth order round them: the set is rendered twice, with the cast's pass filled black
+    and then white, and the difference of the two is the matte of everything the set draws IN FRONT of that pass
+    (the board over a cow's hooves, the rail, the lamp's light, the water over a wading dog's legs)."""
+    def run(fill):
+        caps = {}
+
+        def strip_cb(ink_, t_, oy_):
+            if sharp_strip:
+                caps["back"] = ink_.img.copy()
+                ink_.img.paste(fill, (0, 0, W, H))
+                ink_.d = ImageDraw.Draw(ink_.img, "RGBA")
+            else:
+                stg.play("strip", ink_)
+
+        def sill_cb(ink_, t_, oy_):
+            caps["mid"] = ink_.img.copy()
+            ink_.img.paste(fill, (0, 0, W, H))
+            ink_.d = ImageDraw.Draw(ink_.img, "RGBA")
+            if drip:                                                 # water running off it (the set's own drops, soft)
+                porch.drips(ink_, t, 0, drip[0], SILL_Y - 34, drip[1], wet=1.0 if t > 22 else 0.8, width=38, floor=SILL_Y + 2, seed=3)
+
+        c2 = dict(cast)
+        c2["strip"], c2["sill"] = strip_cb, sill_cb
+        k = kit.Ink(t, ink.i)
+        k.paper()
+        porch.scene(k, t, 0, cast=c2, **scene_kw)
+        return caps, k.img
+
+    (cb_, fb_), (cw_, fw_) = run((0, 0, 0)), run((255, 255, 255))
+    box = V.box()
+
+    def up(im):
+        return np.asarray(im.convert("RGB").resize((W, H), Image.BICUBIC, box=box), np.float32)
+
+    def matte(b, w):
+        return np.clip(1.0 - (w - b).mean(axis=2, keepdims=True) / 255.0, 0.0, 1.0)
+
+    def sharp(arr, slot):
+        k = kit.Ink(t, ink.i)
+        k.img = Image.fromarray(arr.clip(0, 255).astype(np.uint8))
+        k.d = ImageDraw.Draw(k.img, "RGBA")
+        stg.play(slot, k, V=V)
+        return np.asarray(k.img.convert("RGB"), np.float32)
+
+    if sharp_strip:
+        base = sharp(up(cb_["back"]), "strip")
+        mb, mw = up(cb_["mid"]), up(cw_["mid"])
+        base = mb + (1.0 - matte(mb, mw)) * base
+    else:
+        base = up(cb_["mid"])
+    base = sharp(base, "sill")
+    fb, fw = up(fb_), up(fw_)
+    out = fb + (1.0 - matte(fb, fw)) * base
+    ink.img = Image.fromarray(out.clip(0, 255).astype(np.uint8))
+    ink.d = ImageDraw.Draw(ink.img, "RGBA")
+
+
+def _score_draw(t, ink, record=False, close=None):
+    """One full 960x540 frame of the SCORE (the continuous action, as the first builder staged it) at score time
+    t (0..26). record=True returns the Stage with every cel's matte (for check()); the picture is the same either
+    way. close=dict(z, x0, y0[, strip]) looks at the same moment through a closer camera (see _close): the
+    world rectangle at (x0, y0), W/z wide; the board's cels (and the strip's, with strip=True) are drawn again at
+    that size. draw() is the film: it cuts between the score, close views of it, and the two shots under water."""
     t = clamp(t, 0.0, SECONDS)
-    cam = camera(t)
+    cam = camera(t) if close is None else dict(oy=0.0, sq=0.0, zoom=1.0, cx=W / 2, cy=H / 2)
     oy, sq = cam["oy"], cam["sq"]
     oyi = int(round(oy))
     line_s = LINE - oyi                                   # the surface on screen
     stg = Stage(t, record)
+    stg.V = View(1.0, 0.0, oyi)
     ds = dog_state(t)
     wk = _walkers()
     wet = dog_wet(t)
@@ -1728,76 +1903,97 @@ def draw(t, ink, record=False):
     hill_all.sort(key=lambda it: it[1].get("d", 0.0))                # up the path is further: drawn first
     for i, (who, st) in enumerate(hill_all):
         stg.add("queue.far" if i < len(hill_all) - 1 else "queue.near", "hill",
-                lambda ink_, who=who, st=st: _draw_cow(ink_, who, st, oyi))
+                lambda ink_, V, who=who, st=st: _draw_cow(ink_, who, st, oyi))
 
     # further along the bank first; in the meadow the second cow passes BEHIND the lead cow, and stays behind her
     strip_cows.sort(key=lambda it: (0 if (it[0] == "second" and it[1]["x"] > 640) else 1, -it[1]["x"]))
     for who, st in strip_cows:
-        def body(ink_, who=who, st=st):
-            a = _draw_cow(ink_, who, st, oyi)
+        def body(ink_, V, who=who, st=st):
+            a = _draw_cow(ink_, who, st, V)
             cache[who] = a
         stg.add("cow.%s.body" % who, "strip", body)
     lead_st = cow_state("lead", t)
     lead_head = t < T_B1 + 0.1 and lead_st.get("nose_to") is not None and t > 0.7
     if lead_head:                                                    # SUBLAYER: her head, over the board
-        stg.add("cow.lead.head", "sill", lambda ink_: _draw_cow(ink_, "lead", lead_st, oyi, only="head"))
+        stg.add("cow.lead.head", "sill", lambda ink_, V: _draw_cow(ink_, "lead", lead_st, V, only="head"))
     if cs["layer"] != "hill":
-        def calf_cel(ink_):
-            cache["calf"] = _draw_cow(ink_, "calf", cs, oyi, shadow=0.5)
+        def calf_cel(ink_, V):
+            cache["calf"] = _draw_cow(ink_, "calf", cs, V, shadow=0.5)
         stg.add("calf", "sill" if cs["on_sill"] else "strip", calf_cel)
     m_st = cow_state("mother", t)
     if T_LICK - 0.05 <= t <= T_LICK + 0.9 and m_st["layer"] == "strip":
-        def mhead(ink_):                                             # SUBLAYER: her head, over her calf
-            a = _draw_cow(ink_, "mother", m_st, oyi, only="head")
+        def mhead(ink_, V):                                          # SUBLAYER: her head, over her calf
+            a = _draw_cow(ink_, "mother", m_st, V, only="head")
             lk = bump((t - T_LICK - 0.08) / 0.5)
             if lk > 0:                                               # the tongue, once, over the top of its head
                 mx, my = a["mouth"]
-                tx = mx - 4 + 14 * clamp((t - T_LICK - 0.08) / 0.5)
-                ink_.d.line([(mx, my), (tx, my + 6), (tx + 5, my + 12)], fill=(226, 138, 142, 255), width=5)
-                ink_.d.line([(mx, my), (tx, my + 6), (tx + 5, my + 12)], fill=(246, 178, 176, 255), width=2)
+                z = V.z
+                tx = mx - 4 * z + 14 * z * clamp((t - T_LICK - 0.08) / 0.5)
+                ink_.d.line([(mx, my), (tx, my + 6 * z), (tx + 5 * z, my + 12 * z)], fill=(226, 138, 142, 255), width=int(round(5 * z)))
+                ink_.d.line([(mx, my), (tx, my + 6 * z), (tx + 5 * z, my + 12 * z)], fill=(246, 178, 176, 255), width=int(round(2 * z)))
         stg.add("cow.mother.head", "sill" if cs["on_sill"] else "strip", mhead)
 
     # ---------------------------------------------------------------- the board: shadows, pile, page, dog
-    def shadows(ink_):
-        _pile_puddle(ink_, t, oyi)
+    def shadows(ink_, V):
+        _pile_puddle(ink_, t, V)
         if ds["where"] in ("sill", "wade") and ds.get("depth", 0) < 8:
-            contact_shadow(ink_, ds["x"], SILL_Y - oyi + 1.5, 44, 0.75)
+            contact_shadow(ink_, V.X(ds["x"]), V.Y(SILL_Y + 1.5), 44 * V.z, 0.75)
         elif ds["where"] == "air" and ds["facing"] < 0:              # the shadow is on the board before the dog is
             tb = max(tb_ for tb_, _ in BREACHES if tb_ <= t)
             land = {T_B1: (X_SHAKE, T_L1), T_B2: (X_LAY2, T_L2), T_B3: (X_LAY3, T_L3), T_B4: (X_LAY4, T_L4)}[tb]
             k = ease(t, tb + 0.1, land[1])
-            contact_shadow(ink_, land[0], SILL_Y - oyi + 1.5, 20 + 24 * k, 0.75 * k)
+            contact_shadow(ink_, V.X(land[0]), V.Y(SILL_Y + 1.5), (20 + 24 * k) * V.z, 0.75 * k)
     stg.add("shadow.sill", "sill", shadows)
-    stg.add("felt", FELT_PASS, lambda ink_: _felt(ink_, oyi))
+    stg.add("felt", FELT_PASS, lambda ink_, V: _felt(ink_, oyi))
 
     ph = page_in_hand(t)
     for k in range(5):
         if t >= LAID[k] and not (k == 0 and ph is not None):
-            stg.add("pile.%d" % k, "sill", lambda ink_, k=k: _pile_item(ink_, t, oyi, k))
+            stg.add("pile.%d" % k, "sill", lambda ink_, V, k=k: _pile_item(ink_, t, V, k))
     if ph is not None:
-        stg.add("page.hand", "sill", lambda ink_: props.page(ink_, ph[0], ph[1] - oyi, DS, "jaw", flat=ph[2], angle=ph[3], wet=0.5, paw=True))
+        stg.add("page.hand", "sill", lambda ink_, V: props.page(ink_, V.X(ph[0]), V.Y(ph[1]), DS * V.z, "jaw", flat=ph[2], angle=ph[3], wet=0.5, paw=True))
 
-    def dog_extras(ink_, j):
+    def dog_extras(ink_, j, V=None):
+        V = V or stg.V
         if ds["bits"] and ds["bits"][0]:
-            dog.draw_bits(ink_, ds["bits"][0], ds["bits"][1], ds["bits"][2] - oyi, DS, facing=ds["facing"])
-        if 0.0 < wet < 4.0 and ds["where"] in ("sill", "wade"):
+            dog.draw_bits(ink_, ds["bits"][0], V.X(ds["bits"][1]), V.Y(ds["bits"][2]), DS * V.z, facing=ds["facing"])
+        if 0.0 < wet < 4.0 and ds["where"] in ("sill", "wade") and not V.hi:
             porch.drips(ink_, t, oyi, ds["x"], SILL_Y - 34, wet, wet=1.0 if t > 22 else 0.8, width=38, floor=SILL_Y + 2, seed=3)
 
-    if ds["anchor"] == "ground":
+    if close is not None:
+        def dog_close(ink_, V):                                      # the whole dog, once, at the close view's size
+            s = DS * V.z
+            layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+            dy = 0.0 if ds["anchor"] == "body" else ds.get("depth", 0.0)
+            j = dog.draw_dog(layer, ds["pose"], V.X(ds["x"]), V.Y(ds["y"] + dy), scale=s, facing=ds["facing"], carry=None,
+                             anchor=ds["anchor"], shadow=False)
+            if ds["carry"] and ds["pose"].get("hold", 1.0) >= 0.5:
+                item = carry_sprite_at(ds["carry"], round(s, 3))
+                mx, my = j["mouth"]
+                dog._composite(layer, item, int(mx - item.width / 2), int(my - 2 * s))
+            if ds["where"] in ("wade", "air"):                       # HOLDOUT waterline, as in the wide shot
+                _split_paste(ink_, layer, V.Y(LINE), deep=0.3)
+            else:
+                ink_.img.paste(layer, (0, 0), layer)
+                ink_.d = ImageDraw.Draw(ink_.img, "RGBA")
+            cache["dogj"] = j
+            dog_extras(ink_, j, V)
+        stg.add("dog", "sill", dog_close)
+    elif ds["anchor"] == "ground":
         if ds["where"] == "wade" and ds.get("depth", 0) > 0.5:
-            def wade_below(ink_):                                    # HOLDOUT waterline, standing in the creek
+            def wade_below(ink_, V):                                 # HOLDOUT waterline, standing in the creek
                 layer, j = _dog_layer(ds, cam)
                 cache["split"] = _split_paste(ink_, layer, line_s, deep=0.3, above=False)
                 cache["dogj"] = j
 
-            def wade_above(ink_):
+            def wade_above(ink_, V):
                 layer, j = _dog_layer(ds, cam)
                 _split_paste(ink_, layer, line_s, below=False)
                 dog_extras(ink_, j)
             stg.add("dog.below", "under", wade_below)
             stg.add("dog.above", "front", wade_above)
         else:
-            def onboard(ink_):
+            def onboard(ink_, V):
                 carry = carry_sprite(ds["carry"]) if ds["carry"] else None
                 j = dog.draw_dog(ink_, ds["pose"], ds["x"], ds["y"] - oyi, scale=DS, facing=ds["facing"], carry=carry, shadow=False)
                 cache["dogj"] = j
@@ -1805,23 +2001,23 @@ def draw(t, ink, record=False):
             stg.add("dog", "sill", onboard)
     elif ds["where"] == "air" or crossing:
         if ds["y"] < LINE - 62 or (ds["where"] == "air" and ds["y"] < LINE - 34 and ds["facing"] < 0):
-            def inair(ink_):
+            def inair(ink_, V):
                 layer, j = _dog_layer(ds, cam)
                 ink_.img.paste(layer, (0, 0), layer)
                 cache["dogj"] = j
             stg.add("dog", "front", inair)
         else:
-            def below(ink_):
+            def below(ink_, V):
                 layer, j = _dog_layer(ds, cam)
                 cache["split"] = _split_paste(ink_, layer, sq_y(LINE, oy, sq), deep=clamp((ds["y"] - LINE) / 60), above=False)
                 cache["dogj"] = j
-            def above(ink_):
+            def above(ink_, V):
                 layer, j = _dog_layer(ds, cam)
                 _split_paste(ink_, layer, sq_y(LINE, oy, sq), below=False)
             stg.add("dog.below", "under", below)
             stg.add("dog.above", "front", above)
     else:
-        def swimmer(ink_):
+        def swimmer(ink_, V):
             if ds["silt"]:
                 hx, hy = ds["silt"][0]
                 _silt(ink_, hx, sq_y(hy, oy, sq) + 4, ds["silt"][1] - 0.2, 1.0, seed=int(hx))
@@ -1838,10 +2034,10 @@ def draw(t, ink, record=False):
     town_seen = oyB > 34
     if town_seen:
         look = dog_w if (under_now or crossing or t < 2.0) else ((600, 400) if 8.8 < t < 14 else (480, 400))
-        stg.add("town", "under", lambda ink_: _draw_town(ink_, t, camB, look))
-        stg.add("weed", "under", lambda ink_: town.front(ink_, t, camB))
+        stg.add("town", "under", lambda ink_, V: _draw_town(ink_, t, camB, look))
+        stg.add("weed", "under", lambda ink_, V: town.front(ink_, t, camB))
 
-    def bubbles(ink_):
+    def bubbles(ink_, V):
         def src(te):
             s2 = dog_state(te)
             if s2["anchor"] != "body" or s2["where"] not in ("swim", "dig"):
@@ -1857,7 +2053,7 @@ def draw(t, ink, record=False):
     stg.add("bubbles", "under", bubbles)
 
     # ---------------------------------------------------------------- thrown water
-    def splash(ink_):
+    def splash(ink_, V):
         for tb, xb in BREACHES:
             if tb - 0.02 <= t <= tb + 1.2:
                 porch.splash(ink_, t, oyi, xb, t - tb, {T_B1: 1.15, T_B2: 1.0, T_B3: 0.8, T_B4: 0.65}[tb], "out", seed=int(tb * 10))
@@ -1911,16 +2107,21 @@ def draw(t, ink, record=False):
         return f
 
     def porch_pass(ink_, t_, oy_):
-        a = thrown_amount(t)
-        if a > 0:
-            props.thrown_frame(ink_, props.REEL_TEETH, (46, 176 - oyi, 166, 296 - oyi), a, image=_thrown_image())
+        # Nothing is thrown on the door. (The first cut had the lamp throw the page's drawing there; a stranger read
+        # the pale panel of pencil strokes as a counter laid over the picture. The door stays a door; the page is
+        # seen large where it is laid, and lit in the hand that lifts it.)
         stg.play("porch", ink_)
 
     cast = {s: cb(s) for s in ("hill", "strip", "sill", "under", "front")}
     cast["porch"] = porch_pass
-    porch.scene(ink, t, oyi, cast=cast, dusk=dusk_at(t), door=door_at(t), q=person_q(t), hand_over_rail=hand_over_rail(t),
-                radio_at="step", radio_on=1.0, pebbles=pebble_string(t), rings=_rings(t),
-                puddles=[pd for pd in puddles_at(t) if pd[1] > 0.02])
+    scene_kw = dict(dusk=dusk_at(t), door=door_at(t), q=person_q(t), hand_over_rail=hand_over_rail(t),
+                    radio_at="step", radio_on=1.0, pebbles=pebble_string(t), rings=_rings(t),
+                    puddles=[pd for pd in puddles_at(t) if pd[1] > 0.02])
+    if close is not None:
+        _close(ink, t, stg, View(close["z"], close["x0"], close["y0"]), close.get("strip", False), cast, scene_kw,
+               drip=(ds["x"], wet) if (0.0 < wet < 4.0 and ds["where"] in ("sill", "wade")) else None)
+        return stg
+    porch.scene(ink, t, oyi, cast=cast, **scene_kw)
 
     # S2 ended looking at the dry world from below (town.back's sky). For the first half second that is still
     # how the strip above the line looks; then it is the bank itself, coming down into frame.
@@ -1960,6 +2161,488 @@ def draw(t, ink, record=False):
 
 
 # ====================================================================== #
+#  8b · UNDER, CLOSE: the two shots the score did not have                #
+# ====================================================================== #
+# The first cut's three dives were one beat three times: nothing was in the dog's way and what it brought up
+# was a 20 px blob. Round three is now a shot of its own, down at the gravel: the reel is STUCK. The dog pulls
+# and its teeth slip; it looks; it braces and heaves, and the reel comes apart in its mouth: one side stays in
+# the gravel and the film tears. That is why it comes up with half a reel. Round four answers it in the same
+# framing: no blind dig this time; the fish child who watched (the waver, who waved at the cow in S2) has pulled
+# the stuck side out and holds it up, and the dog frees the torn film with one rake and takes the piece from the
+# child's fin. That is why it comes up with a strip and a flange. Both shots are town.py's own town through a
+# zoomed town.Cam (drawn at that size, not enlarged) with the dog and the things drawn at the same zoom.
+
+U_ZOOM = 2.8
+U_LOOK = (594.0, 803.0)                           # the world point both shots are centred on
+TUG_LEN, GIVE_LEN = 50 / FPS, 29 / FPS
+TUG_T = 15.6                                      # the score second the tug begins at (for the town's own clocks); GIVE_T is above
+TUG_XA = HOLE_C[0] + 69.0                         # where the dog stands to pull (its mouth reaches the reel's rim)
+REEL_R = 14.5                                     # the reel's radius in world px (a 48 px lid at dog scale)
+REEL_AT = (HOLE_C[0] - 4.0, HOLE_C[1] - 7.0)      # the middle of the reel as it sits in the gravel, a third of it in
+FLANGE_S = 1.62                                   # props' flange is 30 px; a side of THIS reel is as big as its lid
+U_PULL, U_SLIP, U_THINK, U_GRIP2, U_SNAP, U_TEAR = 0.46, 0.94, 1.12, 1.44, 1.74, 1.92
+GIVE_KID = (580.0, 849.0)                         # where the waver stands with the flange
+V_LAND, V_FREE, V_TAKE, V_OFF = 0.30, 0.60, 0.88, 0.98
+UT = dict(tint=TEAL, tint_amount=0.17)
+UT_THING = dict(tint=TEAL, tint_amount=0.2)
+
+
+def _ucam():
+    return town.Cam.look(U_LOOK[0], U_LOOK[1], U_ZOOM)
+
+
+@lru_cache(maxsize=None)
+def _mouth_of(key):
+    """Where the mouth is, in world px from the ground point, for a named ground pose (facing left)."""
+    j = dog.draw_dog(Image.new("RGB", (8, 8)), _TUG_POSES[key](), 0, 0, scale=DS, facing=-1, shadow=False)
+    return j["mouth"]
+
+
+def _p_grip():
+    return _w(dog.dig(0.2), neck=0.05, head=-0.62, jaw=0.34, ear=0.95, ear_f=1.0, tail=0.7, curl=0.5, hold=1.0)
+
+
+def _p_pull(k=1.0):
+    """Hauling on it: forefeet braced, the whole dog leaning back off its teeth. k 0..1 is how hard."""
+    g = _p_grip()
+    return _w(g, cx=g["cx"] - 20 * k, cy=g["cy"] - 5 * k, pitch=g["pitch"] + 0.2 * k, arch=0.1 * k, neck=0.05 + 0.12 * k, head=-0.62 + 0.2 * k,
+              fnx=g["fnx"] + 9 * k, ffx=g["ffx"] + 12 * k, hnx=g["hnx"] - 5 * k, hfx=g["hfx"] - 3 * k,
+              ear=lerp(0.95, 0.12, k), ear_f=lerp(1.0, 0.1, k), tail=lerp(0.7, -0.15, k), eye=1.0 + 0.25 * k, jaw=0.3)
+
+
+def _p_slipped():
+    """Its teeth have come off: it sits down hard on nothing, head thrown up, ears flying."""
+    q = dog.sit(1.0)
+    return _w(q, cx=q["cx"] - 16, neck=1.05, head=0.32, ear=1.25, ear_f=1.3, eye=1.4, jaw=0.25, tail=0.9, curl=0.2, pitch=q["pitch"] + 0.12)
+
+
+def _p_think():
+    """Sat back, looking down at the thing that would not come. One ear cocked."""
+    q = dog.sit(1.4)
+    return _w(q, cx=q["cx"] - 8, neck=0.34, head=-0.5, ear=1.12, ear_f=0.28, eye=1.05, jaw=0.0, tail=0.25, curl=0.5)
+
+
+def _p_grip2():
+    """The second way: chest right down, both forefeet planted wide against the pit's edge, a mouthful of it."""
+    g = _p_grip()
+    return _w(g, cy=g["cy"] - 7, pitch=g["pitch"] - 0.1, neck=-0.02, head=-0.6, jaw=0.5, fnx=g["fnx"] + 16, ffx=g["ffx"] + 4,
+              ear=0.3, ear_f=0.34, tail=1.0, eye=1.15)
+
+
+_TUG_POSES = {"grip": _p_grip, "pull": _p_pull, "grip2": _p_grip2}
+
+
+def _tug_dog(u):
+    """The dog in the tug -> dict(pose, x, y, facing, anchor, grip 0..1 (teeth on the rim), strain, has (it has the half))."""
+    gy = GY_C
+    out = dict(x=TUG_XA, y=gy, facing=-1, anchor="ground", grip=0.0, strain=0.0, has=False)
+    if u < U_PULL:
+        # it is already raking at it as we cut in; then its nose goes to the rim
+        d = dog.dig(u + 0.5, rate=3.4)
+        w = ease(u, U_PULL - 0.14, U_PULL)
+        out.update(pose=dog.blend(d, _p_grip(), w), grip=w, bits=u < U_PULL - 0.1)
+        return out
+    if u < U_SLIP:
+        k = ease(u, U_PULL, U_PULL + 0.2)                        # it leans back off its teeth... and it does not come
+        tremble = math.sin(2 * math.pi * 11 * u) * ease(u, U_PULL + 0.15, U_PULL + 0.3)
+        p = _p_pull(k * (1.0 + 0.05 * tremble))
+        out.update(pose=p, grip=1.0, strain=k)
+        return out
+    if u < U_THINK:
+        w = ease(u, U_SLIP, U_SLIP + 0.09)                       # the teeth slip: three frames
+        back = dog.ease_back(clamp((u - U_SLIP) / 0.16))
+        p = dog.blend(_p_pull(1.0), _p_slipped(), clamp(back))
+        out.update(pose=p, grip=1.0 - w)
+        return out
+    if u < U_GRIP2:
+        w = ease(u, U_THINK, U_THINK + 0.14)                     # it looks at the thing. THE HOLD: it is thinking
+        p = dog.blend(_p_slipped(), _p_think(), w)
+        p = dog._breathe(p, u) if hasattr(dog, "_breathe") else p
+        out.update(pose=p)
+        return out
+    if u < U_SNAP - 0.14:
+        w = dog.ease_back(clamp((u - U_GRIP2) / 0.14))           # down again, lower, both forefeet planted
+        out.update(pose=dog.blend(_p_think(), _p_grip2(), clamp(w)), grip=ease(u, U_GRIP2 + 0.06, U_GRIP2 + 0.14))
+        return out
+    if u < U_SNAP:
+        k = ease(u, U_SNAP - 0.14, U_SNAP)                       # the heave: the hind end comes up off the gravel
+        g = _p_grip2()
+        p = _w(g, cx=g["cx"] - 12 * k, cy=g["cy"] + 4 * k, pitch=g["pitch"] + 0.3 * k, hny=10 * k, hfy=14 * k, hnx=g["hnx"] + 8 * k,
+               neck=g["neck"] + 0.2 * k, head=g["head"] + 0.15 * k, ear=0.1, ear_f=0.1, eye=1.3)
+        out.update(pose=p, grip=1.0, strain=1.0)
+        return out
+    # it comes apart: the dog goes over backwards through the water with half of it
+    g = _p_grip2()
+    p0 = _w(g, cx=g["cx"] - 12, cy=g["cy"] + 4, pitch=g["pitch"] + 0.3, hny=10, hfy=14, hnx=g["hnx"] + 8, neck=g["neck"] + 0.2, head=g["head"] + 0.15,
+            ear=0.1, ear_f=0.1, eye=1.3)
+    q0, bx0, by0 = _as_body(p0, TUG_XA, gy, -1)
+    a = u - U_SNAP
+    fl = dog.wait_float(u, pitch=0.5)
+    fl = _w(fl, jaw=0.33, hold=1.0, eye=1.35, ear=1.2, ear_f=1.25, tail=0.9)
+    look = ease(u, U_TEAR - 0.02, U_TEAR + 0.12)                 # it looks down at what it left behind
+    fl = _w(fl, neck=lerp(0.75, 0.2, look), head=lerp(0.55, -0.55, look), ear=lerp(1.2, 0.5, look), ear_f=lerp(1.25, 0.45, look),
+            pitch=fl["pitch"] - 0.25 * look)
+    fl["_anchor"] = "body"
+    w = clamp(1 - math.exp(-a * 9.0))                            # thrown, then the water stops it
+    p, x, y = _blend_body(q0, (bx0, by0), fl, (bx0 + 34, by0 - 30), w)
+    y -= 8 * ease(u, U_TEAR, TUG_LEN + 0.2)                     # and it is already going up
+    out.update(pose=p, x=x, y=y, anchor="body", has=True)
+    return out
+
+
+def _reel_state(u):
+    """Where the stuck reel is while it is whole -> (x, y, tip degrees, buried 0..1)."""
+    d = _tug_dog(u)
+    lift = tip = 0.0
+    if U_PULL <= u < U_SLIP:
+        lift, tip = 4.5 * d["strain"], 9.0 * d["strain"]
+    elif U_SLIP <= u < U_THINK + 0.2:
+        a = u - U_SLIP                                             # it drops back, rocks, and is still
+        lift = 4.5 * max(0.0, 1 - a / 0.07)
+        tip = 9.0 * math.exp(-a * 9) * math.cos(2 * math.pi * 5 * a)
+    elif u >= U_SNAP - 0.14:
+        k = ease(u, U_SNAP - 0.14, U_SNAP)
+        lift, tip = 6.0 * k, 12.0 * k
+    dug = 0.42 + 0.2 * (1 - ease(u, 0.0, U_PULL))                # the raking has bared it
+    return REEL_AT[0] + 0.5 * lift, REEL_AT[1] - lift, tip, dug
+
+
+def _mound(ink, cam, x, y, w, h, seed=3):
+    """Gravel banked against the near side of something that is in it (it is what makes the thing STUCK)."""
+    z = cam.zoom
+    sx, sy = cam.xy(x, y)
+    rs = random.Random(seed)
+    pts = [(sx - w * z / 2, sy + h * z * 0.5)]
+    for k in range(9):
+        f = k / 8
+        pts.append((sx - w * z / 2 + w * z * f, sy + h * z * 0.5 - h * z * math.sin(math.pi * f) ** 0.7 * (0.8 + 0.25 * rs.random())))
+    pts.append((sx + w * z / 2, sy + h * z * 0.5))
+    ink.d.polygon(pts, fill=(118, 138, 120, 255))
+    ink.d.line(pts[:-1] + [pts[-1]], fill=(20, 40, 40, 230), width=max(1, int(z * 0.8)), joint="curve")
+    for _ in range(7):
+        px = sx + rs.uniform(-0.42, 0.42) * w * z
+        py = sy + h * z * 0.5 - rs.uniform(0.15, 0.7) * h * z * math.sin(math.pi * clamp((px - sx) / (w * z) + 0.5)) ** 0.7
+        r = rs.uniform(1.0, 2.2) * z
+        ink.d.ellipse([px - r, py - r * 0.7, px + r, py + r * 0.7], fill=(166, 182, 160, 255), outline=(30, 50, 48, 255))
+
+
+def _ubub(ink, cam, x, y, r):
+    sx, sy = cam.xy(x, y)
+    r *= cam.zoom
+    ink.d.ellipse([sx - r, sy - r, sx + r, sy + r], fill=(190, 236, 232, 46), outline=(214, 244, 238, 200), width=max(1, int(r * 0.22)))
+    ink.d.ellipse([sx - r * 0.5, sy - r * 0.55, sx - r * 0.1, sy - r * 0.15], fill=(250, 255, 250, 190))
+
+
+def _ububbles(ink, cam, src, t0, t1, u, rate=14.0, seed=0, size=1.0):
+    """Air from a nose under water: born at src(time) between t0 and t1, wobbling up."""
+    rs = random.Random(seed * 31 + 7)
+    n = int((t1 - t0) * rate)
+    for k in range(n):
+        tb = t0 + (k + rs.random()) / rate
+        wob, r, vy = rs.uniform(0, 6.28), rs.uniform(1.0, 2.6) * size, rs.uniform(46, 74)
+        age = u - tb
+        if age < 0 or age > 2.0:
+            continue
+        x, y = src(tb)
+        _ubub(ink, cam, x + 5 * math.sin(wob + age * 5) + rs.uniform(-3, 3), y - vy * age - 6 * age * age, r * min(1.0, 0.4 + age * 3))
+
+
+def _usilt(ink, cam, x, y, age, power=1.0, seed=0):
+    """_silt at the close camera's size."""
+    if age < 0 or age > 2.2:
+        return
+    lay = Image.new("RGBA", (220, 150), (0, 0, 0, 0))
+    hold = kit.Ink(0, 0)
+    hold.img = lay
+    _silt(hold, 110, 118, age, power, seed)
+    lay = hold.img
+    z = cam.zoom
+    lay = lay.resize((int(220 * z), int(150 * z)), Image.BILINEAR)
+    sx, sy = cam.xy(x, y)
+    ink.img.paste(lay, (int(sx - 110 * z), int(sy - 118 * z)), lay)
+    ink.d = ImageDraw.Draw(ink.img, "RGBA")
+
+
+def _uthing(ink, cam, kind, x, y, s=1.0, angle=0.0, **kw):
+    sx, sy = cam.xy(x, y)
+    z = DS * cam.zoom * s
+    if kind == "half":
+        props.reel(ink, props.REEL_HALF, sx, sy, z, tilt=kw.get("tilt", 0.9), angle=angle, half=True, loop=kw.get("loop", 0.0), wet=0, **UT_THING)
+    elif kind == "flange":
+        sh = props._part_sheet("flange", sx, sy, z * FLANGE_S, angle, kw.get("mud", 0.35), 0.0, 0.0, 0.0)
+        if kw.get("squash"):
+            sh.squash(kw["squash"])
+        sh.lay(ink, 1.0, **UT_THING)
+    ink.d = ImageDraw.Draw(ink.img, "RGBA")
+
+
+def _ufilm(ink, cam, a, b, sag, alpha=1.0):
+    """A length of real film between two world points."""
+    pa, pb = cam.xy(*a), cam.xy(*b)
+    props.film_strip(ink, props.REEL_HALF, pa, pb, sag=sag * cam.zoom, s=DS * cam.zoom * 1.25, lit=0.0, alpha=alpha)
+    ink.d = ImageDraw.Draw(ink.img, "RGBA")
+
+
+def _udog(ink, cam, st, carry=None):
+    sx, sy = cam.xy(st["x"], st["y"])
+    j = dog.draw_dog(ink, st["pose"], sx, sy, scale=DS * cam.zoom, facing=st["facing"], anchor=st["anchor"], shadow=False, carry=None, **UT)
+    ink.d = ImageDraw.Draw(ink.img, "RGBA")
+    return j
+
+
+def _ubase(ink, tt, cam, look, lv, cls, skip=()):
+    town.back(ink, tt, cam, sky=False, door=1.0)
+    town.street(ink, tt, cam, holes=3, smudges=1, taken=(0,))
+    for q in sorted(lv, key=lambda q: town.HOLES[q][1]):
+        _hole(ink, cam, q, lv[q])
+    town.thing(ink, cam, "boot", BOOT_AT[0] - 34, BOOT_AT[1] + 3, -16)
+    town.thing(ink, cam, "spool", *SPOOL_AT)
+    town.thing(ink, cam, "pin", PIN_AT[0], PIN_AT[1], PIN_AT[2])
+    town.townsfolk(ink, tt, cam, look=look)
+    town.school_class(ink, tt, cam, look=look, skip=skip, **cls)
+    ink.d = ImageDraw.Draw(ink.img, "RGBA")
+
+
+def tug_draw(u, ink):
+    """Round three, at the gravel (u = seconds into the shot, 0..TUG_LEN)."""
+    u = clamp(u, 0.0, TUG_LEN)
+    cam = _ucam()
+    tt = TUG_T + u
+    d = _tug_dog(u)
+    rx, ry, tip, dug = _reel_state(u)
+    snap = u - U_SNAP
+    # the class: they lean over to see; they duck when its teeth slip and when it comes apart; then they look at what is left
+    duck = bump((u - U_SLIP) / 0.3) + 1.3 * bump(snap / 0.34)
+    lean = 20.0 * ease(u, 0.0, 0.3) - 34.0 * duck
+    tilt = {k: 8.0 + lean * (1.0 if k in (0, 1, 4) else 0.6) for k in range(8)}
+    arm = {k: 20.0 + 120.0 * clamp(duck) for k in (0, 1, 4, 5)}
+    point = ease(u, U_TEAR - 0.02, U_TEAR + 0.12)
+    arm[WAVER] = lerp(20.0, 96.0, point)                             # the waver points a fin at the side that stayed
+    look = (rx, ry) if snap < 0.12 else ((REEL_AT[0], REEL_AT[1]) if point > 0.5 else (d["x"], d["y"] - 30))
+    _ubase(ink, tt, cam, look, {3: 1.0, 6: 1.0, 5: 0.35 + 0.65 * ease(u, 0.0, U_PULL)}, dict(tilt=tilt, arm=arm))
+    # the reel in the gravel: film wound between two sides, a third of it still in
+    if snap < 0:
+        _uthing(ink, cam, "half", rx + 1.5, ry - 0.5, angle=tip)
+        _uthing(ink, cam, "flange", rx, ry, angle=tip + 20, mud=0.5)
+    else:
+        # the near side stays where it was, rocking; the film pays out to the dog, goes tight, and tears
+        rock = 14.0 * math.exp(-snap * 6) * math.cos(2 * math.pi * 4 * snap)
+        _uthing(ink, cam, "flange", REEL_AT[0], REEL_AT[1], angle=20 + rock, mud=0.5)
+    _mound(ink, cam, REEL_AT[0] - 1, REEL_AT[1] + REEL_R * (1.0 - 0.9 * dug) + 2.0, 40.0, 13.0)
+    if U_SLIP <= u:
+        _usilt(ink, cam, REEL_AT[0], REEL_AT[1] + 6, u - U_SLIP, 0.7, seed=4)
+    if snap >= 0:
+        _usilt(ink, cam, REEL_AT[0] + 6, REEL_AT[1] + 4, snap, 1.25, seed=9)
+    # the dog (and, once it has it, the half in its mouth, with the film between)
+    j = _udog(ink, cam, d)
+    mx, my = cam.world(*j["mouth"])
+    if d["has"]:
+        hx, hy = mx - 3.0, my + 12.0
+        if u < U_TEAR:
+            _ufilm(ink, cam, (REEL_AT[0] + 2, REEL_AT[1] - 3), (hx - 8, hy + 4), sag=16.0 * (1 - ease(u, U_SNAP, U_TEAR - 0.03)))
+        else:
+            a = u - U_TEAR                                           # torn: the end left behind sinks toward the gravel
+            fx = lerp(REEL_AT[0] + 14, STRIP_LIES[0], ease(a, 0.0, 0.5))
+            fy = lerp(REEL_AT[1] - 14, STRIP_LIES[1] + 2, clamp(a / 0.5) ** 1.5)
+            _ufilm(ink, cam, (fx - 12, fy + 2 - 4 * a), (fx + 14, fy - 3), sag=5.0 + 4 * math.sin(a * 9))
+        _uthing(ink, cam, "half", hx, hy, angle=-18 + 10 * math.sin(6 * snap), loop=1.0, tilt=0.82)
+        j = _udog(ink, cam, dict(d, pose=d["pose"]))                  # its muzzle is in front of what it holds
+    if d.get("bits"):
+        dog.draw_bits(ink, dog.dig_spray(u + 0.5, rate=3.4, water=True), *cam.xy(d["x"], d["y"]), DS * cam.zoom, facing=-1, color=(150, 160, 136))
+    # air: a string from its nose as it strains, a burst when it comes apart
+    def nose(tb):
+        jj = dog.draw_dog(Image.new("RGB", (8, 8)), _tug_dog(tb)["pose"], _tug_dog(tb)["x"], _tug_dog(tb)["y"], scale=DS, facing=-1,
+                          anchor=_tug_dog(tb)["anchor"], shadow=False)
+        return jj["nose"][0] - 2, jj["nose"][1] - 4
+    _ububbles(ink, cam, nose, U_PULL + 0.12, U_SLIP, u, rate=16.0, seed=1, size=0.8)
+    _ububbles(ink, cam, nose, U_SLIP, U_SLIP + 0.1, u, rate=60.0, seed=2, size=1.3)
+    _ububbles(ink, cam, nose, U_SNAP, U_SNAP + 0.12, u, rate=90.0, seed=3, size=1.5)
+    town.front(ink, tt, cam)
+    ink.d = ImageDraw.Draw(ink.img, "RGBA")
+    ink.vignette(0.22)
+
+
+GIVE_XA, GIVE_GY = XA_D, GY_D                     # the dog's ground point as it rakes at hole 4
+FILM_LIES = ((604.0, 846.0), (HOLE_D[0] - 2.0, HOLE_D[1] - 1.0))     # the torn film on the gravel, one end under
+
+
+def _give_dog(v):
+    """The dog in the handing-over -> dict(pose, x, y, facing, anchor, film (it has the film), flange 0..1 (it has that too))."""
+    out = dict(x=GIVE_XA, y=GIVE_GY, facing=-1, anchor="ground", film=False, flange=0.0, bits=None)
+    q_dig0, bxd, byd = _stand_body(GIVE_XA, GIVE_GY, -1, dog.dig(0.0))
+    if v < V_LAND:
+        keys = [(-0.2, bxd + 96, byd - 190.0), (0.0, bxd + 70, byd - 128.0), (V_LAND - 0.1, bxd + 8, byd - 34.0), (V_LAND, bxd, byd)]
+        x, y, vx, vy = _hermite(keys, v)
+        p = _swim_pose(v + 0.4, vx, vy, -1)
+        land = ease(v, V_LAND - 0.12, V_LAND)
+        if land > 0:
+            p, x, y = _blend_body(p, (x, y), q_dig0, (bxd, byd), land)
+        out.update(pose=p, x=x, y=y, anchor="body")
+        return out
+    took = _w(dog.stand(v), cx=-6.0, neck=0.42, head=-0.2, ear=1.16, ear_f=1.18, tail=0.75, curl=0.5, jaw=0.3, hold=1.0, eye=1.1,
+              wag=0.5 * math.sin(2 * math.pi * 3.0 * v))
+    if v < V_FREE:
+        tau = v - V_LAND
+        d = dog.dig(tau + 0.44, rate=3.8)                        # ONE rake: it knows what it has come for
+        got = ease(v, V_FREE - 0.1, V_FREE)
+        out.update(pose=dog.blend(d, _w(_p_grip(), jaw=0.3), got), bits=tau, film=got > 0.6)
+        return out
+    if v < V_OFF:
+        w = dog.ease_back(clamp((v - V_FREE) / 0.2))             # its head comes up to the child, ears forward
+        p = dog.blend(_w(_p_grip(), jaw=0.3), took, clamp(w))
+        p["jaw"] = lerp(0.3, 0.42, bump((v - V_TAKE + 0.12) / 0.2))     # it opens for the piece, and shuts on it gently
+        out.update(pose=p, film=True, flange=ease(v, V_TAKE - 0.08, V_TAKE))
+        return out
+    q0, bx0, by0 = _as_body(took, GIVE_XA, GIVE_GY, -1)
+    keys = [(V_OFF - 0.1, bx0, by0 + 4), (V_OFF, bx0, by0), (V_OFF + 0.14, bx0 - 6, by0 - 26), (GIVE_LEN + 0.1, bx0 - 30, by0 - 150.0)]
+    x, y, vx, vy = _hermite(keys, v)
+    p = _swim_pose(v - V_OFF, vx, vy, -1)
+    p["jaw"], p["hold"] = 0.3, 1.0
+    off = ease(v, V_OFF, V_OFF + 0.16)
+    if off < 1:
+        p, x, y = _blend_body(q0, (bx0, by0), p, (x, y), off)
+    out.update(pose=p, x=x, y=y, anchor="body", film=True, flange=1.0)
+    return out
+
+
+def give_draw(v, ink):
+    """Round four, at the gravel, in the tug's own framing (v = seconds into the shot, 0..GIVE_LEN)."""
+    v = clamp(v, 0.0, GIVE_LEN)
+    cam = _ucam()
+    tt = GIVE_T + v
+    d = _give_dog(v)
+    dig = clamp((v - V_LAND) / (V_FREE - V_LAND))
+    lean = 16.0 * ease(v, 0.0, 0.3)
+    wave = ease(v, V_TAKE + 0.02, V_TAKE + 0.12)
+    cls = dict(tilt={k: 8.0 + lean for k in range(8)}, arm={k: 20.0 + 110.0 * wave * (0.5 + 0.5 * math.sin(2 * math.pi * 3 * v + k)) for k in (1, 5)})
+    _ubase(ink, tt, cam, (d["x"] - 30, d["y"] - 30), {3: 1.0, 6: 1.0, 5: 1.0, 4: 0.25 + 0.75 * dig if v >= V_LAND else 0.0}, cls, skip=(WAVER,))
+    if not d["film"]:
+        _ufilm(ink, cam, FILM_LIES[0], FILM_LIES[1], sag=-3.0)
+        if v < V_LAND + 0.1:
+            _mound(ink, cam, FILM_LIES[1][0] + 2, FILM_LIES[1][1] + 2, 20.0, 7.0, seed=8)
+    if v >= V_LAND:
+        _usilt(ink, cam, HOLE_D[0], HOLE_D[1] + 4, v - V_LAND - 0.05, 0.8, seed=12)
+    # the waver: it has pulled the stuck side out, and holds it up for the dog
+    up = ease(v, V_FREE, V_TAKE)                                 # it swims up off its tail to reach the dog's mouth
+    kx, ky = GIVE_KID[0] + 3 * up, GIVE_KID[1] - 9 * up
+    reach = lerp(128.0, 100.0, up)
+    reach = lerp(reach, 150.0 + 14 * math.sin(2 * math.pi * 3.5 * v), ease(v, V_TAKE + 0.03, V_TAKE + 0.16))     # and waves it off
+    kid = town.child(ink, tt, cam, WAVER, kx, ky, facing=1, tilt=-10.0 - 8 * up, arm=reach, look=(d["x"] - 40, d["y"] - 40), swim=0.5 + 0.5 * up)
+    ink.d = ImageDraw.Draw(ink.img, "RGBA")
+    hand = cam.world(*kid["hand"])
+    j = _udog(ink, cam, d)
+    mx, my = cam.world(*j["mouth"])
+    fl_from = (hand[0] + 2, hand[1] - 9)
+    fl_to = (mx - 6, my + 9)
+    fx, fy = lerp(fl_from[0], fl_to[0], d["flange"]), lerp(fl_from[1], fl_to[1], d["flange"])
+    if d["film"]:                                                # the film hangs from its mouth
+        sway = 5 * math.sin(2 * math.pi * 1.8 * v)
+        _ufilm(ink, cam, (mx + 2, my + 3), (mx + 10 + sway, my + 34), sag=5.0)
+    _uthing(ink, cam, "flange", fx, fy, angle=20 + 30 * d["flange"], mud=0.2)
+    if d["flange"] > 0.5:
+        j = _udog(ink, cam, d)                                   # its muzzle in front of what it holds
+        if d["film"]:
+            sway = 5 * math.sin(2 * math.pi * 1.8 * v)
+            _ufilm(ink, cam, (mx + 2, my + 3), (mx + 10 + sway, my + 34), sag=5.0)
+    if d["bits"] is not None:
+        dog.draw_bits(ink, dog.dig_spray(d["bits"] + 0.44, rate=3.8, water=True), *cam.xy(d["x"], d["y"]), DS * cam.zoom, facing=-1, color=(150, 160, 136))
+
+    def nose(tb):
+        dd = _give_dog(tb)
+        jj = dog.draw_dog(Image.new("RGB", (8, 8)), dd["pose"], dd["x"], dd["y"], scale=DS, facing=-1, anchor=dd["anchor"], shadow=False)
+        return jj["nose"][0] - 2, jj["nose"][1] - 4
+    _ububbles(ink, cam, nose, 0.0, V_LAND, v, rate=14.0, seed=5, size=0.9)
+    _ububbles(ink, cam, nose, V_OFF, GIVE_LEN, v, rate=18.0, seed=6, size=0.9)
+    town.front(ink, tt, cam)
+    ink.d = ImageDraw.Draw(ink.img, "RGBA")
+    ink.vignette(0.22)
+
+
+# ====================================================================== #
+#  8c · THE CUT (the film: the score, closer cameras on it, and the two shots under water)   #
+# ====================================================================== #
+# The score above is one continuous take. An independent critic who saw only the picture said what that cost:
+# what the dog brings up could not be named (20 px, never a closer shot); three dives were one beat three times;
+# the calf and the cow were small in a wide frame; there was no cut at all. So the film is now CUT from the score.
+# Each entry: frames on screen, kind, score second it begins at, score second it ends at, close view (or None).
+#   "score"  the score through its own camera            "close"  the same moment through a closer camera (_close)
+#   "tug"    round three at the gravel (tug_draw)         "give"   round four at the gravel (give_draw)
+# A cut may skip score time (an ellipsis); the two shots under water REPLACE the score's own digs for rounds three
+# and four. Nothing above the water is slowed or stretched: one stretch under water (the long swim down of round
+# two) runs 17 % fast to pay for the tug.
+
+K_PAGE = dict(z=2.8, x0=106.0, y0=176.0)                    # the page held up to the lamp, the dog looking up at it
+K_REEL = dict(z=2.6, x0=284.0, y0=226.0, strip=True)        # the first reel: in its mouth, laid, pawed; the cow it came up under
+K_CALF = dict(z=2.1, x0=346.0, y0=205.0, strip=True)        # the calf and the dog, and the mother's head coming down
+K_LAST = dict(z=4.2, x0=316.0, y0=292.0)                    # the strip and the flange laid; water running off its chin
+
+EDL = [   # frames, kind, score from, score to, view, why the camera is there
+    (134, "score", 0.0, 134 / FPS, None, "up with the page; the shake; the page laid; the hand comes for it"),
+    (20, "close", 5.90, 5.90 + 20 / FPS, K_PAGE, "CUT IN: the page, large, in the hands at the lamp; the dog watching it"),
+    (58, "score", 7.06, 7.06 + 58 / FPS, None, "CUT BACK: asked again; it looks at the water, and goes"),
+    (33, "score", 7.06 + 58 / FPS, 11.08, None, "(no cut) down to the far holes, a little fast"),
+    (45, "score", 11.08, 12.955, None, "(no cut) the reel found; up; it bursts out under the drinking cow's nose"),
+    (36, "close", 12.955, 14.455, K_REEL, "CUT IN: the reel in its mouth, laid, the paw on it; she has jerked her head up"),
+    (27, "score", 14.455, 15.58, None, "CUT BACK: the hand points; it goes"),
+    (50, "tug", 0.0, 50 / FPS, None, "CUT: at the gravel. The reel is stuck; it slips; it thinks; it comes apart"),
+    (51, "score", 16.78, 18.905, None, "CUT: up with half of it; laid; the calf follows it out along the boards"),
+    (56, "close", 18.95, 18.95 + 56 / FPS, K_CALF, "CUT IN: the calf nosed back; its mother's tongue; the dog watches that it stays"),
+    (29, "give", 0.0, 29 / FPS, None, "CUT, on the dive: the waver holds up the side that stayed; one rake for the film"),
+    (18, "score", 22.39, 23.14, None, "CUT: up with both, the camera coming up with it"),
+    (18, "close", 23.14, 23.89, K_LAST, "CUT IN: the strip and the flange on the wet boards; it does not shake"),
+    (49, "score", 26.0 - 49 / FPS, 26.0, None, "CUT BACK: the spent dog, the person down beside it, the queue still a queue"),
+]
+assert sum(e[0] for e in EDL) == int(round(SECONDS * FPS))
+
+
+def _edl_starts():
+    out, k = [], 0
+    for e in EDL:
+        out.append(k)
+        k += e[0]
+    return out
+
+
+EDL_K0 = _edl_starts()
+TUG_AT = EDL_K0[[e[1] for e in EDL].index("tug")] / FPS       # screen seconds the two shots under water begin at
+GIVE_AT = EDL_K0[[e[1] for e in EDL].index("give")] / FPS
+
+
+def edit_at(t):
+    """Screen second -> (kind, the time to draw (score seconds, or seconds into the tug / the give), view, index)."""
+    k = clamp(t, 0.0, SECONDS) * FPS
+    for i, (n, kind, a, b, view, _) in enumerate(EDL):
+        k0 = EDL_K0[i]
+        if k < k0 + n - 1e-6 or i == len(EDL) - 1:
+            return kind, lerp(a, b, clamp((k - k0) / n)), view, i
+    raise AssertionError
+
+
+def screen_of(ts):
+    """Score second -> the screen second it is seen at (or, if the cut skips it, the cut it falls behind)."""
+    best = None
+    for i, (n, kind, a, b, view, _) in enumerate(EDL):
+        if kind in ("tug", "give"):
+            continue
+        k0 = EDL_K0[i]
+        if a - 1e-9 <= ts <= b + 1e-9:
+            return (k0 + n * (ts - a) / max(b - a, 1e-9)) / FPS
+        if ts > b:
+            best = (k0 + n) / FPS
+    return 0.0 if best is None else best
+
+
+def draw(t, ink, record=False):
+    """One full 960x540 frame of S3 at screen second t (0..26): the film."""
+    kind, tau, view, _ = edit_at(t)
+    if kind == "tug":
+        return tug_draw(tau, ink)
+    if kind == "give":
+        return give_draw(tau, ink)
+    return _score_draw(tau, ink, record=record, close=view)
+
+
+# ====================================================================== #
 #  9 · THE SOUND (laid with sound.py; nobody here has heard it)           #
 # ====================================================================== #
 
@@ -1992,9 +2675,22 @@ def sound(mix, at=0.0):
     S = snd
 
     def A(t):
-        return at + t
+        return at + screen_of(t)                                  # the picture is cut: a contact is where the cut puts it
 
     wk = _walkers()
+    # ---- the two shots under water: the BELOW room, and what happens in them
+    for a0, ln in ((TUG_AT, TUG_LEN), (GIVE_AT, GIVE_LEN)):
+        S.hush(mix, at + a0, ln, 0.6, 0.04, 0.04)
+    pt = S.P_WATER * 0.2
+    S.dig(mix, at + TUG_AT, U_PULL - 0.1, find=None, gain=0.07, pan=pt)
+    S.bubbles(mix, at + TUG_AT + U_PULL + 0.1, 5, 0.4, gain=0.03, pan=pt)
+    S.nose_bump(mix, at + TUG_AT + U_SLIP, gain=0.06, pan=pt)                                  # its teeth come off the rim
+    S.bubbles(mix, at + TUG_AT + U_SLIP, 3, 0.2, low=True, gain=0.04, pan=pt)
+    S.dig(mix, at + TUG_AT + U_GRIP2, U_SNAP - U_GRIP2, find="ring", gain=0.08, pan=pt)         # it comes apart: a small tin ring
+    S.bubbles(mix, at + TUG_AT + U_SNAP, 6, 0.3, gain=0.05, pan=pt)
+    S.dig(mix, at + GIVE_AT + V_LAND, V_FREE - V_LAND, find=None, gain=0.07, pan=pt)
+    S.collar(mix, at + GIVE_AT + V_TAKE, 2, gain=0.03, pan=pt, under=True)                     # the piece taken, gently
+    S.bubbles(mix, at + GIVE_AT + V_OFF, 4, 0.25, gain=0.03, pan=pt)
     # ---- rooms: below until its head breaks the line; above; both at half in the split; above again
     S.hush(mix, A(-0.1), T_B1 + 0.2, 1.0, 0.2, 0.2)
     S.above(mix, A(T_B1 - 0.1), 9.3 - T_B1 + 0.3, 1.0, 0.2, 0.3)
@@ -2050,7 +2746,6 @@ def sound(mix, at=0.0):
     S.paws(mix, A(T_GO2 + 0.06), 3, 0.09, gain=0.11, pan=heard(T_GO2, X_PAW2), pan_to=heard(T_D3, 560), wet=True)
     S.plunge(mix, A(T_D3), gain=0.3, pan=heard(T_D3, 580))
     # ---- round three: sooner
-    S.dig(mix, A(T_DIG_C), T_FOUND3 - T_DIG_C, find="thud", gain=0.075, pan=heard(T_DIG_C, HOLE_C[0]), under=True)
     S.breach(mix, A(T_B3), gain=0.27, pan=heard(T_B3, XB3))
     S.paws(mix, A(T_L3), 2, 0.06, gain=0.1, pan=heard(T_L3, X_LAY3), wet=True)
     S.reel_down(mix, A(T_LAID3), gain=0.1, pan=heard(T_LAID3, THING_X[2]))                    # half made
@@ -2072,7 +2767,6 @@ def sound(mix, at=0.0):
     S.calf(mix, A(T_CALF_BACK + 0.05), 4, 0.15, gain=0.05, pan=heard(20.3, 500), pan_to=heard(20.8, X_CALF_HOME))
     _slide(mix, A(PEBBLES[3][2]), A(PEBBLES[3][3]))
     S.plunge(mix, A(T_D4), gain=0.28, pan=heard(T_D4, 604))
-    S.dig(mix, A(T_DIG_D), T_FOUND4 - T_DIG_D, find="ring", gain=0.08, pan=heard(T_DIG_D, HOLE_D[0]), under=True)
     S.breach(mix, A(T_B4), gain=0.26, pan=heard(T_B4, XB4))
     S.paws(mix, A(T_L4), 2, 0.07, gain=0.1, pan=heard(T_L4, X_LAY4), wet=True)
     S.page_slap(mix, A(T_LAID4), gain=0.07, pan=heard(T_LAID4, THING_X[3]))
@@ -2103,7 +2797,7 @@ def sound(mix, at=0.0):
 def _render(t, record=False):
     ink = kit.Ink(t, int(round(t * FPS)))
     ink.paper()
-    stg = draw(t, ink, record=record)
+    stg = _score_draw(t, ink, record=record)
     return ink, stg
 
 
@@ -2129,6 +2823,16 @@ def check(verbose=True, pixels=True):
         jump = abs(ca["oy"] - cb["oy"]) + abs(ca["sq"] - cb["sq"]) + 200 * abs(ca["zoom"] - cb["zoom"])
         is_cut = any(a < c <= b + 1e-9 for c in cuts)
         assert jump < 40 or is_cut, ("camera jump", a, jump)
+    k0, t0_, _, _ = edit_at(0.0)
+    k1, t1_, _, _ = edit_at(SECONDS)
+    assert (k0, t0_, k1, t1_) == ("score", 0.0, "score", SECONDS)
+    for n, kind, a, b, view, _ in EDL:
+        if kind in ("score", "close"):
+            assert 0.98 < (b - a) / (n / FPS) < 1.2, ("a shot runs off speed", kind, a, b)
+    ncut = sum(1 for (e0, e1) in zip(EDL, EDL[1:]) if e0[1] != e1[1] or e0[4] is not e1[4] or abs(e0[3] - e1[2]) > 1e-6)
+    say("MEASURED cut: %d shots, %d cuts; begins on the score's first frame and ends on its last; no shot off speed but the swim"
+        " down of round two (%.0f %% fast); the tug is at %.2f-%.2f, the handing over at %.2f-%.2f" % (
+            len(EDL), ncut, 100 * ((EDL[3][3] - EDL[3][2]) / (EDL[3][0] / FPS) - 1), T0 + TUG_AT, T0 + TUG_AT + TUG_LEN, T0 + GIVE_AT, T0 + GIVE_AT + GIVE_LEN))
     say("MEASURED camera: F-TOWN at 58.0, F-PORCH at 84.0 (zoom 1); continuous everywhere but at the declared cut %s" % [T0 + c for c in cuts])
     # 2 · the squeeze is continuous and monotonic, and 1:1 above the line and below the zone
     ys = [sq_y(400 + d, SPLIT_OY, SPLIT_SQ) for d in range(-50, 480)]
@@ -2332,7 +3036,9 @@ def check(verbose=True, pixels=True):
 def _sheet(times, path, cols=4, scale=0.5, crop=None):
     ims = []
     for t in times:
-        ink, _ = _render(t)
+        ink = kit.Ink(t, int(round(t * FPS)))
+        ink.paper()
+        draw(t, ink)
         im = ink.finish()
         if crop:
             im = im.crop(crop)
