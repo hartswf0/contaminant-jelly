@@ -90,14 +90,14 @@ REELS = [
     ("films/c16.mp4", 20.0, 0.62, 0.50, 1.00, "Class film 16: the three-headed monster"),
     ("films/c25.mp4", 26.0, 0.42, 0.50, 1.00, "Class film 25: the fish with arms and legs, painting"),
     ("films/c33.mp4", 35.0, 0.47, 0.50, 1.00, "Class film 33: the bars across the window, a movie"),
-    ("voiced/c10.mp4", 6.0, 0.42, 0.52, 0.92, "Class film 10 with the voice: the child's page, zigzag teeth in a box"),
+    ("voiced/c10.mp4", 7.6, 0.41, 0.48, 0.90, "Class film 10 with the voice: the child's page, zigzag teeth in a box"),
     ("voiced/c13.mp4", 6.0, 0.42, 0.50, 0.92, "Class film 13 with the voice: the child's page, two fish and a bell"),
     ("voiced/c16.mp4", 6.0, 0.36, 0.50, 0.92, "Class film 16 with the voice: the child's page, the boxy sub"),
     ("voiced/c25.mp4", 6.0, 0.42, 0.52, 0.92, "Class film 25 with the voice: the child's page, the fish across a bowl"),
     ("voiced/c33.mp4", 7.0, 0.38, 0.50, 0.92, "Class film 33 with the voice: the child's page, the tall bars"),
     # 6 · the five cut into one, with the steps taught
     ("how-to-play-the-porthole-game.mp4", 165.0, 0.52, 0.47, 0.90, "How to Play the Porthole Game: the fish and the bell (reel one)"),
-    ("how-to-play-the-porthole-game.mp4", 53.0, 0.44, 0.45, 0.80, "How to Play the Porthole Game: the sub in the river (reel two)"),
+    ("how-to-play-the-porthole-game.mp4", 53.0, 0.44, 0.45, 0.80, "How to Play the Porthole Game: the pilot draws what is outside (reel two)"),
     ("how-to-play-the-porthole-game.mp4", 355.0, 0.47, 0.47, 0.90, "How to Play the Porthole Game: the bars (reel three)"),
     # 7 · five making films, the children at the desk; then The Class Plays
     ("films/m10.mp4", 11.0, 0.42, 0.50, 1.00, "Making film 10: a cut-paper hand draws the zigzag teeth"),
@@ -110,13 +110,13 @@ REELS = [
     ("voiced/m16.mp4", 68.0, 0.50, 0.50, 1.00, "Making film 16 with the voice: out into the river"),
     ("voiced/m25.mp4", 70.0, 0.55, 0.55, 0.90, "Making film 25 with the voice: the sub's brass door in the river"),
     ("voiced/m33.mp4", 68.0, 0.62, 0.50, 1.00, "Making film 33 with the voice: the sub's lamp on the bars"),
-    ("tourkey-trouttown-the-class-plays.mp4", 252.0, 0.50, 0.50, 1.00, "Tourkey Trouttown: The Class Plays (reel one): the hand and the page"),
-    ("tourkey-trouttown-the-class-plays.mp4", 380.0, 0.50, 0.47, 0.90, "The Class Plays (reel two): Turkey thinks"),
-    ("tourkey-trouttown-the-class-plays.mp4", 507.0, 0.50, 0.47, 0.90, "The Class Plays (reel three): the trout think, the sub in the river"),
-    ("tourkey-trouttown-the-class-plays.mp4", 634.0, 0.45, 0.47, 0.90, "The Class Plays (reel four): a yellow paper hand draws"),
-    ("tourkey-trouttown-the-class-plays.mp4", 760.0, 0.78, 0.47, 0.90, "The Class Plays (reel five): the fish in its bowl, in the porthole"),
+    ("tourkey-trouttown-the-class-plays.mp4", 252.0, 0.50, 0.50, 1.00, "Tourkey Trouttown: The Class Plays (reel one): the trout in the porthole"),
+    ("tourkey-trouttown-the-class-plays.mp4", 380.0, 0.50, 0.47, 0.90, "The Class Plays (reel two): a paper hand at the page"),
+    ("tourkey-trouttown-the-class-plays.mp4", 507.0, 0.50, 0.47, 0.90, "The Class Plays (reel three): the three-headed monster in the porthole"),
+    ("tourkey-trouttown-the-class-plays.mp4", 634.0, 0.45, 0.47, 0.90, "The Class Plays (reel four): a wall of small cards"),
+    ("tourkey-trouttown-the-class-plays.mp4", 760.0, 0.78, 0.47, 0.90, "The Class Plays (reel five): a paper hand writes under the bars"),
     # 9 · films about how it works
-    ("how-a-language-model-makes-a-film.mp4", 106.0, 0.29, 0.56, 0.52, "How a Language Model Makes a Film: the porthole after the repair"),
+    ("how-a-language-model-makes-a-film.mp4", 106.0, 0.29, 0.56, 0.52, "How a Language Model Makes a Film: the porthole the judge looked at"),
     ("who-held-the-chalk.mp4", 110.0, 0.80, 0.55, 0.70, "Who Held the Chalk: the pinned photographs that were foraged"),
     ("what-is-a-scion.mp4", 56.0, 0.50, 0.50, 1.00, "What Is a SCION? (reel one): the river built in planes"),
     ("what-is-a-scion.mp4", 180.0, 0.25, 0.52, 0.70, "What Is a SCION? (reel two): the swarm at its desks"),
@@ -134,7 +134,7 @@ REELS = [
 ]
 assert len(REELS) == 53, len(REELS)
 N_REELS = len(REELS)
-FRAME_SIZE = (240, 135)
+FRAME_SIZE = (320, 180)
 
 # names the board uses
 REEL_FIRST = 0                  # the first can the lead dog brings up (S3, 70.0)
@@ -155,7 +155,7 @@ def frame_path(n):
 
 
 def build_frames(force=False, which=None):
-    """Cut one frame for every reel out of the real films with ffmpeg and cache it small (240x135 JPEG) under
+    """Cut one frame for every reel out of the real films with ffmpeg and cache it small (320x180 JPEG) under
     films/swarm/dogs/frames/. Only decodes; nothing else touches the films."""
     FRAMES.mkdir(parents=True, exist_ok=True)
     made = 0
@@ -175,7 +175,7 @@ def build_frames(force=False, which=None):
 
 @lru_cache(maxsize=None)
 def frame(n):
-    """The real frame reel n holds: an RGB image, 240x135. n counts from 0 in the order of WHAT_WE_MADE.md."""
+    """The real frame reel n holds: an RGB image, 320x180. n counts from 0 in the order of WHAT_WE_MADE.md."""
     n = int(n) % N_REELS
     p = frame_path(n)
     if not p.exists():
@@ -574,7 +574,7 @@ def film_strip(ink, n, a, b, sag=10.0, s=1.0, lit=0.0, alpha=1.0):
     return pts[8][0] + cx, pts[8][1] + cy
 
 
-def thrown_frame(ink, n, box, level=1.0, color=(255, 214, 150), soft=3.0, image=None):
+def thrown_frame(ink, n, box, level=1.0, color=(255, 214, 150), soft=2.0, image=None):
     """The lamp throwing the frame of reel n onto the door planks: light, not a picture stuck on. box = (x0, y0,
     x1, y1) on the door; the frame keeps its 16:9 inside it. The planks show through. level 0..1 fades it in.
     image = your own RGB image to throw instead (the tidy wrong drawing, say). Returns the lit rectangle."""
@@ -586,13 +586,16 @@ def thrown_frame(ink, n, box, level=1.0, color=(255, 214, 150), soft=3.0, image=
     h = w * 9 / 16
     cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
     w, h = int(w), int(h)
-    src = (image or frame(n)).convert("RGB").resize((w, h), Image.LANCZOS)
+    src = (image or frame(n)).convert("RGB")
+    if sum(src.resize((1, 1), Image.BILINEAR).getpixel((0, 0))) > 480:      # a pencilled page: thicken the pencil so it carries
+        src = src.filter(ImageFilter.MinFilter(3)).point(lambda v: int(255 * (v / 255) ** 2.2))
+    src = src.resize((w, h), Image.LANCZOS)
     pad = int(soft * 3) + 2
     lightmap = Image.new("RGB", (w + 2 * pad, h + 2 * pad), (0, 0, 0))
     warm = ImageChops.multiply(src, Image.new("RGB", src.size, tuple(color[:3])))
     warm = Image.blend(warm, Image.new("RGB", src.size, tuple(color[:3])), 0.16)      # even the dark parts are lit
     lightmap.paste(warm, (pad, pad))
-    lightmap = lightmap.filter(ImageFilter.GaussianBlur(soft * 0.45))
+    lightmap = lightmap.filter(ImageFilter.GaussianBlur(soft * 0.3))
     m = Image.new("L", lightmap.size, 0)
     ImageDraw.Draw(m).rectangle([pad, pad, pad + w, pad + h], fill=int(235 * clamp(level)))
     m = m.filter(ImageFilter.GaussianBlur(soft))
@@ -927,17 +930,17 @@ def lantern_sprite(s=1.0, t=0.0, lit=1.0, swing=0.0, seed=0, tint=None, tint_amo
 # a longer pile goes on with. (kind, argument, paw print, dx, lift, angle)
 PILE = [
     ("page", "jaw", True, 0, 0, -6),
-    ("reel", REEL_FIRST, True, 27, 0, 4),
-    ("half", REEL_HALF, False, 55, 0, -3),
-    ("strip", None, False, 81, 0, 8),
-    ("flange", None, False, 100, 0, -10),
-    ("gear", None, False, 13, 8, 20),
-    ("reel", 2, False, 42, 9, -5),
-    ("spool", None, False, 70, 7, 84),
-    ("page", "fish_bell", False, 91, 7, 5),
-    ("reel", 3, False, 28, 17, 3),
-    ("crank", None, False, 58, 15, -14),
-    ("reel", 4, False, 80, 16, -2),
+    ("reel", REEL_FIRST, True, 44, 0, 4),
+    ("half", REEL_HALF, False, 92, 0, -3),
+    ("strip", None, False, 142, 0, 8),
+    ("flange", None, False, 172, 0, -10),
+    ("gear", None, False, 20, 3, 20),
+    ("reel", 2, False, 68, 12, -5),
+    ("spool", None, False, 120, 2, 84),
+    ("page", "fish_bell", False, 150, 10, 5),
+    ("reel", 3, False, 30, 22, 3),
+    ("crank", None, False, 100, 20, -14),
+    ("reel", 4, False, 122, 22, -2),
 ]
 
 
@@ -960,20 +963,20 @@ def puddle(ink, x, y, w, level=1.0, t=0.0, color=(150, 190, 200), alpha=1.0):
     sh.lay(ink)
 
 
-def pile(ink, t, x, y, count, s=0.6, born=None, wet=1.0, edge=None, spread=1.0, lit=1.0, alpha=1.0):
+def pile(ink, t, x, y, count, s=0.6, born=None, wet=1.0, edge=None, floor=None, spread=1.0, lit=1.0, alpha=1.0):
     """The pile on the sill: small, wet, and growing. (x, y) = the board under its left end. count = how many
     things are on it (0..12): they come in the order of PILE (the child's page with a paw print, the first reel
     with a paw print, the one-sided reel with its loop, a strip, a flange, then a second row on top). born = the
     time each was laid ([t0, t1, ...]): a thing settles for a third of a second after it lands, drips for four
     seconds, and the water under the pile widens with each one. edge = the y of the sill's front lip: if given,
-    water runs over it in drops. spread stretches the row. Returns [(x, y, kind)] for the things drawn."""
+    water runs over it in drops, down to `floor` (the y of the water line) if that is given too. spread stretches the row. Returns [(x, y, kind)] for the things drawn."""
     count = int(clamp(count, 0, len(PILE)))
     out = []
     if count <= 0:
         return out
     born = list(born or [])
     last_x = max(PILE[k][3] for k in range(count)) * s * spread
-    puddle(ink, x + last_x / 2, y + 1.5, last_x + 46 * s, level=wet * (0.45 + 0.55 * count / len(PILE)), t=t)
+    puddle(ink, x + last_x / 2, y + 1.5, last_x + 60 * s, level=wet * (0.45 + 0.55 * count / len(PILE)), t=t)
     for k in range(count):
         kind, arg, pw, dx, lift, ang = PILE[k]
         age = t - born[k] if k < len(born) else 99.0
@@ -985,18 +988,19 @@ def pile(ink, t, x, y, count, s=0.6, born=None, wet=1.0, edge=None, spread=1.0, 
         px = x + dx * s * spread
         if kind == "page":
             py = y - 3.4 * s - lift * s + drop
-            page(ink, px, py, s, drawing=arg, flat=0.84, angle=ang, wet=w * 0.8, paw=pw, alpha=alpha)
+            py = y - 6.0 * s - lift * s + drop
+            page(ink, px, py, s, drawing=arg, flat=0.72, angle=ang, wet=w * 0.6, paw=pw, alpha=alpha)
         elif kind in ("reel", "half"):
-            py = y - 9.5 * s - lift * s + drop
-            reel(ink, arg, px, py, s * 0.8, tilt=0.5, angle=ang, wet=w, paw=pw, half=kind == "half", lit=lit, alpha=alpha)
+            py = y - 15.5 * s - lift * s + drop
+            reel(ink, arg, px, py, s, tilt=0.62, angle=ang, wet=w, paw=pw, half=kind == "half", loop=0.8, lit=lit, alpha=alpha)
         else:
             py = y - (5.0 if kind in ("strip", "crank") else 8.0) * s - lift * s + drop
-            _s = _part_sheet(kind, px, py, s * 0.8, ang, 0.6, w, 0.0, t)
+            _s = _part_sheet(kind, px, py, s * 0.9, ang, 0.6, w, 0.0, t)
             if kind in ("flange", "gear"):
                 _s.squash(0.55)
             _s.lay(ink, alpha)
         if age < 4.2 and edge is not None:
-            drips(ink, t, px, edge, born[k] + 0.25, width=22 * s, floor=None, s=max(0.6, s), seed=k, heavy=0.8)
+            drips(ink, t, px, edge, born[k] + 0.25, width=22 * s, floor=floor, s=max(0.6, s), seed=k, heavy=0.8)
         out.append((px, py, kind))
     return out
 
