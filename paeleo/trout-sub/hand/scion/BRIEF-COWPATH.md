@@ -22,7 +22,7 @@ This one is a CARTOON, and it is made by actually running the SCION.
 - **Almost no words.** At most 20 words on screen in the whole film, the title included. No headings, lists,
   tables, quotations, labels, captions or diagrams. At most three short spoken lines, or none. Sound and
   music carry it: use the kit's Mix.
-- **Run the SCION.** `scion/SCION_AGENT_FIRST_ARCHITECT.md` holds SCION: AUTONOMOUS ANIMATION STUDIO.
+- **Run the SCION.** `scion/SCION_AUTONOMOUS_ANIMATION_STUDIO.md` is SCION: AUTONOMOUS ANIMATION STUDIO, in full.
   It is your operating instruction: creative thesis, a bar, the hardest passage first, independent
   criticism, root-cause repair, honest evidence labels. Each scene builder is also handed ONE animation
   SCION whole (`scion/animation-NN.md`) and must work by it: its primitives, its hard proof, its bar.
