@@ -1,0 +1,1044 @@
+{
+ "library": {
+  "hoof_turf_touch": {
+   "peak_dbfs": -17.7,
+   "peak": 0.13,
+   "rms_dbfs": -30.2,
+   "seconds": 0.156,
+   "centroid_hz": 150,
+   "dominant_hz": 135,
+   "lr_db": 0.0,
+   "onset_ms": 7.6,
+   "clipped": 0
+  },
+  "hoof_turf_walk": {
+   "peak_dbfs": -11.7,
+   "peak": 0.26,
+   "rms_dbfs": -25.0,
+   "seconds": 0.237,
+   "centroid_hz": 97,
+   "dominant_hz": 93,
+   "lr_db": 0.0,
+   "onset_ms": 3.6,
+   "clipped": 0
+  },
+  "hoof_turf_heavy": {
+   "peak_dbfs": -7.6,
+   "peak": 0.4159,
+   "rms_dbfs": -20.6,
+   "seconds": 0.313,
+   "centroid_hz": 73,
+   "dominant_hz": 70,
+   "lr_db": 0.0,
+   "onset_ms": 3.6,
+   "clipped": 0
+  },
+  "hoof_pavement_touch": {
+   "peak_dbfs": -19.2,
+   "peak": 0.11,
+   "rms_dbfs": -38.4,
+   "seconds": 0.111,
+   "centroid_hz": 1466,
+   "dominant_hz": 432,
+   "lr_db": 0.0,
+   "onset_ms": 5.2,
+   "clipped": 0
+  },
+  "hoof_pavement_walk": {
+   "peak_dbfs": -13.2,
+   "peak": 0.22,
+   "rms_dbfs": -33.6,
+   "seconds": 0.144,
+   "centroid_hz": 726,
+   "dominant_hz": 97,
+   "lr_db": 0.0,
+   "onset_ms": 5.2,
+   "clipped": 0
+  },
+  "hoof_pavement_heavy": {
+   "peak_dbfs": -9.1,
+   "peak": 0.3519,
+   "rms_dbfs": -30.2,
+   "seconds": 0.169,
+   "centroid_hz": 325,
+   "dominant_hz": 83,
+   "lr_db": 0.0,
+   "onset_ms": 5.2,
+   "clipped": 0
+  },
+  "hoof_slab": {
+   "peak_dbfs": -12.3,
+   "peak": 0.242,
+   "rms_dbfs": -33.3,
+   "seconds": 0.188,
+   "centroid_hz": 344,
+   "dominant_hz": 308,
+   "lr_db": 0.0,
+   "onset_ms": 3.1,
+   "clipped": 0
+  },
+  "hoof_gravel": {
+   "peak_dbfs": -15.2,
+   "peak": 0.1747,
+   "rms_dbfs": -33.3,
+   "seconds": 0.158,
+   "centroid_hz": 2965,
+   "dominant_hz": 139,
+   "lr_db": 0.0,
+   "onset_ms": 2.8,
+   "clipped": 0
+  },
+  "hoof_mud": {
+   "peak_dbfs": -8.8,
+   "peak": 0.3639,
+   "rms_dbfs": -20.9,
+   "seconds": 0.497,
+   "centroid_hz": 200,
+   "dominant_hz": 56,
+   "lr_db": 0.0,
+   "onset_ms": 5.0,
+   "clipped": 0
+  },
+  "hoof_water": {
+   "peak_dbfs": -13.2,
+   "peak": 0.22,
+   "rms_dbfs": -31.0,
+   "seconds": 0.274,
+   "centroid_hz": 1241,
+   "dominant_hz": 128,
+   "lr_db": 0.0,
+   "onset_ms": 4.7,
+   "clipped": 0
+  },
+  "hoof_wood": {
+   "peak_dbfs": -13.2,
+   "peak": 0.22,
+   "rms_dbfs": -29.5,
+   "seconds": 0.126,
+   "centroid_hz": 282,
+   "dominant_hz": 151,
+   "lr_db": 0.0,
+   "onset_ms": 7.1,
+   "clipped": 0
+  },
+  "walk_turf_then_pavement": {
+   "peak_dbfs": -11.7,
+   "peak": 0.26,
+   "rms_dbfs": -31.3,
+   "seconds": 3.799,
+   "centroid_hz": 353,
+   "dominant_hz": 138,
+   "lr_db": 0.0,
+   "onset_ms": 3.7,
+   "clipped": 0
+  },
+  "bell": {
+   "peak_dbfs": -14.0,
+   "peak": 0.2,
+   "rms_dbfs": -31.4,
+   "seconds": 0.952,
+   "centroid_hz": 871,
+   "dominant_hz": 743,
+   "lr_db": 0.0,
+   "onset_ms": 9.4,
+   "clipped": 0
+  },
+  "bell_settling": {
+   "peak_dbfs": -24.4,
+   "peak": 0.06,
+   "rms_dbfs": -41.7,
+   "seconds": 0.788,
+   "centroid_hz": 801,
+   "dominant_hz": 740,
+   "lr_db": 0.0,
+   "onset_ms": 9.4,
+   "clipped": 0
+  },
+  "bell_startled": {
+   "peak_dbfs": -10.5,
+   "peak": 0.3,
+   "rms_dbfs": -28.4,
+   "seconds": 1.153,
+   "centroid_hz": 883,
+   "dominant_hz": 742,
+   "lr_db": 0.0,
+   "onset_ms": 9.4,
+   "clipped": 0
+  },
+  "bell_under_paper": {
+   "peak_dbfs": -24.4,
+   "peak": 0.06,
+   "rms_dbfs": -38.0,
+   "seconds": 0.825,
+   "centroid_hz": 370,
+   "dominant_hz": 370,
+   "lr_db": 0.0,
+   "onset_ms": 20.0,
+   "clipped": 0
+  },
+  "bell_under_water": {
+   "peak_dbfs": -20.4,
+   "peak": 0.096,
+   "rms_dbfs": -35.0,
+   "seconds": 0.985,
+   "centroid_hz": 684,
+   "dominant_hz": 743,
+   "lr_db": 0.0,
+   "onset_ms": 11.3,
+   "clipped": 0
+  },
+  "moo_content": {
+   "peak_dbfs": -14.0,
+   "peak": 0.2,
+   "rms_dbfs": -23.6,
+   "seconds": 1.427,
+   "centroid_hz": 423,
+   "dominant_hz": 116,
+   "lr_db": 0.0,
+   "onset_ms": 698.3,
+   "clipped": 0
+  },
+  "moo_puzzled": {
+   "peak_dbfs": -14.0,
+   "peak": 0.2,
+   "rms_dbfs": -23.3,
+   "seconds": 0.938,
+   "centroid_hz": 338,
+   "dominant_hz": 101,
+   "lr_db": 0.0,
+   "onset_ms": 372.3,
+   "clipped": 0
+  },
+  "moo_alarmed": {
+   "peak_dbfs": -10.5,
+   "peak": 0.3,
+   "rms_dbfs": -21.4,
+   "seconds": 0.811,
+   "centroid_hz": 745,
+   "dominant_hz": 224,
+   "lr_db": 0.0,
+   "onset_ms": 176.2,
+   "clipped": 0
+  },
+  "pencil_line": {
+   "peak_dbfs": -25.2,
+   "peak": 0.055,
+   "rms_dbfs": -42.8,
+   "seconds": 2.2,
+   "centroid_hz": 4476,
+   "dominant_hz": 4251,
+   "lr_db": 0.0,
+   "onset_ms": 1330.8,
+   "clipped": 0
+  },
+  "pencil_stroke": {
+   "peak_dbfs": -26.2,
+   "peak": 0.0489,
+   "rms_dbfs": -43.3,
+   "seconds": 0.501,
+   "centroid_hz": 4356,
+   "dominant_hz": 3469,
+   "lr_db": 0.0,
+   "onset_ms": 281.6,
+   "clipped": 0
+  },
+  "pencil_hard": {
+   "peak_dbfs": -21.6,
+   "peak": 0.0829,
+   "rms_dbfs": -38.3,
+   "seconds": 0.501,
+   "centroid_hz": 3469,
+   "dominant_hz": 3469,
+   "lr_db": 0.0,
+   "onset_ms": 281.6,
+   "clipped": 0
+  },
+  "stamp": {
+   "peak_dbfs": -9.4,
+   "peak": 0.3399,
+   "rms_dbfs": -26.6,
+   "seconds": 0.295,
+   "centroid_hz": 118,
+   "dominant_hz": 112,
+   "lr_db": 0.0,
+   "onset_ms": 2.7,
+   "clipped": 0
+  },
+  "stamp_careless": {
+   "peak_dbfs": -13.8,
+   "peak": 0.204,
+   "rms_dbfs": -30.5,
+   "seconds": 0.308,
+   "centroid_hz": 137,
+   "dominant_hz": 130,
+   "lr_db": 0.0,
+   "onset_ms": 2.7,
+   "clipped": 0
+  },
+  "lever": {
+   "peak_dbfs": -12.4,
+   "peak": 0.24,
+   "rms_dbfs": -25.5,
+   "seconds": 0.356,
+   "centroid_hz": 105,
+   "dominant_hz": 79,
+   "lr_db": 0.0,
+   "onset_ms": 63.3,
+   "clipped": 0
+  },
+  "brush": {
+   "peak_dbfs": -23.1,
+   "peak": 0.07,
+   "rms_dbfs": -36.9,
+   "seconds": 0.498,
+   "centroid_hz": 1193,
+   "dominant_hz": 1652,
+   "lr_db": 0.0,
+   "onset_ms": 223.6,
+   "clipped": 0
+  },
+  "paper_flip": {
+   "peak_dbfs": -20.9,
+   "peak": 0.09,
+   "rms_dbfs": -34.2,
+   "seconds": 0.088,
+   "centroid_hz": 5073,
+   "dominant_hz": 7640,
+   "lr_db": 0.0,
+   "onset_ms": 55.4,
+   "clipped": 0
+  },
+  "paper_land": {
+   "peak_dbfs": -23.1,
+   "peak": 0.07,
+   "rms_dbfs": -41.2,
+   "seconds": 0.109,
+   "centroid_hz": 1411,
+   "dominant_hz": 781,
+   "lr_db": 0.0,
+   "onset_ms": 8.8,
+   "clipped": 0
+  },
+  "paper_slide": {
+   "peak_dbfs": -20.7,
+   "peak": 0.0922,
+   "rms_dbfs": -39.0,
+   "seconds": 0.306,
+   "centroid_hz": 4472,
+   "dominant_hz": 425,
+   "lr_db": -3.9,
+   "onset_ms": 84.6,
+   "clipped": 0
+  },
+  "paper_pile": {
+   "peak_dbfs": -12.8,
+   "peak": 0.2287,
+   "rms_dbfs": -31.7,
+   "seconds": 3.601,
+   "centroid_hz": 3965,
+   "dominant_hz": 1522,
+   "lr_db": 0.0,
+   "onset_ms": 3471.7,
+   "clipped": 0
+  },
+  "knife_cut": {
+   "peak_dbfs": -7.5,
+   "peak": 0.4199,
+   "rms_dbfs": -27.6,
+   "seconds": 0.606,
+   "centroid_hz": 6015,
+   "dominant_hz": 5404,
+   "lr_db": 0.0,
+   "onset_ms": 417.5,
+   "clipped": 0
+  },
+  "graft_seat": {
+   "peak_dbfs": -14.0,
+   "peak": 0.2,
+   "rms_dbfs": -31.5,
+   "seconds": 0.137,
+   "centroid_hz": 629,
+   "dominant_hz": 233,
+   "lr_db": 0.0,
+   "onset_ms": 3.0,
+   "clipped": 0
+  },
+  "creak": {
+   "peak_dbfs": -18.4,
+   "peak": 0.12,
+   "rms_dbfs": -32.9,
+   "seconds": 0.596,
+   "centroid_hz": 503,
+   "dominant_hz": 312,
+   "lr_db": 0.0,
+   "onset_ms": 128.6,
+   "clipped": 0
+  },
+  "binding": {
+   "peak_dbfs": -17.2,
+   "peak": 0.138,
+   "rms_dbfs": -33.0,
+   "seconds": 1.429,
+   "centroid_hz": 488,
+   "dominant_hz": 327,
+   "lr_db": 0.0,
+   "onset_ms": 1154.6,
+   "clipped": 0
+  },
+  "wind": {
+   "peak_dbfs": -32.8,
+   "peak": 0.023,
+   "rms_dbfs": -47.6,
+   "seconds": 7.875,
+   "centroid_hz": 99,
+   "dominant_hz": 33,
+   "lr_db": 0.0,
+   "onset_ms": 4883.0,
+   "clipped": 0
+  },
+  "room": {
+   "peak_dbfs": -36.6,
+   "peak": 0.0147,
+   "rms_dbfs": -50.6,
+   "seconds": 5.995,
+   "centroid_hz": 858,
+   "dominant_hz": 203,
+   "lr_db": 0.2,
+   "onset_ms": 5228.2,
+   "clipped": 0
+  },
+  "water_bank": {
+   "peak_dbfs": -16.2,
+   "peak": 0.1543,
+   "rms_dbfs": -34.5,
+   "seconds": 7.937,
+   "centroid_hz": 1357,
+   "dominant_hz": 1320,
+   "lr_db": -0.1,
+   "onset_ms": 5096.4,
+   "clipped": 0
+  },
+  "water_under": {
+   "peak_dbfs": -18.4,
+   "peak": 0.1195,
+   "rms_dbfs": -34.4,
+   "seconds": 7.931,
+   "centroid_hz": 528,
+   "dominant_hz": 434,
+   "lr_db": 0.0,
+   "onset_ms": 1832.8,
+   "clipped": 0
+  },
+  "splash_under": {
+   "peak_dbfs": -13.2,
+   "peak": 0.22,
+   "rms_dbfs": -26.1,
+   "seconds": 0.579,
+   "centroid_hz": 337,
+   "dominant_hz": 97,
+   "lr_db": 0.1,
+   "onset_ms": 3.5,
+   "clipped": 0
+  },
+  "bubbles": {
+   "peak_dbfs": -27.6,
+   "peak": 0.0418,
+   "rms_dbfs": -40.9,
+   "seconds": 0.267,
+   "centroid_hz": 710,
+   "dominant_hz": 795,
+   "lr_db": 0.3,
+   "onset_ms": 4.7,
+   "clipped": 0
+  },
+  "fish_drift": {
+   "peak_dbfs": -26.7,
+   "peak": 0.046,
+   "rms_dbfs": -41.5,
+   "seconds": 0.754,
+   "centroid_hz": 318,
+   "dominant_hz": 305,
+   "lr_db": -0.8,
+   "onset_ms": 416.1,
+   "clipped": 0
+  },
+  "fish_swim": {
+   "peak_dbfs": -23.1,
+   "peak": 0.07,
+   "rms_dbfs": -36.7,
+   "seconds": 0.287,
+   "centroid_hz": 469,
+   "dominant_hz": 689,
+   "lr_db": 0.0,
+   "onset_ms": 148.3,
+   "clipped": 0
+  },
+  "fish_dart": {
+   "peak_dbfs": -20.1,
+   "peak": 0.099,
+   "rms_dbfs": -32.8,
+   "seconds": 0.174,
+   "centroid_hz": 688,
+   "dominant_hz": 512,
+   "lr_db": 0.0,
+   "onset_ms": 83.4,
+   "clipped": 0
+  },
+  "tail_flick": {
+   "peak_dbfs": -22.1,
+   "peak": 0.0789,
+   "rms_dbfs": -31.4,
+   "seconds": 0.212,
+   "centroid_hz": 59,
+   "dominant_hz": 61,
+   "lr_db": 0.0,
+   "onset_ms": 38.0,
+   "clipped": 0
+  },
+  "fish_turn": {
+   "peak_dbfs": -22.3,
+   "peak": 0.0764,
+   "rms_dbfs": -34.7,
+   "seconds": 0.436,
+   "centroid_hz": 373,
+   "dominant_hz": 342,
+   "lr_db": 0.0,
+   "onset_ms": 349.7,
+   "clipped": 0
+  },
+  "stone_set": {
+   "peak_dbfs": -12.2,
+   "peak": 0.2448,
+   "rms_dbfs": -35.2,
+   "seconds": 1.049,
+   "centroid_hz": 1246,
+   "dominant_hz": 1110,
+   "lr_db": 0.0,
+   "onset_ms": 15.4,
+   "clipped": 0
+  },
+  "stone_dropped": {
+   "peak_dbfs": -14.0,
+   "peak": 0.2,
+   "rms_dbfs": -26.3,
+   "seconds": 0.389,
+   "centroid_hz": 70,
+   "dominant_hz": 67,
+   "lr_db": 0.0,
+   "onset_ms": 3.9,
+   "clipped": 0
+  },
+  "slab_on": {
+   "peak_dbfs": -10.5,
+   "peak": 0.3002,
+   "rms_dbfs": -30.8,
+   "seconds": 1.522,
+   "centroid_hz": 630,
+   "dominant_hz": 185,
+   "lr_db": 0.0,
+   "onset_ms": 62.4,
+   "clipped": 0
+  },
+  "nudge_firm": {
+   "peak_dbfs": -10.3,
+   "peak": 0.3049,
+   "rms_dbfs": -32.6,
+   "seconds": 1.233,
+   "centroid_hz": 1187,
+   "dominant_hz": 1320,
+   "lr_db": 0.0,
+   "onset_ms": 4.1,
+   "clipped": 0
+  },
+  "slab_rocks": {
+   "peak_dbfs": -11.0,
+   "peak": 0.2805,
+   "rms_dbfs": -32.4,
+   "seconds": 0.816,
+   "centroid_hz": 478,
+   "dominant_hz": 152,
+   "lr_db": 0.2,
+   "onset_ms": 34.7,
+   "clipped": 0
+  },
+  "refuse": {
+   "peak_dbfs": -15.9,
+   "peak": 0.16,
+   "rms_dbfs": -29.1,
+   "seconds": 0.667,
+   "centroid_hz": 181,
+   "dominant_hz": 99,
+   "lr_db": 0.0,
+   "onset_ms": 109.6,
+   "clipped": 0
+  },
+  "passed": {
+   "peak_dbfs": -10.3,
+   "peak": 0.3049,
+   "rms_dbfs": -34.1,
+   "seconds": 2.435,
+   "centroid_hz": 1030,
+   "dominant_hz": 880,
+   "lr_db": 0.0,
+   "onset_ms": 4.1,
+   "clipped": 0
+  },
+  "refuse_then_passed": {
+   "peak_dbfs": -9.5,
+   "peak": 0.3357,
+   "rms_dbfs": -33.9,
+   "seconds": 5.499,
+   "centroid_hz": 1467,
+   "dominant_hz": 880,
+   "lr_db": 0.0,
+   "onset_ms": 33.9,
+   "clipped": 0
+  }
+ },
+ "music": {
+  "music_1_wanders": {
+   "peak_dbfs": -7.7,
+   "peak": 0.4141,
+   "rms_dbfs": -30.3,
+   "seconds": 29.053,
+   "centroid_hz": 1365,
+   "dominant_hz": 73,
+   "lr_db": -0.6,
+   "onset_ms": 14852.6,
+   "clipped": 0,
+   "film_span": [
+    0.0,
+    36.0
+   ]
+  },
+  "music_2_ground_up": {
+   "peak_dbfs": -8.6,
+   "peak": 0.3694,
+   "rms_dbfs": -32.1,
+   "seconds": 35.902,
+   "centroid_hz": 1148,
+   "dominant_hz": 495,
+   "lr_db": -0.1,
+   "onset_ms": 24477.4,
+   "clipped": 0,
+   "film_span": [
+    36.0,
+    76.0
+   ]
+  },
+  "music_3_straight": {
+   "peak_dbfs": -9.1,
+   "peak": 0.3525,
+   "rms_dbfs": -33.2,
+   "seconds": 39.131,
+   "centroid_hz": 2036,
+   "dominant_hz": 73,
+   "lr_db": 0.5,
+   "onset_ms": 28968.2,
+   "clipped": 0,
+   "film_span": [
+    76.0,
+    120.0
+   ]
+  },
+  "music (the three together, not written: it is the three files end to end)": {
+   "peak_dbfs": -7.7,
+   "peak": 0.4141,
+   "rms_dbfs": -32.1,
+   "seconds": 110.207,
+   "centroid_hz": 1044,
+   "dominant_hz": 294,
+   "lr_db": -0.1,
+   "onset_ms": 14852.6,
+   "clipped": 0
+  },
+  "foley (board times, no music; not written)": {
+   "peak_dbfs": -2.0,
+   "peak": 0.7969,
+   "rms_dbfs": -32.8,
+   "seconds": 119.035,
+   "centroid_hz": 1418,
+   "dominant_hz": 150,
+   "lr_db": 0.4,
+   "onset_ms": 23514.6,
+   "clipped": 0
+  },
+  "film_reference": {
+   "peak_dbfs": -2.0,
+   "peak": 0.7969,
+   "rms_dbfs": -29.6,
+   "seconds": 119.035,
+   "centroid_hz": 1206,
+   "dominant_hz": 294,
+   "lr_db": 0.1,
+   "onset_ms": 23514.6,
+   "clipped": 0
+  }
+ },
+ "music_silences": [
+  {
+   "span": [
+    0.0,
+    5.23
+   ],
+   "music_peak": 0.0,
+   "film_peak_dbfs": -11.1,
+   "film_rms_dbfs": -33.7
+  },
+  {
+   "span": [
+    7.006,
+    7.594
+   ],
+   "music_peak": 0.0,
+   "film_peak_dbfs": -34.4,
+   "film_rms_dbfs": -47.1
+  },
+  {
+   "span": [
+    14.006,
+    14.57
+   ],
+   "music_peak": 0.0,
+   "film_peak_dbfs": -17.2,
+   "film_rms_dbfs": -30.6
+  },
+  {
+   "span": [
+    20.71,
+    26.57
+   ],
+   "music_peak": 0.0,
+   "film_peak_dbfs": -2.0,
+   "film_rms_dbfs": -30.0
+  },
+  {
+   "span": [
+    27.36,
+    27.47
+   ],
+   "music_peak": 0.0,
+   "film_peak_dbfs": -36.7,
+   "film_rms_dbfs": -46.7
+  },
+  {
+   "span": [
+    35.006,
+    40.07
+   ],
+   "music_peak": 0.0,
+   "film_peak_dbfs": -19.9,
+   "film_rms_dbfs": -43.6
+  },
+  {
+   "span": [
+    55.506,
+    59.98
+   ],
+   "music_peak": 0.0,
+   "film_peak_dbfs": -27.0,
+   "film_rms_dbfs": -47.5
+  },
+  {
+   "span": [
+    60.71,
+    60.98
+   ],
+   "music_peak": 0.0,
+   "film_peak_dbfs": -38.5,
+   "film_rms_dbfs": -50.0
+  },
+  {
+   "span": [
+    64.606,
+    65.48
+   ],
+   "music_peak": 0.0,
+   "film_peak_dbfs": -25.7,
+   "film_rms_dbfs": -40.9
+  },
+  {
+   "span": [
+    71.51,
+    73.28
+   ],
+   "music_peak": 0.0,
+   "film_peak_dbfs": -37.1,
+   "film_rms_dbfs": -47.5
+  },
+  {
+   "span": [
+    79.006,
+    80.98
+   ],
+   "music_peak": 0.0,
+   "film_peak_dbfs": -17.0,
+   "film_rms_dbfs": -34.0
+  },
+  {
+   "span": [
+    83.006,
+    84.49
+   ],
+   "music_peak": 0.0,
+   "film_peak_dbfs": -24.6,
+   "film_rms_dbfs": -38.6
+  },
+  {
+   "span": [
+    93.506,
+    94.48
+   ],
+   "music_peak": 0.0,
+   "film_peak_dbfs": -23.2,
+   "film_rms_dbfs": -37.3
+  },
+  {
+   "span": [
+    97.83,
+    103.18
+   ],
+   "music_peak": 0.0,
+   "film_peak_dbfs": -12.0,
+   "film_rms_dbfs": -34.6
+  },
+  {
+   "span": [
+    116.006,
+    120.0
+   ],
+   "music_peak": 0.0,
+   "film_peak_dbfs": -22.6,
+   "film_rms_dbfs": -38.3
+  }
+ ],
+ "holds": {
+  "1.1 title 0.8-3.0": {
+   "peak_dbfs": -36.3,
+   "rms_dbfs": -47.4
+  },
+  "1.2 at the tree 7.0-7.6": {
+   "peak_dbfs": -34.4,
+   "rms_dbfs": -46.9
+  },
+  "1.5 after the tree 23.8+0.6..24.3": {
+   "peak_dbfs": -36.7,
+   "rms_dbfs": -44.5
+  },
+  "1.5 her look 25.5-26.5": {
+   "peak_dbfs": -34.5,
+   "rms_dbfs": -45.2
+  },
+  "1.7 silence 35.2-36.0": {
+   "peak_dbfs": -120.0,
+   "rms_dbfs": -120.0
+  },
+  "2.4 insert 55.5-57.5": {
+   "peak_dbfs": -37.9,
+   "rms_dbfs": -50.3
+  },
+  "2.5 silence 64.6-64.9": {
+   "peak_dbfs": -70.8,
+   "rms_dbfs": -114.0
+  },
+  "2.5 silence 65.2-65.5": {
+   "peak_dbfs": -41.9,
+   "rms_dbfs": -55.7
+  },
+  "2.7 the wait 71.6-73.3": {
+   "peak_dbfs": -37.1,
+   "rms_dbfs": -47.6
+  },
+  "3.2 bubble line 83.0-83.5": {
+   "peak_dbfs": -24.6,
+   "rms_dbfs": -38.4
+  },
+  "3.3 hold 93.6-94.0": {
+   "peak_dbfs": -24.9,
+   "rms_dbfs": -37.9
+  },
+  "3.4 97.9-98.6": {
+   "peak_dbfs": -21.5,
+   "rms_dbfs": -35.3
+  },
+  "3.4 stillest second 100.3-101.2": {
+   "peak_dbfs": -29.3,
+   "rms_dbfs": -42.7
+  },
+  "3.4 before it 99.0-99.2": {
+   "peak_dbfs": -26.2,
+   "rms_dbfs": -37.4
+  },
+  "credit 119.6-120": {
+   "peak_dbfs": -120.0,
+   "rms_dbfs": -120.0
+  }
+ },
+ "pitches": {
+  "crossing": [
+   293.7,
+   329.6,
+   370.0,
+   440.0,
+   493.9,
+   587.3
+  ],
+  "nudges": [
+   293.7,
+   329.6,
+   370.0
+  ],
+  "wrong_A": 415.0,
+  "true_A": 440.0,
+  "stamp_bad_B": 479.8,
+  "survey_D": 293.7,
+  "settle_start": 107.6,
+  "settle_end": 73.4,
+  "moo_content": {
+   "first_third_hz": 119.2,
+   "last_third_hz": 104.1
+  },
+  "moo_puzzled": {
+   "first_third_hz": 102.4,
+   "last_third_hz": 140.3
+  },
+  "moo_alarmed": {
+   "first_third_hz": 232.1,
+   "last_third_hz": 197.2
+  },
+  "bell_strikes_s_after_head_turn": [
+   0.11,
+   0.38
+  ]
+ },
+ "acts": {
+  "act 1": {
+   "music": {
+    "peak_dbfs": -7.7,
+    "peak": 0.4141,
+    "rms_dbfs": -30.3,
+    "seconds": 29.053,
+    "centroid_hz": 1365,
+    "dominant_hz": 73,
+    "lr_db": -0.6,
+    "onset_ms": 14852.6
+   },
+   "foley": {
+    "peak_dbfs": -2.0,
+    "peak": 0.7969,
+    "rms_dbfs": -30.9,
+    "seconds": 34.089,
+    "centroid_hz": 281,
+    "dominant_hz": 150,
+    "lr_db": 0.7,
+    "onset_ms": 23514.6
+   },
+   "together": {
+    "peak_dbfs": -2.0,
+    "peak": 0.7969,
+    "rms_dbfs": -27.9,
+    "seconds": 34.089,
+    "centroid_hz": 810,
+    "dominant_hz": 73,
+    "lr_db": 0.1,
+    "onset_ms": 23514.6
+   }
+  },
+  "act 2": {
+   "music": {
+    "peak_dbfs": -8.6,
+    "peak": 0.3694,
+    "rms_dbfs": -32.1,
+    "seconds": 35.902,
+    "centroid_hz": 1148,
+    "dominant_hz": 495,
+    "lr_db": -0.1,
+    "onset_ms": 24477.4
+   },
+   "foley": {
+    "peak_dbfs": -5.8,
+    "peak": 0.5154,
+    "rms_dbfs": -33.8,
+    "seconds": 39.683,
+    "centroid_hz": 1217,
+    "dominant_hz": 134,
+    "lr_db": 0.3,
+    "onset_ms": 32100.7
+   },
+   "together": {
+    "peak_dbfs": -4.3,
+    "peak": 0.6064,
+    "rms_dbfs": -30.1,
+    "seconds": 39.683,
+    "centroid_hz": 1322,
+    "dominant_hz": 495,
+    "lr_db": 0.1,
+    "onset_ms": 23684.3
+   }
+  },
+  "act 3": {
+   "music": {
+    "peak_dbfs": -9.1,
+    "peak": 0.3525,
+    "rms_dbfs": -33.2,
+    "seconds": 39.564,
+    "centroid_hz": 2036,
+    "dominant_hz": 73,
+    "lr_db": 0.4,
+    "onset_ms": 29400.6
+   },
+   "foley": {
+    "peak_dbfs": -9.5,
+    "peak": 0.3341,
+    "rms_dbfs": -33.7,
+    "seconds": 40.0,
+    "centroid_hz": 442,
+    "dominant_hz": 152,
+    "lr_db": 0.0,
+    "onset_ms": 12901.3
+   },
+   "together": {
+    "peak_dbfs": -5.3,
+    "peak": 0.5462,
+    "rms_dbfs": -30.5,
+    "seconds": 40.0,
+    "centroid_hz": 1193,
+    "dominant_hz": 73,
+    "lr_db": 0.3,
+    "onset_ms": 34201.3
+   }
+  },
+  "credit": {
+   "music": {
+    "peak_dbfs": -120.0,
+    "peak": 0.0,
+    "rms_dbfs": -120.0,
+    "seconds": 0.0,
+    "centroid_hz": 0,
+    "dominant_hz": 0,
+    "lr_db": 0.0,
+    "onset_ms": 0.0
+   },
+   "foley": {
+    "peak_dbfs": -22.6,
+    "peak": 0.0738,
+    "rms_dbfs": -37.8,
+    "seconds": 3.561,
+    "centroid_hz": 541,
+    "dominant_hz": 502,
+    "lr_db": -0.1,
+    "onset_ms": 2073.7
+   },
+   "together": {
+    "peak_dbfs": -22.6,
+    "peak": 0.0738,
+    "rms_dbfs": -37.8,
+    "seconds": 3.561,
+    "centroid_hz": 541,
+    "dominant_hz": 502,
+    "lr_db": -0.1,
+    "onset_ms": 2073.7
+   }
+  }
+ }
+}

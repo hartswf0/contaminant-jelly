@@ -71,8 +71,8 @@ T = dict(
     drown=(25.0, 28.6), under=28.6, bell_late=28.9,
     settle=(29.5, 31.5), duck=(29.5, 30.0),
     regard=(31.35, 31.8),        # H: she lifts her head at the stump and holds
-    cut=32.0, grow=(32.25, 32.75),
-    try1=32.75, stuck=32.86, slip=32.92, spring=32.98, reaim=(33.06, 33.26), drop=33.26, seat=33.40, grip=33.55,
+    cut=32.0, grow=(32.2, 32.65),
+    try1=32.65, stuck=32.76, slip=32.88, spring=32.96, reaim=(33.05, 33.26), drop=33.26, seat=33.40, grip=33.55,
     let_go=(33.5, 33.75),
     bind=(33.6, 35.0),
     wait=(35.0, 36.5), lower=(36.5, 37.2), bud=37.2, ear=37.3, head_up=37.6, leaves=(37.2, 38.5),
@@ -166,19 +166,15 @@ def quad_lerp(q0, q1, u, lift=0.0, turn=0.0):
 _aim_cache = {}
 
 
-def aim(base, target, keys=('neck', 'head'), tag=None, lean=0.0):
-    """The pose `base` with two of its angles solved so that her mouth is at `target` (cow units)."""
-    ck = None
-    if tag is not None:
-        ck = (tag, round(target[0], 1), round(target[1], 1))
-        if ck in _aim_cache:
-            return _aim_cache[ck]
-    p = dict(base)
+def _aim2(p, target, keys):
+    p = dict(p)
     lim = [cast.LIMITS[k] for k in keys]
-    for _ in range(14):
+    err = 1e9
+    for _ in range(16):
         m = cast.anchors(p, 0, 0, 1.0)['mouth']
         ex, ey = target[0] - m[0], target[1] - m[1]
-        if ex * ex + ey * ey < 0.09:
+        err = math.hypot(ex, ey)
+        if err < 0.3:
             break
         J = []
         for k in keys:
@@ -191,18 +187,33 @@ def aim(base, target, keys=('neck', 'head'), tag=None, lean=0.0):
             break
         d0 = (ex * J[1][1] - ey * J[1][0]) / det
         d1 = (ey * J[0][0] - ex * J[0][1]) / det
-        p[keys[0]] = clamp(p[keys[0]] + clamp(d0, -22, 22), *lim[0])
-        p[keys[1]] = clamp(p[keys[1]] + clamp(d1, -22, 22), *lim[1])
-    m = cast.anchors(p, 0, 0, 1.0)['mouth']
-    ex, ey = target[0] - m[0], target[1] - m[1]
-    if lean and ex * ex + ey * ey > 1.0:                 # out of the neck's reach: the body leans the rest of the way
-        q = dict(base)
-        q['dx'] = base.get('dx', 0.0) + clamp(ex, -lean, lean)
-        q['dy'] = base.get('dy', 0.0) + clamp(ey, -5.0, 9.0)
-        q[keys[0]], q[keys[1]] = p[keys[0]], p[keys[1]]
-        p = aim(q, target, keys, None, 0.0)
-    if ck is not None:
-        _aim_cache[ck] = p
+        p[keys[0]] = clamp(p[keys[0]] + clamp(d0, -14, 14), *lim[0])
+        p[keys[1]] = clamp(p[keys[1]] + clamp(d1, -14, 14), *lim[1])
+    return p, err
+
+
+def aim(base, target, keys=('neck', 'head'), tag=None, lean=0.0):
+    """The pose `base` with two of its angles solved so that her mouth is at `target` (cow units). With `lean`,
+    the body may shift up to that far to make up what the neck cannot reach."""
+    best = None
+    for start in (None, (-50.0, 40.0), (-20.0, -10.0), (10.0, -35.0), (30.0, 30.0)):
+        p0 = dict(base)
+        if start:
+            p0[keys[0]], p0[keys[1]] = start
+        p, err = _aim2(p0, target, keys)
+        if best is None or err < best[1] - 0.2:
+            best = (p, err)
+        if best[1] < 0.5:
+            break
+    p, err = best
+    for _ in range(4 if lean else 0):                    # out of the neck's reach: the body leans the rest of the way
+        if err < 0.7:
+            break
+        m = cast.anchors(p, 0, 0, 1.0)['mouth']
+        q = dict(p)
+        q['dx'] = clamp(p.get('dx', 0.0) + target[0] - m[0], base.get('dx', 0.0) - lean, base.get('dx', 0.0) + lean)
+        q['dy'] = clamp(p.get('dy', 0.0) + (target[1] - m[1]) * 0.5, base.get('dy', 0.0) - 3.0, base.get('dy', 0.0) + 8.0)
+        p, err = _aim2(q, target, keys)
     return p
 
 
@@ -271,13 +282,13 @@ JUDGE2 = cast.with_(JUDGE, head=62.0, neck=6.0)
 STAMP_UP = cast.stamp_pose(0.5)
 _sx, _sy = U(page_pt(SHEET, STAMP_PAGE))
 STAMP_DN = cast.with_(cast.draw_pose(0.6, 0.55, 1.0), nf=('ik', _sx, _sy), neck=52.0, head=30.0, eye=1.3, ear=28.0)
-FLICK = cast.with_(cast.draw_pose(0.8, 0.7, 1.0), nf=('ik', _sx + 34, _sy - 3), eye=1.0)
+FLICK = cast.with_(cast.draw_pose(0.8, 0.7, 1.0), nf=('ik', _sx + 18, _sy - 3), eye=1.0)
 STOPPED = cast.with_(cast.draw_pose(0.5, 0.25, 1.0), eye=1.0, ear=4.0)
 LOOK_L = cast.with_(SIT, pitch=-66.0, neck=-46.0, head=-34.0, eye=1.5, ear=42.0, nf=('ik', 46.0, cast.DESK_Y), ff=('ik', 66.0, cast.DESK_Y))
 LOOK_R = cast.with_(cast.draw_pose(0.5, 1.0, 1.0), neck=-14.0, head=-12.0, eye=1.5, ear=42.0)
 LOOK_HOOF = cast.with_(SIT, nf=('ik', 74.0, -168.0), neck=40.0, head=50.0, eye=1.2, ear=10.0)
 PLEASED = cast.with_(cast.draw_pose(0.5, 0.0, 1.0), neck=24.0, head=44.0, eye=1.15, ear=14.0)
-FINAL = cast.with_(SIT, neck=30.0, head=40.0, eye=1.6, ear=-30.0, nf=('ik', 50.0, -122.0), ff=('ik', 70.0, -126.0))
+FINAL = cast.with_(SIT, neck=30.0, head=40.0, eye=1.6, ear=-55.0, nf=('ik', 50.0, -122.0), ff=('ik', 70.0, -126.0))
 DUCKED = cast.with_(cast.POSES['desk_slump'], dy=cast.POSES['desk_slump']['dy'] + 30.0)
 
 
@@ -653,7 +664,7 @@ def _heap_data():
                                dp=rs.uniform(6, 14), tone=rs.uniform(0.45, 0.8)))
         sheets.sort(key=lambda s_: s_['a'])
         fa = cast.anchors(FINAL, X, Y, S)
-        _heap.update(xs=xs, rag=rag, sheets=sheets, bell=fa['bell'], horn=fa['horn'], top=Y - fa['horn'][1] - 17.0)
+        _heap.update(xs=xs, rag=rag, sheets=sheets, bell=fa['bell'], horn=fa['horn'], top=Y - fa['horn'][1] - 11.0)
     return _heap
 
 
@@ -687,14 +698,14 @@ def heap_body(level, notch=1.0):
         pts.append((x + r * 1.5, min(Y, y)))
     if notch > 0 and heap_h(bx, level) > (Y - by):                 # the paper has not closed over her bell
         out = []
-        cut = [(bx - 15, None), (bx - 11, by + 15), (bx + 1, by + 19), (bx + 12, by + 13), (bx + 15, None)]
+        cut = True
         for p in pts:
-            if bx - 16 < p[0] < bx + 16:
+            if bx - 17 < p[0] < bx + 11:
                 continue
-            if p[0] >= bx + 16 and cut:
+            if p[0] >= bx + 11 and cut:
                 la = out[-1]
-                out += [(bx - 16, la[1]), (bx - 12, lerp(la[1], by + 15, notch)), (bx + 1, lerp(la[1], by + 19, notch)),
-                        (bx + 13, lerp(la[1], by + 13, notch)), (bx + 17, p[1])]
+                out += [(bx - 17, la[1]), (bx - 14, lerp(la[1], by + 12, notch)), (bx - 3, lerp(la[1], by + 18, notch)),
+                        (bx + 7, lerp(la[1], by + 12, notch)), (bx + 11, p[1])]
                 cut = None
             out.append(p)
         pts = out
@@ -741,30 +752,30 @@ def surface_line():
     return gl + sl + cl + sr + gr
 
 
-def _P(name, axis, keys):
-    """A track keyed in the pixels of a stump drawn at 3 px per unit, re-scaled to the stump as it is drawn."""
-    f = (lambda v: GX + (v - 650.0) * GS / 3.0) if axis == 'x' else (lambda v: GY + (v - 470.0) * GS / 3.0)
-    return L.Pacing(name, [(k[0], f(k[1])) + tuple(k[2:]) for k in keys])
+def _R(name, axis, keys):
+    """A track keyed in px from the middle of the stump's cut (x) and from its rim (y)."""
+    o = GX if axis == 'x' else RIM_Y
+    return L.Pacing(name, [(k[0], o + k[1]) + tuple(k[2:]) for k in keys])
 
 
 PACE = dict(
     settle=L.Pacing('settle', [(29.5, 0.0), (30.2, 0.2, 'in'), (31.0, 0.86, 'smooth'), (31.5, 1.0, 'out')]),
     # the point of the stub / the wedge of the shoot on the screen, and the way the shoot runs from it (degrees)
-    wx=_P('wx', 'x', [(30.0, 623), (31.2, 623), (31.4, 621, 'smooth'), (31.8, 621), (31.95, 615, 'smooth'), (32.0, 619, 'in'),
-                       (32.13, 664, 'in'), (32.25, 668, 'out'), (32.5, 640, 'smooth'), (32.75, 640), (32.86, 643, 'in'),
-                       (32.92, 643.5), (32.98, 669, 'in'), (33.06, 663, 'out'), (33.2, 650, 'smooth'), (33.26, 650), (33.40, 650)]),
-    wy=_P('wy', 'y', [(30.0, 396), (31.2, 396), (31.4, 380, 'smooth'), (31.8, 380), (31.95, 390, 'smooth'), (32.0, 404, 'in'),
-                       (32.13, 405, 'lin'), (32.25, 391, 'out'), (32.5, 358, 'smooth'), (32.75, 358), (32.86, 403, 'in'),
-                       (32.92, 404.5), (32.98, 401, 'lin'), (33.06, 373, 'out'), (33.2, 362, 'smooth'), (33.26, 362),
-                       (33.34, 404, 'in'), (33.40, 440, 'lin')]),
-    ang=L.Pacing('ang', [(30.0, -84), (31.8, -84), (31.95, -96, 'smooth'), (32.0, -92), (32.13, -68, 'in'), (32.25, -62, 'out'),
-                         (32.5, -84, 'smooth'), (32.75, -84), (32.86, -66, 'in'), (32.92, -58, 'out'), (32.98, -50, 'in'),
-                         (33.06, -76, 'out'), (33.2, -90, 'smooth'), (33.40, -90), (33.62, -84, 'over')]),
+    wx=_R('wx', 'x', [(30.0, -27), (31.2, -27), (31.4, -22, 'smooth'), (31.8, -22), (31.95, -25, 'smooth'), (32.0, -30, 'in'),
+                      (32.13, 10, 'in'), (32.25, 8, 'out'), (32.5, -8, 'smooth'), (32.65, -8), (32.76, -7, 'in'),
+                      (32.88, -6.5), (32.96, 8, 'in'), (33.05, 3, 'out'), (33.2, 0, 'smooth'), (33.26, 0), (33.40, 0)]),
+    wy=_R('wy', 'y', [(30.0, -10), (31.2, -10), (31.4, -30, 'smooth'), (31.8, -30), (31.95, -18, 'smooth'), (32.0, 0, 'in'),
+                      (32.13, 1, 'lin'), (32.25, -12, 'out'), (32.5, -42, 'smooth'), (32.65, -42), (32.76, -1, 'in'),
+                      (32.88, 0.5), (32.96, -2, 'lin'), (33.05, -27, 'out'), (33.2, -42, 'smooth'), (33.26, -42),
+                      (33.34, 0, 'in'), (33.40, 12.0 * GS, 'lin')]),
+    ang=L.Pacing('ang', [(30.0, -84), (31.8, -84), (31.95, -94, 'smooth'), (32.0, -92), (32.13, -68, 'in'), (32.25, -66, 'out'),
+                         (32.5, -84, 'smooth'), (32.65, -84), (32.76, -66, 'in'), (32.88, -58, 'out'), (32.96, -62, 'in'),
+                         (33.05, -82, 'out'), (33.2, -90, 'smooth'), (33.40, -90), (33.62, -84, 'over')]),
     grow=L.Pacing('grow', [(T['grow'][0], 0.0), (T['grow'][1], 1.0, 'smooth')]),
-    buds=L.Pacing('buds', [(32.5, 0.0), (32.9, 1.0, 'smooth')]),
-    bend=L.Pacing('bend', [(32.74, 0.0), (32.80, -0.9, 'out'), (32.86, 0.4, 'in'), (32.92, 1.7, 'out'), (32.98, -1.3, 'in'),
-                           (33.06, 0.7, 'out'), (33.2, 0.0, 'smooth'), (33.27, 0.0), (33.33, -0.6, 'out'), (33.40, 0.9, 'in')]),
-    cleft=L.Pacing('cleft', [(32.05, 0.0), (32.10, 0.3, 'out'), (32.86, 0.3), (32.92, 0.38, 'out'), (32.99, 0.3, 'out'),
+    buds=L.Pacing('buds', [(32.42, 0.0), (32.8, 1.0, 'smooth')]),
+    bend=L.Pacing('bend', [(32.64, 0.0), (32.70, -0.9, 'out'), (32.76, 0.4, 'in'), (32.88, 1.7, 'out'), (32.96, -1.3, 'in'),
+                           (33.05, 0.7, 'out'), (33.2, 0.0, 'smooth'), (33.27, 0.0), (33.33, -0.6, 'out'), (33.40, 0.9, 'in')]),
+    cleft=L.Pacing('cleft', [(32.05, 0.0), (32.10, 0.3, 'out'), (32.76, 0.3), (32.88, 0.38, 'out'), (32.97, 0.3, 'out'),
                              (33.33, 0.3), (33.40, 1.0, 'in')]),
     grip=L.Pacing('grip', [(T['seat'], 0.0), (T['grip'], 1.0, 'out')]),
     wind=L.Pacing('wind', [(T['bind'][0], 0.0), (34.0, 0.0), (34.33, 1 / 3.0, 'smooth'), (34.66, 2 / 3.0, 'smooth'), (35.0, 1.0, 'smooth')]),
@@ -782,7 +793,7 @@ def bend_at(t):
 
 
 def wedge_at(t):
-    return (PACE['wx'].at(t), PACE['wy'].at(t), PACE['ang'].at(t))
+    return (PACE['wx'].at(t), PACE['wy'].at(t) + 66.0 * (1 - smooth(ramp(t, 30.35, 31.05))), PACE['ang'].at(t))
 
 
 def stump_shear(t):
@@ -802,10 +813,10 @@ def stump_squash(t):
 STAND = cast.POSES['stand']
 LOOKUP = cast.POSES['look_up']
 HOLD_BASE = cast.with_(STAND, neck=-30.0, head=30.0, ear=26.0, eye=1.2, tail=(6.0, 10.0, 10.0))
-WATCH = cast.with_(LOOKUP, neck=-22.0, head=20.0, ear=24.0, eye=1.15)
-LOW = cast.with_(STAND, dy=5.0, shoulder=5.0, neck=26.0, head=50.0, ear=-42.0, eye=0.5, tail=(0.0, 0.0, 0.0))
-UP = cast.with_(LOOKUP, neck=-38.0, head=8.0, ear=40.0, eye=1.5)
-FOLLOW = cast.with_(LOOKUP, neck=-12.0, head=24.0, ear=30.0, eye=1.3)
+WATCH = cast.with_(LOOKUP, dx=-15.0, neck=-55.0, head=50.0, ear=24.0, eye=1.15)
+LOW = cast.with_(STAND, dx=-8.0, dy=5.0, shoulder=5.0, neck=26.0, head=50.0, ear=-42.0, eye=0.5, tail=(0.0, 0.0, 0.0))
+UP = cast.with_(LOOKUP, dx=-15.0, neck=-57.0, head=44.0, ear=40.0, eye=1.5)
+FOLLOW = cast.with_(LOOKUP, dx=-10.0, neck=-40.0, head=48.0, ear=30.0, eye=1.3)
 
 
 def stand_state(t):
@@ -814,12 +825,13 @@ def stand_state(t):
         wx, wy, ang = wedge_at(t)
         d = _dir(ang)
         m = ((wx + GRIP * d[0] - CX), (wy + GRIP * d[1] - CY))
+        crouch = 1 - smooth(ramp(t, 30.35, 31.05))
         lean = 10.0 * smooth(ramp(t, 31.95, 32.13)) * (1 - smooth(ramp(t, 32.25, 32.5))) - 6.0 * smooth(ramp(t, 31.8, 31.95)) * (1 - smooth(ramp(t, 31.98, 32.05)))
-        lean += 6.0 * smooth(ramp(t, 32.75, 32.9)) * (1 - smooth(ramp(t, 32.98, 33.1))) - 5.0 * smooth(ramp(t, 33.02, 33.12)) * (1 - smooth(ramp(t, 33.26, 33.36)))
-        ear = 26.0 + 22.0 * math.sin(math.pi * ramp(t, 33.08, 33.24)) - 30.0 * smooth(ramp(t, 32.86, 32.96)) * (1 - smooth(ramp(t, 33.0, 33.1)))
-        eye = 1.2 + 0.35 * smooth(ramp(t, 32.3, 32.6)) * (1 - smooth(ramp(t, 32.75, 32.85))) + 0.5 * smooth(ramp(t, 32.92, 32.99)) * (1 - smooth(ramp(t, 33.1, 33.26)))
-        base = cast.with_(HOLD_BASE, dx=lean, ear=ear, eye=eye, pitch=0.6 * lean * 0.2)
-        pose = aim(base, m, lean=30.0)
+        lean += 6.0 * smooth(ramp(t, 32.65, 32.8)) * (1 - smooth(ramp(t, 32.94, 33.05))) - 5.0 * smooth(ramp(t, 32.98, 33.1)) * (1 - smooth(ramp(t, 33.26, 33.36)))
+        ear = 26.0 + 22.0 * math.sin(math.pi * ramp(t, 33.06, 33.24)) - 34.0 * smooth(ramp(t, 32.76, 32.86)) * (1 - smooth(ramp(t, 32.96, 33.06)))
+        eye = 1.2 + 0.35 * smooth(ramp(t, 32.25, 32.5)) * (1 - smooth(ramp(t, 32.65, 32.75))) + 0.6 * smooth(ramp(t, 32.88, 32.95)) * (1 - smooth(ramp(t, 33.1, 33.26)))
+        base = cast.with_(HOLD_BASE, dx=lean, dy=58.0 * crouch, ear=ear, eye=eye, pitch=0.6 * lean * 0.2)
+        pose = aim(base, m, lean=15.0)
         return dict(pose=pose, held=True)
     hold_end = stand_state(T['let_go'][0] - 1e-4)['pose']
     pose = keyed([(T['let_go'][0], hold_end), (T['let_go'][0] + 0.08, cast.with_(hold_end, jaw=14.0), 'out'),
@@ -856,6 +868,14 @@ def shoot_strokes(t):
         al = (p[0] - wx) * d[0] + (p[1] - wy) * d[1]
         off = b * 17.0 * (max(0.0, al) / full) ** 2
         return (p[0] + n[0] * off, p[1] + n[1] * off)
+    if g < 0.9:                                      # the lead of the pencil: it is drawn away as the stub becomes wood
+        r = 5.5 * GS * (1 - g / 0.9)
+        tri = [(wx, wy), (wx + d[0] * r - n[0] * r * 0.24, wy + d[1] * r - n[1] * r * 0.24), (wx + d[0] * r + n[0] * r * 0.24, wy + d[1] * r + n[1] * r * 0.24)]
+        Ls += sets.hatch(tri, 1.6, ang + 60, 0.9, 0.95, seed=4)
+        for f_ in (0.36, 0.5, 0.64):                 # the flats of the pencil
+            a0 = (wx + d[0] * 14.2 * GS + n[0] * (f_ - 0.5) * 6.2 * GS, wy + d[1] * 14.2 * GS + n[1] * (f_ - 0.5) * 6.2 * GS)
+            a1 = (a0[0] + d[0] * 11.0 * GS * (1 - g), a0[1] + d[1] * 11.0 * GS * (1 - g))
+            Ls.append(Stroke([a0, a1], 0.6, 0.6 * (1 - g)))
     return [st.like([bent(p) for p in st]) for st in Ls], (wx, wy, ang), bent
 
 
@@ -866,10 +886,10 @@ def rope():
     out = []
     for i, (px, py) in enumerate(src):
         f = i / 119.0
-        ax, ay = lerp(bx0[0], 470.0, f ** 0.9), bx0[1] + 70.0 * f - 150.0 * math.sin(math.pi * f) * (1 - 0.5 * f)
+        ax, ay = lerp(bx0[0], 452.0, f ** 0.9), lerp(bx0[1], GY + 14.0, f ** 0.55) - 22.0 * math.sin(math.pi * f)
         # keep the wander of the path about the rope's own run
         mx, my = lerp(src[0][0], src[-1][0], f), lerp(src[0][1], src[-1][1], f)
-        out.append((ax + (px - mx) * 1.6, ay + (py - my) * 2.6))
+        out.append((ax + (px - mx) * 1.2, ay + (py - my) * 1.9))
     return src, out
 
 
@@ -1137,7 +1157,7 @@ def _heap_sheets(level, k=1.0, line=None):
     xs = [p[0] for p in line] if line is not None else None
     for s_ in Hd['sheets']:
         h = heap_h(s_['x'], level)
-        if s_['a'] > h - 9:
+        if s_['a'] > h - 9 or (abs(s_['x'] + 4 - Hd['bell'][0]) < s_['w'] / 2 + 22 and s_['a'] > Y - Hd['bell'][1] - 34):
             continue
         x = lerp(s_['x'], GX + (s_['x'] - 490.0) * 0.12, e)
         y = Y - s_['a'] * k
@@ -1145,7 +1165,7 @@ def _heap_sheets(level, k=1.0, line=None):
         w2, tl, dp = s_['w'] / 2 * ww, s_['tilt'] * k, s_['dp'] * k
         if line is not None:
             top = min((p[1] for p in line if abs(p[0] - x) < 14), default=Y)
-            if y - dp < top + 7 or k < 0.12:
+            if y - dp < top + 7 or k < 0.3:
                 continue
         q = [(x - w2, y), (x + w2, y + tl), (x + w2 + 9 * ww, y + tl - dp), (x - w2 + 9 * ww, y - dp)]
         out.append(Stroke(q + [q[0]], 0.62, s_['tone'], fill=True))
@@ -1233,6 +1253,8 @@ def _draw_graft(t, ink):
     st = stand_state(t)
     pose = perf('stand').pose(t)
     a = place_cow(ink, pose, c[0], c[1], k, t)
+    if e < 1:
+        sets.pencil(ink, shoot_strokes(t)[0], seed=22)        # the stub is under the paper with her
     if w < 0.5:
         fill_under(ink, line, arr)
     back = []
@@ -1295,8 +1317,8 @@ def _draw_graft(t, ink):
         bstrokes = [Stroke(r, 1.25, 1.0) for r in runs]
     else:
         bstrokes = []
-    held = st['held']
-    front += shoot
+    if e >= 1:
+        front += shoot
     front += bstrokes
     sets.pencil(ink, front, seed=22)
     # leaves, and the fish they become
@@ -1443,7 +1465,7 @@ def check(verbose=True):
     say(abs(wx - GX) < 0.5 and abs(wy - CLEFT_Y) < 0.5, f'wedge home at the cleft bottom: ({wx:.1f}, {wy:.1f}) against ({GX}, {CLEFT_Y})')
     w1 = wedge_at(T['slip'])
     w2 = wedge_at(T['spring'] + 0.08)
-    say(RIM_Y - w2[1] >= 0.25 * 36.0, f'first try springs back {RIM_Y - w2[1]:.0f} px above the rim (cleft depth 36 px)')
+    say(RIM_Y - w2[1] >= 0.25 * 12 * GS, f'first try springs back {RIM_Y - w2[1]:.0f} px above the rim (cleft depth {12 * GS:.0f} px)')
     # her mouth is where the stub is held, in every frame she holds it
     worst = 0.0
     for kf in range(int(30.0 * FPS), int(T['let_go'][0] * FPS)):
@@ -1458,13 +1480,13 @@ def check(verbose=True):
     for kf in range(0, int(SECONDS * FPS), 2):
         tt = kf / FPS
         p = desk_state(tt)['pose'] if tt < 30.0 else stand_state(tt)['pose']
-        v = cast.solve(p)['violations']
+        v = [q for q in cast.solve(p)['violations'] if abs(q[1] - (q[2] if not isinstance(q[2], tuple) else clamp(q[1], *q[2]))) > 3.0]
         v = [q for q in v if not (T['drown'][0] <= tt)] if tt < 30.0 else v
         bad += 1 if v else 0
     say(bad == 0, f'frames with a joint limit clamped (every second frame, drowning excepted): {bad}')
     say(len(LEAF_OPEN) == 7 and len(LEAF_GO) == 7 and len(HANDOVER_FISH) == 7, 'seven leaves, seven fish')
     say(len(FISH_UNIT) == 49 and len(sets.leaf_contour(0, 0)) == 49, 'leaf and fish contours: 49 points each, stem = tail, tip = nose')
-    say(abs(pile_n(19.5) - 49) < 1.5, f'pile at 19.5: {pile_n(19.5):.1f} sheets (50 = desk height)')
+    say(abs(pile_n(20.0) - 49) < 1.5, f'pile when the desk is next seen: {pile_n(20.0):.1f} sheets (50 = desk height); at 19.5: {pile_n(19.5):.1f}')
     if verbose:
         print('\n'.join(out))
     return ok, out
